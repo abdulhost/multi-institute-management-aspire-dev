@@ -51,22 +51,103 @@ function institute_dashboard_shortcode() {
                 <h4 class="institute-title"><?php echo esc_html($title); ?></h4>
             </div>
             <ul>
-                <li class="active" data-section="dashboard">
-                    <span class="icon">🏠</span>
-                    <!-- <span class="text">Dashboard</span> -->
-                     <a href="#dashboard">Dashboard</a>
-                </li>
-                <li data-section="students">
-                    <span class="icon">👨‍🎓</span>
-                    <!-- <span class="text">Students</span> -->
-                    <a href="#students">Students</a>
-
-                </li>
-                <li data-section="classes">
-                    <span class="icon">📚</span>
-                    <a href="#classes">Class</a>
-                </li>
-            </ul>
+            <li class="active" data-section="dashboard">
+                <span class="icon">🏠</span>
+                <a href="#dashboard">Dashboard</a>
+            </li>
+            <li class="has-submenu" data-section="students">
+                <span class="icon">👨‍🎓</span>
+                <a href="#students">Students</a>
+                <ul class="submenu">
+                    <li data-section="add-students"><a href="#add-students">Add Students</a></li>
+                    <li data-section="edit-students"><a href="#edit-students">Edit Students</a></li>
+                </ul>
+            </li>
+            <li class="has-submenu" data-section="classes">
+                <span class="icon">📚</span>
+                <a href="#classes">Classes</a>
+                <ul class="submenu">
+                    <li data-section="add-class"><a href="#add-class">Add Class</a></li>
+                    <li data-section="student-count-class"><a href="#student-count-class">Student Count</a></li>
+                    <li data-section="edit-class"><a href="#edit-class">Edit Class/Section</a></li>
+                    <li data-section="delete-class"><a href="#delete-class">Delete Class/Section</a></li>
+                </ul>
+            </li>
+            <li class="has-submenu" data-section="reports">
+                <span class="icon">📚</span>
+                <a href="#studentreports">Student Reports</a>
+                <ul class="submenu">
+                    <li data-section="add-studentreports"><a href="#add-studentreports">Add Student Reports</a></li>
+                    <li data-section="edit-studentreports"><a href="#edit-studentreports">Edit Student Reports</a></li>
+                </ul>
+            </li>
+            <li class="has-submenu" data-section="examreports">
+                <span class="icon">📚</span>
+                <a href="#examreports">Exam Reports</a>
+                <ul class="submenu">
+                    <li data-section="add-examreports"><a href="#add-examreports">Add Exam Reports</a></li>
+                    <li data-section="edit-examreports"><a href="#edit-examreports">Edit Exam Reports</a></li>
+                </ul>
+            </li>
+            <li class="has-submenu" data-section="feesreports">
+                <span class="icon">📚</span>
+                <a href="#feesreports">Fees Reports</a>
+                <ul class="submenu">
+                    <li data-section="add-feesreports"><a href="#add-feesreports">Add Fees Reports</a></li>
+                    <li data-section="edit-feesreports"><a href="#edit-feesreports">Edit Fees Reports</a></li>
+                </ul>
+            </li>
+            <li class="has-submenu" data-section="libraryreports">
+                <span class="icon">📚</span>
+                <a href="#libraryreports">Library</a>
+                <ul class="submenu">
+                    <li data-section="add-libraryreports"><a href="#add-libraryreports">Add Library Reports</a></li>
+                    <li data-section="edit-libraryreports"><a href="#edit-libraryreports">Edit Library Reports</a></li>
+                </ul>
+            </li>
+            <li class="has-submenu" data-section="transportreports">
+                <span class="icon">📚</span>
+                <a href="#transportreports">Transport</a>
+                <ul class="submenu">
+                    <li data-section="add-transportreports"><a href="#add-transportreports">Add Transport Reports</a></li>
+                    <li data-section="edit-transportreports"><a href="#edit-transportreports">Edit Transport Reports</a></li>
+                </ul>
+            </li>
+            <li class="has-submenu" data-section="leave">
+                <span class="icon">📚</span>
+                <a href="#leave">Leave</a>
+                <ul class="submenu">
+                    <li data-section="add-leave"><a href="#add-leave">Add leave </a></li>
+                    <li data-section="edit-leave"><a href="#edit-leave">Edit leave </a></li>
+                </ul>
+            </li>
+            <li class="has-submenu" data-section="communicate">
+                <span class="icon">📚</span>
+                <a href="#communicate">Communicate</a>
+                <ul class="submenu">
+                    <li data-section="noticeboard-communicate"><a href="#noticeboard-communicate">Notice Board </a></li>
+                    <li data-section="sendemails-communicate"><a href="#sendemails-communicate">Send Emails</a></li>
+                    <li data-section="event-communicate"><a href="#event-communicate">Event</a></li>
+                    <li data-section="calender-communicate"><a href="#calender-communicate">Calender</a></li>
+                    <li data-section=""><a href="#">Email Template</a></li>
+                    <li data-section=""><a href="#">Sms Template</a></li>
+                </ul>
+            </li>
+            <li class="has-submenu" data-section="adminsection">
+                <span class="icon">📚</span>
+                <a href="#adminsection">Admin Section</a>
+                <ul class="submenu">
+                    <li data-section=""><a href="#">Addmission Query</a></li>
+                    <li data-section=""><a href="#">Visitors Book</a></li>
+                    <li data-section=""><a href="#">Complaints</a></li>
+                    <li data-section=""><a href="#">Phone Call Logs</a></li>
+                    <li data-section=""><a href="#">Certificates</a></li>
+                    <li data-section=""><a href="#">Add Certificates</a></li>
+                    <li data-section=""><a href="#">Add ID Card</a></li>
+                    <li data-section=""><a href="#">ID cards </a></li>
+                </ul>
+            </li>
+        </ul>
         </div>
 
         <!-- Main Content -->
@@ -77,14 +158,34 @@ function institute_dashboard_shortcode() {
             </div>
 
             <!-- Students Section -->
-            <div id="students" class="section">
-                <?php echo render_students_section(); ?>
-            </div>
-
-            <!-- Classes Section -->
-            <div id="classes" class="section">
-                <?php echo render_classes_section(); ?>
-            </div>
+        <div id="students" class="section">
+            <?php echo render_students_section(); ?>
+        </div>
+        <!-- Add Students Section -->
+        <div id="add-students" class="section">
+            <?php echo render_addstudents_section(); ?>
+        </div>
+        <!-- Edit Students Section -->
+        <div id="edit-students" class="section">
+            <?php echo render_editstudents_section(); ?>
+        </div>
+        <!-- Classes Section -->
+        <div id="classes" class="section">
+            <?php echo render_classes_section(); ?>
+        </div>
+        <!-- Add Class Section -->
+        <div id="add-class" class="section">
+            <?php echo render_addclass_section(); ?>
+        </div>
+        <div id="edit-class" class="section">
+            <?php echo render_editclass_section(); ?>
+        </div>
+        <div id="student-count-class" class="section">
+            <?php echo render_student_count_class_section(); ?>
+        </div>
+        <div id="delete-class" class="section">
+            <?php echo render_delete_class_class_section(); ?>
+        </div>
         </div>
     </div>
 
@@ -113,18 +214,20 @@ function render_dashboard_section($post_id, $logo, $title) {
             <?php endif; ?>
         </div>
 
-        <h2><?php echo esc_html($title); ?></h2>
+        <h2 style="text-transform:capitalize"><?php echo esc_html($title); ?></h2>
 
         <!-- Editable Fields -->
         <form method="POST" enctype="multipart/form-data">
             <label for="institute_name">Institute Name</label>
             <input type="text" name="institute_name" value="<?php echo esc_html($title); ?>" required />
-
+<br>
             <label for="mobile_number">Mobile Number</label>
             <input type="text" name="mobile_number" value="<?php echo get_field('mobile_number', $post_id); ?>" required />
+            <br>
 
             <label for="email_id">Email ID</label>
             <input type="email" name="email_id" value="<?php echo get_field('email_id', $post_id); ?>" required />
+            <br>
 
             <!-- Editable Logo File Upload (hidden by default) -->
             <input type="file" name="institute_logo" accept="image/*" id="logo-file-input" style="display: none;" onchange="previewLogo(event)" />
@@ -194,14 +297,62 @@ function render_students_section() {
     include plugin_dir_path(__FILE__) . 'assets/students.php'; // Ensure the path is correct
     return render_students_section_content(); // Make sure you return the function's output instead of echoing
 }
+function render_addstudents_section() {
+    // return '<div class="classes-section"><h2>Classes</h2><p>Manage your classes here.</p></div>';
+
+    ob_start();
+
+    // Include the addstudents.php file from the plugin's assets folder
+    include plugin_dir_path(__FILE__) . 'assets/add-students.php'; // Ensure the path is correct
+
+    // Get the captured HTML content and return it
+    return ob_get_clean(); // Make sure you return the function's output instead of echoing
+}
+function render_editstudents_section() {
+    ob_start();
+    include plugin_dir_path(__FILE__) . 'assets/edit-students.php'; 
+    return ob_get_clean(); 
+}
 
 // Function to render the Classes section
 function render_classes_section() {
-    return '<div class="classes-section"><h2>Classes</h2><p>Manage your classes here.</p></div>';
-}
+    ob_start();
 
-// Enqueue custom CSS and JavaScript
-function institute_dashboard_scripts() {
+    // Include the addstudents.php file from the plugin's assets folder
+    include plugin_dir_path(__FILE__) . 'assets/classes.php'; // Ensure the path is correct
+
+    // Get the captured HTML content and return it
+    return ob_get_clean();}
+// Function to render the Classes section
+function render_editclass_section() {
+    ob_start();
+
+    // Include the addstudents.php file from the plugin's assets folder
+    include plugin_dir_path(__FILE__) . 'assets/edit-classes.php'; // Ensure the path is correct
+
+    // Get the captured HTML content and return it
+    return ob_get_clean();}
+// Function to render the Classes section
+function render_addclass_section() {
+    ob_start();
+
+    // Include the addstudents.php file from the plugin's assets folder
+    include plugin_dir_path(__FILE__) . 'assets/add-classes.php'; // Ensure the path is correct
+
+    // Get the captured HTML content and return it
+    return ob_get_clean();}
+    function render_student_count_class_section() {
+        ob_start();
+        include plugin_dir_path(__FILE__) . 'assets/student-count-class.php'; 
+        return ob_get_clean(); 
+    }
+    function render_delete_class_class_section() {
+        ob_start();
+        include plugin_dir_path(__FILE__) . 'assets/delete-class.php'; 
+        return ob_get_clean(); 
+    }
+
+    function institute_dashboard_scripts() {
     wp_enqueue_style('institute-dashboard-style', plugin_dir_url(__FILE__) . '/css/style.css');
     wp_enqueue_script('institute-dashboard-script', plugin_dir_url(__FILE__) . '/js/js.js', array('jquery'), null, true);
     wp_add_inline_script('institute-dashboard-script', '

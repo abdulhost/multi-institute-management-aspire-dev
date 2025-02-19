@@ -1,4 +1,37 @@
 <!-- edit students file -->
+<?php
+    // Fetch the current user and their admin_id
+    $current_user = wp_get_current_user();
+    $admin_id = $current_user->user_login;
+
+    // Query the Educational Center based on the admin_id
+    $educational_center = get_posts(array(
+        'post_type' => 'educational-center',
+        'meta_key' => 'admin_id',
+        'meta_value' => $admin_id,
+        'posts_per_page' => 1, // Limit to 1 post
+    ));
+
+    // Check if there is an Educational Center for this admin
+    if (empty($educational_center)) {
+        return '<p>No Educational Center found for this Admin ID.</p>';
+    }
+
+    $educational_center_id = get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
+
+    // Handle form submission to add student
+   // Include WordPress media handling functions
+require_once(ABSPATH . 'wp-admin/includes/image.php');
+?>
+    <!-- Search Form -->
+
+<div class="form-group search-form">
+    <div class="input-group">
+        <span class="input-group-addon">Search</span>
+        <input type="text" id="search_text" placeholder="Search by Student Details" class="form-control" />
+    </div>
+</div>
+
 <!-- Student List Table -->
 <div id="result">
     <h3>Student List</h3>
@@ -28,7 +61,7 @@
                     $student_id = get_post_meta($student->ID, 'student_id', true);
                     $student_name = $student->post_title;
                     $student_email = get_post_meta($student->ID, 'student_email', true);
-                    $student_class = get_post_meta($student->ID, 'student_class', true);
+                    $student_class = get_post_meta($student->ID, 'class', true);
 
                     echo '<tr class="student-row">
                             <td>' . esc_html($student_id) . '</td>
@@ -48,6 +81,7 @@
         </tbody>
     </table>
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 
 <!-- Edit Student Modal -->
 <div id="edit-student-modal" class="modal">
@@ -56,10 +90,10 @@
         <h3>Edit Student</h3>
         <form id="edit-student-form" method="POST">
             <label for="edit_student_name">Student Name</label>
-            <input type="text" id="edit_student_name" name="student_name" required>
+            <input type="text" id="edit_student_name_" name="student_name" required>
 
             <label for="edit_student_email">Student Email</label>
-            <input type="email" id="edit_student_email" name="student_email">
+            <input type="email" id="edit_student_email_" name="student_email">
 
             <label for="edit_student_class">Class</label>
             <input type="text" id="edit_student_class" name="student_class">

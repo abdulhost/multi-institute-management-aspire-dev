@@ -3,12 +3,54 @@
 <!-- addstudents file -->
 <!-- Add Student Button -->
 <button id="add-student-btn" onclick="toggleForm()">+ Add Student</button>
+<?php
+global $wpdb;
+    $table_name = $wpdb->prefix . 'class_sections';
+    $charset_collate = $wpdb->get_charset_collate();
+
+    // Check if the table exists before creating it
+    if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+        $sql = "CREATE TABLE $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            class_name varchar(255) NOT NULL,
+            sections text NOT NULL,
+            PRIMARY KEY (id)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+
+
+// Fetch all classes and sections
+$class_sections = $wpdb->get_results("SELECT * FROM $table_name", ARRAY_A);
+?>
 
 <!-- Add Student Form (Hidden by default) -->
 <div id="add-student-form" style="display: none;">
     <h3>Add Student</h3>
     <form method="POST">
 
+  <!-- Class Dropdown -->
+  <label for="class_name">Class:</label>
+        <select name="class_name" id="class_name" required>
+            <option value="">Select Class</option>
+            <?php foreach ($class_sections as $row) : ?>
+                <option value="<?php echo esc_attr($row['class_name']); ?>"><?php echo esc_html($row['class_name']); ?></option>
+            <?php endforeach; ?>
+        </select>
+
+        <!-- Section Dropdown -->
+        <label for="section">Section:</label>
+        <select name="section" id="section" required>
+            <option value="">Select Section</option>
+            <?php foreach ($class_sections as $row) : ?>
+                <?php $sections = explode(',', $row['sections']); ?>
+                <?php foreach ($sections as $section) : ?>
+                    <option value="<?php echo esc_attr($section); ?>"><?php echo esc_html($section); ?></option>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
+        </select>
 
     <label for="admission_number">Admission Number</label>
     <input type="text" name="admission_number" required>
@@ -209,6 +251,34 @@ if ($field): ?>
 
 <!-- JavaScript to dynamically populate sections based on selected class -->
 <script>
+jQuery(document).ready(function($) {
+    // Preload sections for all classes
+    var sectionsData = {};
+    <?php
+    foreach ($class_sections as $row) {
+        echo 'sectionsData["' . esc_attr($row['class_name']) . '"] = ' . json_encode(explode(',', $row['sections'])) . ';';
+    }
+    ?>
+
+    // Update sections dropdown when class is selected
+    $('#class_name').change(function() {
+        var selectedClass = $(this).val();
+        var sectionSelect = $('#section');
+
+        if (selectedClass && sectionsData[selectedClass]) {
+            sectionSelect.html('<option value="">Select Section</option>');
+            sectionsData[selectedClass].forEach(function(section) {
+                sectionSelect.append('<option value="' + section + '">' + section + '</option>');
+            });
+            sectionSelect.prop('disabled', false); // Enable the dropdown
+        } else {
+            sectionSelect.html('<option value="">Select Class First</option>').prop('disabled', true); // Disable the dropdown
+        }
+    });
+
+    // Initialize the sections dropdown on page load
+    $('#class_name').trigger('change');
+});
 jQuery(document).ready(function($) {
     // Preload sections for all classes
     var sectionsData = {};

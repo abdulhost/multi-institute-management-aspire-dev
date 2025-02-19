@@ -151,7 +151,88 @@ add_action('template_redirect', 'restrict_institute_dashboard_access');
 
 require_once plugin_dir_path(__FILE__) . 'dashboard.php';
 
+// Add admin menu for managing classes and sections
+add_action('admin_menu', 'class_section_admin_menu');
 
+function class_section_admin_menu() {
+    add_menu_page(
+        'Class Section Manager',
+        'Class Sections',
+        'manage_options',
+        'class-section-manager',
+        'class_section_admin_page',
+        'dashicons-list-view',
+        6
+    );
+}
+
+// Admin page to add new classes and sections
+function class_section_admin_page() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'class_sections';
+
+    // Handle form submission
+    if (isset($_POST['submit_class_section'])) {
+        $class_name = sanitize_text_field($_POST['class_name']);
+        $sections = sanitize_text_field($_POST['sections']);
+
+        if (!empty($class_name) && !empty($sections)) {
+            // Insert new class and sections into the table
+            $wpdb->insert(
+                $table_name,
+                array(
+                    'class_name' => $class_name,
+                    'sections' => $sections,
+                )
+            );
+            echo '<div class="notice notice-success"><p>Class and sections added successfully!</p></div>';
+        } else {
+            echo '<div class="notice notice-error"><p>Please fill in all fields.</p></div>';
+        }
+    }
+
+    // Fetch all classes and sections
+    $class_sections = $wpdb->get_results("SELECT * FROM $table_name", ARRAY_A);
+
+    ?>
+    <div class="wrap">
+        <h1>Class Section Manager</h1>
+        <form method="post" action="">
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><label for="class_name">Class Name</label></th>
+                    <td><input name="class_name" type="text" id="class_name" class="regular-text" required></td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="sections">Sections (comma-separated)</label></th>
+                    <td><input name="sections" type="text" id="sections" class="regular-text" required></td>
+                </tr>
+            </table>
+            <p class="submit">
+                <input type="submit" name="submit_class_section" class="button-primary" value="Add Class & Sections">
+            </p>
+        </form>
+
+        <h2>Existing Classes and Sections</h2>
+        <table class="wp-list-table widefat fixed striped">
+            <thead>
+                <tr>
+                    <th>Class Name</th>
+                    <th>Sections</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($class_sections as $row) : ?>
+                    <tr>
+                        <td><?php echo esc_html($row['class_name']); ?></td>
+                        <td><?php echo esc_html($row['sections']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+}
 // Hook to initialize the plugin
 // add_action('init', 'custom_institute_dashboard_init');
 
