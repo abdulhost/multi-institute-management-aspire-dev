@@ -1,0 +1,535 @@
+:root {
+    --primary-color: #87CEEB; /* Sky Blue */
+    --secondary-color: #F8F8FF; /* Ghost White */
+    --accent-color: #4682B4; /* Steel Blue */
+    --text-color: #333;
+    --hover-color: #B0E0E6; /* Powder Blue */
+    --active-color: #ADD8E6; /* Light Blue */
+    /* --secondary-color: #f9f9f9; Light Gray Background */
+    /* --accent-color: #005bb5; Darker Blue for Hover Effects */
+    /* --text-color: #333333; Dark Gray Text */
+    /* --border-color: #dddddd; Light Gray Border */
+    --border-color: #cfcfcf; 
+    --shadow-color: rgba(0, 0, 0, 0.1); /* Subtle Shadow */
+    --hover-shadow-color: rgba(0, 115, 230, 0.2); /* Blue Shadow for Hover */
+    --success-color: #2e7d32; /* Green for Success Messages */
+    --error-color: #c62828; /* Red for Error Messages */
+}
+
+/* Dashboard Wrapper */
+.institute-dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--secondary-color);
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background: var(--primary-color);
+    color: var(--text-color);
+    padding: 20px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li {
+    display: flex;
+    /* align-items: center; */
+    padding: 2px;
+    /* margin-bottom: 10px; */
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s;
+    flex-direction: column;
+    align-content: flex-start;
+
+}
+
+.sidebar li.active,
+.sidebar li:hover {
+    background: var(--hover-color);
+}
+
+.sidebar .icon {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.sidebar .text {
+    font-size: 16px;
+}
+
+/* Subclasses */
+.sidebar .subclasses {
+    display: none;
+    margin-left: 20px;
+}
+
+.sidebar li.active .subclasses {
+    display: block;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 20px;
+    background: var(--secondary-color);
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+/* Dashboard Section */
+.institute-dashboard-container {
+    /* max-width: 600px; */
+    margin:  auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Students and Classes Sections */
+.students-section,
+.classes-section {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo-title-section {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.logo-title-section h4 {
+    color: var(--text-color);
+}
+
+.edit-logo-icon,
+.upload-logo-icon,
+.upload-logo-text {
+    cursor: pointer;
+}
+
+.sidebar a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.sidebar li.active a {
+    color: var(--text-color);
+    font-weight: 800;
+    transform: scale(1.1);
+    margin-left: 8%;
+}
+/* Subclasses */
+.sidebar .subclasses {
+    display: none;
+    margin-left: 20px;
+}
+
+.sidebar li.active .subclasses,
+.sidebar li:hover .subclasses {
+    display: block;
+}
+
+
+
+/* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 10000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin:  auto; /* 5% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+    max-width: 500px; /* Maximum width */
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.close-modal {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+    color: black;
+    text-decoration: none;
+}
+
+/* Form Styles */
+#add-student-form, #edit-student-form {
+    margin-top: 20px;
+}
+
+input, #edit-student-form input {
+    width: 100%;
+    padding: 10px;
+    margin: 20px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 0;
+}
+
+#add-student-form label, #edit-student-form label {
+    font-weight: bold;
+}
+
+/* Button Styles */
+#add-student-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+#add-student-btn:hover {
+    background-color: #45a049;
+}
+
+/* Table Styles */
+#students-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#students-table th, #students-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+#students-table th {
+    background-color: #f2f2f2;
+}
+
+#students-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Search Form Styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+}
+
+.input-group-addon {
+    padding: 10px;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    border-right: none;
+    border-radius: 5px 0 0 5px;
+}
+
+.form-control {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-left: none;
+    border-radius: 0 5px 5px 0;
+}
+
+/* Form Container */
+#add-student-form {
+    /* max-width: 800px; */
+    margin: auto;
+    padding: 30px;
+    background: #ffffff; /* White Background */
+    border-radius: 12px; /* Rounded Corners */
+    box-shadow: 0 8px 24px var(--shadow-color); /* Soft 3D Shadow */
+    font-family: 'Arial', sans-serif;
+    color: var(--text-color);
+}
+
+/* Form Heading */
+ h3 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 24px;
+    color: var(--text-color);
+    font-weight: 600; /* Semi-Bold */
+}
+
+/* Form Row (Label + Field) */
+.form-row {
+    display: flex;
+    align-items: center; /* Align Label and Field Vertically */
+    margin-bottom: 20px;
+}
+
+/* Labels */
+ label {
+    flex: 1; /* Take Up 1 Part of the Row */
+    /* margin-right: 15px; Space Between Label and Field */
+    font-weight: 600; /* Medium Weight */
+    color: var(--text-color);
+    font-size: 16px;
+    text-align: right; /* Align Label Text to the Right */
+}
+
+/* Input Fields */
+ input[type="text"],
+ input[type="number"],
+ input[type="email"],
+ input[type="date"],input[type="password"],
+ select,
+ textarea {
+    flex: 2; /* Take Up 2 Parts of the Row */
+    padding: 10px;
+ /*    border: 1px solid var(--border-color)!important; Light Gray Border */
+    border-radius: 8px; /* Rounded Corners */
+    background: var(--secondary-color); /* Light Gray Background */
+    font-size: 14px;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+/* Input Fields Hover and Focus */
+ input[type="text"]:hover,
+ input[type="number"]:hover,
+ input[type="email"]:hover,
+ input[type="date"]:hover, input[type="password"]:hover,
+select:hover,
+ textarea:hover,
+ input[type="text"]:focus,
+ input[type="number"]:focus,
+ input[type="email"]:focus,
+input[type="date"]:focus,input[type="password"]:focus,
+ select:focus,
+ textarea:focus {
+    border-color: var(--primary-color); /* Blue Border on Focus */
+    background: #ffffff; /* White Background on Focus */
+    box-shadow: 0 0 0 3px var(--hover-shadow-color); /* Subtle Blue Glow */
+    outline: none;
+}
+
+/* Textarea Specific Styling */
+#add-student-form textarea {
+    resize: vertical; /* Allow Vertical Resizing */
+    min-height: 100px;
+}
+
+/* Select Dropdown Styling */
+ select {
+    margin: 10px;
+    width: 28%;
+    appearance: none; /* Remove Default Arrow */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23555555'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+    margin-left: 0;
+}
+
+/* Submit Button */
+ input[type="submit"] {
+    width: 100%;
+    max-width: 200px; /* Smaller Button */
+    padding: 12px;
+    margin: 20px auto 0 auto; /* Center Button */
+    display: block; /* Ensure Button is Centered */
+    background: var(--primary-color); /* Blue Background */
+    color: #ffffff; /* White Text */
+    border: none;
+    border-radius: 8px; /* Rounded Corners */
+    font-size: 16px;
+    font-weight: 500; /* Medium Weight */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px var(--hover-shadow-color); /* Soft 3D Shadow */
+}
+
+/* Submit Button Hover */
+ input[type="submit"]:hover {
+    background: var(--accent-color); /* Darker Blue on Hover */
+    box-shadow: 0 6px 16px var(--hover-shadow-color); /* Deeper Shadow on Hover */
+    transform: translateY(-2px); /* Slight Lift */
+}
+
+/* File Input Styling */
+ input[type="file"] {
+    flex: 2; /* Take Up 2 Parts of the Row */
+    padding: 10px;
+    border: 1px solid var(--border-color); /* Light Gray Border */
+    border-radius: 8px; /* Rounded Corners */
+    background: var(--secondary-color); /* Light Gray Background */
+    font-size: 14px;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+/* File Input Hover and Focus */
+ input[type="file"]:hover,
+ input[type="file"]:focus {
+    border-color: var(--primary-color); /* Blue Border on Focus */
+    background: #ffffff; /* White Background on Focus */
+    box-shadow: 0 0 0 3px var(--hover-shadow-color); /* Subtle Blue Glow */
+    outline: none;
+}
+
+/* Calendar Input Styling */
+ input[type="date"] {
+    appearance: none; /* Remove Default Styling */
+    /* background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23555555'%3e%3cpath d='M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z'/%3e%3c/svg%3e"); */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+}
+
+/* Error and Success Messages */
+.error-message,
+.success-message {
+    width: 100%;
+    max-width: 400px; /* Shorter Messages */
+    padding: 10px;
+    margin: 0 auto 20px auto; /* Center Messages */
+    display: block; /* Ensure Messages are Centered */
+    border-radius: 8px; /* Rounded Corners */
+    text-align: center;
+    font-weight: 500; /* Medium Weight */
+    font-size: 14px;
+}
+
+.error-message {
+    background: #ffebee; /* Light Red Background */
+    color: var(--error-color); /* Dark Red Text */
+}
+
+.success-message {
+    background: #e8f5e9; /* Light Green Background */
+    color: var(--success-color); /* Dark Green Text */
+}
+/* Form Section Styling */
+.form-section {
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: var(--secondary-color);
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.section-header h4 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--text-color);
+}
+
+.toggle-icon {
+    font-size: 14px;
+    transition: transform 0.3s ease;
+}
+
+.section-content {
+    padding: 15px;
+    background-color: #fff;
+}
+
+/* Rotate toggle icon when section is open */
+.section-header.active .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.e-con >.e-con-inner {
+    gap: var(--row-gap) var(--column-gap);
+    height: 100%;
+    margin: 0 !important;
+    
+    padding-inline-end: 0;
+    padding-inline-start: 0;
+    width: 100%;
+    max-width: 100% !important;
+}
+.e-con {
+    max-width: 100% !important;
+}
+.search-form input{
+    margin:0;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close-modal {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.close-modal:hover {
+    color: #000;
+}
+
+.edit-btn { background-color: #007cba; color: white; }
+        .delete-btn { background-color: #d63638; color: white; }
