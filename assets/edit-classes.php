@@ -86,7 +86,7 @@ include plugin_dir_path(__FILE__) . 'searchbar.php';
                         <th><?php esc_html_e('ID', 'textdomain'); ?></th>
                         <th><?php esc_html_e('Class Name', 'textdomain'); ?></th>
                         <th><?php esc_html_e('Sections', 'textdomain'); ?></th>
-                        <th><?php esc_html_e('Actions', 'textdomain'); ?></th>
+                        <th><?php esc_html_e('Edit', 'textdomain'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -106,11 +106,6 @@ include plugin_dir_path(__FILE__) . 'searchbar.php';
                                     onclick="openEditModal(this)">
                                     <?php esc_html_e('Edit', 'textdomain'); ?>
                                 </button>
-                                <a href="<?php echo esc_url(add_query_arg(array('action' => 'delete', 'id' => $row->id))); ?>" 
-                                   class="button delete-btn" 
-                                   onclick="return deleteRecord(<?php echo esc_js($row->id); ?>)">
-                                   <?php esc_html_e('Delete', 'textdomain'); ?>
-                                </a>
                             </td>
                         </tr>
                         <?php
@@ -167,13 +162,6 @@ include plugin_dir_path(__FILE__) . 'searchbar.php';
 
         function closeEditModal() {
             document.getElementById('editModal').style.display = 'none';
-        }
-
-        function deleteRecord(id) {
-            if (confirm('Are you sure you want to delete this record?')) {
-                return true;
-            }
-            return false;
         }
 
         document.getElementById('editForm').addEventListener('submit', function(e) {

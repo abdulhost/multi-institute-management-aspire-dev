@@ -127,7 +127,7 @@ function custom_login_processing() {
 add_action('template_redirect', 'custom_login_processing');
 
 function restrict_dashboard_access() {
-    if (is_page('institute-dashboard') || is_page('edit-class-section')) {
+    if (is_page('institute-dashboard') || is_page('edit-class-section')|| is_page('delete-class-section')|| is_page('attendance-management')|| is_page('attendance-entry-form')) {
         
         // Check if the user is logged in
         if (!is_user_logged_in()) {
@@ -243,6 +243,70 @@ function class_section_admin_page() {
 }
 
 
+include plugin_dir_path(__FILE__) . 'assets/edit-classes.php';
+include plugin_dir_path(__FILE__) . 'assets/delete-class.php';
+include plugin_dir_path(__FILE__) . 'assets/attendance/attendance-management.php';
+include plugin_dir_path(__FILE__) . 'assets/attendance/insert-attendance.php';
+
+function create_custom_user_roles() {
+    // Check if 'student' role exists, if not create it
+    if ( !get_role( 'student' ) ) {
+        add_role( 'student', 'Student', array(
+            'read' => true, // Allow the user to read posts and pages
+            'edit_posts' => false, // Disable editing posts
+            'publish_posts' => false, // Disable publishing posts
+            'edit_pages' => false, // Disable editing pages
+            'manage_options' => false, // Disable admin options
+        ));
+    }
+
+    // Check if 'parent' role exists, if not create it
+    if ( !get_role( 'parent' ) ) {
+        add_role( 'parent', 'Parent', array(
+            'read' => true,
+            'edit_posts' => false,
+            'publish_posts' => false,
+            'edit_pages' => false,
+            'manage_options' => false,
+        ));
+    }
+
+    // Check if 'teacher' role exists, if not create it
+    if ( !get_role( 'teacher' ) ) {
+        add_role( 'teacher', 'Teacher', array(
+            'read' => true,
+            'edit_posts' => true,
+            'publish_posts' => false,
+            'edit_pages' => false,
+            'manage_options' => false,
+        ));
+    }
+
+    // Check if 'accountant' role exists, if not create it
+    if ( !get_role( 'accountant' ) ) {
+        add_role( 'accountant', 'Accountant', array(
+            'read' => true,
+            'edit_posts' => false,
+            'publish_posts' => false,
+            'edit_pages' => false,
+            'manage_options' => false,
+        ));
+    }
+
+    // Check if 'institute_admin' role exists, if not create it
+    if ( !get_role( 'institute_admin' ) ) {
+        add_role( 'institute_admin', 'Institute Admin', array(
+            'read' => true,
+            'edit_posts' => true,
+            'publish_posts' => true,
+            'edit_pages' => true,
+            'manage_options' => true, // Grant access to manage admin options
+        ));
+    }
+}
+add_action( 'init', 'create_custom_user_roles' );
+
+
 // function restrict_edit_class_section_access() {
 //     if (is_page('edit-class-section')) {
         
@@ -264,7 +328,6 @@ function class_section_admin_page() {
 // }
 
 // add_action('template_redirect', 'restrict_edit_class_section_access');
-include plugin_dir_path(__FILE__) . 'assets/edit-classes.php';
 // Hook to initialize the plugin
 // add_action('init', 'custom_institute_dashboard_init');
 

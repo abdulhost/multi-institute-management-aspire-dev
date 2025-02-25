@@ -38,29 +38,34 @@ function institute_dashboard_shortcode() {
     ?>
 
     <div class="institute-dashboard-wrapper">
+
+    <?php
+            // $active_section = 'record-attendance';
+            include(plugin_dir_path(__FILE__) . 'assets/sidebar.php');
+            ?>
         <!-- Sidebar -->
-        <div class="sidebar">
+        <!-- <div class="sidebar">
             <div class="logo-title-section">
-                <!-- Institute Logo -->
+                Institute Logo
                 <?php if ($logo): ?>
                     <div class="institute-logo">
                         <img src="<?php echo esc_url($logo['url']); ?>" alt="Institute Logo" style="border-radius: 50%; width: 60px; height: 60px; object-fit: cover;">
                     </div>
                 <?php endif; ?>
-                <!-- Institute Title -->
+                Institute Title
                 <h4 class="institute-title"><?php echo esc_html($title); ?></h4>
             </div>
             <ul>
             <li class="active" data-section="dashboard">
                 <span class="icon">🏠</span>
-                <a href="#dashboard">Dashboard</a>
+                <a href="/institute-dashboard/#dashboard">Dashboard</a>
             </li>
             <li class="has-submenu" data-section="students">
                 <span class="icon">👨‍🎓</span>
-                <a href="#students">Students</a>
+                <a href="/institute-dashboard/#students">Students</a>
                 <ul class="submenu">
-                    <li data-section="add-students"><a href="#add-students">Add Students</a></li>
-                    <li data-section="edit-students"><a href="#edit-students">Edit Students</a></li>
+                    <li data-section="add-students"><a href="/institute-dashboard/#add-students">Add Students</a></li>
+                    <li data-section="edit-students"><a href="/institute-dashboard/#edit-students">Edit Students</a></li>
                 </ul>
             </li>
             <li class="has-submenu" data-section="classes">
@@ -70,7 +75,7 @@ function institute_dashboard_shortcode() {
                     <li data-section="add-class"><a href="#add-class">Add Class</a></li>
                     <li data-section="student-count-class"><a href="#student-count-class">Student Count</a></li>
                     <li data-section="edit-class"><a href="<?php echo esc_url(home_url('/edit-class-section')); ?>">Edit Class/Section</a></li>
-                    <li data-section="delete-class"><a href="#delete-class">Delete Class/Section</a></li>
+                    <li data-section="delete-class"><a href="<?php echo esc_url(home_url('/delete-class-section')); ?>">Delete Class/Section</a></li>
                 </ul>
             </li>
             <li class="has-submenu" data-section="reports">
@@ -148,43 +153,9 @@ function institute_dashboard_shortcode() {
                 </ul>
             </li>
         </ul>
-        </div>
+        </div> -->
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Dashboard Section (Default Active) -->
-            <div id="dashboard" class="section active">
-                <?php echo render_dashboard_section($post_id, $logo, $title); ?>
-            </div>
-
-            <!-- Students Section -->
-        <div id="students" class="section">
-            <?php echo render_students_section(); ?>
-        </div>
-        <!-- Add Students Section -->
-        <div id="add-students" class="section">
-            <?php echo render_addstudents_section(); ?>
-        </div>
-        <!-- Edit Students Section -->
-        <div id="edit-students" class="section">
-            <?php echo render_editstudents_section(); ?>
-        </div>
-        <!-- Classes Section -->
-        <div id="classes" class="section">
-            <?php echo render_classes_section(); ?>
-        </div>
-        <!-- Add Class Section -->
-        <div id="add-class" class="section">
-            <?php echo render_addclass_section(); ?>
-        </div>
-        
-        <div id="student-count-class" class="section">
-            <?php echo render_student_count_class_section(); ?>
-        </div>
-        <div id="delete-class" class="section">
-            <?php echo render_delete_class_class_section(); ?>
-        </div>
-        </div>
+       
     </div>
 
     <?php
@@ -290,85 +261,33 @@ function render_dashboard_section($post_id, $logo, $title) {
     return ob_get_clean();
 }
 
-// Function to render the Students section
-function render_students_section() {
-    include plugin_dir_path(__FILE__) . 'assets/students.php'; // Ensure the path is correct
-    return render_students_section_content(); // Make sure you return the function's output instead of echoing
-}
-function render_addstudents_section() {
-    // return '<div class="classes-section"><h2>Classes</h2><p>Manage your classes here.</p></div>';
-
-    ob_start();
-
-    // Include the addstudents.php file from the plugin's assets folder
-    include plugin_dir_path(__FILE__) . 'assets/add-students.php'; // Ensure the path is correct
-
-    // Get the captured HTML content and return it
-    return ob_get_clean(); // Make sure you return the function's output instead of echoing
-}
-function render_editstudents_section() {
-    ob_start();
-    include plugin_dir_path(__FILE__) . 'assets/edit-students.php'; 
-    return ob_get_clean(); 
-}
-
-// Function to render the Classes section
-function render_classes_section() {
-    ob_start();
-
-    // Include the addstudents.php file from the plugin's assets folder
-    include plugin_dir_path(__FILE__) . 'assets/classes.php'; // Ensure the path is correct
-
-    // Get the captured HTML content and return it
-    return ob_get_clean();}
-// Function to render the Classes section
-
-// Function to render the Classes section
-function render_addclass_section() {
-    ob_start();
-
-    // Include the addstudents.php file from the plugin's assets folder
-    include plugin_dir_path(__FILE__) . 'assets/add-classes.php'; // Ensure the path is correct
-
-    // Get the captured HTML content and return it
-    return ob_get_clean();}
-    function render_student_count_class_section() {
-        ob_start();
-        include plugin_dir_path(__FILE__) . 'assets/student-count-class.php'; 
-        return ob_get_clean(); 
-    }
-    function render_delete_class_class_section() {
-        ob_start();
-        include plugin_dir_path(__FILE__) . 'assets/delete-class.php'; 
-        return ob_get_clean(); 
-    }
 
     function institute_dashboard_scripts() {
     wp_enqueue_style('institute-dashboard-style', plugin_dir_url(__FILE__) . '/css/style.css');
     wp_enqueue_script('institute-dashboard-script', plugin_dir_url(__FILE__) . '/js/js.js', array('jquery'), null, true);
-    wp_add_inline_script('institute-dashboard-script', '
-       jQuery(document).ready(function() {
-    function showSection(section) {
-        jQuery(".section").removeClass("active");
-        jQuery("#" + section).addClass("active");
-        jQuery(".sidebar li").removeClass("active");
-        jQuery("[data-section=" + section + "]").addClass("active");
-    }
+//     wp_add_inline_script('institute-dashboard-script', '
+//        jQuery(document).ready(function() {
+//     function showSection(section) {
+//         jQuery(".section").removeClass("active");
+//         jQuery("#" + section).addClass("active");
+//         jQuery(".sidebar li").removeClass("active");
+//         jQuery("[data-section=" + section + "]").addClass("active");
+//     }
 
-    var hash = window.location.hash.substring(1);
-    if (hash) {
-        showSection(hash);
-    }
+//     var hash = window.location.hash.substring(1);
+//     if (hash) {
+//         showSection(hash);
+//     }
 
-    // Trigger section change when clicking on any part of the <li> element
-    jQuery(".sidebar li").click(function() {
-        var section = jQuery(this).attr("data-section"); // Get the section from data-section attribute
-        window.location.hash = section; // Update the URL hash
-        showSection(section); // Show the corresponding section
-    });
-});
+//     // Trigger section change when clicking on any part of the <li> element
+//     jQuery(".sidebar li").click(function() {
+//         var section = jQuery(this).attr("data-section"); // Get the section from data-section attribute
+//         window.location.hash = section; // Update the URL hash
+//         showSection(section); // Show the corresponding section
+//     });
+// });
 
-    ');
+//     ');
 }
 add_action('wp_enqueue_scripts', 'institute_dashboard_scripts');
 

@@ -23,7 +23,17 @@ global $wpdb;
 
 
 // Fetch all classes and sections
-$class_sections = $wpdb->get_results("SELECT * FROM $table_name", ARRAY_A);
+$educational_center_id = get_educational_center_data();
+
+if (is_string($educational_center_id) && strpos($educational_center_id, '<p>') === 0) {
+    return $educational_center_id;
+}
+// Fetch all classes and sections
+$class_sections = $wpdb->get_results(
+    $wpdb->prepare("SELECT * FROM $table_name WHERE education_center_id = %s", $educational_center_id),
+    ARRAY_A
+);
+// $class_sections = $wpdb->get_results("SELECT * FROM $table_name", ARRAY_A);
 ?>
 
 <!-- Add Student Form (Hidden by default) -->

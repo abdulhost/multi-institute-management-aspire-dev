@@ -36,10 +36,10 @@ function get_educational_center_data() {
         'posts_per_page' => 1,
     ));
 
-    if (empty($educational_center)) {
-        // return '<p>No Educational Center found for this Admin ID.</p>';
-        wp_redirect(home_url('/')); 
-    }
+    // if (empty($educational_center)) {
+    //     // return '<p>No Educational Center found for this Admin ID.</p>';
+    //     // wp_redirect(home_url('/')); 
+    // }
 
     return get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
 }

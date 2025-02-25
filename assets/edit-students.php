@@ -22,12 +22,6 @@ if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
     dbDelta($sql);
 }
 
-// Fetch all classes and sections
-$class_sections = $wpdb->get_results(
-    $wpdb->prepare("SELECT * FROM $table_name WHERE education_center_id = %s", $educational_center_id),
-    ARRAY_A
-);
-
 // Query the Educational Center based on the admin_id
 $educational_center = get_posts(array(
     'post_type' => 'educational-center',
@@ -42,6 +36,12 @@ if (empty($educational_center)) {
 }
 
 $educational_center_id = get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
+
+// Fetch all classes and sections
+$class_sections = $wpdb->get_results(
+    $wpdb->prepare("SELECT * FROM $table_name WHERE education_center_id = %s", $educational_center_id),
+    ARRAY_A
+);
 
 // Include WordPress media handling functions
 require_once(ABSPATH . 'wp-admin/includes/image.php');
