@@ -120,6 +120,18 @@ html{
 #sidebar a span, #sidebar .dropdown-btn span{
   flex-grow: 1;
 }
+.section {
+    display: none;
+}
+.section.active {
+    display: block;
+}
+.sub-menu {
+    display: none;
+}
+.sub-menu.show {
+    display: block;
+}
 #sidebar a:hover, #sidebar .dropdown-btn:hover{
   background-color: var(--hover-clr2);
 }
@@ -450,7 +462,7 @@ input, #edit-student-form input {
 /* Form Container */
 #add-student-form {
     /* max-width: 800px; */
-    margin: auto;
+    margin: 1%;
     padding: 30px;
     background: #ffffff; /* White Background */
     border-radius: 12px; /* Rounded Corners */
@@ -871,3 +883,7 @@ input[type="date"]:focus,input[type="password"]:focus,
 #students-list p{
     margin: 0;
 }
+
+/* .elementor-shortcode{
+    display: flex;
+} */

@@ -1,36 +1,50 @@
 <?php
-global $wpdb;
-$table_name = $wpdb->prefix . 'class_sections';
-$charset_collate = $wpdb->get_charset_collate();
+function add_students_institute_dashboard_shortcode() {
+    global $wpdb;
 
-// Check if the table exists before creating it
-// if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
-//     $sql = "CREATE TABLE $table_name (
-//         id mediumint(9) NOT NULL AUTO_INCREMENT,
-//         class_name varchar(255) NOT NULL,
-//         sections text NOT NULL,
-//         PRIMARY KEY (id)
-//     ) $charset_collate;";
+    $table_name = $wpdb->prefix . 'class_sections';
+    $charset_collate = $wpdb->get_charset_collate();
 
-//     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-//     dbDelta($sql);
-// }
+    // Uncomment and adjust table creation if needed
+    /*
+    if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+        $sql = "CREATE TABLE $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            class_name varchar(255) NOT NULL,
+            sections text NOT NULL,
+            education_center_id varchar(255), -- Added to match query
+            PRIMARY KEY (id)
+        ) $charset_collate;";
 
-// Fetch all classes and sections
-$educational_center_id = get_educational_center_data();
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta($sql);
+    }
+    */
 
-if (is_string($educational_center_id) && strpos($educational_center_id, '<p>') === 0) {
-    return $educational_center_id;
-}
-// Fetch all classes and sections
-$class_sections = $wpdb->get_results(
-    $wpdb->prepare("SELECT * FROM $table_name WHERE education_center_id = %s", $educational_center_id),
-    ARRAY_A
-);
-// $class_sections = $wpdb->get_results("SELECT * FROM $table_name", ARRAY_A);
+    // Fetch educational center ID (assuming this function exists)
+    $educational_center_id = get_educational_center_data();
+
+    if (is_string($educational_center_id) && strpos($educational_center_id, '<p>') === 0) {
+        return $educational_center_id;
+    }
+
+    // Fetch all classes and sections
+    $class_sections = $wpdb->get_results(
+        $wpdb->prepare("SELECT * FROM $table_name WHERE education_center_id = %s", $educational_center_id),
+        ARRAY_A
+    );
+
+    // Start output buffering
+    ob_start();
 ?>
-
-<div id="add-student-form" style="display: block;">
+ <div class="attendance-main-wrapper" style="display: flex;">
+        <!-- <div class="institute-dashboard-wrapper"> -->
+            <?php
+        $active_section = 'add-students';
+        include(plugin_dir_path(__FILE__) . 'sidebar.php');
+            ?>
+        <!-- </div> -->
+<div id="add-student-form" style="display: block; width:100%">
     <h3>Add Student</h3>
     <form method="POST" enctype="multipart/form-data">
         <!-- Basic Details Section -->
@@ -54,7 +68,7 @@ $class_sections = $wpdb->get_results(
                 <select name="section" id="sectionadd" required disabled>
                     <option value="">Select Class First</option>
                 </select>
-<br>
+                <br>
                 <!-- Student Details -->
                 <label for="admission_number">Admission Number</label>
                 <input type="text" name="admission_number" required>
@@ -68,10 +82,8 @@ $class_sections = $wpdb->get_results(
                 <label for="phone_number">Phone Number</label>
                 <input type="text" name="phone_number">
                 <br>
-                <!-- Hidden field to pass the educational center ID -->
+                <!-- Hidden field for educational center ID -->
                 <input type="hidden" name="educational_center_id" value="<?php echo esc_attr($educational_center_id); ?>">
-                <!-- <br> -->
-                <!-- Student ID Field -->
                 <label for="student_id">Student ID (Auto-generated)</label>
                 <input type="text" name="student_id" value="<?php echo 'STU-' . uniqid(); ?>" readonly>
                 <br>
@@ -92,7 +104,6 @@ $class_sections = $wpdb->get_results(
                 <span class="toggle-icon">▼</span>
             </div>
             <div class="section-content" id="medical-details" style="display: none;">
-                <!-- Gender Dropdown -->
                 <?php
                 $gender_field = get_field_object('field_67ab1ab5978fc');
                 if ($gender_field) : ?>
@@ -105,7 +116,6 @@ $class_sections = $wpdb->get_results(
                     </select>
                 <?php endif; ?>
 
-                <!-- Religion Dropdown -->
                 <?php
                 $religion_field = get_field_object('field_67ab1b6d978fe');
                 if ($religion_field) : ?>
@@ -118,7 +128,6 @@ $class_sections = $wpdb->get_results(
                     </select>
                 <?php endif; ?>
                 <br>
-                <!-- Blood Group Dropdown -->
                 <?php
                 $blood_group_field = get_field_object('field_67ab1c0197900');
                 if ($blood_group_field) : ?>
@@ -134,11 +143,9 @@ $class_sections = $wpdb->get_results(
                 <label for="date_of_birth">Date of Birth</label>
                 <input type="date" name="date_of_birth">
                 <br>
-                <!-- Height -->
                 <label for="height">Height (in cm):</label>
                 <input type="number" name="height" id="height" required>
                 <br>
-                <!-- Weight -->
                 <label for="weight">Weight (in kg):</label>
                 <input type="number" name="weight" id="weight" required>
             </div>
@@ -151,11 +158,8 @@ $class_sections = $wpdb->get_results(
                 <span class="toggle-icon">▼</span>
             </div>
             <div class="section-content" id="address-details" style="display: none;">
-                <!-- Current Address -->
                 <label for="current_address">Current Address:</label>
                 <textarea name="current_address" id="current_address" rows="4" required></textarea>
-
-                <!-- Permanent Address -->
                 <label for="permanent_address">Permanent Address:</label>
                 <textarea name="permanent_address" id="permanent_address" rows="4" required></textarea>
             </div>
@@ -177,9 +181,10 @@ $class_sections = $wpdb->get_results(
         <input type="submit" name="add_student" value="Add Student">
     </form>
 </div>
+</div>
+
 <script>
 jQuery(document).ready(function($) {
-    // Preload sections for all classes
     var sectionsData = {};
     <?php
     foreach ($class_sections as $row) {
@@ -187,7 +192,6 @@ jQuery(document).ready(function($) {
     }
     ?>
 
-    // Update sections dropdown when class is selected
     $('#class_nameadd').change(function() {
         var selectedClass = $(this).val();
         var sectionSelect = $('#sectionadd');
@@ -197,15 +201,15 @@ jQuery(document).ready(function($) {
             sectionsData[selectedClass].forEach(function(section) {
                 sectionSelect.append('<option value="' + section + '">' + section + '</option>');
             });
-            sectionSelect.prop('disabled', false); // Enable the dropdown
+            sectionSelect.prop('disabled', false);
         } else {
-            sectionSelect.html('<option value="">Select Class First</option>').prop('disabled', true); // Disable the dropdown
+            sectionSelect.html('<option value="">Select Class First</option>').prop('disabled', true);
         }
     });
 
-    // Initialize the sections dropdown on page load
     $('#class_nameadd').trigger('change');
 });
+
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
     const fileInput = document.querySelector('input[name="student_profile_photo"]');
@@ -230,11 +234,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-// /section wise toggle
+
 function toggleSection(sectionId) {
     const section = document.getElementById(sectionId);
     const header = section.parentElement.querySelector('.section-header');
-    const icon = header.querySelector('.toggle-icon');
 
     if (section.style.display === 'none' || section.style.display === '') {
         section.style.display = 'block';
@@ -245,3 +248,9 @@ function toggleSection(sectionId) {
     }
 }
 </script>
+
+<?php
+    return ob_get_clean();
+}
+
+add_shortcode('add_students_institute_dashboard', 'add_students_institute_dashboard_shortcode');

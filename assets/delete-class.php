@@ -35,7 +35,7 @@ function display_delete_class_section_manager() {
     <div style="display: flex;">
 
         <!-- Sidebar (Left Side) -->
-        <div class="institute-dashboard-wrapper">
+        <!-- <div class="institute-dashboard-wrapper"> -->
         <?php
 // Set the active section for the sidebar
 $active_section = 'delete-class';
@@ -43,7 +43,7 @@ $active_section = 'delete-class';
 // Include the sidebar
 include plugin_dir_path(__FILE__) . 'sidebar.php';
 ?>
-        </div>
+        <!-- </div> -->
 
         <!-- Content (Right Side) -->
         <div class="wrap" style="width: 70%; padding: 20px;">

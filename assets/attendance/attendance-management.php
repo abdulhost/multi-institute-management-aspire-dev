@@ -1,27 +1,26 @@
 <?php
-
-
 // Create table
 global $wpdb;
 $table_name = $wpdb->prefix . 'student_attendance';
 $charset_collate = $wpdb->get_charset_collate();
 
-$sql = "CREATE TABLE IF NOT EXISTS $table_name (
-    sa_id mediumint(9) NOT NULL AUTO_INCREMENT,
-    education_center_id varchar(255) NOT NULL,
-    student_id VARCHAR(50) NOT NULL,
-    student_name VARCHAR(255) NOT NULL,
-    class varchar(255) NOT NULL,
-    section text NOT NULL,
-    date DATE NOT NULL,
-    status VARCHAR(50) NOT NULL,
-    teacher_id VARCHAR(50) NOT NULL,
-    PRIMARY KEY (sa_id),
-    INDEX (student_id, date)
-) $charset_collate;";
+// $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+//     sa_id mediumint(9) NOT NULL AUTO_INCREMENT,
+//     education_center_id varchar(255) NOT NULL,
+//     student_id VARCHAR(50) NOT NULL,
+//     student_name VARCHAR(255) NOT NULL,
+//     class varchar(255) NOT NULL,
+//     section text NOT NULL,
+//     date DATE NOT NULL,
+//     status VARCHAR(50) NOT NULL,
+//     teacher_id VARCHAR(50) NOT NULL,
+//     subject VARCHAR(50) ,
+//     PRIMARY KEY (sa_id),
+//     INDEX (student_id, date)
+// ) $charset_collate;";
 
-require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-dbDelta($sql);
+// require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+// dbDelta($sql);
 
 // Enqueue CSS and JS
 function enqueue_attendance_management_scripts() {
@@ -232,13 +231,13 @@ function display_attendance_management() {
     ob_start();
     ?>
     <div class="attendance-main-wrapper" style="display: flex;">
-        <div class="institute-dashboard-wrapper">
+        <!-- <div class="institute-dashboard-wrapper"> -->
             <?php
             $active_section = 'students-attendance';
             $main_section = 'student';
             include(plugin_dir_path(__FILE__) . '../sidebar.php');
             ?>
-        </div>
+        <!-- </div> -->
         <div class="attendance-content-wrapper">
             <div class="attendance-management">
                 <h2>Attendance Management</h2>

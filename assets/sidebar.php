@@ -29,6 +29,7 @@ if ($educational_center->have_posts()) {
 
 // Get the active section from the passed parameter (default to 'dashboard' if not set)
 $active_section = isset($active_section) ? $active_section : 'dashboard';
+
 ?>
 
 <!-- Sidebar -->
@@ -298,20 +299,21 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
 <nav id="sidebar">
   <ul>
     <li>
-      <div class="logo-title-section">
+    <div class="logo-title-section">
         <?php if ($logo): ?>
-          <div class="institute-logo">
-            <img src="<?php echo esc_url($logo['url']); ?>" alt="Institute Logo" style="border-radius: 50%; width: 60px; height: 60px; object-fit: cover;">
-          </div>
+            <div class="institute-logo">
+                <img src="<?php echo esc_url($logo['url']); ?>" alt="Institute Logo" style="border-radius: 50%; width: 60px; height: 60px; object-fit: cover;">
+            </div>
         <?php endif; ?>
         <h4 class="institute-title" style="margin-bottom:0; margin-left:4px; color: var(--text-clr);"><?php echo esc_html($title); ?></h4>
-      </div>
+    </div>
+      <!-- <span class="logo">codin</span> -->
       <button onclick="toggleSidebar()" id="toggle-btn">
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m313-480 155 156q11 11 11.5 27.5T468-268q-11 11-28 11t-28-11L228-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T468-692q11 11 11 28t-11 28L313-480Zm264 0 155 156q11 11 11.5 27.5T732-268q-11 11-28 11t-28-11L492-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T732-692q11 11 11 28t-11 28L577-480Z"/></svg>
       </button>
     </li>
     <li class="<?php echo $active_section == 'dashboard' ? 'active' : ''; ?>">
-      <a href="/institute-dashboard/#dashboard">
+      <a href="/institute-dashboard">
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M240-200h120v-200q0-17 11.5-28.5T400-440h160q17 0 28.5 11.5T600-400v200h120v-360L480-740 240-560v360Zm-80 0v-360q0-19 8.5-36t23.5-28l240-180q21-16 48-16t48 16l240 180q15 11 23.5 28t8.5 36v360q0 33-23.5 56.5T720-120H560q-17 0-28.5-11.5T520-160v-200h-80v200q0 17-11.5 28.5T400-120H240q-33 0-56.5-23.5T160-200Zm320-270Z"/></svg>
         <span>Dashboard</span>
       </a>
@@ -324,19 +326,21 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
       </button>
       <ul class="sub-menu <?php echo $active_section == 'add-students' || $active_section == 'edit-students' ? 'show' : ''; ?>">
         <div>
-          <li class="<?php echo $active_section == 'add-students' ? 'active' : ''; ?>"><a href="/institute-dashboard/#add-students">Add Students</a></li>
-          <li class="<?php echo $active_section == 'edit-students' ? 'active' : ''; ?>"><a href="/institute-dashboard/#edit-students">Edit Students</a></li>
+          <li class="<?php echo $active_section == 'students' ? 'active' : ''; ?>"><a href="/institute-dashboard/students/">Students</a></li>
+          <li class="<?php echo $active_section == 'add-students' ? 'active' : ''; ?>"><a href="/institute-dashboard/add-students/">Add Students</a></li>
+          <li class="<?php echo $active_section == 'edit-students' ? 'active' : ''; ?>"><a href="/institute-dashboard/edit-students">Edit Students</a></li>
         </div>
       </ul>
     </li>
     <li>
-      <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'add-class' || $active_section == 'student-count-class' || $active_section == 'edit-class' || $active_section == 'delete-class' ? 'rotate' : ''; ?>">
+      <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'classes' || $active_section == 'add-class' || $active_section == 'student-count-class' || $active_section == 'edit-class' || $active_section == 'delete-class' ? 'rotate' : ''; ?>">
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm0 0v-480 480Z"/></svg>
         <span>Classes</span>
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
       </button>
-      <ul class="sub-menu <?php echo $active_section == 'add-class' || $active_section == 'student-count-class' || $active_section == 'edit-class' || $active_section == 'delete-class' ? 'show' : ''; ?>">
+      <ul class="sub-menu <?php echo $active_section == 'classes' || $active_section == 'add-class' || $active_section == 'student-count-class' || $active_section == 'edit-class' || $active_section == 'delete-class' ? 'show' : ''; ?>">
         <div>
+          <li class="<?php echo $active_section == 'classes' ? 'active' : ''; ?>"><a href="/institute-dashboard/classes">Classes</a></li>
           <li class="<?php echo $active_section == 'add-class' ? 'active' : ''; ?>"><a href="/institute-dashboard/#add-class">Add Class</a></li>
           <li class="<?php echo $active_section == 'student-count-class' ? 'active' : ''; ?>"><a href="/institute-dashboard/#student-count-class">Student Count</a></li>
           <li class="<?php echo $active_section == 'edit-class' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/edit-class-section')); ?>">Edit Class/Section</a></li>
@@ -345,15 +349,18 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
       </ul>
     </li>
     <li>
-      <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'students-attendance' || $active_section == 'record-attendance' || $active_section == 'teachers-attendance' || $active_section == 'fees-reports' ? 'rotate' : ''; ?>">
+      <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'export-attendance'|| $active_section == 'students-attendance' || $active_section == 'update-attendance'|| $active_section == 'bulk-upload-attendance'|| $active_section == 'record-attendance' || $active_section == 'teachers-attendance' || $active_section == 'fees-reports' ? 'rotate' : ''; ?>">
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M520-640v-160q0-17 11.5-28.5T560-840h240q17 0 28.5 11.5T840-800v160q0 17-11.5 28.5T800-600H560q-17 0-28.5-11.5T520-640ZM120-480v-320q0-17 11.5-28.5T160-840h240q17 0 28.5 11.5T440-800v320q0 17-11.5 28.5T400-440H160q-17 0-28.5-11.5T120-480Zm400 320v-320q0-17 11.5-28.5T560-520h240q17 0 28.5 11.5T840-480v320q0 17-11.5 28.5T800-120H560q-17 0-28.5-11.5T520-160Zm-400 0v-160q0-17 11.5-28.5T160-360h240q17 0 28.5 11.5T440-320v160q0 17-11.5 28.5T400-120H160q-17 0-28.5-11.5T120-160Zm80-360h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/></svg>
         <span>Attendance</span>
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
       </button>
-      <ul class="sub-menu <?php echo $active_section == 'students-attendance' || $active_section == 'record-attendance' || $active_section == 'teachers-attendance' || $active_section == 'fees-reports' ? 'show' : ''; ?>">
+      <ul class="sub-menu <?php echo $active_section == 'export-attendance' || $active_section == 'students-attendance' ||$active_section == 'update-attendance' ||$active_section == 'bulk-upload-attendance' || $active_section == 'record-attendance' || $active_section == 'teachers-attendance' || $active_section == 'fees-reports' ? 'show' : ''; ?>">
         <div>
-          <li class="<?php echo $active_section == 'students-attendance' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/attendance-management')); ?>">Students Attendance</a></li>
-          <li class="<?php echo $active_section == 'record-attendance' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/attendance-entry-form')); ?>">Record Attendance</a></li>
+          <li class="<?php echo $active_section == 'students-attendance' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/attendance-management')); ?>">Students Attendance</a></li>
+          <li class="<?php echo $active_section == 'record-attendance' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/attendance-entry-form')); ?>">Record Attendance</a></li>
+          <li class="<?php echo $active_section == 'update-attendance' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/edit-attendance')); ?>">Update Attendance</a></li>
+          <li class="<?php echo $active_section == 'bulk-upload-attendance' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/bulk-upload-attendance/')); ?>">Bulk Upload Attendance</a></li>
+          <li class="<?php echo $active_section == 'export-attendance' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/export-attendance/')); ?>">Export Attendance</a></li>
           <li class="<?php echo $active_section == 'teachers-attendance' ? 'active' : ''; ?>"><a href="#teachers-attendance">Teachers Attendance</a></li>
           <li class="<?php echo $active_section == 'fees-reports' ? 'active' : ''; ?>"><a href="#fees-reports">Attendance</a></li>
         </div>
@@ -414,104 +421,4 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
     </li>
   </ul>
 </nav>
-
-<!-- Main Content -->
-<div class="main-content">
-  <!-- Dashboard Section -->
-  <div id="dashboard" class="section <?php echo $active_section == 'dashboard' ? 'active' : ''; ?>">
-    <?php echo render_dashboard_section($post_id, $logo, $title); ?>
-  </div>
-
-  <!-- Students Section -->
-  <div id="students" class="section <?php echo $active_section == 'students' ? 'active' : ''; ?>">
-    <?php echo render_students_section(); ?>
-  </div>
-  <!-- Add Students Section -->
-  <div id="add-students" class="section <?php echo $active_section == 'add-students' ? 'active' : ''; ?>">
-    <?php echo render_addstudents_section(); ?>
-  </div>
-  <!-- Edit Students Section -->
-  <div id="edit-students" class="section <?php echo $active_section == 'edit-students' ? 'active' : ''; ?>">
-    <?php echo render_editstudents_section(); ?>
-  </div>
-  <!-- Classes Section -->
-  <div id="classes" class="section <?php echo $active_section == 'classes' ? 'active' : ''; ?>">
-    <?php echo render_classes_section(); ?>
-  </div>
-  <!-- Add Class Section -->
-  <div id="add-class" class="section <?php echo $active_section == 'add-class' ? 'active' : ''; ?>">
-    <?php echo render_addclass_section(); ?>
-  </div>
-  <!-- Student Count Class Section -->
-  <div id="student-count-class" class="section <?php echo $active_section == 'student-count-class' ? 'active' : ''; ?>">
-    <?php echo render_student_count_class_section(); ?>
-  </div>
-</div>
-
-<?php
-// Updated Render Functions
-function render_students_section() {
-    ob_start();
-    $file_path = plugin_dir_path(__FILE__) . 'students.php';
-    if (file_exists($file_path)) {
-        include $file_path;
-    } else {
-        echo "<p>Error: students.php not found at $file_path</p>";
-    }
-    return ob_get_clean();
-}
-
-function render_addstudents_section() {
-    ob_start();
-    $file_path = plugin_dir_path(__FILE__) . 'add-students.php';
-    if (file_exists($file_path)) {
-        include $file_path;
-    } else {
-        echo "<p>Error: add-students.php not found at $file_path</p>";
-    }
-    return ob_get_clean();
-}
-
-function render_editstudents_section() {
-    ob_start();
-    $file_path = plugin_dir_path(__FILE__) . 'edit-students.php';
-    if (file_exists($file_path)) {
-        include $file_path;
-    } else {
-        echo "<p>Error: edit-students.php not found at $file_path</p>";
-    }
-    return ob_get_clean();
-}
-
-function render_classes_section() {
-    ob_start();
-    $file_path = plugin_dir_path(__FILE__) . 'classes.php';
-    if (file_exists($file_path)) {
-        include $file_path;
-    } else {
-        echo "<p>Error: classes.php not found at $file_path</p>";
-    }
-    return ob_get_clean();
-}
-
-function render_addclass_section() {
-    ob_start();
-    $file_path = plugin_dir_path(__FILE__) . 'add-classes.php';
-    if (file_exists($file_path)) {
-        include $file_path;
-    } else {
-        echo "<p>Error: add-classes.php not found at $file_path</p>";
-    }
-    return ob_get_clean();
-}
-
-function render_student_count_class_section() {
-    ob_start();
-    $file_path = plugin_dir_path(__FILE__) . 'student-count-class.php';
-    if (file_exists($file_path)) {
-        include $file_path;
-    } else {
-        echo "<p>Error: student-count-class.php not found at $file_path</p>";
-    }
-    return ob_get_clean();
-}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>

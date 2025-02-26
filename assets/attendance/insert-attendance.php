@@ -119,28 +119,7 @@ function submit_attendance() {
     wp_send_json_success('Attendance recorded successfully for selected students.');
 }
 
-// Helper function to get teacher ID
-function get_current_teacher_id() {
-    $user = wp_get_current_user();
-    if (!$user->exists()) {
-        return false;
-    }
 
-    // Check user role and return appropriate value
-    if (in_array('administrator', $user->roles)) {
-        return $user->user_email; // Return email for administrator
-    }
-
-    if (in_array('institute_admin', $user->roles)) {
-        return $user->user_email; // Return email for institute admin
-    }
-
-    if (in_array('teacher', $user->roles)) {
-        return get_user_meta($user->ID, 'teacher_id', true) ?: $user->ID; // Return teacher_id for teacher
-    }
-
-    return false; // Return false if no matching role
-}
 
 
 // Frontend form shortcode
@@ -165,12 +144,12 @@ function display_attendance_entry_form() {
     ob_start();
     ?>
        <div class="attendance-main-wrapper" style="display: flex;">
-        <div class="institute-dashboard-wrapper">
+        <!-- <div class="institute-dashboard-wrapper"> -->
             <?php
             $active_section = 'record-attendance';
             include(plugin_dir_path(__FILE__) . '../sidebar.php');
             ?>
-        </div>
+      
     <div class="form-container attendance-entry-wrapper attendance-content-wrapper">
         <h3 class="form-title">Record Attendance</h3>
         <form id="attendance-entry-form" class="form">

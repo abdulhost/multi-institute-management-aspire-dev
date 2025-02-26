@@ -37,135 +37,15 @@ function institute_dashboard_shortcode() {
 
     ?>
 
-    <div class="institute-dashboard-wrapper">
-
-    <?php
-            // $active_section = 'record-attendance';
-            include(plugin_dir_path(__FILE__) . 'assets/sidebar.php');
+    <div class="attendance-main-wrapper" style="display: flex;">
+        <!-- <div class="institute-dashboard-wrapper"> -->
+            <?php
+        $active_section = 'dashboard';
+        include(plugin_dir_path(__FILE__) . 'assets/sidebar.php');
             ?>
-        <!-- Sidebar -->
-        <!-- <div class="sidebar">
-            <div class="logo-title-section">
-                Institute Logo
-                <?php if ($logo): ?>
-                    <div class="institute-logo">
-                        <img src="<?php echo esc_url($logo['url']); ?>" alt="Institute Logo" style="border-radius: 50%; width: 60px; height: 60px; object-fit: cover;">
-                    </div>
-                <?php endif; ?>
-                Institute Title
-                <h4 class="institute-title"><?php echo esc_html($title); ?></h4>
-            </div>
-            <ul>
-            <li class="active" data-section="dashboard">
-                <span class="icon">🏠</span>
-                <a href="/institute-dashboard/#dashboard">Dashboard</a>
-            </li>
-            <li class="has-submenu" data-section="students">
-                <span class="icon">👨‍🎓</span>
-                <a href="/institute-dashboard/#students">Students</a>
-                <ul class="submenu">
-                    <li data-section="add-students"><a href="/institute-dashboard/#add-students">Add Students</a></li>
-                    <li data-section="edit-students"><a href="/institute-dashboard/#edit-students">Edit Students</a></li>
-                </ul>
-            </li>
-            <li class="has-submenu" data-section="classes">
-                <span class="icon">📚</span>
-                <a href="#classes">Classes</a>
-                <ul class="submenu">
-                    <li data-section="add-class"><a href="#add-class">Add Class</a></li>
-                    <li data-section="student-count-class"><a href="#student-count-class">Student Count</a></li>
-                    <li data-section="edit-class"><a href="<?php echo esc_url(home_url('/edit-class-section')); ?>">Edit Class/Section</a></li>
-                    <li data-section="delete-class"><a href="<?php echo esc_url(home_url('/delete-class-section')); ?>">Delete Class/Section</a></li>
-                </ul>
-            </li>
-            <li class="has-submenu" data-section="reports">
-                <span class="icon">📚</span>
-                <a href="#studentreports">Student Reports</a>
-                <ul class="submenu">
-                    <li data-section="add-studentreports"><a href="#add-studentreports">Add Student Reports</a></li>
-                    <li data-section="edit-studentreports"><a href="#edit-studentreports">Edit Student Reports</a></li>
-                </ul>
-            </li>
-            <li class="has-submenu" data-section="examreports">
-                <span class="icon">📚</span>
-                <a href="#examreports">Exam Reports</a>
-                <ul class="submenu">
-                    <li data-section="add-examreports"><a href="#add-examreports">Add Exam Reports</a></li>
-                    <li data-section="edit-examreports"><a href="#edit-examreports">Edit Exam Reports</a></li>
-                </ul>
-            </li>
-            <li class="has-submenu" data-section="feesreports">
-                <span class="icon">📚</span>
-                <a href="#feesreports">Fees Reports</a>
-                <ul class="submenu">
-                    <li data-section="add-feesreports"><a href="#add-feesreports">Add Fees Reports</a></li>
-                    <li data-section="edit-feesreports"><a href="#edit-feesreports">Edit Fees Reports</a></li>
-                </ul>
-            </li>
-            <li class="has-submenu" data-section="libraryreports">
-                <span class="icon">📚</span>
-                <a href="#libraryreports">Library</a>
-                <ul class="submenu">
-                    <li data-section="add-libraryreports"><a href="#add-libraryreports">Add Library Reports</a></li>
-                    <li data-section="edit-libraryreports"><a href="#edit-libraryreports">Edit Library Reports</a></li>
-                </ul>
-            </li>
-            <li class="has-submenu" data-section="transportreports">
-                <span class="icon">📚</span>
-                <a href="#transportreports">Transport</a>
-                <ul class="submenu">
-                    <li data-section="add-transportreports"><a href="#add-transportreports">Add Transport Reports</a></li>
-                    <li data-section="edit-transportreports"><a href="#edit-transportreports">Edit Transport Reports</a></li>
-                </ul>
-            </li>
-            <li class="has-submenu" data-section="leave">
-                <span class="icon">📚</span>
-                <a href="#leave">Leave</a>
-                <ul class="submenu">
-                    <li data-section="add-leave"><a href="#add-leave">Add leave </a></li>
-                    <li data-section="edit-leave"><a href="#edit-leave">Edit leave </a></li>
-                </ul>
-            </li>
-            <li class="has-submenu" data-section="communicate">
-                <span class="icon">📚</span>
-                <a href="#communicate">Communicate</a>
-                <ul class="submenu">
-                    <li data-section="noticeboard-communicate"><a href="#noticeboard-communicate">Notice Board </a></li>
-                    <li data-section="sendemails-communicate"><a href="#sendemails-communicate">Send Emails</a></li>
-                    <li data-section="event-communicate"><a href="#event-communicate">Event</a></li>
-                    <li data-section="calender-communicate"><a href="#calender-communicate">Calender</a></li>
-                    <li data-section=""><a href="#">Email Template</a></li>
-                    <li data-section=""><a href="#">Sms Template</a></li>
-                </ul>
-            </li>
-            <li class="has-submenu" data-section="adminsection">
-                <span class="icon">📚</span>
-                <a href="#adminsection">Admin Section</a>
-                <ul class="submenu">
-                    <li data-section=""><a href="#">Addmission Query</a></li>
-                    <li data-section=""><a href="#">Visitors Book</a></li>
-                    <li data-section=""><a href="#">Complaints</a></li>
-                    <li data-section=""><a href="#">Phone Call Logs</a></li>
-                    <li data-section=""><a href="#">Certificates</a></li>
-                    <li data-section=""><a href="#">Add Certificates</a></li>
-                    <li data-section=""><a href="#">Add ID Card</a></li>
-                    <li data-section=""><a href="#">ID cards </a></li>
-                </ul>
-            </li>
-        </ul>
-        </div> -->
-
-       
-    </div>
-
-    <?php
-    return ob_get_clean(); // Return the buffered content
-}
-add_shortcode('institute_dashboard', 'institute_dashboard_shortcode');
-
-// Function to render the Dashboard section
-function render_dashboard_section($post_id, $logo, $title) {
-    ob_start();
+        <!-- </div> -->
+    <div class="form-container attendance-entry-wrapper attendance-content-wrapper">
+    <?php ob_start();
     ?>
     <div class="institute-dashboard-container">
         <!-- Institute Logo -->
@@ -258,37 +138,23 @@ function render_dashboard_section($post_id, $logo, $title) {
     </div>
 
     <?php
-    return ob_get_clean();
+    return ob_get_clean();?>
+    </div>
+    </div>
+
+
+    <?php
+    return ob_get_clean(); // Return the buffered content
 }
+add_shortcode('institute_dashboard', 'institute_dashboard_shortcode');
+
+// Function to render the Dashboard section
+// function render_dashboard_section($post_id, $logo, $title) {
+   
+// }
 
 
-    function institute_dashboard_scripts() {
-    wp_enqueue_style('institute-dashboard-style', plugin_dir_url(__FILE__) . '/css/style.css');
-    wp_enqueue_script('institute-dashboard-script', plugin_dir_url(__FILE__) . '/js/js.js', array('jquery'), null, true);
-//     wp_add_inline_script('institute-dashboard-script', '
-//        jQuery(document).ready(function() {
-//     function showSection(section) {
-//         jQuery(".section").removeClass("active");
-//         jQuery("#" + section).addClass("active");
-//         jQuery(".sidebar li").removeClass("active");
-//         jQuery("[data-section=" + section + "]").addClass("active");
-//     }
+   
 
-//     var hash = window.location.hash.substring(1);
-//     if (hash) {
-//         showSection(hash);
-//     }
-
-//     // Trigger section change when clicking on any part of the <li> element
-//     jQuery(".sidebar li").click(function() {
-//         var section = jQuery(this).attr("data-section"); // Get the section from data-section attribute
-//         window.location.hash = section; // Update the URL hash
-//         showSection(section); // Show the corresponding section
-//     });
-// });
-
-//     ');
-}
-add_action('wp_enqueue_scripts', 'institute_dashboard_scripts');
-
+   
 ?>

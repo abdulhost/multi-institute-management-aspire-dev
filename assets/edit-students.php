@@ -1,5 +1,6 @@
 <?php
 // student-list.php
+function edit_students_institute_dashboard_shortcode() {
 
 // Fetch the current user and their admin_id
 $current_user = wp_get_current_user();
@@ -46,6 +47,14 @@ $class_sections = $wpdb->get_results(
 // Include WordPress media handling functions
 require_once(ABSPATH . 'wp-admin/includes/image.php');
 ?>
+    <div class="attendance-main-wrapper" style="display: flex;">
+        <!-- <div class="institute-dashboard-wrapper"> -->
+            <?php
+        $active_section = 'edit-students';
+        include(plugin_dir_path(__FILE__) . 'sidebar.php');
+            ?>
+        <!-- </div> -->
+        <div class="form-container attendance-entry-wrapper attendance-content-wrapper">
 
 <!-- Search Form -->
 <div class="form-group search-form">
@@ -143,6 +152,7 @@ require_once(ABSPATH . 'wp-admin/includes/image.php');
             ?>
         </tbody>
     </table>
+</div>
 </div>
 
 <!-- Include the edit student modal form -->
@@ -286,4 +296,19 @@ $(document).ready(function() {
     });
 });
 
+function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    const header = section.parentElement.querySelector('.section-header');
+
+    if (section.style.display === 'none' || section.style.display === '') {
+        section.style.display = 'block';
+        header.classList.add('active');
+    } else {
+        section.style.display = 'none';
+        header.classList.remove('active');
+    }
+}
 </script>
+<?php
+}
+add_shortcode('edit_students_institute_dashboard', 'edit_students_institute_dashboard_shortcode');

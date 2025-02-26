@@ -1,0 +1,122 @@
+/* Container for the entire form */
+.form-table {
+    width: 100%;
+    /* max-width: 800px; */
+    margin: 20px auto;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Style for table rows */
+.form-table tr {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+/* Style for table headers (labels) */
+.form-table th {
+    flex: 1 1 25%;
+    padding: 10px;
+    /* text-align: right; */
+    font-weight: 600;
+    color: #333;
+}
+
+/* Style for table data (inputs/selects) */
+.form-table td {
+    flex: 2 1 70%;
+    padding: 10px;
+}
+
+/* Input and select styling */
+.form-table input[type="text"],
+.form-table input[type="date"],
+.form-table select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.form-table input[type="text"]:focus,
+.form-table input[type="date"]:focus,
+.form-table select:focus {
+    border-color: #0073aa;
+    outline: none;
+    box-shadow: 0 0 3px rgba(0,115,170,0.3);
+}
+
+/* Submit button styling */
+.form-table .button-primary {
+    padding: 10px 20px;
+    font-size: 14px;
+    line-height: 1;
+    height: auto;
+    margin: 10px 0 0 35%;
+    background: #0073aa;
+    border-color: #0073aa;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.form-table .button-primary:hover {
+    background: #005177;
+    border-color: #005177;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .form-table tr {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .form-table th {
+        flex: 1 1 100%;
+        text-align: left;
+        padding: 5px 10px;
+    }
+    
+    .form-table td {
+        flex: 1 1 100%;
+        padding: 5px 10px;
+    }
+    
+    .form-table .button-primary {
+        margin: 10px 0;
+        width: 100%;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .form-table th {
+        flex: 1 1 30%;
+    }
+    
+    .form-table td {
+        flex: 2 1 65%;
+    }
+}
+
+.form-table tr { /* student_name */
+    display: inline-flex;
+    /* width: 33.33%; */
+    width: 25%;
+    margin-right: -4px; /* Compensate for padding */
+}
+
+@media (max-width: 768px) {
+    .form-table tr {
+        display: flex;
+        width: 100%;
+    }
+}
