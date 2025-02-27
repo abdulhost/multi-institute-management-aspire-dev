@@ -1,5 +1,4 @@
 <?php
-// Register REST endpoint for viewing
 add_action('rest_api_init', function () {
     register_rest_route('subjects/v1', '/view', array(
         'methods' => 'POST',
@@ -60,6 +59,13 @@ function fetch_subjects_view($request) {
 function display_subjects_view() {
     ob_start();
     ?>
+     <div class="attendance-main-wrapper" style="display: flex;">
+        <!-- <div class="institute-dashboard-wrapper"> -->
+            <?php
+            $active_section = 'view-subjects';
+            $main_section = 'student';
+            include(plugin_dir_path(__FILE__) . '../sidebar.php');
+            ?>
     <div class="subjects-wrapper">
         <div class="subjects-content">
             <h2>View Subjects</h2>
@@ -72,6 +78,22 @@ function display_subjects_view() {
             </div>
         </div>
     </div>
+    </div>
+    <style>
+        .subjects-wrapper { padding: 20px; }
+        .subjects-content { background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .search-filters { margin-bottom: 20px; }
+        .search-filters input, .search-filters select { margin-right: 10px; padding: 5px; }
+        .actions { margin-bottom: 20px; }
+        .actions button { margin-right: 10px; padding: 5px 10px; }
+        .subjects-table { width: 100%; border-collapse: collapse; }
+        .subjects-table th, .subjects-table td { padding: 8px; border: 1px solid #ddd; text-align: left; }
+        .subjects-table th { background: #f5f5f5; }
+        .loading-message { text-align: center; padding: 20px; }
+        .crud-form, .add-form { margin: 20px 0; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; }
+        .crud-form input, .add-form input { margin: 5px 0; padding: 5px; width: 200px; }
+        .crud-form button, .add-form button { margin-top: 10px; padding: 5px 10px; }
+    </style>
     <script>
     jQuery(document).ready(function($) {
         function fetchSubjects() {

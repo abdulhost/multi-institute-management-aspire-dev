@@ -499,8 +499,6 @@ add_action('template_redirect', 'handle_add_student_submission');
 
 
 
-
-
 include plugin_dir_path(__FILE__) . 'assets/edit-classes.php';
 include plugin_dir_path(__FILE__) . 'assets/delete-class.php';
 include plugin_dir_path(__FILE__) . 'assets/attendance/attendance-management.php';
@@ -514,6 +512,11 @@ include plugin_dir_path(__FILE__) . 'assets/edit-students.php';
 include plugin_dir_path(__FILE__) . 'assets/classes.php';
 include plugin_dir_path(__FILE__) . 'interface.php';
 include plugin_dir_path(__FILE__) . 'subjects_interface.php';
+include plugin_dir_path(__FILE__) . 'assets/subjects/subjects-management.php';
+include plugin_dir_path(__FILE__) . 'assets/subjects/add-subjects.php';
+include plugin_dir_path(__FILE__) . 'assets/subjects/edit-delete-subjects.php';
+include plugin_dir_path(__FILE__) . 'assets/subjects/delete-subjects.php';
+include plugin_dir_path(__FILE__) . 'assets/teachers/teachers.php';
 
 function create_custom_user_roles() {
     // Check if 'student' role exists, if not create it
