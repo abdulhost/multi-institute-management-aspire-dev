@@ -389,9 +389,9 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
   </button>
   <ul class="sub-menu <?php echo $active_section == 'view-teachers' || $active_section == 'add-teacher' || $active_section == 'update-teacher' || $active_section == 'delete-teacher' ? 'show' : ''; ?>">
     <div>
-      <li class="<?php echo $active_section == 'view-teachers' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/view-teachers')); ?>">View Teachers</a></li>
-      <li class="<?php echo $active_section == 'add-teacher' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/add-teacher')); ?>">Add New Teacher</a></li>
-      <li class="<?php echo $active_section == 'update-teacher' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/update-teacher')); ?>">Update Teacher</a></li>
+      <li class="<?php echo $active_section == 'view-teachers' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/teacher')); ?>">View Teachers</a></li>
+      <li class="<?php echo $active_section == 'add-teacher' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/add-teachers')); ?>">Add New Teacher</a></li>
+      <li class="<?php echo $active_section == 'update-teacher' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/edit-teachers/')); ?>">Update Teacher</a></li>
       <li class="<?php echo $active_section == 'delete-teacher' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/delete-teacher')); ?>">Delete Teacher</a></li>
     </div>
   </ul>
