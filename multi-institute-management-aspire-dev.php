@@ -602,94 +602,188 @@ function handle_add_teacher_submission() {
     }
 
     // Handle teacher editing
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_teacher'])) {
-        $teacher_post_id = isset($_POST['teacher_post_id']) ? intval($_POST['teacher_post_id']) : 0;
-        if ($teacher_post_id <= 0) {
-            echo '<p class="error-message">Invalid teacher post ID.</p>';
-            return;
+    // if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_teacher'])) {
+    //     $teacher_post_id = isset($_POST['teacher_post_id']) ? intval($_POST['teacher_post_id']) : 0;
+    //     if ($teacher_post_id <= 0) {
+    //         echo '<p class="error-message">Invalid teacher post ID.</p>';
+    //         return;
+    //     }
+
+    //     $teacher_id = sanitize_text_field($_POST['teacher_id']);
+    //     $teacher_email = sanitize_email($_POST['teacher_email']);
+    //     $teacher_phone_number = sanitize_text_field($_POST['teacher_phone_number']);
+    //     $teacher_roll_number = sanitize_text_field($_POST['teacher_roll_number']);
+    //     $teacher_admission_date = sanitize_text_field($_POST['teacher_admission_date']);
+    //     $teacher_gender = sanitize_text_field($_POST['teacher_gender']);
+    //     $teacher_religion = sanitize_text_field($_POST['teacher_religion']);
+    //     $teacher_blood_group = sanitize_text_field($_POST['teacher_blood_group']);
+    //     $teacher_date_of_birth = sanitize_text_field($_POST['teacher_date_of_birth']);
+    //     $teacher_height = sanitize_text_field($_POST['teacher_height']);
+    //     $teacher_weight = sanitize_text_field($_POST['teacher_weight']);
+    //     $teacher_current_address = sanitize_textarea_field($_POST['teacher_current_address']);
+    //     $teacher_permanent_address = sanitize_textarea_field($_POST['teacher_permanent_address']);
+
+    //     // Handle profile picture upload
+    //     if (!empty($_FILES['teacher_profile_photo']['name'])) {
+    //         $file = $_FILES['teacher_profile_photo'];
+    //         $upload = wp_handle_upload($file, array('test_form' => false));
+    //         if (isset($upload['error'])) {
+    //             echo '<p class="error-message">File upload error: ' . esc_html($upload['error']) . '</p>';
+    //             return;
+    //         }
+    //         if (isset($upload['file'])) {
+    //             $attachment_id = wp_insert_attachment(array(
+    //                 'post_mime_type' => $upload['type'],
+    //                 'post_title' => preg_replace('/\.[^.]+$/', '', basename($upload['file'])),
+    //                 'post_content' => '',
+    //                 'post_status' => 'inherit'
+    //             ), $upload['file']);
+    //             if (is_wp_error($attachment_id)) {
+    //                 echo '<p class="error-message">Error creating attachment: ' . $attachment_id->get_error_message() . '</p>';
+    //                 return;
+    //             }
+    //             require_once(ABSPATH . 'wp-admin/includes/image.php');
+    //             $attachment_data = wp_generate_attachment_metadata($attachment_id, $upload['file']);
+    //             wp_update_attachment_metadata($attachment_id, $attachment_data);
+    //             update_post_meta($teacher_post_id, 'teacher_profile_photo', $attachment_id);
+    //         }
+    //     }
+
+    //     // Update the teacher post
+    //     $update_post = wp_update_post(array(
+    //         'ID' => $teacher_post_id,
+    //         'post_title' => $teacher_id, // Adjust if teacher_name is intended
+    //     ));
+    //     if (is_wp_error($update_post)) {
+    //         echo '<p class="error-message">Error updating post: ' . $update_post->get_error_message() . '</p>';
+    //         return;
+    //     }
+
+    //     // Update meta fields with error checking
+    //     $fields = array(
+    //         'teacher_email' => $teacher_email,
+    //         'teacher_phone_number' => $teacher_phone_number,
+    //         'teacher_roll_number' => $teacher_roll_number,
+    //         'teacher_admission_date' => $teacher_admission_date,
+    //         'teacher_gender' => $teacher_gender,
+    //         'teacher_religion' => $teacher_religion,
+    //         'teacher_blood_group' => $teacher_blood_group,
+    //         'teacher_date_of_birth' => $teacher_date_of_birth,
+    //         'teacher_height' => $teacher_height,
+    //         'teacher_weight' => $teacher_weight,
+    //         'teacher_current_address' => $teacher_current_address,
+    //         'teacher_permanent_address' => $teacher_permanent_address,
+    //     );
+    //     foreach ($fields as $meta_key => $value) {
+    //         $updated = update_post_meta($teacher_post_id, $meta_key, $value);
+    //         if ($updated === false) {
+    //             echo '<p class="error-message">Failed to update ' . esc_html($meta_key) . '.</p>';
+    //             return;
+    //         }
+    //     }
+
+    //     // Redirect to the same page
+    //     wp_redirect(home_url('/institute-dashboard/teachers'));
+    //     exit;
+    // }
+
+     // Handle student deletion
+     if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['teacher_post_id'])) {
+        $teacher_post_id = intval($_GET['teacher_post_id']);
+        if (wp_delete_post($teacher_post_id, true)) {
+            wp_redirect(home_url('/institute-dashboard/edit-teachers'));
+            exit;
+        } else {
+            echo '<p class="error-message">Error deleting Teacher.</p>';
         }
-
-        $teacher_id = sanitize_text_field($_POST['teacher_id']);
-        $teacher_email = sanitize_email($_POST['teacher_email']);
-        $teacher_phone_number = sanitize_text_field($_POST['teacher_phone_number']);
-        $teacher_roll_number = sanitize_text_field($_POST['teacher_roll_number']);
-        $teacher_admission_date = sanitize_text_field($_POST['teacher_admission_date']);
-        $teacher_gender = sanitize_text_field($_POST['teacher_gender']);
-        $teacher_religion = sanitize_text_field($_POST['teacher_religion']);
-        $teacher_blood_group = sanitize_text_field($_POST['teacher_blood_group']);
-        $teacher_date_of_birth = sanitize_text_field($_POST['teacher_date_of_birth']);
-        $teacher_height = sanitize_text_field($_POST['teacher_height']);
-        $teacher_weight = sanitize_text_field($_POST['teacher_weight']);
-        $teacher_current_address = sanitize_textarea_field($_POST['teacher_current_address']);
-        $teacher_permanent_address = sanitize_textarea_field($_POST['teacher_permanent_address']);
-
-        // Handle profile picture upload
-        if (!empty($_FILES['teacher_profile_photo']['name'])) {
-            $file = $_FILES['teacher_profile_photo'];
-            $upload = wp_handle_upload($file, array('test_form' => false));
-            if (isset($upload['error'])) {
-                echo '<p class="error-message">File upload error: ' . esc_html($upload['error']) . '</p>';
-                return;
-            }
-            if (isset($upload['file'])) {
-                $attachment_id = wp_insert_attachment(array(
-                    'post_mime_type' => $upload['type'],
-                    'post_title' => preg_replace('/\.[^.]+$/', '', basename($upload['file'])),
-                    'post_content' => '',
-                    'post_status' => 'inherit'
-                ), $upload['file']);
-                if (is_wp_error($attachment_id)) {
-                    echo '<p class="error-message">Error creating attachment: ' . $attachment_id->get_error_message() . '</p>';
-                    return;
-                }
-                require_once(ABSPATH . 'wp-admin/includes/image.php');
-                $attachment_data = wp_generate_attachment_metadata($attachment_id, $upload['file']);
-                wp_update_attachment_metadata($attachment_id, $attachment_data);
-                update_post_meta($teacher_post_id, 'teacher_profile_photo', $attachment_id);
-            }
-        }
-
-        // Update the teacher post
-        $update_post = wp_update_post(array(
-            'ID' => $teacher_post_id,
-            'post_title' => $teacher_id, // Adjust if teacher_name is intended
-        ));
-        if (is_wp_error($update_post)) {
-            echo '<p class="error-message">Error updating post: ' . $update_post->get_error_message() . '</p>';
-            return;
-        }
-
-        // Update meta fields with error checking
-        $fields = array(
-            'teacher_email' => $teacher_email,
-            'teacher_phone_number' => $teacher_phone_number,
-            'teacher_roll_number' => $teacher_roll_number,
-            'teacher_admission_date' => $teacher_admission_date,
-            'teacher_gender' => $teacher_gender,
-            'teacher_religion' => $teacher_religion,
-            'teacher_blood_group' => $teacher_blood_group,
-            'teacher_date_of_birth' => $teacher_date_of_birth,
-            'teacher_height' => $teacher_height,
-            'teacher_weight' => $teacher_weight,
-            'teacher_current_address' => $teacher_current_address,
-            'teacher_permanent_address' => $teacher_permanent_address,
-        );
-        foreach ($fields as $meta_key => $value) {
-            $updated = update_post_meta($teacher_post_id, $meta_key, $value);
-            if ($updated === false) {
-                echo '<p class="error-message">Failed to update ' . esc_html($meta_key) . '.</p>';
-                return;
-            }
-        }
-
-        // Redirect to the same page
-        wp_redirect(home_url('/institute-dashboard/teachers'));
-        exit;
     }
 }
 
 // Hook the function to run on init
 add_action('init', 'handle_add_teacher_submission');
+
+
+
+function handle_teacher_update_submission() {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['edit_teacher']) || !isset($_POST['action']) || $_POST['action'] !== 'edit_teacher_submission') {
+        return;
+    }
+
+    if (!current_user_can('edit_posts')) {
+        wp_die('Insufficient permissions to update teacher information.');
+        return;
+    }
+
+    $teacher_post_id = isset($_POST['teacher_post_id']) ? intval($_POST['teacher_post_id']) : 0;
+    if ($teacher_post_id <= 0) {
+        wp_die('Invalid teacher post ID: ' . $teacher_post_id);
+        return;
+    }
+
+    $post = get_post($teacher_post_id);
+    if (!$post || $post->post_type !== 'teacher') {
+        wp_die('Teacher post not found or invalid post type for ID: ' . $teacher_post_id);
+        return;
+    }
+
+    $fields = array(
+        'teacher_email' => sanitize_email($_POST['teacher_email'] ?? ''),
+        'teacher_phone_number' => sanitize_text_field($_POST['teacher_phone_number'] ?? ''),
+        'teacher_roll_number' => sanitize_text_field($_POST['teacher_roll_number'] ?? ''),
+        'teacher_admission_date' => sanitize_text_field($_POST['teacher_admission_date'] ?? ''),
+        'teacher_gender' => sanitize_text_field($_POST['teacher_gender'] ?? ''),
+        'teacher_religion' => sanitize_text_field($_POST['teacher_religion'] ?? ''),
+        'teacher_blood_group' => sanitize_text_field($_POST['teacher_blood_group'] ?? ''),
+        'teacher_date_of_birth' => sanitize_text_field($_POST['teacher_date_of_birth'] ?? ''),
+        'teacher_height' => sanitize_text_field($_POST['teacher_height'] ?? ''),
+        'teacher_weight' => sanitize_text_field($_POST['teacher_weight'] ?? ''),
+        'teacher_current_address' => sanitize_textarea_field($_POST['teacher_current_address'] ?? ''),
+        'teacher_permanent_address' => sanitize_textarea_field($_POST['teacher_permanent_address'] ?? ''),
+    );
+
+    foreach ($fields as $meta_key => $value) {
+        $old_value = get_post_meta($teacher_post_id, $meta_key, true);
+        if ($old_value !== $value) { // Only update if the value has changed
+            $updated = update_post_meta($teacher_post_id, $meta_key, $value);
+            if ($updated === false) {
+                global $wpdb;
+                $last_error = $wpdb->last_error;
+                error_log("Failed to update meta_key: $meta_key for post ID: $teacher_post_id");
+                error_log("Old value: " . print_r($old_value, true));
+                error_log("New value: " . print_r($value, true));
+                error_log("DB error: " . ($last_error ? $last_error : 'None reported'));
+                error_log("Current user ID: " . get_current_user_id());
+                wp_die("Failed to update " . esc_html($meta_key) . ". Check debug.log for details.");
+                return;
+            }
+        }
+    }
+
+    // Handle other updates (post title, file upload) as before
+    $teacher_id = sanitize_text_field($_POST['teacher_id'] ?? '');
+    wp_update_post(array('ID' => $teacher_post_id, 'post_title' => $teacher_id));
+
+    if (!empty($_FILES['teacher_profile_photo']['name'])) {
+        $file = $_FILES['teacher_profile_photo'];
+        $upload = wp_handle_upload($file, array('test_form' => false));
+        if (isset($upload['file'])) {
+            $attachment_id = wp_insert_attachment(array(
+                'post_mime_type' => $upload['type'],
+                'post_title' => preg_replace('/\.[^.]+$/', '', basename($upload['file'])),
+                'post_content' => '',
+                'post_status' => 'inherit'
+            ), $upload['file']);
+            wp_update_attachment_metadata($attachment_id, wp_generate_attachment_metadata($attachment_id, $upload['file']));
+            update_post_meta($teacher_post_id, 'teacher_profile_photo', $attachment_id);
+        }
+    }
+
+    wp_redirect(home_url('/institute-dashboard/edit-teachers'));
+    // exit;
+}
+
+add_action('admin_post_edit_teacher_submission', 'handle_teacher_update_submission');
+add_action('admin_post_nopriv_edit_teacher_submission', 'handle_teacher_update_submission');
 
 
 // Reusable function to render ACF select fields
@@ -707,26 +801,57 @@ function render_acf_select($name, $field_key, $label) {
 }
 
 
+// include plugin_dir_path(__FILE__) . 'assets/edit-classes.php';
+// include plugin_dir_path(__FILE__) . 'assets/delete-class.php';
+// include plugin_dir_path(__FILE__) . 'assets/attendance/attendance-management.php';
+// include plugin_dir_path(__FILE__) . 'assets/attendance/insert-attendance.php';
+// include plugin_dir_path(__FILE__) . 'assets/attendance/edit-attendance.php';
+// include plugin_dir_path(__FILE__) . 'assets/attendance/bulk-import.php';
+// include plugin_dir_path(__FILE__) . 'assets/attendance/export-attendance.php';
+// include plugin_dir_path(__FILE__) . 'assets/add-students.php';
+// include plugin_dir_path(__FILE__) . 'assets/students.php';
+// include plugin_dir_path(__FILE__) . 'assets/edit-students.php';
+// include plugin_dir_path(__FILE__) . 'assets/classes.php';
+// include plugin_dir_path(__FILE__) . 'interface.php';
+// include plugin_dir_path(__FILE__) . 'subjects_interface.php';
+// include plugin_dir_path(__FILE__) . 'assets/subjects/subjects-management.php';
+// include plugin_dir_path(__FILE__) . 'assets/subjects/add-subjects.php';
+// include plugin_dir_path(__FILE__) . 'assets/subjects/edit-delete-subjects.php';
+// include plugin_dir_path(__FILE__) . 'assets/subjects/delete-subjects.php';
+// include plugin_dir_path(__FILE__) . 'assets/teachers/teachers.php';
+// include plugin_dir_path(__FILE__) . 'assets/teachers/add-teachers.php';
+// include plugin_dir_path(__FILE__) . 'assets/teachers/update-teachers.php';
+// include plugin_dir_path(__FILE__) . 'assets/teachers/delete-teachers.php';
+
+// Function to include all files from a given directory
+function include_files_from_directory($directory) {
+    // Get all PHP files in the directory
+    $files = glob(plugin_dir_path(__FILE__) . $directory . '/*.php');
+    
+    // Include each file
+    foreach ($files as $file) {
+        include_once $file;
+    }
+}
+
+// Include all files from the teachers folder
+include_files_from_directory('assets/teachers');
+
+// Include all files from the subjects folder
+include_files_from_directory('assets/subjects');
+include_files_from_directory('assets/attendance');
+
+// Include all other necessary files
 include plugin_dir_path(__FILE__) . 'assets/edit-classes.php';
 include plugin_dir_path(__FILE__) . 'assets/delete-class.php';
-include plugin_dir_path(__FILE__) . 'assets/attendance/attendance-management.php';
-include plugin_dir_path(__FILE__) . 'assets/attendance/insert-attendance.php';
-include plugin_dir_path(__FILE__) . 'assets/attendance/edit-attendance.php';
-include plugin_dir_path(__FILE__) . 'assets/attendance/bulk-import.php';
-include plugin_dir_path(__FILE__) . 'assets/attendance/export-attendance.php';
 include plugin_dir_path(__FILE__) . 'assets/add-students.php';
 include plugin_dir_path(__FILE__) . 'assets/students.php';
 include plugin_dir_path(__FILE__) . 'assets/edit-students.php';
 include plugin_dir_path(__FILE__) . 'assets/classes.php';
 include plugin_dir_path(__FILE__) . 'interface.php';
 include plugin_dir_path(__FILE__) . 'subjects_interface.php';
-include plugin_dir_path(__FILE__) . 'assets/subjects/subjects-management.php';
-include plugin_dir_path(__FILE__) . 'assets/subjects/add-subjects.php';
-include plugin_dir_path(__FILE__) . 'assets/subjects/edit-delete-subjects.php';
-include plugin_dir_path(__FILE__) . 'assets/subjects/delete-subjects.php';
-include plugin_dir_path(__FILE__) . 'assets/teachers/teachers.php';
-include plugin_dir_path(__FILE__) . 'assets/teachers/add-teachers.php';
-include plugin_dir_path(__FILE__) . 'assets/teachers/update-teachers.php';
+
+
 
 function create_custom_user_roles() {
     // Check if 'student' role exists, if not create it
