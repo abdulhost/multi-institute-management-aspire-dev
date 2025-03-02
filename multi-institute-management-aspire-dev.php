@@ -955,6 +955,7 @@ include_files_from_directory('assets/teachers');
 include_files_from_directory('assets/subjects');
 include_files_from_directory('assets/attendance');
 include_files_from_directory('assets/parents');
+include_files_from_directory('assets/fees');
 
 // Include all other necessary files
 include plugin_dir_path(__FILE__) . 'assets/edit-classes.php';
@@ -965,6 +966,7 @@ include plugin_dir_path(__FILE__) . 'assets/edit-students.php';
 include plugin_dir_path(__FILE__) . 'assets/classes.php';
 include plugin_dir_path(__FILE__) . 'interface.php';
 include plugin_dir_path(__FILE__) . 'subjects_interface.php';
+include plugin_dir_path(__FILE__) . 'db.php';
 
 
 

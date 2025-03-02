@@ -384,3 +384,93 @@ function attendance_management_admin_styles($hook) {
         });
     ");
 }
+
+//fees ,transport
+add_action('admin_menu', 'my_education_erp_add_admin_menu');
+
+function my_education_erp_add_admin_menu() {
+    add_menu_page('Fee Management', 'Fee Management', 'manage_options', 'fee-management', 'my_education_erp_render_admin_page', 'dashicons-money-alt');
+}
+
+function my_education_erp_render_admin_page() {
+    global $wpdb;
+    if (isset($_POST['record_payment']) && wp_verify_nonce($_POST['nonce'], 'record_payment_nonce')) {
+        $student_id = intval($_POST['student']);
+        $template_id = intval($_POST['template']);
+        $months = array_map('sanitize_text_field', $_POST['months']);
+        $payment_method = sanitize_text_field($_POST['payment_method']);
+        $cheque_number = $payment_method == 'cheque' ? sanitize_text_field($_POST['cheque_number']) : '';
+        
+        $template = my_education_erp_get_template($template_id);
+        $function = $template->fee_type == 'transport' ? 'my_education_erp_record_transport_fee_payment' : 'my_education_erp_record_fee_payment';
+        foreach ($months as $month) {
+            $function($student_id, $template_id, $month, $payment_method, $cheque_number);
+        }
+        echo '<div class="updated"><p>Payment recorded!</p></div>';
+    }
+
+    if (isset($_GET['action']) && $_GET['action'] == 'verify') {
+        $fee_id = intval($_GET['fee_id']);
+        $table = $_GET['type'] == 'transport' ? 'transport_fees' : 'student_fees';
+        $wpdb->update($wpdb->prefix . $table, ['status' => 'paid', 'paid_date' => current_time('Y-m-d')], ['id' => $fee_id]);
+        echo '<div class="updated"><p>Cheque verified!</p></div>';
+    }
+
+    ?>
+    <div class="wrap">
+        <h1>Record Fee Payment</h1>
+        <form method="post">
+            <label>Student:</label>
+            <select name="student" required>
+                <?php
+                $students = get_users(['role' => 'subscriber']);
+                foreach ($students as $s) {
+                    echo '<option value="' . $s->ID . '">' . $s->display_name . '</option>';
+                }
+                ?>
+            </select><br>
+            <label>Template:</label>
+            <select name="template" required>
+                <?php
+                $templates = my_education_erp_get_templates();
+                foreach ($templates as $t) {
+                    echo '<option value="' . $t->id . '">' . $t->name . '</option>';
+                }
+                ?>
+            </select><br>
+            <label>Months:</label><br>
+            <?php
+            for ($i = 0; $i < 12; $i++) {
+                $month = date('Y-m', strtotime("+$i months"));
+                echo '<label><input type="checkbox" name="months[]" value="' . $month . '"> ' . date('F Y', strtotime($month)) . '</label><br>';
+            }
+            ?>
+            <label>Payment Method:</label>
+            <select name="payment_method" required>
+                <option value="cash">Cash</option>
+                <option value="cheque">Cheque</option>
+            </select><br>
+            <input type="text" name="cheque_number" placeholder="Cheque Number" style="display:none;" id="cheque_number">
+            <script>
+                document.querySelector('[name="payment_method"]').addEventListener('change', function() {
+                    document.getElementById('cheque_number').style.display = this.value === 'cheque' ? 'block' : 'none';
+                });
+            </script>
+            <?php wp_nonce_field('record_payment_nonce', 'nonce'); ?>
+            <input type="submit" name="record_payment" value="Record Payment" class="button-primary">
+        </form>
+
+        <h2>Pending Cheque Payments</h2>
+        <?php
+        $pending = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}student_fees WHERE payment_method = 'cheque' AND status = 'pending'");
+        foreach ($pending as $fee) {
+            echo '<p>Student: ' . get_userdata($fee->student_id)->display_name . ' | Cheque: ' . $fee->cheque_number . ' | <a href="?page=fee-management&action=verify&fee_id=' . $fee->id . '&type=tuition">Verify</a></p>';
+        }
+        $pending_transport = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}transport_fees WHERE payment_method = 'cheque' AND status = 'pending'");
+        foreach ($pending_transport as $fee) {
+            echo '<p>Student: ' . get_userdata($fee->student_id)->display_name . ' | Cheque: ' . $fee->cheque_number . ' | <a href="?page=fee-management&action=verify&fee_id=' . $fee->id . '&type=transport">Verify</a></p>';
+        }
+        ?>
+    </div>
+    <?php
+}
