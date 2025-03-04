@@ -914,6 +914,25 @@ function render_acf_select($name, $field_key, $label) {
     <?php endif;
 }
 
+// Extracted Delete Function for Fee Templates
+function my_education_erp_delete_fee_template() {
+    global $wpdb;
+    $education_center_id = get_educational_center_data();
+    if (empty($education_center_id)) {
+        return '<p>No Educational Center found.</p>';
+    }
+
+    if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['template_id'])) {
+        $template_id = intval($_GET['template_id']);
+        $deleted = $wpdb->delete($wpdb->prefix . 'fee_templates', ['id' => $template_id]);
+        if ($deleted === false) {
+            error_log('Delete error: ' . $wpdb->last_error);
+        }
+        wp_redirect(home_url('/institute-dashboard/fees/?section=delete-fee-template'));
+        exit;
+    }
+}
+
 
 // include plugin_dir_path(__FILE__) . 'assets/edit-classes.php';
 // include plugin_dir_path(__FILE__) . 'assets/delete-class.php';
@@ -967,6 +986,7 @@ include plugin_dir_path(__FILE__) . 'assets/classes.php';
 include plugin_dir_path(__FILE__) . 'interface.php';
 include plugin_dir_path(__FILE__) . 'subjects_interface.php';
 include plugin_dir_path(__FILE__) . 'db.php';
+// include plugin_dir_path(__FILE__) . 'test.php';
 
 
 
