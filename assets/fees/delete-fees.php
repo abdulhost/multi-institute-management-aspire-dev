@@ -7,11 +7,17 @@ function delete_fees_institute_dashboard_shortcode() {
     global $wpdb;
     $education_center_id = get_educational_center_data();
 
-    if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['fee_id'])) {
-        $fee_id = intval($_GET['fee_id']);
-        $wpdb->delete($wpdb->prefix . 'student_fees', ['id' => $fee_id]);
-        wp_redirect(home_url('/institute-dashboard/#delete-fees'));
-        exit;
+    // Handle deletion if form is submitted
+    if (isset($_POST['delete_fee_id']) && !empty($_POST['delete_fee_id'])) {
+        $fee_id = intval($_POST['delete_fee_id']);
+        $nonce = $_POST['_wpnonce'] ?? '';
+        
+        if (wp_verify_nonce($nonce, 'delete_fee_nonce')) {
+            $wpdb->delete(
+                $wpdb->prefix . 'student_fees',
+                ['id' => $fee_id]
+            );
+        }
     }
 
     ob_start();
@@ -54,17 +60,22 @@ function delete_fees_institute_dashboard_shortcode() {
                         if (!empty($fees)) {
                             foreach ($fees as $fee) {
                                 $student_name = get_userdata($fee->student_id)->display_name;
-                                echo '<tr class="fee-row">
-                                    <td>' . esc_html($student_name) . '</td>
-                                    <td>' . esc_html($fee->template_name) . '</td>
-                                    <td>' . esc_html($fee->amount) . '</td>
-                                    <td>' . esc_html($fee->month_year) . '</td>
-                                    <td>' . esc_html($fee->status) . '</td>
+                                ?>
+                                <tr class="fee-row">
+                                    <td><?php echo esc_html($student_name); ?></td>
+                                    <td><?php echo esc_html($fee->template_name); ?></td>
+                                    <td><?php echo esc_html($fee->amount); ?></td>
+                                    <td><?php echo esc_html($fee->month_year); ?></td>
+                                    <td><?php echo esc_html($fee->status); ?></td>
                                     <td>
-                                        <a href="?action=delete&fee_id=' . $fee->id . '" 
-                                           onclick="return confirm(\'Are you sure you want to delete this fee?\')">Delete</a>
+                                        <form method="post" onsubmit="return confirm('Are you sure you want to delete this fee?');">
+                                            <input type="hidden" name="delete_fee_id" value="<?php echo $fee->id; ?>">
+                                            <input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce('delete_fee_nonce'); ?>">
+                                            <button type="submit" class="delete-fee">Delete</button>
+                                        </form>
                                     </td>
-                                </tr>';
+                                </tr>
+                                <?php
                             }
                         } else {
                             echo '<tr><td colspan="6">No fees found for this Educational Center.</td></tr>';
@@ -76,19 +87,24 @@ function delete_fees_institute_dashboard_shortcode() {
         </div>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script>
-    $(document).ready(function() {
-        $('#search_text_fee').keyup(function() {
-            var searchText = $(this).val().toLowerCase();
-            $('#fees-table tbody tr').each(function() {
-                var student = $(this).find('td').eq(0).text().toLowerCase();
-                var template = $(this).find('td').eq(1).text().toLowerCase();
-                var amount = $(this).find('td').eq(2).text().toLowerCase();
+    // Search functionality without jQuery
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search_text_fee');
+        const rows = document.querySelectorAll('#fees-table tbody tr');
+
+        searchInput.addEventListener('keyup', function() {
+            const searchText = this.value.toLowerCase();
+            
+            rows.forEach(row => {
+                const student = row.cells[0].textContent.toLowerCase();
+                const template = row.cells[1].textContent.toLowerCase();
+                const amount = row.cells[2].textContent.toLowerCase();
+                
                 if (student.includes(searchText) || template.includes(searchText) || amount.includes(searchText)) {
-                    $(this).show();
+                    row.style.display = '';
                 } else {
-                    $(this).hide();
+                    row.style.display = 'none';
                 }
             });
         });
@@ -98,3 +114,4 @@ function delete_fees_institute_dashboard_shortcode() {
     return ob_get_clean();
 }
 add_shortcode('delete_fees_institute_dashboard', 'delete_fees_institute_dashboard_shortcode');
+?>

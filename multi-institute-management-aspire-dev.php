@@ -915,23 +915,27 @@ function render_acf_select($name, $field_key, $label) {
 }
 
 // Extracted Delete Function for Fee Templates
-function my_education_erp_delete_fee_template() {
-    global $wpdb;
-    $education_center_id = get_educational_center_data();
-    if (empty($education_center_id)) {
-        return '<p>No Educational Center found.</p>';
-    }
+// function my_education_erp_delete_fee_template() {
+//     global $wpdb;
+//     $education_center_id = get_educational_center_data();
+    
+//     if (empty($education_center_id)) {
+//         return '<p>No Educational Center found.</p>';
+//     }
 
-    if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['template_id'])) {
-        $template_id = intval($_GET['template_id']);
-        $deleted = $wpdb->delete($wpdb->prefix . 'fee_templates', ['id' => $template_id]);
-        if ($deleted === false) {
-            error_log('Delete error: ' . $wpdb->last_error);
-        }
-        wp_redirect(home_url('/institute-dashboard/fees/?section=delete-fee-template'));
-        exit;
-    }
-}
+//     if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['template_id'])) {
+//         $template_id = intval($_GET['template_id']);
+//         $deleted = $wpdb->delete($wpdb->prefix . 'fee_templates', ['id' => $template_id]);
+        
+//         if ($deleted === false) {
+//             error_log('Delete error: ' . $wpdb->last_error);
+//             return '<p>Error deleting template. Please try again.</p>';
+//         }
+        
+//         wp_redirect(home_url('/institute-dashboard/fees/?section=delete-fee-template'));
+//         exit;
+//     }
+// }
 
 
 // include plugin_dir_path(__FILE__) . 'assets/edit-classes.php';
@@ -955,6 +959,8 @@ function my_education_erp_delete_fee_template() {
 // include plugin_dir_path(__FILE__) . 'assets/teachers/add-teachers.php';
 // include plugin_dir_path(__FILE__) . 'assets/teachers/update-teachers.php';
 // include plugin_dir_path(__FILE__) . 'assets/teachers/delete-teachers.php';
+
+
 
 // Function to include all files from a given directory
 function include_files_from_directory($directory) {
@@ -1055,7 +1061,17 @@ add_action( 'init', 'create_custom_user_roles' );
 function institute_dashboard_scripts() {
     wp_enqueue_style('institute-dashboard-style', plugin_dir_url(__FILE__) . '/css/style.css');
     wp_enqueue_script('institute-dashboard-script', plugin_dir_url(__FILE__) . '/js/js.js', array('jquery'), null, true);
-   
+   // First, include Select2 library (you'll need to add these to your theme's header/footer)
+wp_enqueue_style('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css');
+wp_enqueue_script('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array('jquery'), '4.0.13', true);
+
+    // Enqueue Bootstrap, Select2, and jQuery
+    wp_enqueue_script('jquery');
+    wp_enqueue_style('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css');
+    wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js', ['jquery'], '5.3.0', true);
+    // wp_enqueue_style('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css');
+    // wp_enqueue_script('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', ['jquery'], '4.0.13', true);
+
 }
 add_action('wp_enqueue_scripts', 'institute_dashboard_scripts');
 

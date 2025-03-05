@@ -10,6 +10,19 @@ function delete_fee_templates_institute_dashboard_shortcode() {
         return '<p>No Educational Center found.</p>';
     }
 
+    // Handle deletion if form is submitted
+    if (isset($_POST['delete_template_id']) && !empty($_POST['delete_template_id'])) {
+        $template_id = intval($_POST['delete_template_id']);
+        $nonce = $_POST['_wpnonce'] ?? '';
+        
+        if (wp_verify_nonce($nonce, 'delete_fee_template_nonce')) {
+            $deleted = $wpdb->delete(
+                $wpdb->prefix . 'fee_templates',
+                ['id' => $template_id]
+            );
+        }
+    }
+
     ob_start();
     ?>
     <div class="form-container attendance-entry-wrapper attendance-content-wrapper">
@@ -40,16 +53,21 @@ function delete_fee_templates_institute_dashboard_shortcode() {
                     ));
                     if (!empty($templates)) {
                         foreach ($templates as $template) {
-                            echo '<tr class="fee-template-row">
-                                <td>' . esc_html($template->name) . '</td>
-                                <td>' . esc_html($template->amount) . '</td>
-                                <td>' . esc_html($template->frequency) . '</td>
-                                <td>' . esc_html($template->class_id ?: 'N/A') . '</td>
+                            ?>
+                            <tr class="fee-template-row">
+                                <td><?php echo esc_html($template->name); ?></td>
+                                <td><?php echo esc_html($template->amount); ?></td>
+                                <td><?php echo esc_html($template->frequency); ?></td>
+                                <td><?php echo esc_html($template->class_id ?: 'N/A'); ?></td>
                                 <td>
-                                    <a href="' . home_url('/institute-dashboard/fees/?section=delete-fee-template&action=delete&template_id=' . $template->id) . '" 
-                                       onclick="return confirm(\'Are you sure you want to delete this fee template?\')">Delete</a>
+                                    <form method="post" onsubmit="return confirm('Are you sure you want to delete this fee template?');">
+                                        <input type="hidden" name="delete_template_id" value="<?php echo $template->id; ?>">
+                                        <input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce('delete_fee_template_nonce'); ?>">
+                                        <button type="submit" class="delete-template">Delete</button>
+                                    </form>
                                 </td>
-                            </tr>';
+                            </tr>
+                            <?php
                         }
                     } else {
                         echo '<tr><td colspan="5">No fee templates found for this Educational Center.</td></tr>';
@@ -60,25 +78,32 @@ function delete_fee_templates_institute_dashboard_shortcode() {
         </div>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script>
-    $(document).ready(function() {
-        $('#search_text_template').keyup(function() {
-            var searchText = $(this).val().toLowerCase();
-            $('#fee-templates-table tbody tr').each(function() {
-                var name = $(this).find('td').eq(0).text().toLowerCase();
-                var amount = $(this).find('td').eq(1).text().toLowerCase();
-                var frequency = $(this).find('td').eq(2).text().toLowerCase();
+    // Basic search functionality without jQuery dependency
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search_text_template');
+        const rows = document.querySelectorAll('#fee-templates-table tbody tr');
+
+        searchInput.addEventListener('keyup', function() {
+            const searchText = this.value.toLowerCase();
+            
+            rows.forEach(row => {
+                const name = row.cells[0].textContent.toLowerCase();
+                const amount = row.cells[1].textContent.toLowerCase();
+                const frequency = row.cells[2].textContent.toLowerCase();
+                
                 if (name.includes(searchText) || amount.includes(searchText) || frequency.includes(searchText)) {
-                    $(this).show();
+                    row.style.display = '';
                 } else {
-                    $(this).hide();
+                    row.style.display = 'none';
                 }
             });
         });
     });
     </script>
     <?php
+
     return ob_get_clean();
 }
 add_shortcode('delete_fee_templates_institute_dashboard', 'delete_fee_templates_institute_dashboard_shortcode');
+?>

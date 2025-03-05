@@ -27,7 +27,7 @@ function fee_templates_institute_dashboard_shortcode() {
         // include plugin_dir_path(__FILE__) . '../sidebar.php'; // Adjust path as needed
         ?> -->
         <div class="form-container attendance-entry-wrapper attendance-content-wrapper">
-            <a href="/institute-dashboard/add-fee-template">+ Add Fee Template</a>
+            <a href="/institute-dashboard/fees/?section=fees-templates">+ Add Fee Template</a>
 
             <!-- Search Form -->
             <?php

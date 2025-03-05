@@ -421,7 +421,7 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
     <div>
       <li class="<?php echo $active_section == 'view-fees' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/fees')); ?>">View Fees</a></li>
       <li class="<?php echo $active_section == 'add-fees' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/fees/?section=add-fees')); ?>">Add New Fees</a></li>
-      <li class="<?php echo $active_section == 'update-fees' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/fees/?section=edit-fees')); ?>">Update Fees</a></li>
+      <li class="<?php echo $active_section == 'update-fees' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/fees/?section=update-fees')); ?>">Update Fees</a></li>
       <li class="<?php echo $active_section == 'delete-fees' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/fees/?section=delete-fees')); ?>">Delete Fees</a></li>
     </div>
   </ul>

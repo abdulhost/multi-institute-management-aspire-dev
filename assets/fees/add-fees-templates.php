@@ -11,7 +11,7 @@ function add_fee_templates_institute_dashboard_shortcode() {
         $name = sanitize_text_field($_POST['template_name']);
         $amount = floatval($_POST['template_amount']);
         $frequency = sanitize_text_field($_POST['template_frequency']);
-        $class_id = !empty($_POST['class_id']) ? intval($_POST['class_id']) : null;
+        $class_id = sanitize_text_field($_POST['class_id']);
 
         $wpdb->insert($wpdb->prefix . 'fee_templates', [
             'name' => $name,
@@ -20,7 +20,9 @@ function add_fee_templates_institute_dashboard_shortcode() {
             'class_id' => $class_id,
             'education_center_id' => $education_center_id,
         ]);
-        return '<p>Fee template added successfully!</p>';
+        // return '<p>Fee template added successfully!</p>';
+        wp_redirect(home_url('/institute-dashboard/fees/?section=add-fees-template'));
+
     }
 
     ob_start();
@@ -50,7 +52,7 @@ function add_fee_templates_institute_dashboard_shortcode() {
                             <option value="annual">Annual</option>
                         </select><br>
                         <label for="class_id">Class ID (Optional):</label>
-                        <input type="number" name="class_id"><br>
+                        <input type="text" name="class_id"><br>
                     </div>
                 </div>
                 <?php wp_nonce_field('add_fee_template_nonce', 'nonce'); ?>
