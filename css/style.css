@@ -56,6 +56,7 @@ html{
     background-color: var(--hover-clr2) ;
 }
 #sidebar{
+
   box-sizing: border-box;
   /* height: 100vh; */
   width: 250px;
@@ -69,6 +70,7 @@ html{
   transition: 300ms ease-in-out;
   overflow: hidden;
   text-wrap: nowrap;
+  padding-left: 2px;
 }
 #sidebar.close{
   padding: 5px;
@@ -105,6 +107,7 @@ html{
   display: flex;
   align-items: center;
   gap: 1em;
+  font-size: 14px;
 }
 .dropdown-btn{
   width: 100%;
