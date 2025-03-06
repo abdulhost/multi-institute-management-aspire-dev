@@ -225,3 +225,21 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+jQuery(document).ready(function($) {
+  $('#exam-search').on('keyup', function() {
+      var value = $(this).val().toLowerCase();
+      $('#exams-table tr').filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      });
+  });
+
+  window.addSubjectRow = function() {
+      var table = document.getElementById('subjects-table').getElementsByTagName('tbody')[0];
+      var row = table.insertRow();
+      row.innerHTML = `
+          <td><input type="text" name="subjects[]" class="form-control" required></td>
+          <td><input type="number" name="max_marks[]" class="form-control" value="100" step="0.01" min="0" required></td>
+          <td><button type="button" class="btn btn-danger" onclick="this.parentElement.parentElement.remove()">Remove</button></td>
+      `;
+  };
+});

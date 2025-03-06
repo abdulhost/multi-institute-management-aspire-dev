@@ -474,3 +474,908 @@ function my_education_erp_render_admin_page() {
     </div>
     <?php
 }
+
+
+// Add admin menu items
+add_action('admin_menu', 'education_erp_admin_menu');
+function education_erp_admin_menu() {
+    // Parent menu
+    add_menu_page(
+        'Education ERP',
+        'Education ERP',
+        'manage_options',
+        'education-erp',
+        'education_erp_dashboard_page', // No callback for parent
+        'dashicons-admin-generic',
+        6
+    );
+
+    // Submenu: Fees
+    add_submenu_page(
+        'education-erp',
+        'Fees Management',
+        'Fees',
+        'manage_options',
+        'education-erp-fees',
+        'education_erp_fees_page'
+    );
+
+    // Submenu: Fees Templates
+    add_submenu_page(
+        'education-erp',
+        'Fees Templates Management',
+        'Fees Templates',
+        'manage_options',
+        'education-erp-fees-templates',
+        'education_erp_fees_templates_page'
+    );
+
+    // Submenu: Transport Enrollments
+    add_submenu_page(
+        'education-erp',
+        'Transport Enrollments Management',
+        'Transport Enrollments',
+        'manage_options',
+        'education-erp-transport-enrollments',
+        'education_erp_transport_enrollments_page'
+    );
+
+    // Submenu: Transport Fees
+    add_submenu_page(
+        'education-erp',
+        'Transport Fees Management',
+        'Transport Fees',
+        'manage_options',
+        'education-erp-transport-fees',
+        'education_erp_transport_fees_page'
+    );
+}
+// Dummy Dashboard Page for Parent Menu
+function education_erp_dashboard_page() {
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to access this page.'));
+    }
+    ?>
+    <div class="wrap education-erp-dashboard">
+        <h1 class="wp-heading-inline">Education ERP Dashboard</h1>
+        <div class="welcome-panel">
+            <h2>Welcome to Education ERP Developed By Aspire Dev</h2>
+            <p>This is the main dashboard for managing educational resources. Use the menu items below "Education ERP" to access specific sections:</p>
+            <ul>
+                <li><a href="<?php echo admin_url('admin.php?page=education-erp-fees'); ?>">Fees</a> - Manage student fees.</li>
+                <li><a href="<?php echo admin_url('admin.php?page=education-erp-fees-templates'); ?>">Fees Templates</a> - Configure fee templates.</li>
+                <li><a href="<?php echo admin_url('admin.php?page=education-erp-transport-enrollments'); ?>">Transport Enrollments</a> - Handle transport enrollments.</li>
+                <li><a href="<?php echo admin_url('admin.php?page=education-erp-transport-fees'); ?>">Transport Fees</a> - Manage transport-related fees.</li>
+            </ul>
+        </div>
+    </div>
+    <style>
+        .education-erp-dashboard .welcome-panel {
+            background: #fff;
+            border: 1px solid #ccd0d4;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 1px 1px rgba(0,0,0,.04);
+        }
+        .education-erp-dashboard .welcome-panel h2 {
+            margin-top: 0;
+        }
+        .education-erp-dashboard .welcome-panel ul {
+            list-style: disc;
+            margin-left: 20px;
+        }
+    </style>
+    <?php
+}
+// Fees Page
+function education_erp_fees_page() {
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to access this page.'));
+    }
+    global $wpdb;
+    render_fees_ui($wpdb);
+}
+
+// Fees Templates Page
+function education_erp_fees_templates_page() {
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to access this page.'));
+    }
+    global $wpdb;
+    render_fees_templates_ui($wpdb);
+}
+
+// Transport Enrollments Page
+function education_erp_transport_enrollments_page() {
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to access this page.'));
+    }
+    global $wpdb;
+    render_transport_enrollments_ui($wpdb);
+}
+
+// Transport Fees Page
+function education_erp_transport_fees_page() {
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to access this page.'));
+    }
+    global $wpdb;
+    render_transport_fees_ui($wpdb);
+}
+
+// Shared Styles and Scripts
+function render_admin_styles_and_scripts() {
+    ?>
+    <style>
+        .education-erp-dashboard .table {
+            margin-top: 20px;
+        }
+        .education-erp-dashboard .form-group {
+            margin-bottom: 15px;
+        }
+        .education-erp-dashboard .btn {
+            margin-right: 10px;
+        }
+        .education-erp-dashboard .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .education-erp-dashboard .modal-content {
+            background: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 5px;
+            position: relative;
+        }
+        .education-erp-dashboard .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .education-erp-dashboard .search-bar {
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <script>
+    jQuery(document).ready(function($) {
+        // Modal handling
+        $('.edit-btn, .add-btn').on('click', function(e) {
+            e.preventDefault();
+            var modalId = $(this).data('modal');
+            $('#' + modalId).show();
+        });
+
+        $('.modal-close').on('click', function() {
+            $(this).closest('.modal').hide();
+        });
+
+        $(window).on('click', function(event) {
+            if ($(event.target).hasClass('modal')) {
+                $('.modal').hide();
+            }
+        });
+
+        // Delete confirmation
+        $('.delete-form').on('submit', function(e) {
+            if (!confirm('Are you sure you want to delete the selected items?')) {
+                e.preventDefault();
+            }
+        });
+
+        // Search functionality
+        $('.search-bar input').on('keyup', function() {
+            var searchValue = $(this).val().toLowerCase();
+            var tableId = $(this).data('table');
+            $('#' + tableId + ' tbody tr').each(function() {
+                var studentId = $(this).find('td:eq(1)').text().toLowerCase();
+                $(this).toggle(studentId.indexOf(searchValue) > -1);
+            });
+        });
+    });
+    </script>
+    <?php
+}
+
+// Fees UI
+function render_fees_ui($wpdb) {
+    $table_name = $wpdb->prefix . 'student_fees';
+    $templates_table = $wpdb->prefix . 'fee_templates';
+
+    // Handle CRUD
+    if (isset($_POST['add_fee']) && check_admin_referer('add_fee_nonce')) {
+        $wpdb->insert($table_name, [
+            'student_id' => sanitize_text_field($_POST['student_id']),
+            'education_center_id' => sanitize_text_field($_POST['education_center_id']),
+            'template_id' => sanitize_text_field($_POST['template_id']),
+            'amount' => floatval($_POST['amount']),
+            'month_year' => sanitize_text_field($_POST['month_year']),
+            'status' => sanitize_text_field($_POST['status']),
+            'paid_date' => !empty($_POST['paid_date']) ? sanitize_text_field($_POST['paid_date']) : null,
+            'payment_method' => sanitize_text_field($_POST['payment_method']),
+            'cheque_number' => !empty($_POST['cheque_number']) ? sanitize_text_field($_POST['cheque_number']) : null,
+        ]);
+        echo '<div class="notice notice-success"><p>Fee added successfully!</p></div>';
+    }
+
+    if (isset($_POST['update_fee']) && check_admin_referer('update_fee_nonce')) {
+        foreach ($_POST['fee_id'] as $index => $id) {
+            $wpdb->update($table_name, [
+                'template_id' => sanitize_text_field($_POST['template_id'][$index]),
+                'amount' => floatval($_POST['amount'][$index]),
+                'status' => sanitize_text_field($_POST['status'][$index]),
+                'paid_date' => !empty($_POST['paid_date'][$index]) ? sanitize_text_field($_POST['paid_date'][$index]) : null,
+                'payment_method' => sanitize_text_field($_POST['payment_method'][$index]),
+                'cheque_number' => !empty($_POST['cheque_number'][$index]) ? sanitize_text_field($_POST['cheque_number'][$index]) : null,
+            ], ['id' => intval($id)]);
+        }
+        echo '<div class="notice notice-success"><p>Fees updated successfully!</p></div>';
+    }
+
+    if (isset($_POST['delete_fees']) && check_admin_referer('delete_fees_nonce')) {
+        $ids = array_map('intval', $_POST['fee_ids'] ?? []);
+        if (!empty($ids)) {
+            $wpdb->query($wpdb->prepare("DELETE FROM $table_name WHERE id IN (" . implode(',', array_fill(0, count($ids), '%d')) . ")", ...$ids));
+            echo '<div class="notice notice-success"><p>Fees deleted successfully!</p></div>';
+        }
+    }
+
+    // Fetch all fees
+    $fees = $wpdb->get_results(
+        "SELECT sf.*, ft.name as template_name 
+         FROM $table_name sf 
+         LEFT JOIN $templates_table ft ON sf.template_id = ft.id 
+         ORDER BY sf.month_year DESC"
+    );
+    $templates = $wpdb->get_results("SELECT id, name, amount FROM $templates_table");
+
+    ?>
+    <div class="wrap education-erp-dashboard">
+        <h1 class="wp-heading-inline">Fees Management</h1>
+        <div class="search-bar">
+            <input type="text" class="form-control" placeholder="Search by Student ID" data-table="fees-table">
+        </div>
+        <button class="btn btn-primary add-btn" data-modal="add-fee-modal">Add Fee</button>
+        <table id="fees-table" class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th><input type="checkbox" id="select-all-fees"></th>
+                    <th>Student ID</th>
+                    <th>Center ID</th>
+                    <th>Template</th>
+                    <th>Amount</th>
+                    <th>Month/Year</th>
+                    <th>Status</th>
+                    <th>Paid Date</th>
+                    <th>Payment Method</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($fees) : ?>
+                    <?php foreach ($fees as $fee) : ?>
+                        <tr>
+                            <td><input type="checkbox" name="fee_ids[]" value="<?php echo esc_attr($fee->id); ?>" class="fee-checkbox"></td>
+                            <td><?php auxin_print($fee->student_id); ?></td>
+                            <td><?php auxin_print($fee->education_center_id); ?></td>
+                            <td><?php auxin_print($fee->template_name ?: 'N/A'); ?></td>
+                            <td><?php auxin_print($fee->amount); ?></td>
+                            <td><?php auxin_print($fee->month_year); ?></td>
+                            <td><?php auxin_print($fee->status); ?></td>
+                            <td><?php auxin_print($fee->paid_date ?: '-'); ?></td>
+                            <td><?php auxin_print($fee->payment_method ?: '-'); ?></td>
+                            <td>
+                                <button class="btn btn-sm btn-warning edit-btn" data-modal="edit-fee-modal-<?php echo esc_attr($fee->id); ?>">Edit</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else : ?>
+                    <tr><td colspan="10">No fees found.</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+        <form method="post" class="delete-form">
+            <?php wp_nonce_field('delete_fees_nonce'); ?>
+            <button type="submit" name="delete_fees" class="btn btn-danger">Delete Selected</button>
+        </form>
+
+        <!-- Add Fee Modal -->
+        <div id="add-fee-modal" class="modal">
+            <div class="modal-content">
+                <span class="modal-close">×</span>
+                <h3>Add Fee</h3>
+                <form method="post">
+                    <?php wp_nonce_field('add_fee_nonce'); ?>
+                    <div class="form-group">
+                        <label for="student_id">Student ID</label>
+                        <input type="text" class="form-control" name="student_id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="education_center_id">Education Center ID</label>
+                        <input type="text" class="form-control" name="education_center_id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="template_id">Template</label>
+                        <select class="form-control" name="template_id" required>
+                            <option value="">Select Template</option>
+                            <?php foreach ($templates as $template) : ?>
+                                <option value="<?php echo esc_attr($template->id); ?>"><?php auxin_print($template->name); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount</label>
+                        <input type="number" step="0.01" class="form-control" name="amount" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="month_year">Month/Year</label>
+                        <input type="text" class="form-control" name="month_year" placeholder="YYYY-MM" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select class="form-control" name="status" required>
+                            <option value="pending">Pending</option>
+                            <option value="paid">Paid</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="paid_date">Paid Date</label>
+                        <input type="date" class="form-control" name="paid_date">
+                    </div>
+                    <div class="form-group">
+                        <label for="payment_method">Payment Method</label>
+                        <select class="form-control" name="payment_method">
+                            <option value="">Select</option>
+                            <option value="cod">COD</option>
+                            <option value="cheque">Cheque</option>
+                            <option value="cash">Cash</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cheque_number">Cheque Number</label>
+                        <input type="text" class="form-control" name="cheque_number">
+                    </div>
+                    <button type="submit" name="add_fee" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit Fee Modals -->
+        <?php foreach ($fees as $fee) : ?>
+            <div id="edit-fee-modal-<?php echo esc_attr($fee->id); ?>" class="modal">
+                <div class="modal-content">
+                    <span class="modal-close">×</span>
+                    <h3>Edit Fee</h3>
+                    <form method="post">
+                        <?php wp_nonce_field('update_fee_nonce'); ?>
+                        <input type="hidden" name="fee_id[]" value="<?php echo esc_attr($fee->id); ?>">
+                        <div class="form-group">
+                            <label for="template_id">Template</label>
+                            <select class="form-control" name="template_id[]">
+                                <option value="">Select Template</option>
+                                <?php foreach ($templates as $template) : ?>
+                                    <option value="<?php echo esc_attr($template->id); ?>" <?php selected($fee->template_id, $template->id); ?>><?php auxin_print($template->name); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Amount</label>
+                            <input type="number" step="0.01" class="form-control" name="amount[]" value="<?php echo esc_attr($fee->amount); ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select class="form-control" name="status[]">
+                                <option value="pending" <?php selected($fee->status, 'pending'); ?>>Pending</option>
+                                <option value="paid" <?php selected($fee->status, 'paid'); ?>>Paid</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="paid_date">Paid Date</label>
+                            <input type="date" class="form-control" name="paid_date[]" value="<?php echo esc_attr($fee->paid_date); ?>">
+                        </div>
+                        <div class="form-group">
+                            <label for="payment_method">Payment Method</label>
+                            <select class="form-control" name="payment_method[]">
+                                <option value="">Select</option>
+                                <option value="cod" <?php selected($fee->payment_method, 'cod'); ?>>COD</option>
+                                <option value="cheque" <?php selected($fee->payment_method, 'cheque'); ?>>Cheque</option>
+                                <option value="cash" <?php selected($fee->payment_method, 'cash'); ?>>Cash</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="cheque_number">Cheque Number</label>
+                            <input type="text" class="form-control" name="cheque_number[]" value="<?php echo esc_attr($fee->cheque_number); ?>">
+                        </div>
+                        <button type="submit" name="update_fee" class="btn btn-primary">Update</button>
+                    </form>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php
+    render_admin_styles_and_scripts();
+}
+
+// Fees Templates UI
+function render_fees_templates_ui($wpdb) {
+    $table_name = $wpdb->prefix . 'fee_templates';
+
+    // Handle CRUD
+    if (isset($_POST['add_template']) && check_admin_referer('add_template_nonce')) {
+        $wpdb->insert($table_name, [
+            'name' => sanitize_text_field($_POST['name']),
+            'amount' => floatval($_POST['amount']),
+        ]);
+        echo '<div class="notice notice-success"><p>Template added successfully!</p></div>';
+    }
+
+    if (isset($_POST['update_template']) && check_admin_referer('update_template_nonce')) {
+        foreach ($_POST['template_id'] as $index => $id) {
+            $wpdb->update($table_name, [
+                'name' => sanitize_text_field($_POST['name'][$index]),
+                'amount' => floatval($_POST['amount'][$index]),
+            ], ['id' => intval($id)]);
+        }
+        echo '<div class="notice notice-success"><p>Templates updated successfully!</p></div>';
+    }
+
+    if (isset($_POST['delete_templates']) && check_admin_referer('delete_templates_nonce')) {
+        $ids = array_map('intval', $_POST['template_ids'] ?? []);
+        if (!empty($ids)) {
+            $wpdb->query($wpdb->prepare("DELETE FROM $table_name WHERE id IN (" . implode(',', array_fill(0, count($ids), '%d')) . ")", ...$ids));
+            echo '<div class="notice notice-success"><p>Templates deleted successfully!</p></div>';
+        }
+    }
+
+    // Fetch all templates
+    $templates = $wpdb->get_results("SELECT * FROM $table_name ORDER BY name ASC");
+
+    ?>
+    <div class="wrap education-erp-dashboard">
+        <h1 class="wp-heading-inline">Fees Templates Management</h1>
+        <button class="btn btn-primary add-btn" data-modal="add-template-modal">Add Template</button>
+        <table id="templates-table" class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th><input type="checkbox" id="select-all-templates"></th>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($templates) : ?>
+                    <?php foreach ($templates as $template) : ?>
+                        <tr>
+                            <td><input type="checkbox" name="template_ids[]" value="<?php echo esc_attr($template->id); ?>" class="template-checkbox"></td>
+                            <td><?php auxin_print($template->name); ?></td>
+                            <td><?php auxin_print($template->amount); ?></td>
+                            <td>
+                                <button class="btn btn-sm btn-warning edit-btn" data-modal="edit-template-modal-<?php echo esc_attr($template->id); ?>">Edit</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else : ?>
+                    <tr><td colspan="4">No templates found.</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+        <form method="post" class="delete-form">
+            <?php wp_nonce_field('delete_templates_nonce'); ?>
+            <button type="submit" name="delete_templates" class="btn btn-danger">Delete Selected</button>
+        </form>
+
+        <!-- Add Template Modal -->
+        <div id="add-template-modal" class="modal">
+            <div class="modal-content">
+                <span class="modal-close">×</span>
+                <h3>Add Template</h3>
+                <form method="post">
+                    <?php wp_nonce_field('add_template_nonce'); ?>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount</label>
+                        <input type="number" step="0.01" class="form-control" name="amount" required>
+                    </div>
+                    <button type="submit" name="add_template" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit Template Modals -->
+        <?php foreach ($templates as $template) : ?>
+            <div id="edit-template-modal-<?php echo esc_attr($template->id); ?>" class="modal">
+                <div class="modal-content">
+                    <span class he="modal-close">×</span>
+                    <h3>Edit Template</h3>
+                    <form method="post">
+                        <?php wp_nonce_field('update_template_nonce'); ?>
+                        <input type="hidden" name="template_id[]" value="<?php echo esc_attr($template->id); ?>">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" name="name[]" value="<?php echo esc_attr($template->name); ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Amount</label>
+                            <input type="number" step="0.01" class="form-control" name="amount[]" value="<?php echo esc_attr($template->amount); ?>" required>
+                        </div>
+                        <button type="submit" name="update_template" class="btn btn-primary">Update</button>
+                    </form>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php
+    render_admin_styles_and_scripts();
+}
+
+// Transport Enrollments UI
+function render_transport_enrollments_ui($wpdb) {
+    $table_name = $wpdb->prefix . 'transport_enrollments';
+
+    // Handle CRUD
+    if (isset($_POST['add_enrollment']) && check_admin_referer('add_enrollment_nonce')) {
+        $wpdb->insert($table_name, [
+            'student_id' => sanitize_text_field($_POST['student_id']),
+            'education_center_id' => sanitize_text_field($_POST['education_center_id']),
+            'enrollment_date' => sanitize_text_field($_POST['enrollment_date']),
+            'active' => isset($_POST['active']) ? 1 : 0,
+        ]);
+        echo '<div class="notice notice-success"><p>Enrollment added successfully!</p></div>';
+    }
+
+    if (isset($_POST['update_enrollment']) && check_admin_referer('update_enrollment_nonce')) {
+        foreach ($_POST['enrollment_id'] as $index => $id) {
+            $wpdb->update($table_name, [
+                'enrollment_date' => sanitize_text_field($_POST['enrollment_date'][$index]),
+                'active' => isset($_POST['active'][$index]) ? 1 : 0,
+            ], ['id' => intval($id)]);
+        }
+        echo '<div class="notice notice-success"><p>Enrollments updated successfully!</p></div>';
+    }
+
+    if (isset($_POST['delete_enrollments']) && check_admin_referer('delete_enrollments_nonce')) {
+        $ids = array_map('intval', $_POST['enrollment_ids'] ?? []);
+        if (!empty($ids)) {
+            $wpdb->query($wpdb->prepare("DELETE FROM $table_name WHERE id IN (" . implode(',', array_fill(0, count($ids), '%d')) . ")", ...$ids));
+            echo '<div class="notice notice-success"><p>Enrollments deleted successfully!</p></div>';
+        }
+    }
+
+    // Fetch all enrollments
+    $enrollments = $wpdb->get_results(
+        "SELECT * FROM $table_name 
+         ORDER BY enrollment_date DESC"
+    );
+
+    ?>
+    <div class="wrap education-erp-dashboard">
+        <h1 class="wp-heading-inline">Transport Enrollments Management</h1>
+        <div class="search-bar">
+            <input type="text" class="form-control" placeholder="Search by Student ID" data-table="enrollments-table">
+        </div>
+        <button class="btn btn-primary add-btn" data-modal="add-enrollment-modal">Add Enrollment</button>
+        <table id="enrollments-table" class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th><input type="checkbox" id="select-all-enrollments"></th>
+                    <th>Student ID</th>
+                    <th>Center ID</th>
+                    <th>Enrollment Date</th>
+                    <th>Active</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($enrollments) : ?>
+                    <?php foreach ($enrollments as $enrollment) : ?>
+                        <tr>
+                            <td><input type="checkbox" name="enrollment_ids[]" value="<?php echo esc_attr($enrollment->id); ?>" class="enrollment-checkbox"></td>
+                            <td><?php auxin_print($enrollment->student_id); ?></td>
+                            <td><?php auxin_print($enrollment->education_center_id); ?></td>
+                            <td><?php auxin_print($enrollment->enrollment_date); ?></td>
+                            <td><?php echo $enrollment->active ? 'Yes' : 'No'; ?></td>
+                            <td>
+                                <button class="btn btn-sm btn-warning edit-btn" data-modal="edit-enrollment-modal-<?php echo esc_attr($enrollment->id); ?>">Edit</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else : ?>
+                    <tr><td colspan="6">No transport enrollments found.</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+        <form method="post" class="delete-form">
+            <?php wp_nonce_field('delete_enrollments_nonce'); ?>
+            <button type="submit" name="delete_enrollments" class="btn btn-danger">Delete Selected</button>
+        </form>
+
+        <!-- Add Enrollment Modal -->
+        <div id="add-enrollment-modal" class="modal">
+            <div class="modal-content">
+                <span class="modal-close">×</span>
+                <h3>Add Enrollment</h3>
+                <form method="post">
+                    <?php wp_nonce_field('add_enrollment_nonce'); ?>
+                    <div class="form-group">
+                        <label for="student_id">Student ID</label>
+                        <input type="text" class="form-control" name="student_id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="education_center_id">Education Center ID</label>
+                        <input type="text" class="form-control" name="education_center_id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="enrollment_date">Enrollment Date</label>
+                        <input type="date" class="form-control" name="enrollment_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label><input type="checkbox" name="active" checked> Active</label>
+                    </div>
+                    <button type="submit" name="add_enrollment" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit Enrollment Modals -->
+        <?php foreach ($enrollments as $enrollment) : ?>
+            <div id="edit-enrollment-modal-<?php echo esc_attr($enrollment->id); ?>" class="modal">
+                <div class="modal-content">
+                    <span class="modal-close">×</span>
+                    <h3>Edit Enrollment</h3>
+                    <form method="post">
+                        <?php wp_nonce_field('update_enrollment_nonce'); ?>
+                        <input type="hidden" name="enrollment_id[]" value="<?php echo esc_attr($enrollment->id); ?>">
+                        <div class="form-group">
+                            <label for="enrollment_date">Enrollment Date</label>
+                            <input type="date" class="form-control" name="enrollment_date[]" value="<?php echo esc_attr($enrollment->enrollment_date); ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label><input type="checkbox" name="active[]" <?php checked($enrollment->active, 1); ?>> Active</label>
+                        </div>
+                        <button type="submit" name="update_enrollment" class="btn btn-primary">Update</button>
+                    </form>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php
+    render_admin_styles_and_scripts();
+}
+
+// Transport Fees UI
+function render_transport_fees_ui($wpdb) {
+    $table_name = $wpdb->prefix . 'transport_fees';
+    $templates_table = $wpdb->prefix . 'fee_templates';
+
+    // Handle CRUD
+    if (isset($_POST['add_transport_fee']) && check_admin_referer('add_transport_fee_nonce')) {
+        $wpdb->insert($table_name, [
+            'student_id' => sanitize_text_field($_POST['student_id']),
+            'education_center_id' => sanitize_text_field($_POST['education_center_id']),
+            'template_id' => sanitize_text_field($_POST['template_id']),
+            'amount' => floatval($_POST['amount']),
+            'month_year' => sanitize_text_field($_POST['month_year']),
+            'status' => sanitize_text_field($_POST['status']),
+            'paid_date' => !empty($_POST['paid_date']) ? sanitize_text_field($_POST['paid_date']) : null,
+            'payment_method' => sanitize_text_field($_POST['payment_method']),
+            'cheque_number' => !empty($_POST['cheque_number']) ? sanitize_text_field($_POST['cheque_number']) : null,
+        ]);
+        echo '<div class="notice notice-success"><p>Transport Fee added successfully!</p></div>';
+    }
+
+    if (isset($_POST['update_transport_fee']) && check_admin_referer('update_transport_fee_nonce')) {
+        foreach ($_POST['fee_id'] as $index => $id) {
+            $wpdb->update($table_name, [
+                'template_id' => sanitize_text_field($_POST['template_id'][$index]),
+                'amount' => floatval($_POST['amount'][$index]),
+                'status' => sanitize_text_field($_POST['status'][$index]),
+                'paid_date' => !empty($_POST['paid_date'][$index]) ? sanitize_text_field($_POST['paid_date'][$index]) : null,
+                'payment_method' => sanitize_text_field($_POST['payment_method'][$index]),
+                'cheque_number' => !empty($_POST['cheque_number'][$index]) ? sanitize_text_field($_POST['cheque_number'][$index]) : null,
+            ], ['id' => intval($id)]);
+        }
+        echo '<div class="notice notice-success"><p>Transport Fees updated successfully!</p></div>';
+    }
+
+    if (isset($_POST['delete_transport_fees']) && check_admin_referer('delete_transport_fees_nonce')) {
+        $ids = array_map('intval', $_POST['fee_ids'] ?? []);
+        if (!empty($ids)) {
+            $wpdb->query($wpdb->prepare("DELETE FROM $table_name WHERE id IN (" . implode(',', array_fill(0, count($ids), '%d')) . ")", ...$ids));
+            echo '<div class="notice notice-success"><p>Transport Fees deleted successfully!</p></div>';
+        }
+    }
+
+    // Fetch all transport fees
+    $fees = $wpdb->get_results(
+        "SELECT tf.*, ft.name as template_name 
+         FROM $table_name tf 
+         LEFT JOIN $templates_table ft ON tf.template_id = ft.id 
+         ORDER BY tf.month_year DESC"
+    );
+    $templates = $wpdb->get_results("SELECT id, name, amount FROM $templates_table WHERE name LIKE 'transport_%'");
+
+    ?>
+    <div class="wrap education-erp-dashboard">
+        <h1 class="wp-heading-inline">Transport Fees Management</h1>
+        <div class="search-bar">
+            <input type="text" class="form-control" placeholder="Search by Student ID" data-table="transport-fees-table">
+        </div>
+        <button class="btn btn-primary add-btn" data-modal="add-transport-fee-modal">Add Transport Fee</button>
+        <table id="transport-fees-table" class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th><input type="checkbox" id="select-all-transport-fees"></th>
+                    <th>Student ID</th>
+                    <th>Center ID</th>
+                    <th>Template</th>
+                    <th>Amount</th>
+                    <th>Month/Year</th>
+                    <th>Status</th>
+                    <th>Paid Date</th>
+                    <th>Payment Method</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($fees) : ?>
+                    <?php foreach ($fees as $fee) : ?>
+                        <tr>
+                            <td><input type="checkbox" name="fee_ids[]" value="<?php echo esc_attr($fee->id); ?>" class="transport-fee-checkbox"></td>
+                            <td><?php auxin_print($fee->student_id); ?></td>
+                            <td><?php auxin_print($fee->education_center_id); ?></td>
+                            <td><?php auxin_print($fee->template_name ?: 'N/A'); ?></td>
+                            <td><?php auxin_print($fee->amount); ?></td>
+                            <td><?php auxin_print($fee->month_year); ?></td>
+                            <td><?php auxin_print($fee->status); ?></td>
+                            <td><?php auxin_print($fee->paid_date ?: '-'); ?></td>
+                            <td><?php auxin_print($fee->payment_method ?: '-'); ?></td>
+                            <td>
+                                <button class="btn btn-sm btn-warning edit-btn" data-modal="edit-transport-fee-modal-<?php echo esc_attr($fee->id); ?>">Edit</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else : ?>
+                    <tr><td colspan="10">No transport fees found.</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+        <form method="post" class="delete-form">
+            <?php wp_nonce_field('delete_transport_fees_nonce'); ?>
+            <button type="submit" name="delete_transport_fees" class="btn btn-danger">Delete Selected</button>
+        </form>
+
+        <!-- Add Transport Fee Modal -->
+        <div id="add-transport-fee-modal" class="modal">
+            <div class="modal-content">
+                <span class="modal-close">×</span>
+                <h3>Add Transport Fee</h3>
+                <form method="post">
+                    <?php wp_nonce_field('add_transport_fee_nonce'); ?>
+                    <div class="form-group">
+                        <label for="student_id">Student ID</label>
+                        <input type="text" class="form-control" name="student_id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="education_center_id">Education Center ID</label>
+                        <input type="text" class="form-control" name="education_center_id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="template_id">Template</label>
+                        <select class="form-control" name="template_id" required>
+                            <option value="">Select Template</option>
+                            <?php foreach ($templates as $template) : ?>
+                                <option value="<?php echo esc_attr($template->id); ?>"><?php auxin_print($template->name); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount</label>
+                        <input type="number" step="0.01" class="form-control" name="amount" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="month_year">Month/Year</label>
+                        <input type="text" class="form-control" name="month_year" placeholder="YYYY-MM" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select class="form-control" name="status" required>
+                            <option value="pending">Pending</option>
+                            <option value="paid">Paid</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="paid_date">Paid Date</label>
+                        <input type="date" class="form-control" name="paid_date">
+                    </div>
+                    <div class="form-group">
+                        <label for="payment_method">Payment Method</label>
+                        <select class="form-control" name="payment_method">
+                            <option value="">Select</option>
+                            <option value="cod">COD</option>
+                            <option value="cheque">Cheque</option>
+                            <option value="cash">Cash</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cheque_number">Cheque Number</label>
+                        <input type="text" class="form-control" name="cheque_number">
+                    </div>
+                    <button type="submit" name="add_transport_fee" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit Transport Fee Modals -->
+        <?php foreach ($fees as $fee) : ?>
+            <div id="edit-transport-fee-modal-<?php echo esc_attr($fee->id); ?>" class="modal">
+                <div class="modal-content">
+                    <span class="modal-close">×</span>
+                    <h3>Edit Transport Fee</h3>
+                    <form method="post">
+                        <?php wp_nonce_field('update_transport_fee_nonce'); ?>
+                        <input type="hidden" name="fee_id[]" value="<?php echo esc_attr($fee->id); ?>">
+                        <div class="form-group">
+                            <label for="template_id">Template</label>
+                            <select class="form-control" name="template_id[]">
+                                <option value="">Select Template</option>
+                                <?php foreach ($templates as $template) : ?>
+                                    <option value="<?php echo esc_attr($template->id); ?>" <?php selected($fee->template_id, $template->id); ?>><?php auxin_print($template->name); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Amount</label>
+                            <input type="number" step="0.01" class="form-control" name="amount[]" value="<?php echo esc_attr($fee->amount); ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select class="form-control" name="status[]">
+                                <option value="pending" <?php selected($fee->status, 'pending'); ?>>Pending</option>
+                                <option value="paid" <?php selected($fee->status, 'paid'); ?>>Paid</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="paid_date">Paid Date</label>
+                            <input type="date" class="form-control" name="paid_date[]" value="<?php echo esc_attr($fee->paid_date); ?>">
+                        </div>
+                        <div class="form-group">
+                            <label for="payment_method">Payment Method</label>
+                            <select class="form-control" name="payment_method[]">
+                                <option value="">Select</option>
+                                <option value="cod" <?php selected($fee->payment_method, 'cod'); ?>>COD</option>
+                                <option value="cheque" <?php selected($fee->payment_method, 'cheque'); ?>>Cheque</option>
+                                <option value="cash" <?php selected($fee->payment_method, 'cash'); ?>>Cash</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="cheque_number">Cheque Number</label>
+                            <input type="text" class="form-control" name="cheque_number[]" value="<?php echo esc_attr($fee->cheque_number); ?>">
+                        </div>
+                        <button type="submit" name="update_transport_fee" class="btn btn-primary">Update</button>
+                    </form>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php
+    render_admin_styles_and_scripts();
+}
+
+// Auxin Print Helper Function
+function auxin_print($data) {
+    echo esc_html($data);
+}

@@ -982,6 +982,7 @@ include_files_from_directory('assets/attendance');
 include_files_from_directory('assets/parents');
 include_files_from_directory('assets/fees');
 include_files_from_directory('assets/transport');
+include_files_from_directory('assets/exam');
 
 // Include all other necessary files
 include plugin_dir_path(__FILE__) . 'assets/edit-classes.php';

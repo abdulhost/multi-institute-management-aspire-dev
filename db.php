@@ -3,31 +3,38 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function my_education_erp_create_tables() {
+function my_education_erp_create_db() {
     global $wpdb;
     $charset_collate = $wpdb->get_charset_collate();
 
+    // Define table names
+    $fee_templates_table = $wpdb->prefix . 'fee_templates';
+    $student_fees_table = $wpdb->prefix . 'student_fees';
+    $transport_enrollments_table = $wpdb->prefix . 'transport_enrollments';
+    $transport_fees_table = $wpdb->prefix . 'transport_fees';
+    $exams_table = $wpdb->prefix . 'exams';
+    $exam_subjects_table = $wpdb->prefix . 'exam_subjects';
+    $exam_results_table = $wpdb->prefix . 'exam_results';
+
     // Fee Templates Table
-    $templates_table = $wpdb->prefix . 'fee_templates';
-    $sql = "CREATE TABLE $templates_table (
+    $sql = "CREATE TABLE $fee_templates_table (
         id BIGINT(20) NOT NULL AUTO_INCREMENT,
         name VARCHAR(100) NOT NULL,
         amount DECIMAL(10,2) NOT NULL,
         frequency ENUM('monthly', 'quarterly', 'annual') DEFAULT 'monthly',
-        class_id varchar(255) DEFAULT NULL,
-        education_center_id varchar(255) NOT NULL,
+        class_id VARCHAR(255) DEFAULT NULL,
+        education_center_id VARCHAR(255) NOT NULL,
         PRIMARY KEY (id)
     ) $charset_collate;";
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
 
     // Student Fees Table (Tuition/Combo)
-    $student_fees_table = $wpdb->prefix . 'student_fees';
     $sql = "CREATE TABLE $student_fees_table (
         id BIGINT(20) NOT NULL AUTO_INCREMENT,
-        student_id varchar(255) NOT NULL,
-        education_center_id varchar(255) NOT NULL,
-        template_id varchar(255) NOT NULL,
+        student_id VARCHAR(255) NOT NULL,
+        education_center_id VARCHAR(255) NOT NULL,
+        template_id VARCHAR(255) NOT NULL,
         amount DECIMAL(10,2) NOT NULL,
         month_year VARCHAR(7) NOT NULL,
         status ENUM('pending', 'paid') DEFAULT 'paid',
@@ -39,11 +46,10 @@ function my_education_erp_create_tables() {
     dbDelta($sql);
 
     // Transport Enrollments Table
-    $enrollments_table = $wpdb->prefix . 'transport_enrollments';
-    $sql = "CREATE TABLE $enrollments_table (
+    $sql = "CREATE TABLE $transport_enrollments_table (
         id BIGINT(20) NOT NULL AUTO_INCREMENT,
-        student_id varchar(255) NOT NULL,
-        education_center_id varchar(255) NOT NULL,
+        student_id VARCHAR(255) NOT NULL,
+        education_center_id VARCHAR(255) NOT NULL,
         enrollment_date DATE NOT NULL,
         active TINYINT(1) DEFAULT 1,
         PRIMARY KEY (id)
@@ -51,13 +57,12 @@ function my_education_erp_create_tables() {
     dbDelta($sql);
 
     // Transport Fees Table
-    $transport_fees_table = $wpdb->prefix . 'transport_fees';
     $sql = "CREATE TABLE $transport_fees_table (
         id BIGINT(20) NOT NULL AUTO_INCREMENT,
-        student_id varchar(255) NOT NULL,
-        education_center_id varchar(255) NOT NULL,
-        template_id varchar(255) NOT NULL,
-        amount DECIMAL(10,2) NOT NULL,
+        student_id VARCHAR(255) NOT NULL,
+        education_center_id VARCHAR(255) NOT NULL,
+        template_id VARCHAR(255) NOT NULL,
+        amount DECIMAL(15,2) NOT NULL,
         month_year VARCHAR(7) NOT NULL,
         status ENUM('pending', 'paid') DEFAULT 'paid',
         paid_date DATE DEFAULT NULL,
@@ -66,17 +71,85 @@ function my_education_erp_create_tables() {
         PRIMARY KEY (id)
     ) $charset_collate;";
     dbDelta($sql);
+
+    // Exams Table
+    $sql = "CREATE TABLE $exams_table (
+        id BIGINT(20) NOT NULL AUTO_INCREMENT,
+        name VARCHAR(100) NOT NULL,
+        exam_date DATE NOT NULL,
+        class_id VARCHAR(255) DEFAULT NULL,
+        education_center_id VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+    dbDelta($sql);
+
+    // Exam Subjects Table (No foreign key for now)
+    $sql = "CREATE TABLE $exam_subjects_table (
+        id BIGINT(20) NOT NULL AUTO_INCREMENT,
+        exam_id VARCHAR(255) NOT NULL,
+        subject_name VARCHAR(100) NOT NULL,
+        max_marks DECIMAL(10,2) NOT NULL DEFAULT 100.00,
+        education_center_id VARCHAR(255) NOT NULL,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+    dbDelta($sql);
+
+    // Exam Results Table (No foreign keys for now)
+    $sql = "CREATE TABLE $exam_results_table (
+        id BIGINT(20) NOT NULL AUTO_INCREMENT,
+        exam_id VARCHAR(255) NOT NULL,
+        subject_id VARCHAR(255) NOT NULL,
+        student_id VARCHAR(255) NOT NULL,
+        marks DECIMAL(10,2) NOT NULL,
+        education_center_id VARCHAR(255) NOT NULL,
+        recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+    dbDelta($sql);
 }
 
-// function my_education_erp_seed_templates() {
-//     global $wpdb;
-//     $table = $wpdb->prefix . 'fee_templates';
-//     $existing = $wpdb->get_var("SELECT COUNT(*) FROM $table");
-//     if ($existing == 0) {
-//         $wpdb->insert($table, ['name' => 'Tuition Class 11', 'amount' => 500.00, 'frequency' => 'monthly', 'education_center_id' => 1, 'fee_type' => 'tuition']);
-//         $wpdb->insert($table, ['name' => 'Transport', 'amount' => 200.00, 'frequency' => 'monthly', 'education_center_id' => 1, 'fee_type' => 'transport']);
-//         $wpdb->insert($table, ['name' => 'Tuition + Transport', 'amount' => 700.00, 'frequency' => 'monthly', 'education_center_id' => 1, 'fee_type' => 'combo']);
-//     }
-// }
-my_education_erp_create_tables();
-// my_education_erp_seed_templates();
+function my_education_erp_seed_templates() {
+    global $wpdb;
+
+    $fee_templates_table = $wpdb->prefix . 'fee_templates';
+    $exams_table = $wpdb->prefix . 'exams';
+    $exam_subjects_table = $wpdb->prefix . 'exam_subjects';
+    $exam_results_table = $wpdb->prefix . 'exam_results';
+
+    // Seed Fee Templates
+    if ($wpdb->get_var("SELECT COUNT(*) FROM $fee_templates_table") == 0) {
+        $wpdb->insert($fee_templates_table, ['name' => 'Tuition Class 11', 'amount' => 500.00, 'frequency' => 'monthly', 'education_center_id' => 1]);
+        $wpdb->insert($fee_templates_table, ['name' => 'Transport', 'amount' => 200.00, 'frequency' => 'monthly', 'education_center_id' => 1]);
+        $wpdb->insert($fee_templates_table, ['name' => 'Tuition + Transport', 'amount' => 700.00, 'frequency' => 'monthly', 'education_center_id' => 1]);
+    }
+
+    // Seed Exams
+    if ($wpdb->get_var("SELECT COUNT(*) FROM $exams_table") == 0) {
+        $wpdb->insert($exams_table, [
+            'name' => 'Final Exam Class 12 2025',
+            'exam_date' => '2025-12-15',
+            'class_id' => 12,
+            'education_center_id' => 1,
+        ]);
+    }
+
+    // Seed Exam Subjects
+    if ($wpdb->get_var("SELECT COUNT(*) FROM $exam_subjects_table") == 0) {
+        $wpdb->insert($exam_subjects_table, ['exam_id' => 1, 'subject_name' => 'Mathematics', 'max_marks' => 100, 'education_center_id' => 1]);
+        $wpdb->insert($exam_subjects_table, ['exam_id' => 1, 'subject_name' => 'Science', 'max_marks' => 100, 'education_center_id' => 1]);
+        $wpdb->insert($exam_subjects_table, ['exam_id' => 1, 'subject_name' => 'English', 'max_marks' => 100, 'education_center_id' => 1]);
+        $wpdb->insert($exam_subjects_table, ['exam_id' => 1, 'subject_name' => 'History', 'max_marks' => 100, 'education_center_id' => 1]);
+        $wpdb->insert($exam_subjects_table, ['exam_id' => 1, 'subject_name' => 'Geography', 'max_marks' => 100, 'education_center_id' => 1]);
+    }
+
+    // Seed Exam Results
+    if ($wpdb->get_var("SELECT COUNT(*) FROM $exam_results_table") == 0) {
+        $wpdb->insert($exam_results_table, ['exam_id' => 1, 'subject_id' => 1, 'student_id' => 1, 'marks' => 85.50, 'education_center_id' => 1]);
+        $wpdb->insert($exam_results_table, ['exam_id' => 1, 'subject_id' => 2, 'student_id' => 1, 'marks' => 78.00, 'education_center_id' => 1]);
+    }
+}
+// / Only run on activation, not on every include
+// Remove direct calls outside functions
+my_education_erp_create_db();
+my_education_erp_seed_templates();

@@ -471,6 +471,36 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
     </div>
   </ul>
 </li>
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'exams' || $active_section == 'add-exam' || $active_section == 'edit-exam' || $active_section == 'delete-exam' || $active_section == 'add-exam-subjects' || $active_section == 'results' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-240q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm0-160q-33 0-56.5 23.5T400-400q0 33 23.5 56.5T480-320q33 0 56.5-23.5T560-400q0-33-23.5-56.5T480-480ZM240-120q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm0-160q-33 0-56.5 23.5T160-280q0 33 23.5 56.5T240-200q33 0 56.5-23.5T320-280q0-33-23.5-56.5T240-360Z"/></svg>
+    <span>Exams</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'exams' || $active_section == 'add-exam' || $active_section == 'edit-exam' || $active_section == 'delete-exam' || $active_section == 'add-exam-subjects' || $active_section == 'results' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'exams' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/exam'); ?>">Exams</a></li>
+      <li class="<?php echo $active_section == 'add-exam' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/exam/?section=add-exam'); ?>">Add Exam</a></li>
+      <li class="<?php echo $active_section == 'edit-exam' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/exam/?section=edit-exam'); ?>">Edit Exam</a></li>
+      <li class="<?php echo $active_section == 'delete-exam' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/exam/?section=delete-exam'); ?>">Delete Exam</a></li>
+      <li class="<?php echo $active_section == 'add-exam-subjects' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/exam/?section=add-exam-subjects'); ?>">Add Subjects</a></li>
+      <li class="<?php echo $active_section == 'results' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/exam/?section=results'); ?>">Results</a></li>
+    </div>
+  </ul>
+</li>
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'view-reports' || $active_section == 'generate-reports' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-240q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm0-160q-33 0-56.5 23.5T400-400q0 33 23.5 56.5T480-320q33 0 56.5-23.5T560-400q0-33-23.5-56.5T480-480ZM240-120q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm0-160q-33 0-56.5 23.5T160-280q0 33 23.5 56.5T240-200q33 0 56.5-23.5T320-280q0-33-23.5-56.5T240-360Z"/></svg>
+    <span>Reports</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'view-reports' || $active_section == 'generate-reports' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'view-reports' ? 'active' : ''; ?>"><a href="/institute-dashboard/exams/?section=view-reports">View Reports</a></li>
+      <li class="<?php echo $active_section == 'generate-reports' ? 'active' : ''; ?>"><a href="/institute-dashboard/exams/?section=generate-reports">Generate Reports</a></li>
+    </div>
+  </ul>
+</li>
 
     <li>
       <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'student-reports' || $active_section == 'exam-reports' || $active_section == 'fees-reports' ? 'rotate' : ''; ?>">
