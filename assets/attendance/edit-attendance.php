@@ -31,22 +31,43 @@ function edit_attendance_frontend_shortcode($atts) {
         $output .= "<div class='attendance-message $type'>$message</div>";
     }
 
-    // Get students for this educational center
-    $students = $wpdb->get_results($wpdb->prepare(
-        "SELECT DISTINCT student_id, student_name, class, section 
-         FROM $table_name 
-         WHERE education_center_id = %s 
-         ORDER BY student_name",
-        $educational_center_id
-    ));
+    // Get students from 'students' post type
+    $args = array(
+        'post_type' => 'students',
+        'posts_per_page' => -1,
+        'meta_query' => array(
+            array(
+                'key' => 'educational_center_id',
+                'value' => $educational_center_id,
+                'compare' => '='
+            )
+        ),
+        'orderby' => 'title',
+        'order' => 'ASC'
+    );
+    $students_query = new WP_Query($args);
+    $students = array();
+
+    if ($students_query->have_posts()) {
+        while ($students_query->have_posts()) {
+            $students_query->the_post();
+            $students[] = (object) array(
+                'student_id' => get_field('student_id'),
+                'student_name' => get_the_title(),
+                'class' => get_field('class'),
+                'section' => get_field('section')
+            );
+        }
+        wp_reset_postdata();
+    }
 
     $selected_student = isset($_POST['select_student_id']) ? sanitize_text_field($_POST['select_student_id']) : '';
     $selected_month = isset($_POST['select_month']) ? sanitize_text_field($_POST['select_month']) : '';
     $selected_date = isset($_POST['select_date']) ? sanitize_text_field($_POST['select_date']) : '';
 
-    // Get edit record if selected
+    // Get edit record only when "Load Record" is clicked
     $edit_record = null;
-    if ($selected_student && $selected_date) {
+    if (isset($_POST['select_attendance_record']) && $selected_student && $selected_date) {
         $edit_record = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM $table_name 
              WHERE student_id = %s 
@@ -56,165 +77,166 @@ function edit_attendance_frontend_shortcode($atts) {
             $selected_date,
             $educational_center_id
         ));
+        if (!$edit_record) {
+            $output .= '<div class="attendance-message error">No record found for student ' . esc_html($selected_student) . ' on ' . esc_html($selected_date) . '</div>';
+        }
     }
 
     ob_start();
     ?>
-    <div class="attendance-main-wrapper" style="display: flex; ">
-        <!-- <div class="institute-dashboard-wrapper"> -->
-            <?php
-            $active_section = 'update-attendance';
-           
-            include(plugin_dir_path(__FILE__) . '../sidebar.php');
-            ?>
-    <div class="attendance-frontend">
-        <?php echo $output; ?>
+    <div class="attendance-main-wrapper" style="display: flex;">
+        <?php
+        $active_section = 'update-attendance';
+        include(plugin_dir_path(__FILE__) . '../sidebar.php');
+        ?>
+        <div class="attendance-frontend">
+            <?php echo $output; ?>
 
-        <!-- Selection Form -->
-        <form method="post" class="attendance-select-form" action="<?php echo esc_url(get_permalink()); ?>">
-            <h2>Select Student, Month, and Date</h2>
-            <div class="form-group">
-                <label for="select_student_id">Select Student:</label>
-                <select name="select_student_id" id="select_student_id" required>
-                    <option value="">-- Select Student --</option>
-                    <?php foreach ($students as $student) : ?>
-                        <option value="<?php echo esc_attr($student->student_id); ?>" 
-                                <?php selected($selected_student, $student->student_id); ?>>
-                            <?php echo esc_html("{$student->student_name} ({$student->student_id} - {$student->class} {$student->section})"); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <div class="form-group" id="month_select_container" style="<?php echo $selected_student ? '' : 'display: none;'; ?>">
-                <label for="select_month">Filter by Month (Optional):</label>
-                <select name="select_month" id="select_month">
-                    <option value="">-- All Months --</option>
-                    <?php if ($selected_student) : ?>
-                        <?php
-                        $months = $wpdb->get_results($wpdb->prepare(
-                            "SELECT DISTINCT DATE_FORMAT(date, '%Y-%m') as month 
-                             FROM $table_name 
-                             WHERE student_id = %s 
-                             AND education_center_id = %s 
-                             ORDER BY month DESC",
-                            $selected_student,
-                            $educational_center_id
-                        ));
-                        foreach ($months as $month) : ?>
-                            <option value="<?php echo esc_attr($month->month); ?>" 
-                                    <?php selected($selected_month, $month->month); ?>>
-                                <?php echo esc_html(date('F Y', strtotime($month->month . '-01'))); ?>
+            <!-- Selection Form -->
+            <form method="post" class="attendance-select-form" action="">
+                <h2>Select Student, Month, and Date</h2>
+                <div class="form-group">
+                    <label for="select_student_id">Select Student:</label>
+                    <select name="select_student_id" id="select_student_id" required>
+                        <option value="">-- Select Student --</option>
+                        <?php foreach ($students as $student) : ?>
+                            <option value="<?php echo esc_attr($student->student_id); ?>" 
+                                    <?php selected($selected_student, $student->student_id); ?>>
+                                <?php echo esc_html("{$student->student_name} ({$student->student_id} - {$student->class} {$student->section})"); ?>
                             </option>
                         <?php endforeach; ?>
-                    <?php endif; ?>
-                </select>
-            </div>
+                    </select>
+                </div>
 
-            <div class="form-group" id="date_select_container" style="<?php echo $selected_student ? '' : 'display: none;'; ?>">
-                <label for="select_date">Select Date:</label>
-                <select name="select_date" id="select_date" required>
-                    <option value="">-- Select Date --</option>
-                    <?php if ($selected_student) : ?>
-                        <?php
-                        $query = "SELECT date, status 
-                                  FROM $table_name 
-                                  WHERE student_id = %s 
-                                  AND education_center_id = %s";
-                        $params = [$selected_student, $educational_center_id];
-                        if ($selected_month) {
-                            $query .= " AND DATE_FORMAT(date, '%Y-%m') = %s";
-                            $params[] = $selected_month;
-                        }
-                        $query .= " ORDER BY date DESC";
-                        $dates = $wpdb->get_results($wpdb->prepare($query, $params));
-                        foreach ($dates as $date) : ?>
-                            <option value="<?php echo esc_attr($date->date); ?>" 
-                                    <?php selected($selected_date, $date->date); ?>>
-                                <?php echo esc_html("{$date->date} ({$date->status})"); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </select>
-            </div>
+                <div class="form-group" id="month_select_container" style="<?php echo $selected_student ? '' : 'display: none;'; ?>">
+                    <label for="select_month">Filter by Month (Optional):</label>
+                    <select name="select_month" id="select_month">
+                        <option value="">-- All Months --</option>
+                        <?php if ($selected_student) : ?>
+                            <?php
+                            $months = $wpdb->get_results($wpdb->prepare(
+                                "SELECT DISTINCT DATE_FORMAT(date, '%Y-%m') as month 
+                                 FROM $table_name 
+                                 WHERE student_id = %s 
+                                 AND education_center_id = %s 
+                                 ORDER BY month DESC",
+                                $selected_student,
+                                $educational_center_id
+                            ));
+                            foreach ($months as $month) : ?>
+                                <option value="<?php echo esc_attr($month->month); ?>" 
+                                        <?php selected($selected_month, $month->month); ?>>
+                                    <?php echo esc_html(date('F Y', strtotime($month->month . '-01'))); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
 
-            <input type="submit" name="select_attendance_record" value="Load Record" class="button">
-        </form>
+                <div class="form-group" id="date_select_container" style="<?php echo $selected_student ? '' : 'display: none;'; ?>">
+                    <label for="select_date">Select Date:</label>
+                    <select name="select_date" id="select_date" required>
+                        <option value="">-- Select Date --</option>
+                        <?php if ($selected_student) : ?>
+                            <?php
+                            $query = "SELECT date, status 
+                                      FROM $table_name 
+                                      WHERE student_id = %s 
+                                      AND education_center_id = %s";
+                            $params = [$selected_student, $educational_center_id];
+                            if ($selected_month) {
+                                $query .= " AND DATE_FORMAT(date, '%Y-%m') = %s";
+                                $params[] = $selected_month;
+                            }
+                            $query .= " ORDER BY date DESC";
+                            $dates = $wpdb->get_results($wpdb->prepare($query, $params));
+                            foreach ($dates as $date) : ?>
+                                <option value="<?php echo esc_attr($date->date); ?>" 
+                                        <?php selected($selected_date, $date->date); ?>>
+                                    <?php echo esc_html("{$date->date} ({$date->status})"); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
 
-        <!-- Edit Form -->
-        <form method="post" class="attendance-update-form" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-            <input type="hidden" name="action" value="edit_attendance_submit">
-            <?php wp_nonce_field('edit_attendance_submit', 'edit_attendance_nonce'); ?>
-            <h2><?php echo $edit_record ? 'Edit Attendance' : 'Add New Attendance'; ?></h2>
-            <?php if ($edit_record) : ?>
-                <input type="hidden" name="attendance_id" value="<?php echo esc_attr($edit_record->sa_id); ?>">
-            <?php endif; ?>
-            
-            <div class="form-group">
-                <label for="edu_center_id">Education Center ID:</label>
-                <input type="text" name="edu_center_id" id="edu_center_id" 
-                       value="<?php echo esc_attr($edit_record->education_center_id ?? $educational_center_id); ?>" 
-                       readonly required>
-            </div>
+                <input type="submit" name="select_attendance_record" value="Load Record" class="button">
+            </form>
 
-            <div class="form-group">
-                <label for="student_id">Student ID:</label>
-                <input type="text" name="student_id" id="student_id" 
-                       value="<?php echo esc_attr($edit_record->student_id ?? ($selected_student ?? '')); ?>" 
-                       <?php echo $edit_record ? 'readonly' : ''; ?> required>
-            </div>
+            <!-- Edit Form -->
+            <form method="post" class="attendance-update-form" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                <input type="hidden" name="action" value="edit_attendance_submit">
+                <?php wp_nonce_field('edit_attendance_submit', 'edit_attendance_nonce'); ?>
+                <h2><?php echo $edit_record ? 'Edit Attendance' : 'Add New Attendance'; ?></h2>
+                <?php if ($edit_record) : ?>
+                    <input type="hidden" name="attendance_id" value="<?php echo esc_attr($edit_record->sa_id); ?>">
+                <?php endif; ?>
+                
+                <div class="form-group">
+                    <label for="edu_center_id">Education Center ID:</label>
+                    <input type="text" name="edu_center_id" id="edu_center_id" 
+                           value="<?php echo esc_attr($edit_record->education_center_id ?? $educational_center_id); ?>" 
+                           readonly required>
+                </div>
 
-            <div class="form-group">
-                <label for="student_name">Student Name:</label>
-                <input type="text" name="student_name" id="student_name" 
-                       value="<?php echo esc_attr($edit_record->student_name ?? ''); ?>" required>
-            </div>
+                <div class="form-group">
+                    <label for="student_id">Student ID:</label>
+                    <input type="text" name="student_id" id="student_id" 
+                           value="<?php echo esc_attr($edit_record->student_id ?? ($selected_student ?? '')); ?>" 
+                           <?php echo $edit_record ? 'readonly' : ''; ?> required>
+                </div>
 
-            <div class="form-group">
-                <label for="class_name">Class:</label>
-                <input type="text" name="class_name" id="class_name" 
-                       value="<?php echo esc_attr($edit_record->class ?? ''); ?>" required>
-            </div>
+                <div class="form-group">
+                    <label for="student_name">Student Name:</label>
+                    <input type="text" name="student_name" id="student_name" 
+                           value="<?php echo esc_attr($edit_record->student_name ?? ''); ?>" required>
+                </div>
 
-            <div class="form-group">
-                <label for="section_name">Section:</label>
-                <input type="text" name="section_name" id="section_name" 
-                       value="<?php echo esc_attr($edit_record->section ?? ''); ?>" required>
-            </div>
+                <div class="form-group">
+                    <label for="class_name">Class:</label>
+                    <input type="text" name="class_name" id="class_name" 
+                           value="<?php echo esc_attr($edit_record->class ?? ''); ?>" required>
+                </div>
 
-            <div class="form-group">
-                <label for="attendance_date">Date:</label>
-                <input type="date" name="attendance_date" id="attendance_date" 
-                       value="<?php echo esc_attr($edit_record->date ?? ($selected_date ?? '')); ?>" 
-                       <?php echo $edit_record ? 'readonly' : ''; ?> required>
-            </div>
+                <div class="form-group">
+                    <label for="section_name">Section:</label>
+                    <input type="text" name="section_name" id="section_name" 
+                           value="<?php echo esc_attr($edit_record->section ?? ''); ?>" required>
+                </div>
 
-            <div class="form-group">
-                <label for="attendance_status">Status:</label>
-                <select name="attendance_status" id="attendance_status" required>
-                    <option value="Present" <?php selected($edit_record->status ?? '', 'Present'); ?>>Present</option>
-                    <option value="Late" <?php selected($edit_record->status ?? '', 'Late'); ?>>Late</option>
-                    <option value="Absent" <?php selected($edit_record->status ?? '', 'Absent'); ?>>Absent</option>
-                    <option value="Full Day" <?php selected($edit_record->status ?? '', 'Full Day'); ?>>Full Day</option>
-                    <option value="Holiday" <?php selected($edit_record->status ?? '', 'Holiday'); ?>>Holiday</option>
-                </select>
-            </div>
+                <div class="form-group">
+                    <label for="attendance_date">Date:</label>
+                    <input type="date" name="attendance_date" id="attendance_date" 
+                           value="<?php echo esc_attr($edit_record->date ?? ($selected_date ?? '')); ?>" 
+                           <?php echo $edit_record ? 'readonly' : ''; ?> required>
+                </div>
 
-            <div class="form-group">
-                <label for="subject_name">Subject:</label>
-                <input type="text" name="subject_name" id="subject_name" 
-                       value="<?php echo esc_attr($edit_record->subject ?? ''); ?>" required>
-            </div>
+                <div class="form-group">
+                    <label for="attendance_status">Status:</label>
+                    <select name="attendance_status" id="attendance_status" required>
+                        <option value="Present" <?php selected($edit_record->status ?? '', 'Present'); ?>>Present</option>
+                        <option value="Late" <?php selected($edit_record->status ?? '', 'Late'); ?>>Late</option>
+                        <option value="Absent" <?php selected($edit_record->status ?? '', 'Absent'); ?>>Absent</option>
+                        <option value="Full Day" <?php selected($edit_record->status ?? '', 'Full Day'); ?>>Full Day</option>
+                        <option value="Holiday" <?php selected($edit_record->status ?? '', 'Holiday'); ?>>Holiday</option>
+                    </select>
+                </div>
 
-            <div class="form-group">
-                <label for="teacher_id">Teacher ID:</label>
-                <input type="text" name="teacher_id" id="teacher_id" 
-                       value="<?php echo esc_attr($current_teacher_id); ?>" readonly required>
-            </div>
+                <div class="form-group">
+                    <label for="subject_name">Subject:</label>
+                    <input type="text" name="subject_name" id="subject_name" 
+                           value="<?php echo esc_attr($edit_record->subject ?? ''); ?>" required>
+                </div>
 
-            <input type="submit" name="edit_attendance_action" value="<?php echo $edit_record ? 'Update Attendance' : 'Add Attendance'; ?>" class="button button-primary">
-        </form>
-    </div>
+                <div class="form-group">
+                    <label for="teacher_id">Teacher ID:</label>
+                    <input type="text" name="teacher_id" id="teacher_id" 
+                           value="<?php echo esc_attr($current_teacher_id); ?>" readonly required>
+                </div>
+
+                <input type="submit" name="edit_attendance_action" value="<?php echo $edit_record ? 'Update Attendance' : 'Add Attendance'; ?>" class="button button-primary">
+            </form>
+        </div>
     </div>
     <?php
     $content = ob_get_clean();
@@ -309,7 +331,6 @@ function attendance_frontend_scripts() {
 
         $custom_css = "
             .attendance-frontend {
-                // max-width: 600px;
                 margin: 20px auto;
                 padding: 20px;
                 background: #fff;

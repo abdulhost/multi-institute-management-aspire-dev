@@ -15,7 +15,8 @@ function my_education_erp_create_db() {
     $exams_table = $wpdb->prefix . 'exams';
     $exam_subjects_table = $wpdb->prefix . 'exam_subjects';
     $exam_results_table = $wpdb->prefix . 'exam_results';
-
+    $table_name = $wpdb->prefix . 'teacher_attendance';
+    $departments_table = $wpdb->prefix . 'departments';
     // Fee Templates Table
     $sql = "CREATE TABLE $fee_templates_table (
         id BIGINT(20) NOT NULL AUTO_INCREMENT,
@@ -107,6 +108,46 @@ function my_education_erp_create_db() {
         PRIMARY KEY (id)
     ) $charset_collate;";
     dbDelta($sql);
+
+    
+$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+    ta_id INT(11) NOT NULL AUTO_INCREMENT,
+    education_center_id VARCHAR(255) NOT NULL,
+    teacher_id VARCHAR(50) NOT NULL,
+    teacher_name VARCHAR(255) NOT NULL,
+    department_id INT(11) NOT NULL,
+    date DATE NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    PRIMARY KEY (ta_id),
+    INDEX (teacher_id, date)
+) $charset_collate;";
+require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+dbDelta($sql);
+
+// Create departments table
+$sql = "CREATE TABLE IF NOT EXISTS $departments_table (
+    department_id INT(11) NOT NULL AUTO_INCREMENT,
+    department_name VARCHAR(255) NOT NULL,
+    education_center_id VARCHAR(255) NOT NULL,
+    PRIMARY KEY (department_id),
+    INDEX (education_center_id)
+) $charset_collate;";
+dbDelta($sql);
+
+$table_class_name = $wpdb->prefix . 'class_sections';
+
+    // Uncomment and adjust table creation if needed
+        $sql = "CREATE TABLE $table_class_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            class_name varchar(255) NOT NULL,
+            sections text NOT NULL,
+            education_center_id varchar(255), -- Added to match query
+            PRIMARY KEY (id)
+        ) $charset_collate;";
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta($sql);
+    
 }
 
 function my_education_erp_seed_templates() {

@@ -349,23 +349,27 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
       </ul>
     </li>
     <li>
-      <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'export-attendance'|| $active_section == 'students-attendance' || $active_section == 'update-attendance'|| $active_section == 'bulk-upload-attendance'|| $active_section == 'record-attendance' || $active_section == 'teachers-attendance' || $active_section == 'fees-reports' ? 'rotate' : ''; ?>">
+      <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'bulk-export-teacher-attendance' ||$active_section == 'add-teacher-attendance'||$active_section == 'bulk-import-teacher-attendance'||$active_section == 'edit-teacher-attendance'|| $active_section == 'export-attendance'|| $active_section == 'students-attendance' || $active_section == 'update-attendance'|| $active_section == 'bulk-upload-attendance'|| $active_section == 'record-attendance' || $active_section == 'teachers-attendance' || $active_section == 'fees-reports' ? 'rotate' : ''; ?>">
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M520-640v-160q0-17 11.5-28.5T560-840h240q17 0 28.5 11.5T840-800v160q0 17-11.5 28.5T800-600H560q-17 0-28.5-11.5T520-640ZM120-480v-320q0-17 11.5-28.5T160-840h240q17 0 28.5 11.5T440-800v320q0 17-11.5 28.5T400-440H160q-17 0-28.5-11.5T120-480Zm400 320v-320q0-17 11.5-28.5T560-520h240q17 0 28.5 11.5T840-480v320q0 17-11.5 28.5T800-120H560q-17 0-28.5-11.5T520-160Zm-400 0v-160q0-17 11.5-28.5T160-360h240q17 0 28.5 11.5T440-320v160q0 17-11.5 28.5T400-120H160q-17 0-28.5-11.5T120-160Zm80-360h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/></svg>
         <span>Attendance</span>
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
       </button>
-      <ul class="sub-menu <?php echo $active_section == 'export-attendance' || $active_section == 'students-attendance' ||$active_section == 'update-attendance' ||$active_section == 'bulk-upload-attendance' || $active_section == 'record-attendance' || $active_section == 'teachers-attendance' || $active_section == 'fees-reports' ? 'show' : ''; ?>">
+      <ul class="sub-menu <?php echo $active_section == 'bulk-export-teacher-attendance' || $active_section == 'export-attendance' ||$active_section == 'add-teacher-attendance'||$active_section == 'bulk-import-teacher-attendance'||$active_section == 'edit-teacher-attendance'||  $active_section == 'students-attendance' ||$active_section == 'update-attendance' ||$active_section == 'bulk-upload-attendance' || $active_section == 'record-attendance' || $active_section == 'teachers-attendance' || $active_section == 'fees-reports' ? 'show' : ''; ?>">
         <div>
           <li class="<?php echo $active_section == 'students-attendance' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/attendance-management')); ?>">Students Attendance</a></li>
           <li class="<?php echo $active_section == 'record-attendance' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/attendance-entry-form')); ?>">Record Attendance</a></li>
           <li class="<?php echo $active_section == 'update-attendance' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/edit-attendance')); ?>">Update Attendance</a></li>
           <li class="<?php echo $active_section == 'bulk-upload-attendance' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/bulk-upload-attendance/')); ?>">Bulk Upload Attendance</a></li>
           <li class="<?php echo $active_section == 'export-attendance' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/export-attendance/')); ?>">Export Attendance</a></li>
-          <li class="<?php echo $active_section == 'teachers-attendance' ? 'active' : ''; ?>"><a href="#teachers-attendance">Teachers Attendance</a></li>
-          <li class="<?php echo $active_section == 'fees-reports' ? 'active' : ''; ?>"><a href="#fees-reports">Attendance</a></li>
+          <li class="<?php echo $active_section == 'teachers-attendance' ? 'active' : ''; ?>"><a href="/institute-dashboard/teachers-attendance/">Teachers Attendance</a></li>
+          <li class="<?php echo $active_section == 'add-teacher-attendance' ? 'active' : ''; ?>"><a href="/institute-dashboard/teachers-attendance/?section=add-teacher-attendance">Add Teacher Attendance</a></li>
+          <li class="<?php echo $active_section == 'edit-teacher-attendance' ? 'active' : ''; ?>"><a href="/institute-dashboard/teachers-attendance/?section=edit-teacher-attendance">Update Teacher Attendance</a></li>
+          <li class="<?php echo $active_section == 'bulk-import-teacher-attendance' ? 'active' : ''; ?>"><a href="/institute-dashboard/teachers-attendance/?section=bulk-import-teacher-attendance">Bulk Import Teacher Attendance</a></li>
+          <li class="<?php echo $active_section == 'bulk-export-teacher-attendance' ? 'active' : ''; ?>"><a href="/institute-dashboard/teachers-attendance/?section=bulk-export-teacher-attendance">Bulk Import Teacher Attendance</a></li>
+    
         </div>
       </ul>
-    </li>
+    </li> 
     <li>
   <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'view-subjects' || $active_section == 'add-subject' || $active_section == 'update-subject' || $active_section == 'delete-subject' ? 'rotate' : ''; ?>">
     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M520-640v-160q0-17 11.5-28.5T560-840h240q17 0 28.5 11.5T840-800v160q0 17-11.5 28.5T800-600H560q-17 0-28.5-11.5T520-640ZM120-480v-320q0-17 11.5-28.5T160-840h240q17 0 28.5 11.5T440-800v320q0 17-11.5 28.5T400-440H160q-17 0-28.5-11.5T120-480Zm400 320v-320q0-17 11.5-28.5T560-520h240q17 0 28.5 11.5T840-480v320q0 17-11.5 28.5T800-120H560q-17 0-28.5-11.5T520-160Zm-400 0v-160q0-17 11.5-28.5T160-360h240q17 0 28.5 11.5T440-320v160q0 17-11.5 28.5T400-120H160q-17 0-28.5-11.5T120-160Zm80-360h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/></svg>
@@ -396,6 +400,22 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
     </div>
   </ul>
 </li>
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'departments' || $active_section == 'add-department' || $active_section == 'edit-department' || $active_section == 'delete-department' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q66 0 113-47t47-113q0-66-47-113t-113-47q-66 0-113 47t-47 113q0 66 47 113t113 47Zm0-160q-33 0-56.5-23.5T400-640q0-33 23.5-56.5T480-720q33 0 56.5 23.5T560-640q0 33-23.5 56.5T480-560Zm240 360q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm0-160q-33 0-56.5-23.5T640-200q0-33 23.5-56.5T720-280q33 0 56.5 23.5T800-200q0 33-23.5 56.5T720-120Z"/></svg>
+    <span>Departments</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'departments' || $active_section == 'add-department' || $active_section == 'edit-department' || $active_section == 'delete-department' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'departments' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/departments'); ?>">Departments</a></li>
+      <li class="<?php echo $active_section == 'add-department' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/departments/?section=add-department'); ?>">Add Department</a></li>
+      <li class="<?php echo $active_section == 'edit-department' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/departments/?section=edit-department'); ?>">Edit Department</a></li>
+      <li class="<?php echo $active_section == 'delete-department' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/departments/?section=delete-department'); ?>">Delete Department</a></li>
+    </div>
+  </ul>
+</li>
+
 <li>
   <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'view-parents' || $active_section == 'add-parent' || $active_section == 'update-parent' || $active_section == 'delete-parent' ? 'rotate' : ''; ?>">
     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-240q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm0-160q-33 0-56.5 23.5T400-400q0 33 23.5 56.5T480-320q33 0 56.5-23.5T560-400q0-33-23.5-56.5T480-480ZM240-120q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm0-160q-33 0-56.5 23.5T160-280q0 33 23.5 56.5T240-200q33 0 56.5-23.5T320-280q0-33-23.5-56.5T240-360Z"/></svg>
@@ -496,8 +516,8 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
   </button>
   <ul class="sub-menu <?php echo $active_section == 'view-reports' || $active_section == 'generate-reports' ? 'show' : ''; ?>">
     <div>
-      <li class="<?php echo $active_section == 'view-reports' ? 'active' : ''; ?>"><a href="/institute-dashboard/exams/?section=view-reports">View Reports</a></li>
-      <li class="<?php echo $active_section == 'generate-reports' ? 'active' : ''; ?>"><a href="/institute-dashboard/exams/?section=generate-reports">Generate Reports</a></li>
+      <li class="<?php echo $active_section == 'view-reports' ? 'active' : ''; ?>"><a href="/institute-dashboard/reports/?section=view-reports">View Reports</a></li>
+      <li class="<?php echo $active_section == 'generate-reports' ? 'active' : ''; ?>"><a href="/institute-dashboard/reports/?section=generate-reports">Generate Reports</a></li>
     </div>
   </ul>
 </li>

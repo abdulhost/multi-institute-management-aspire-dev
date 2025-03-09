@@ -378,3 +378,4 @@ function export_attendance_shortcode($atts) {
 
     return $content;
 }
+
