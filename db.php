@@ -141,12 +141,57 @@ $table_class_name = $wpdb->prefix . 'class_sections';
             id mediumint(9) NOT NULL AUTO_INCREMENT,
             class_name varchar(255) NOT NULL,
             sections text NOT NULL,
-            education_center_id varchar(255), -- Added to match query
+            education_center_id varchar(255), 
             PRIMARY KEY (id)
         ) $charset_collate;";
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql);
+        $timetable_table = $wpdb->prefix . 'timetables';
+        $sql = "CREATE TABLE IF NOT EXISTS $timetable_table (
+            timetable_id INT AUTO_INCREMENT PRIMARY KEY,
+            class_id INT NOT NULL,
+            section VARCHAR(50) NOT NULL,
+            subject_id BIGINT DEFAULT NULL,
+            day VARCHAR(20) NOT NULL,
+            start_time TIME NOT NULL,
+            end_time TIME NOT NULL,
+            education_center_id VARCHAR(255) NOT NULL,
+            INDEX (education_center_id, class_id, section)
+        ) $charset_collate;";
+        
+
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+    dbDelta($sql);
+// Define charset and collation
+$charset_collate = $wpdb->get_charset_collate();
+// Staff Table (updated: staff_id as VARCHAR, removed user_id)
+$staff_table = $wpdb->prefix . 'staff';
+$sql_staff = "CREATE TABLE IF NOT EXISTS $staff_table (
+    staff_id VARCHAR(20) NOT NULL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    role VARCHAR(100) NOT NULL,
+    department_id INT DEFAULT NULL,
+    education_center_id VARCHAR(255) NOT NULL,
+    salary_base DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    FOREIGN KEY (department_id) REFERENCES {$wpdb->prefix}departments(department_id) ON DELETE SET NULL,
+    INDEX (education_center_id)
+) $charset_collate;";
+dbDelta($sql_staff);
+
+// Staff Attendance Table (updated: staff_id as VARCHAR)
+$staff_attendance_table = $wpdb->prefix . 'staff_attendance';
+$sql_attendance = "CREATE TABLE IF NOT EXISTS $staff_attendance_table (
+    attendance_id INT AUTO_INCREMENT PRIMARY KEY,
+    staff_id VARCHAR(20) NOT NULL,
+    date DATE NOT NULL,
+    status ENUM('Present', 'Absent', 'Leave') DEFAULT 'Absent',
+    education_center_id VARCHAR(255) NOT NULL,
+    FOREIGN KEY (staff_id) REFERENCES $staff_table(staff_id) ON DELETE CASCADE,
+    INDEX (staff_id, date),
+    INDEX (education_center_id)
+) $charset_collate;";
+dbDelta($sql_attendance);
     
 }
 

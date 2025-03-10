@@ -386,6 +386,22 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
   </ul>
 </li>
 <li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'timetable-list' || $active_section == 'timetable-add' || $active_section == 'timetable-edit' || $active_section == 'timetable-delete' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-240q66 0 113-47t47-113q0-66-47-113t-113-47q-66 0-113 47t-47 113q0 66 47 113t113 47Zm0-160q-33 0-56.5-23.5T400-400q0-33 23.5-56.5T480-480q33 0 56.5 23.5T560-400q0 33-23.5 56.5T480-320q-33 0-56.5-23.5T400-400q0-33 23.5-56.5T480-480Z"/></svg>
+    <span>Timetable</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'timetable-list' || $active_section == 'timetable-add' || $active_section == 'timetable-edit' || $active_section == 'timetable-delete' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'timetable-list' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/time-table'); ?>">Timetable List</a></li>
+      <li class="<?php echo $active_section == 'timetable-add' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/time-table/?section=timetable-add'); ?>">Add Timetable</a></li>
+      <li class="<?php echo $active_section == 'timetable-edit' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/time-table/?section=timetable-edit'); ?>">Edit Timetable</a></li>
+      <li class="<?php echo $active_section == 'timetable-delete' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/time-table/?section=timetable-delete'); ?>">Delete Timetable</a></li>
+    </div>
+  </ul>
+</li>
+
+<li>
   <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'view-teachers' || $active_section == 'add-teacher' || $active_section == 'update-teacher' || $active_section == 'delete-teacher' ? 'rotate' : ''; ?>">
     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M520-640v-160q0-17 11.5-28.5T560-840h240q17 0 28.5 11.5T840-800v160q0 17-11.5 28.5T800-600H560q-17 0-28.5-11.5T520-640ZM120-480v-320q0-17 11.5-28.5T160-840h240q17 0 28.5 11.5T440-800v320q0 17-11.5 28.5T400-440H160q-17 0-28.5-11.5T120-480Zm400 320v-320q0-17 11.5-28.5T560-520h240q17 0 28.5 11.5T840-480v320q0 17-11.5 28.5T800-120H560q-17 0-28.5-11.5T520-160Zm-400 0v-160q0-17 11.5-28.5T160-360h240q17 0 28.5 11.5T440-320v160q0 17-11.5 28.5T400-120H160q-17 0-28.5-11.5T120-160Zm80-360h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/></svg>
     <span>Teachers</span>
@@ -518,6 +534,22 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
     <div>
       <li class="<?php echo $active_section == 'view-reports' ? 'active' : ''; ?>"><a href="/institute-dashboard/reports/?section=view-reports">View Reports</a></li>
       <li class="<?php echo $active_section == 'generate-reports' ? 'active' : ''; ?>"><a href="/institute-dashboard/reports/?section=generate-reports">Generate Reports</a></li>
+    </div>
+  </ul>
+</li>
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'staff-list' || $active_section == 'staff-add' || $active_section == 'staff-edit' || $active_section == 'staff-delete' || $active_section == 'staff-portal' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-240q66 0 113-47t47-113q0-66-47-113t-113-47q-66 0-113 47t-47 113q0 66 47 113t113 47Zm0-160q-33 0-56.5-23.5T400-400q0-33 23.5-56.5T480-480q33 0 56.5 23.5T560-400q0 33-23.5 56.5T480-320q-33 0-56.5-23.5T400-400q0-33 23.5-56.5T480-480Z"/></svg>
+    <span>Staff</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'staff-list' || $active_section == 'staff-add' || $active_section == 'staff-edit' || $active_section == 'staff-delete' || $active_section == 'staff-portal' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'staff-list' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/staff'); ?>">Staff List</a></li>
+      <li class="<?php echo $active_section == 'staff-add' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/staff/?section=staff-add'); ?>">Add Staff</a></li>
+      <li class="<?php echo $active_section == 'staff-edit' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/staff/?section=staff-edit'); ?>">Edit Staff</a></li>
+      <li class="<?php echo $active_section == 'staff-delete' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/staff/?section=staff-delete'); ?>">Delete Staff</a></li>
+      <li class="<?php echo $active_section == 'staff-portal' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/staff/?section=staff-portal'); ?>">Staff Portal</a></li>
     </div>
   </ul>
 </li>
