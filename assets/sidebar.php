@@ -553,6 +553,55 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
     </div>
   </ul>
 </li>
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'library-list' || $active_section == 'library-add' || $active_section == 'library-edit' || $active_section == 'library-delete' || $active_section == 'library-transaction' || $active_section == 'library-history' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-240q66 0 113-47t47-113q0-66-47-113t-113-47q-66 0-113 47t-47 113q0 66 47 113t113 47Zm0-160q-33 0-56.5-23.5T400-400q0-33 23.5-56.5T480-480q33 0 56.5 23.5T560-400q0 33-23.5 56.5T480-320q-33 0-56.5-23.5T400-400q0-33 23.5-56.5T480-480Z"/></svg>
+    <span>Library</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'library-list' || $active_section == 'library-add' || $active_section == 'library-edit' || $active_section == 'library-delete' || $active_section == 'library-transaction' || $active_section == 'library-history' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'library-list' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/library'); ?>">Library List</a></li>
+      <li class="<?php echo $active_section == 'library-add' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/library/?section=library-add'); ?>">Add Book</a></li>
+      <li class="<?php echo $active_section == 'library-edit' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/library/?section=library-edit'); ?>">Edit Book</a></li>
+      <li class="<?php echo $active_section == 'library-delete' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/library/?section=library-delete'); ?>">Delete Book</a></li>
+      <li class="<?php echo $active_section == 'library-transaction' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/library/?section=library-transaction'); ?>">Library Transactions</a></li>
+      <li class="<?php echo $active_section == 'library-history' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/library/?section=library-history'); ?>">Library History</a></li>
+    </div>
+  </ul>
+</li>
+
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'inventory-list' || $active_section == 'inventory-add' || $active_section == 'inventory-edit' || $active_section == 'inventory-transaction' || $active_section == 'inventory-issued' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-240q66 0 113-47t47-113q0-66-47-113t-113-47q-66 0-113 47t-47 113q0 66 47 113t113 47Zm0-160q-33 0-56.5-23.5T400-400q0-33 23.5-56.5T480-480q33 0 56.5 23.5T560-400q0 33-23.5 56.5T480-320q-33 0-56.5-23.5T400-400q0-33 23.5-56.5T480-480Z"/></svg>
+    <span>Inventory</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'inventory-list' || $active_section == 'inventory-add' || $active_section == 'inventory-edit' || $active_section == 'inventory-transaction' || $active_section == 'inventory-issued' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'inventory-list' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/inventory'); ?>">Inventory List</a></li>
+      <li class="<?php echo $active_section == 'inventory-add' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/inventory/?section=inventory-add'); ?>">Add Item</a></li>
+      <li class="<?php echo $active_section == 'inventory-edit' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/inventory/?section=inventory-edit'); ?>">Edit Item</a></li>
+      <li class="<?php echo $active_section == 'inventory-transaction' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/inventory/?section=inventory-transaction'); ?>">Inventory Transactions</a></li>
+      <li class="<?php echo $active_section == 'inventory-issued' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/inventory/?section=inventory-issued'); ?>">Inventory Issued</a></li>
+    </div>
+  </ul>
+</li>
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'announcements' || $active_section == 'inbox' || $active_section == 'compose' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-240q66 0 113-47t47-113q0-66-47-113t-113-47q-66 0-113 47t-47 113q0 66 47 113t113 47Zm0-160q-33 0-56.5-23.5T400-400q0-33 23.5-56.5T480-480q33 0 56.5 23.5T560-400q0 33-23.5 56.5T480-320q-33 0-56.5-23.5T400-400q0-33 23.5-56.5T480-480Z"/></svg>
+    <span>Messages</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'announcements' || $active_section == 'inbox' || $active_section == 'compose' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'announcements' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/communication'); ?>">Announcements</a></li>
+      <li class="<?php echo $active_section == 'inbox' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/communication/?section=inbox'); ?>">Inbox</a></li>
+      <li class="<?php echo $active_section == 'compose' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/communication/?section=compose'); ?>">Compose Message</a></li>
+    </div>
+  </ul>
+</li>
+
 
     <li>
       <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'student-reports' || $active_section == 'exam-reports' || $active_section == 'fees-reports' ? 'rotate' : ''; ?>">

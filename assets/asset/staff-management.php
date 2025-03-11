@@ -110,14 +110,17 @@ function aspire_staff_management_shortcode() {
 
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'staff-list';
 
+    // Generate PDF
     if ($section === 'staff-list' && isset($_GET['action']) && $_GET['action'] === 'generate_payroll_pdf') {
         $month = isset($_GET['month']) ? sanitize_text_field($_GET['month']) : date('Y-m');
-        $dompdf_path = dirname(__FILE__) . '/dompdf/autoload.inc.php';
+        $dompdf_path = dirname(__FILE__) . '/../exam/dompdf/autoload.inc.php';
+
         if (!file_exists($dompdf_path)) {
-            wp_die('Dompdf autoload file not found.');
+            wp_die('Dompdf autoload file not found at: ' . esc_html($dompdf_path));
         }
         require_once $dompdf_path;
 
+        // Fetch payroll data
         $payroll = $wpdb->get_results($wpdb->prepare(
             "SELECT s.staff_id, s.name, s.role, s.salary_base, 
                     COUNT(a.attendance_id) AS days_present,
@@ -129,57 +132,149 @@ function aspire_staff_management_shortcode() {
             $month, $education_center_id
         ));
 
+        if (empty($payroll)) {
+            wp_die('No payroll data found for the specified month: ' . esc_html($month));
+        }
+
+        // Configure Dompdf options
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('chroot', ABSPATH);
+        $options->set('tempDir', sys_get_temp_dir());
+        $options->set('defaultFont', 'Helvetica');
+
+        $dompdf = new Dompdf($options);
+
+        // Build HTML content
         $html = '
         <html>
         <head>
+            <meta charset="UTF-8">
             <style>
-                body { font-family: Arial, sans-serif; margin: 20px; }
-                .header { text-align: center; margin-bottom: 20px; }
-                table { width: 100%; border-collapse: collapse; font-size: 12px; }
-                th, td { border: 1px solid #333; padding: 8px; text-align: center; }
-                th { background-color: #f2f2f2; }
+                @page { 
+                    margin: 10mm; 
+                    border: 2px solid #1a2b5f;
+                    padding: 4mm;
+                }
+                body { 
+                    font-family: Helvetica, sans-serif; 
+                    font-size: 10pt; 
+                    color: #333; 
+                    line-height: 1.4;
+                }
+                .container {
+                    width: 100%;
+                    padding: 15px;
+                    border: 1px solid #ccc;
+                    background-color: #fff;
+                }
+                .header {
+                    text-align: center;
+                    padding-bottom: 10px;
+                    border-bottom: 2px solid #1a2b5f;
+                    margin-bottom: 15px;
+                }
+                .header h1 {
+                    font-size: 16pt;
+                    color: #1a2b5f;
+                    margin: 0;
+                    text-transform: uppercase;
+                }
+                .header p {
+                    font-size: 12pt;
+                    color: #666;
+                    margin: 5px 0 0;
+                }
+                .payroll-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 20px 0;
+                    font-size: 9pt;
+                }
+                .payroll-table th, .payroll-table td {
+                    border: 1px solid #333;
+                    padding: 6px;
+                    text-align: center;
+                }
+                .payroll-table th {
+                    background-color: #1a2b5f;
+                    color: white;
+                    font-weight: bold;
+                }
+                .payroll-table tr:nth-child(even) {
+                    background-color: #f9f9f9;
+                }
+                .footer {
+                    text-align: center;
+                    font-size: 9pt;
+                    color: #666;
+                    margin-top: 20px;
+                }
             </style>
         </head>
         <body>
-            <div class="header">
-                <h1>Staff Payroll - ' . esc_html($month) . '</h1>
-                <p>Education Center: ' . esc_html($education_center_id) . '</p>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Role</th>
-                        <th>Base Salary</th>
-                        <th>Days Present</th>
-                        <th>Monthly Salary</th>
-                    </tr>
-                </thead>
-                <tbody>';
+            <div class="container">
+                <div class="header">
+                    <h1>Staff Payroll - ' . esc_html($month) . '</h1>
+                    <p>Education Center: ' . esc_html($education_center_id) . '</p>
+                </div>
+                <table class="payroll-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Base Salary</th>
+                            <th>Days Present</th>
+                            <th>Monthly Salary</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
         foreach ($payroll as $staff) {
             $html .= '<tr>
                 <td>' . esc_html($staff->staff_id) . '</td>
                 <td>' . esc_html($staff->name) . '</td>
                 <td>' . esc_html($staff->role) . '</td>
-                <td>' . esc_html($staff->salary_base) . '</td>
+                <td>' . number_format($staff->salary_base, 2) . '</td>
                 <td>' . esc_html($staff->days_present) . '</td>
                 <td>' . number_format($staff->monthly_salary, 2) . '</td>
             </tr>';
         }
-        $html .= '</tbody></table></body></html>';
 
-        $dompdf = new Dompdf();
-        if (ob_get_length()) {
-            ob_end_clean();
+        $html .= '
+                    </tbody>
+                </table>
+                <div class="footer">
+                    Generated on ' . esc_html(date('Y-m-d H:i:s')) . '
+                </div>
+            </div>
+        </body>
+        </html>';
+
+        try {
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'landscape');
+            $dompdf->render();
+            $pdf_content = $dompdf->output();
+
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
+
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: attachment; filename="payroll_' . rawurlencode($education_center_id . '_' . $month) . '.pdf"');
+            header('Content-Length: ' . strlen($pdf_content));
+            header('Cache-Control: no-cache');
+
+            echo $pdf_content;
+            flush();
+            exit;
+        } catch (Exception $e) {
+            error_log('Dompdf Error: ' . $e->getMessage());
+            wp_die('Error generating payroll PDF: ' . esc_html($e->getMessage()));
         }
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'landscape');
-        $dompdf->render();
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="payroll_' . $education_center_id . '_' . $month . '.pdf"');
-        echo $dompdf->output();
-        exit;
     }
 
     ob_start();
@@ -219,7 +314,6 @@ function aspire_staff_management_shortcode() {
     return ob_get_clean();
 }
 add_shortcode('aspire_staff_management', 'aspire_staff_management_shortcode');
-
 function staff_list_shortcode() {
     global $wpdb;
     $education_center_id = get_educational_center_data();

@@ -1075,10 +1075,19 @@ wp_enqueue_script('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0
     wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js', ['jquery'], '5.3.0', true);
     // wp_enqueue_style('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css');
     // wp_enqueue_script('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', ['jquery'], '4.0.13', true);
-
+    // wp_enqueue_style('bootstrap-css', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css', [], '5.3.0');
 }
 add_action('wp_enqueue_scripts', 'institute_dashboard_scripts');
-
+function enqueue_font_awesome() {
+    wp_enqueue_style(
+        'font-awesome', 
+        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', 
+        array(), 
+        '6.5.1', 
+        'all'
+    );
+}
+add_action('wp_enqueue_scripts', 'enqueue_font_awesome');
 
 // function restrict_edit_class_section_access() {
 //     if (is_page('edit-class-section')) {

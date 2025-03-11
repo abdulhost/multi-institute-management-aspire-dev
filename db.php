@@ -192,7 +192,67 @@ $sql_attendance = "CREATE TABLE IF NOT EXISTS $staff_attendance_table (
     INDEX (education_center_id)
 ) $charset_collate;";
 dbDelta($sql_attendance);
+    // wp_inventory
+    $table_name = $wpdb->prefix . 'inventory';
+    $sql = "CREATE TABLE $table_name (
+        item_id VARCHAR(20) NOT NULL,
+        name VARCHAR(100) NOT NULL,
+        quantity INT NOT NULL DEFAULT 0,
+        status ENUM('Available', 'Issued', 'Damaged') DEFAULT 'Available',
+        category VARCHAR(50) DEFAULT 'Other',
+        education_center_id VARCHAR(50) NOT NULL,
+        low_stock_threshold INT DEFAULT 5,
+        PRIMARY KEY (item_id)
+    ) $charset_collate;";
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
+
+    // wp_inventory_transactions
+    $table_name = $wpdb->prefix . 'inventory_transactions';
+    $sql = "CREATE TABLE $table_name (
+        transaction_id BIGINT NOT NULL AUTO_INCREMENT,
+        item_id VARCHAR(20) NOT NULL,
+        user_id VARCHAR(20) NOT NULL,
+        user_type ENUM('Staff', 'Student') NOT NULL,
+        action ENUM('Issue', 'Return') NOT NULL,
+        date DATETIME NOT NULL,
+        status ENUM('Pending', 'Completed') DEFAULT 'Pending',
+        PRIMARY KEY (transaction_id)
+    ) $charset_collate;";
+    dbDelta($sql);
+
+    // wp_library
+    $table_name = $wpdb->prefix . 'library';
+    $sql = "CREATE TABLE $table_name (
+        book_id VARCHAR(20) NOT NULL,
+        isbn VARCHAR(13),
+        title VARCHAR(100) NOT NULL,
+        author VARCHAR(100) NOT NULL,
+        quantity INT NOT NULL DEFAULT 0,
+        available INT NOT NULL DEFAULT 0,
+        education_center_id VARCHAR(50) NOT NULL,
+        PRIMARY KEY (book_id)
+    ) $charset_collate;";
+    dbDelta($sql);
+
+    // wp_library_transactions
+    $table_name = $wpdb->prefix . 'library_transactions';
+    $sql = "CREATE TABLE $table_name (
+        transaction_id BIGINT NOT NULL AUTO_INCREMENT,
+        book_id VARCHAR(20) NOT NULL,
+        user_id VARCHAR(20) NOT NULL,
+        user_type ENUM('Staff', 'Student') NOT NULL,
+        issue_date DATETIME NOT NULL,
+        due_date DATETIME NOT NULL,
+        return_date DATETIME NULL,
+        fine DECIMAL(10,2) DEFAULT 0.00,
+        PRIMARY KEY (transaction_id)
+    ) $charset_collate;";
+    dbDelta($sql);
+
     
+    
+
 }
 
 function my_education_erp_seed_templates() {
