@@ -74,42 +74,156 @@ add_action('save_post', 'generate_random_meta_fields');
 //form login 
 // Custom Login Authentication
 // Custom Login Authentication with Error Message Display
-function custom_login_processing() {
-    // Initialize error message variable
+// function custom_login_processing() {
+//     // Initialize error message variable
+//     $error_message = '';
+
+//     // Check if the form has been submitted
+//     if (isset($_POST['submit_login'])) {
+//         // Get the user input (admin_id and password)
+//         $admin_id = sanitize_text_field($_POST['admin_id']);
+//         $password = sanitize_text_field($_POST['password']);
+
+//         // Check if the admin ID starts with 'admin' (for Institute Admin)
+//         if (strpos($admin_id, 'admin') === 0) {  // If the admin ID starts with 'admin'
+//             // Attempt to find the user by admin ID (login)
+//             $user = get_user_by('login', $admin_id);
+            
+//             // If user exists and password matches
+//             if ($user && wp_check_password($password, $user->user_pass, $user->ID)) {
+//                 // Set authentication cookie
+//                 wp_set_auth_cookie($user->ID);
+                
+//                 // Redirect to the Institute Admin dashboard if the user is an Institute Admin
+//                 if (in_array('institute_admin', (array) $user->roles)) {
+//                     wp_redirect(home_url('/institute-dashboard/'));  // Redirect to Institute Admin Dashboard
+//                     exit;
+//                 }
+//             } else {
+//                 // Invalid login credentials for Institute Admin
+//                 $error_message = 'Invalid ID or Password. Please try again.';
+//             }
+//         } else {
+//             // If the admin_id doesn't start with 'admin_' (for Institute Admin)
+//             $error_message = 'Incorrect ID Password. Please try again.';
+//         }
+//     }
+
+//     // Pass error message to the page to display below the form
+//     if (!empty($error_message)) {
+//         echo "<script type='text/javascript'>
+//                 document.addEventListener('DOMContentLoaded', function() {
+//                     var errorMessageElement = document.getElementById('login-error-message');
+//                     if (errorMessageElement) {
+//                         errorMessageElement.innerHTML = '$error_message';
+//                         errorMessageElement.style.display = 'block';
+//                     }
+//                 });
+//               </script>";
+//     }
+// }
+function custom_login_processing($user_type_configs = []) {
+    // Default configurations for user types
+    $default_configs = [
+        'institute_admin' => [
+            'prefix' => 'admin',
+            'role' => 'institute_admin',
+            'redirect' => '/institute-dashboard/',
+        ],
+        'teacher' => [
+            'prefix' => 'TEA-',
+            'role' => 'teacher',
+            'redirect' => '/teacher-dashboard/',
+            'validate_edu_center' => true, // Teachers require educational_center_id validation
+        ],
+    ];
+
+    // Ensure $user_type_configs is an array
+    if (!is_array($user_type_configs)) {
+        $user_type_configs = [];
+    }
+
+    $configs = array_merge($default_configs, $user_type_configs);
     $error_message = '';
 
-    // Check if the form has been submitted
     if (isset($_POST['submit_login'])) {
-        // Get the user input (admin_id and password)
-        $admin_id = sanitize_text_field($_POST['admin_id']);
+        $user_id = sanitize_text_field($_POST['user_id']);
         $password = sanitize_text_field($_POST['password']);
+        $educational_center_id = isset($_POST['educational_center_id']) ? sanitize_text_field($_POST['educational_center_id']) : '';
 
-        // Check if the admin ID starts with 'admin' (for Institute Admin)
-        if (strpos($admin_id, 'admin') === 0) {  // If the admin ID starts with 'admin'
-            // Attempt to find the user by admin ID (login)
-            $user = get_user_by('login', $admin_id);
-            
-            // If user exists and password matches
-            if ($user && wp_check_password($password, $user->user_pass, $user->ID)) {
-                // Set authentication cookie
-                wp_set_auth_cookie($user->ID);
-                
-                // Redirect to the Institute Admin dashboard if the user is an Institute Admin
-                if (in_array('institute_admin', (array) $user->roles)) {
-                    wp_redirect(home_url('/institute-dashboard/'));  // Redirect to Institute Admin Dashboard
-                    exit;
-                }
+        // Determine user type based on prefix
+        $matched_type = null;
+        foreach ($configs as $type => $config) {
+            if (strpos($user_id, $config['prefix']) === 0) {
+                $matched_type = $type;
+                break;
+            }
+        }
+
+        if ($matched_type) {
+            $config = $configs[$matched_type];
+
+            // For teachers, educational_center_id is required
+            if ($config['validate_edu_center'] && empty($educational_center_id)) {
+                $error_message = 'Educational Center ID is required for teachers.';
             } else {
-                // Invalid login credentials for Institute Admin
-                $error_message = 'Invalid Admin ID or Password. Please try again.';
+                $user = get_user_by('login', $user_id);
+
+                if ($user && wp_check_password($password, $user->user_pass, $user->ID)) {
+                    if (in_array($config['role'], (array) $user->roles)) {
+                        // Validate educational_center_id for teachers
+                        if ($config['validate_edu_center']) {
+                            $stored_edu_center_id = get_user_meta($user->ID, 'educational_center_id', true);
+                            error_log("Teacher Login Attempt: User ID $user_id, Input Edu Center ID $educational_center_id, Stored Edu Center ID $stored_edu_center_id");
+
+                            if (!$stored_edu_center_id) {
+                                $error_message = 'No Educational Center ID associated with this account.';
+                            } elseif ($stored_edu_center_id !== $educational_center_id) {
+                                $error_message = 'Invalid Educational Center ID.';
+                            } else {
+                                // Additional validation against teacher post
+                                $args = array(
+                                    'post_type' => 'teacher',
+                                    'post_status' => 'publish',
+                                    'meta_query' => array(
+                                        'relation' => 'AND',
+                                        array(
+                                            'key' => 'teacher_id',
+                                            'value' => $user_id,
+                                            'compare' => '=',
+                                        ),
+                                        array(
+                                            'key' => 'educational_center_id',
+                                            'value' => $stored_edu_center_id,
+                                            'compare' => '=',
+                                        ),
+                                    ),
+                                );
+                                $teacher_query = new WP_Query($args);
+
+                                if (!$teacher_query->have_posts()) {
+                                    $error_message = 'Teacher ID and Educational Center ID do not match any records.';
+                                }
+                            }
+                        }
+
+                        if (empty($error_message)) {
+                            wp_set_auth_cookie($user->ID);
+                            wp_redirect(home_url($config['redirect']));
+                            exit;
+                        }
+                    } else {
+                        $error_message = 'User does not have the required role.';
+                    }
+                } else {
+                    $error_message = 'Invalid ID or Password.';
+                }
             }
         } else {
-            // If the admin_id doesn't start with 'admin_' (for Institute Admin)
-            $error_message = 'Admin ID should start with "admin_". Please try again.';
+            $error_message = 'Incorrect ID format. Use a valid Admin or Teacher ID.';
         }
     }
 
-    // Pass error message to the page to display below the form
     if (!empty($error_message)) {
         echo "<script type='text/javascript'>
                 document.addEventListener('DOMContentLoaded', function() {
@@ -123,8 +237,43 @@ function custom_login_processing() {
     }
 }
 
-// Hook the custom login processing to run on the template_redirect hook
 add_action('template_redirect', 'custom_login_processing');
+
+function get_secure_logout_url_by_role() {
+    $user = wp_get_current_user();
+    $nonce = wp_create_nonce('logout_nonce');
+
+    if (in_array('teacher', (array) $user->roles)) {
+        $redirect = home_url('/teacher-login/');
+    } elseif (in_array('institute_admin', (array) $user->roles)) {
+        $redirect = home_url('/institute-login/');
+    } else {
+        $redirect = home_url('/login/');
+    }
+
+    return esc_url(add_query_arg(array('action' => 'logout', 'logout_nonce' => $nonce), $redirect));
+}
+
+function custom_logout_processing($redirect_to = '') {
+    $default_redirect = home_url('/login/');
+    $redirect_url = !empty($redirect_to) ? $redirect_to : $default_redirect;
+
+    if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+        if (!isset($_GET['logout_nonce']) || !wp_verify_nonce($_GET['logout_nonce'], 'logout_nonce')) {
+            wp_die('Invalid logout request.');
+        }
+
+        wp_logout();
+        wp_clear_auth_cookie();
+        wp_redirect($redirect_url);
+        exit;
+    }
+}
+
+add_action('template_redirect', function() {
+    custom_logout_processing();
+});
+
 
 function restrict_dashboard_access() {
     if (is_page('institute-dashboard') || is_page('edit-class-section')|| is_page('delete-class-section')|| is_page('attendance-management')|| is_page('attendance-entry-form')) {
@@ -586,22 +735,70 @@ function handle_add_teacher_submission() {
                 'teacher_weight' => $teacher_weight,
                 'teacher_current_address' => $teacher_current_address,
                 'teacher_permanent_address' => $teacher_permanent_address,
+                '_user_created' => false, // Flag to track if user has been created
             ),
         ));
 
-        if ($teacher_post_id && $attachment_id) {
-            update_field('field_67baed90c18fe', $attachment_id, $teacher_post_id); // ACF field key for teacher_profile_photo
-            wp_redirect(home_url('/institute-dashboard/teachers'));
-            exit;
-        } elseif ($teacher_post_id) {
-            wp_redirect(home_url('/institute-dashboard/teachers'));
-            exit;
-        } else {
-            echo '<p class="error-message">Error adding teacher.</p>';
+        // if ($teacher_post_id && $attachment_id) {
+        //     update_field('field_67baed90c18fe', $attachment_id, $teacher_post_id); // ACF field key for teacher_profile_photo
+        //     // wp_redirect(home_url('/institute-dashboard/teachers'));
+        //     // exit;
+        // }
+        // elseif ($teacher_post_id) {
+        //     wp_redirect(home_url('/institute-dashboard/teachers'));
+        //     exit;
+        // } else {
+        //     echo '<p class="error-message">Error adding teacher.</p>';
+        // }
+        if ($teacher_post_id) {
+            // Handle attachment if it exists
+            if ($attachment_id) {
+                update_field('field_67baed90c18fe', $attachment_id, $teacher_post_id); // ACF field key for teacher_profile_photo
+            }
+
+            // Register the teacher as a WordPress user
+         // Register the teacher as a WordPress user
+         if (!username_exists($teacher_id) && $teacher_email && $educational_center_id && $teacher_name) {
+            $password = $teacher_phone_number ?: wp_generate_password(12, true);
+            $name_parts = explode(' ', trim($teacher_name));
+            $first_name = $name_parts[0];
+            $last_name = isset($name_parts[1]) ? implode(' ', array_slice($name_parts, 1)) : '';
+
+            $user_id = wp_create_user($teacher_id, $password, $teacher_email);
+
+            if (!is_wp_error($user_id)) {
+                wp_update_user(array(
+                    'ID' => $user_id,
+                    'first_name' => $first_name,
+                    'last_name' => $last_name,
+                    'display_name' => $teacher_name,
+                ));
+
+                $user = new WP_User($user_id);
+                $user->set_role('teacher');
+
+                // Store educational_center_id in user meta and log it
+                $edu_center_stored = update_user_meta($user_id, 'educational_center_id', $educational_center_id);
+                error_log("Teacher Registration: User ID $user_id, Teacher ID $teacher_id, Edu Center ID $educational_center_id, Stored: " . ($edu_center_stored ? 'Yes' : 'No'));
+
+                update_user_meta($user_id, 'teacher_name', $teacher_name);
+                update_post_meta($teacher_post_id, '_user_created', true);
+                   $home_url = home_url(); // Corrected function name
+
+                    // Optionally, send a welcome email with credentials
+                    $message = "Welcome, $teacher_name!\n\nYour username: $teacher_id\nYour password: $password\n\nLogin at: $home_url/login/";
+                     wp_mail($teacher_email, 'Your Teacher Account Credentials', $message);
+                    wp_redirect(home_url('/institute-dashboard/teachers'));
+                } else {
+                    echo '<p class="error-message">Error creating user: ' . $user_id->get_error_message() . '</p>';
+                }
+            } elseif (username_exists($teacher_id)) {
+                echo '<p class="error-message">A user with this teacher ID already exists.</p>';
+            }
         }
     }
 
-     // Handle student deletion
+ 
      if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['teacher_post_id'])) {
         $teacher_post_id = intval($_GET['teacher_post_id']);
         if (wp_delete_post($teacher_post_id, true)) {
@@ -984,6 +1181,7 @@ include_files_from_directory('assets/fees');
 include_files_from_directory('assets/transport');
 include_files_from_directory('assets/exam');
 include_files_from_directory('assets/asset');
+include_files_from_directory('teacher-dashboard');
 
 // Include all other necessary files
 include plugin_dir_path(__FILE__) . 'assets/edit-classes.php';
@@ -1028,7 +1226,7 @@ function create_custom_user_roles() {
         add_role( 'teacher', 'Teacher', array(
             'read' => true,
             'edit_posts' => true,
-            'publish_posts' => false,
+            'publish_posts' => true,
             'edit_pages' => false,
             'manage_options' => false,
         ));

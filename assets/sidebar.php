@@ -601,8 +601,10 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
     </div>
   </ul>
 </li>
-
-
+<?php
+// Usage in template
+echo '<a href="' . get_secure_logout_url_by_role() . '">Log Out</a>';
+?>
     <li>
       <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'student-reports' || $active_section == 'exam-reports' || $active_section == 'fees-reports' ? 'rotate' : ''; ?>">
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M320-240q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-240Z"/></svg>
