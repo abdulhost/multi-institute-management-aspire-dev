@@ -8,51 +8,6 @@ if (!defined('ABSPATH')) {
 global $wpdb;
 $charset_collate = $wpdb->get_charset_collate();
 
-// Messages table
-$messages_table = $wpdb->prefix . 'messages';
-$sql = "CREATE TABLE $messages_table (
-    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    sender_id BIGINT(20) UNSIGNED NOT NULL,
-    recipient_id BIGINT(20) UNSIGNED DEFAULT NULL,
-    group_id BIGINT(20) UNSIGNED DEFAULT NULL,
-    type ENUM('announcement', 'message', 'group_message') DEFAULT 'message',
-    title VARCHAR(255) DEFAULT NULL,
-    content TEXT NOT NULL,
-    group_target VARCHAR(50) DEFAULT NULL,
-    status ENUM('sent', 'read') DEFAULT 'sent',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    KEY sender_id (sender_id),
-    KEY recipient_id (recipient_id),
-    KEY group_id (group_id)
-) $charset_collate;";
-require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-dbDelta($sql);
-
-// Groups table
-$groups_table = $wpdb->prefix . 'message_groups';
-$sql = "CREATE TABLE $groups_table (
-    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
-    creator_id BIGINT(20) UNSIGNED NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    KEY creator_id (creator_id)
-) $charset_collate;";
-dbDelta($sql);
-
-// Group members table
-$members_table = $wpdb->prefix . 'message_group_members';
-$sql = "CREATE TABLE $members_table (
-    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    group_id BIGINT(20) UNSIGNED NOT NULL,
-    user_id BIGINT(20) UNSIGNED NOT NULL,
-    PRIMARY KEY (id),
-    UNIQUE KEY group_user (group_id, user_id),
-    KEY group_id (group_id),
-    KEY user_id (user_id)
-) $charset_collate;";
-dbDelta($sql);
 
 // Enqueue Styles and Scripts (Updated to ensure jQuery is loaded)
 add_action('wp_enqueue_scripts', 'aspire_communication_enqueue');

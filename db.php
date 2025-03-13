@@ -250,8 +250,73 @@ dbDelta($sql_attendance);
     ) $charset_collate;";
     dbDelta($sql);
 
+    // Homework Table
+    $homework_table = $wpdb->prefix . 'homework';
+    $sql = "CREATE TABLE IF NOT EXISTS $homework_table (
+        homework_id BIGINT(20) NOT NULL AUTO_INCREMENT,
+        education_center_id VARCHAR(255) NOT NULL,
+        teacher_id VARCHAR(255) NOT NULL,
+        class_name VARCHAR(255) NOT NULL,
+        section VARCHAR(50) NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        description TEXT NOT NULL,
+        due_date DATE NOT NULL,
+        status ENUM('active', 'completed') DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (homework_id),
+        INDEX (education_center_id(191), teacher_id(191), class_name(191), section(50))  -- Limiting index length
+    ) $charset_collate;";
     
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+    dbDelta($sql);
+
     
+// Messages table
+$messages_table = $wpdb->prefix . 'messages';
+$sql = "CREATE TABLE $messages_table (
+    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    sender_id BIGINT(20) UNSIGNED NOT NULL,
+    recipient_id BIGINT(20) UNSIGNED DEFAULT NULL,
+    group_id BIGINT(20) UNSIGNED DEFAULT NULL,
+    education_center_id VARCHAR(255) NOT NULL,
+    type ENUM('announcement', 'message', 'group_message') DEFAULT 'message',
+    title VARCHAR(255) DEFAULT NULL,
+    content TEXT NOT NULL,
+    group_target VARCHAR(50) DEFAULT NULL,
+    status ENUM('sent', 'read') DEFAULT 'sent',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY sender_id (sender_id),
+    KEY recipient_id (recipient_id),
+    KEY group_id (group_id)
+) $charset_collate;";
+require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+dbDelta($sql);
+
+// Groups table
+$groups_table = $wpdb->prefix . 'message_groups';
+$sql = "CREATE TABLE $groups_table (
+    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    creator_id BIGINT(20) UNSIGNED NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY creator_id (creator_id)
+) $charset_collate;";
+dbDelta($sql);
+
+// Group members table
+$members_table = $wpdb->prefix . 'message_group_members';
+$sql = "CREATE TABLE $members_table (
+    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    group_id BIGINT(20) UNSIGNED NOT NULL,
+    user_id BIGINT(20) UNSIGNED NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY group_user (group_id, user_id),
+    KEY group_id (group_id),
+    KEY user_id (user_id)
+) $charset_collate;";
+dbDelta($sql);
 
 }
 

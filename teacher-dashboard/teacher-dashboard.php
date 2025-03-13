@@ -21,7 +21,18 @@ function aspire_teacher_dashboard_enqueue() {
         .form-section { margin-bottom: 15px; }
         .section-header { cursor: pointer; background: #f1f1f1; padding: 10px; border-radius: 5px; }
         .section-content { padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 5px; }
-    ');
+
+        .chat-sidebar { max-height: 70vh; overflow-y: auto; border-right: 1px solid #ddd; background: #f8f9fa; }
+        .chat-message { padding: 10px; margin: 5px 0; border-radius: 8px; max-width: 70%; position: relative; }
+        .chat-message.sent { background: #d4edda; align-self: flex-end; }
+        .chat-message.received { background: #e9ecef; align-self: flex-start; }
+        .chat-header { background: #007bff; color: white; padding: 10px; }
+        .unread { font-weight: bold; background: #cce5ff; }
+        .chat-container { display: flex; flex-direction: column; height: 70vh; }
+        .chat-messages { flex-grow: 1; overflow-y: auto; padding: 15px; }
+   
+    
+        ');
 }
 function educational_center_teacher_id() {
     if (!is_user_logged_in()) {
@@ -78,7 +89,8 @@ function aspire_teacher_dashboard_shortcode() {
     $teacher = get_post($teacher_posts[0]->ID);
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'overview';
     $action = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : '';
-
+    $id = isset($_GET['id']) ? intval($_GET['id']) : null;
+    $contact_id = isset($_GET['contact_id']) ? intval($_GET['contact_id']) : null;
     ob_start();
     ?>
     <div class="container-fluid" style="background: linear-gradient(135deg, #e6ffe6, #ccffcc); min-height: 100vh;">
@@ -125,6 +137,26 @@ function aspire_teacher_dashboard_shortcode() {
                                     echo render_student_management($user_id, $teacher);
                                 }
                                 break;
+                                case 'homework':
+                                    if ($action === 'add-homework') {
+                                        echo render_homework_add($user_id, $teacher);
+                                    } elseif ($action === 'edit-homework') {
+                                        $homework_id = isset($_GET['id']) ? intval($_GET['id']) : null;
+                                        echo render_homework_edit($user_id, $teacher, $homework_id);
+                                    } elseif ($action === 'delete-homework') {
+                                        $homework_id = isset($_GET['id']) ? intval($_GET['id']) : null;
+                                        handle_homework_delete($user_id, $homework_id);
+                                        echo render_homework_assignments($user_id, $teacher);
+                                    } else {
+                                        echo render_homework_assignments($user_id, $teacher);
+                                    }
+                                    break;
+                                    case 'communication':
+                                        
+                                            echo aspire_prochat_shortcode();
+                                        
+                                        break;
+                                
                     default:
                         echo render_teacher_overview($user_id, $teacher);
                 }
@@ -442,8 +474,6 @@ function render_teacher_profile($user_id, $teacher) {
 }
 
 // Feature 3: Class Management
-
-
 // Render Class Management (Main List View)
 function render_class_management($user_id, $teacher) {
     global $wpdb;
@@ -1537,4 +1567,737 @@ function render_student_edit($user_id, $teacher, $student_id = null) {
     </script>
     <?php
     return ob_get_clean();
+}
+
+// Homework Management Functions
+// Homework Management Functions
+function render_homework_assignments($user_id, $teacher) {
+    global $wpdb;
+
+    $education_center_id = educational_center_teacher_id();
+    if (empty($education_center_id)) {
+        return '<div class="alert alert-danger">Error: Could not fetch Education Center ID.</div>';
+    }
+
+    $homework_table = $wpdb->prefix . 'homework';
+    $homeworks = $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT * FROM $homework_table WHERE teacher_id = %d AND education_center_id = %s",
+            $user_id,
+            $education_center_id
+        )
+    );
+
+    ob_start();
+    ?>
+    <div class="attendance-main-wrapper" style="display: flex;">
+        <?php
+        $active_section = 'homework';
+        $active_action = '';
+        include plugin_dir_path(__FILE__) . 'teacher-sidebar.php';
+        ?>
+        <div style="display: block; width: 100%;">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h3 class="card-title m-0"><i class="bi bi-journal-text me-2"></i>Homework/Assignments</h3>
+                    <a href="?section=homework&action=add-homework" class="btn btn-light btn-sm">Assign Homework</a>
+                </div>
+                <div class="card-body">
+                    <?php if (empty($homeworks)): ?>
+                        <p class="text-muted">No homework assigned yet.</p>
+                    <?php else: ?>
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Class</th>
+                                    <th>Section</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($homeworks as $homework): ?>
+                                    <tr>
+                                        <td><?php echo esc_html($homework->title); ?></td>
+                                        <td><?php echo esc_html($homework->class_name); ?></td>
+                                        <td><?php echo esc_html($homework->section); ?></td>
+                                        <td><?php echo esc_html($homework->due_date); ?></td>
+                                        <td><?php echo esc_html($homework->status); ?></td>
+                                        <td>
+                                            <a href="?section=homework&action=edit-homework&id=<?php echo $homework->homework_id; ?>" class="btn btn-sm btn-warning">Edit</a>
+                                            <a href="?section=homework&action=delete-homework&id=<?php echo $homework->homework_id; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?');">Delete</a>
+                                            <button class="btn btn-sm btn-success mark-complete" data-id="<?php echo $homework->homework_id; ?>" <?php echo $homework->status === 'completed' ? 'disabled' : ''; ?>>Mark Complete</button>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    document.querySelectorAll('.mark-complete').forEach(button => {
+        button.addEventListener('click', function() {
+            const homeworkId = this.dataset.id;
+            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=mark_homework_complete&homework_id=${homeworkId}&nonce=<?php echo wp_create_nonce('mark_homework'); ?>`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.closest('tr').querySelector('td:nth-child(5)').textContent = 'completed';
+                    this.disabled = true;
+                } else {
+                    alert('Error marking homework as complete.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+function render_homework_add($user_id, $teacher) {
+    global $wpdb;
+
+    $education_center_id = educational_center_teacher_id();
+    if (empty($education_center_id)) {
+        return '<div class="alert alert-danger">Error: Could not fetch Education Center ID.</div>';
+    }
+
+    $class_sections_table = $wpdb->prefix . 'class_sections';
+    $classes = $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT * FROM $class_sections_table WHERE education_center_id = %s",
+            $education_center_id
+        )
+    );
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_homework']) && wp_verify_nonce($_POST['homework_nonce'], 'add_homework')) {
+        $title = sanitize_text_field($_POST['homework_title'] ?? '');
+        $description = sanitize_textarea_field($_POST['homework_description'] ?? '');
+        $due_date = sanitize_text_field($_POST['due_date'] ?? '');
+        $class_name = sanitize_text_field($_POST['class_name'] ?? '');
+        $section = sanitize_text_field($_POST['section'] ?? '');
+
+        if (empty($title) || empty($description) || empty($due_date) || empty($class_name) || empty($section)) {
+            return '<div class="alert alert-danger">All fields are required.</div>';
+        }
+
+        $homework_table = $wpdb->prefix . 'homework';
+        $inserted = $wpdb->insert(
+            $homework_table,
+            [
+                'education_center_id' => $education_center_id,
+                'teacher_id' => $user_id,
+                'class_name' => $class_name,
+                'section' => $section,
+                'title' => $title,
+                'description' => $description,
+                'due_date' => $due_date,
+                'status' => 'active'
+            ],
+            ['%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s']
+        );
+
+        if ($inserted) {
+            wp_redirect(home_url('/teacher-dashboard/?section=homework'));
+            exit;
+        } else {
+            return '<div class="alert alert-danger">Error assigning homework: ' . esc_html($wpdb->last_error) . '</div>';
+        }
+    }
+
+    ob_start();
+    ?>
+    <div class="attendance-main-wrapper" style="display: flex;">
+        <?php
+        $active_section = 'homework';
+        $active_action = 'add-homework';
+        include plugin_dir_path(__FILE__) . 'teacher-sidebar.php';
+        ?>
+        <div style="display: block; width: 100%;">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title m-0"><i class="bi bi-journal-text me-2"></i>Assign New Homework</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="homework_title" class="form-label">Title</label>
+                            <input type="text" name="homework_title" id="homework_title" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="homework_description" class="form-label">Description</label>
+                            <textarea name="homework_description" id="homework_description" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="due_date" class="form-label">Due Date</label>
+                            <input type="date" name="due_date" id="due_date" class="form-control" required min="<?php echo date('Y-m-d'); ?>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="class_name" class="form-label">Class</label>
+                            <select name="class_name" id="class_name" class="form-select" required>
+                                <option value="">Select a Class</option>
+                                <?php foreach ($classes as $class): ?>
+                                    <option value="<?php echo esc_attr($class->class_name); ?>"><?php echo esc_html($class->class_name); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="section" class="form-label">Section</label>
+                            <select name="section" id="section" class="form-select" required disabled>
+                                <option value="">Select Class First</option>
+                            </select>
+                        </div>
+                        <?php wp_nonce_field('add_homework', 'homework_nonce'); ?>
+                        <div class="d-flex gap-2">
+                            <button type="submit" name="add_homework" class="btn btn-primary">Assign Homework</button>
+                            <a href="?section=homework" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    jQuery(document).ready(function($) {
+        var sectionsData = {};
+        <?php
+        foreach ($classes as $class) {
+            echo 'sectionsData["' . esc_attr($class->class_name) . '"] = ' . json_encode(explode(',', $class->sections)) . ';';
+        }
+        ?>
+
+        $('#class_name').change(function() {
+            var selectedClass = $(this).val();
+            var sectionSelect = $('#section');
+
+            if (selectedClass && sectionsData[selectedClass]) {
+                sectionSelect.html('<option value="">Select Section</option>');
+                sectionsData[selectedClass].forEach(function(section) {
+                    sectionSelect.append('<option value="' + section + '">' + section + '</option>');
+                });
+                sectionSelect.prop('disabled', false);
+            } else {
+                sectionSelect.html('<option value="">Select Class First</option>').prop('disabled', true);
+            }
+        });
+
+        $('#class_name').trigger('change');
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+function render_homework_edit($user_id, $teacher, $homework_id = null) {
+    global $wpdb;
+
+    $education_center_id = educational_center_teacher_id();
+    if (empty($education_center_id)) {
+        return '<div class="alert alert-danger">Error: Could not fetch Education Center ID.</div>';
+    }
+
+    if (!$homework_id) {
+        return render_homework_assignments($user_id, $teacher);
+    }
+
+    $homework_table = $wpdb->prefix . 'homework';
+    $homework = $wpdb->get_row(
+        $wpdb->prepare(
+            "SELECT * FROM $homework_table WHERE homework_id = %d AND teacher_id = %d AND education_center_id = %s",
+            $homework_id,
+            $user_id,
+            $education_center_id
+        )
+    );
+
+    if (!$homework) {
+        return '<div class="alert alert-danger">Homework not found or permission denied.</div>';
+    }
+
+    $class_sections_table = $wpdb->prefix . 'class_sections';
+    $classes = $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT * FROM $class_sections_table WHERE education_center_id = %s",
+            $education_center_id
+        )
+    );
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_homework']) && wp_verify_nonce($_POST['homework_nonce'], 'edit_homework')) {
+        $title = sanitize_text_field($_POST['homework_title'] ?? '');
+        $description = sanitize_textarea_field($_POST['homework_description'] ?? '');
+        $due_date = sanitize_text_field($_POST['due_date'] ?? '');
+        $class_name = sanitize_text_field($_POST['class_name'] ?? '');
+        $section = sanitize_text_field($_POST['section'] ?? '');
+
+        if (empty($title) || empty($description) || empty($due_date) || empty($class_name) || empty($section)) {
+            return '<div class="alert alert-danger">All fields are required.</div>';
+        }
+
+        $updated = $wpdb->update(
+            $homework_table,
+            [
+                'title' => $title,
+                'description' => $description,
+                'due_date' => $due_date,
+                'class_name' => $class_name,
+                'section' => $section
+            ],
+            ['homework_id' => $homework_id, 'teacher_id' => $user_id, 'education_center_id' => $education_center_id],
+            ['%s', '%s', '%s', '%s', '%s'],
+            ['%d', '%d', '%s']
+        );
+
+        if ($updated !== false) {
+            wp_redirect(home_url('/teacher-dashboard/?section=homework'));
+            exit;
+        } else {
+            return '<div class="alert alert-danger">Error updating homework: ' . esc_html($wpdb->last_error) . '</div>';
+        }
+    }
+
+    ob_start();
+    ?>
+    <div class="attendance-main-wrapper" style="display: flex;">
+        <?php
+        $active_section = 'homework';
+        $active_action = 'edit-homework';
+        include plugin_dir_path(__FILE__) . 'teacher-sidebar.php';
+        ?>
+        <div style="display: block; width: 100%;">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title m-0"><i class="bi bi-journal-text me-2"></i>Edit Homework</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="homework_title" class="form-label">Title</label>
+                            <input type="text" name="homework_title" id="homework_title" class="form-control" value="<?php echo esc_attr($homework->title); ?>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="homework_description" class="form-label">Description</label>
+                            <textarea name="homework_description" id="homework_description" class="form-control" rows="3" required><?php echo esc_textarea($homework->description); ?></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="due_date" class="form-label">Due Date</label>
+                            <input type="date" name="due_date" id="due_date" class="form-control" value="<?php echo esc_attr($homework->due_date); ?>" required min="<?php echo date('Y-m-d'); ?>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="class_name" class="form-label">Class</label>
+                            <select name="class_name" id="class_name" class="form-select" required>
+                                <option value="">Select a Class</option>
+                                <?php foreach ($classes as $class): ?>
+                                    <option value="<?php echo esc_attr($class->class_name); ?>" <?php selected($homework->class_name, $class->class_name); ?>><?php echo esc_html($class->class_name); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="section" class="form-label">Section</label>
+                            <select name="section" id="section" class="form-select" required>
+                                <?php
+                                $sections = explode(',', $wpdb->get_var($wpdb->prepare("SELECT sections FROM $class_sections_table WHERE class_name = %s AND education_center_id = %s", $homework->class_name, $education_center_id)));
+                                foreach ($sections as $section_val) {
+                                    echo '<option value="' . esc_attr($section_val) . '" ' . selected($homework->section, $section_val, false) . '>' . esc_html($section_val) . '</option>';
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <?php wp_nonce_field('edit_homework', 'homework_nonce'); ?>
+                        <div class="d-flex gap-2">
+                            <button type="submit" name="edit_homework" class="btn btn-primary">Update Homework</button>
+                            <a href="?section=homework" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    jQuery(document).ready(function($) {
+        var sectionsData = {};
+        <?php
+        foreach ($classes as $class) {
+            echo 'sectionsData["' . esc_attr($class->class_name) . '"] = ' . json_encode(explode(',', $class->sections)) . ';';
+        }
+        ?>
+
+        $('#class_name').change(function() {
+            var selectedClass = $(this).val();
+            var sectionSelect = $('#section');
+
+            if (selectedClass && sectionsData[selectedClass]) {
+                sectionSelect.html('<option value="">Select Section</option>');
+                sectionsData[selectedClass].forEach(function(section) {
+                    sectionSelect.append('<option value="' + section + '">' + section + '</option>');
+                });
+                sectionSelect.val('<?php echo esc_js($homework->section); ?>');
+            } else {
+                sectionSelect.html('<option value="">Select Class First</option>');
+            }
+        });
+
+        $('#class_name').trigger('change');
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+function handle_homework_delete($user_id, $homework_id) {
+    global $wpdb;
+
+    $education_center_id = educational_center_teacher_id();
+    if (empty($education_center_id)) {
+        return;
+    }
+
+    $homework_table = $wpdb->prefix . 'homework';
+    $wpdb->delete(
+        $homework_table,
+        ['homework_id' => $homework_id, 'teacher_id' => $user_id, 'education_center_id' => $education_center_id],
+        ['%d', '%d', '%s']
+    );
+}
+
+add_action('wp_ajax_mark_homework_complete', 'mark_homework_complete_callback');
+function mark_homework_complete_callback() {
+    global $wpdb;
+
+    check_ajax_referer('mark_homework', 'nonce');
+    $homework_id = intval($_POST['homework_id'] ?? 0);
+    $user_id = get_current_user_id();
+    $education_center_id = educational_center_teacher_id();
+
+    if ($homework_id && $education_center_id) {
+        $homework_table = $wpdb->prefix . 'homework';
+        $updated = $wpdb->update(
+            $homework_table,
+            ['status' => 'completed'],
+            ['homework_id' => $homework_id, 'teacher_id' => $user_id, 'education_center_id' => $education_center_id],
+            ['%s'],
+            ['%d', '%d', '%s']
+        );
+        if ($updated !== false) {
+            wp_send_json_success();
+        }
+    }
+    wp_send_json_error();
+}
+
+// Activation: Create tables
+
+    global $wpdb;
+    $charset_collate = $wpdb->get_charset_collate();
+    $messages_table = $wpdb->prefix . 'aspire_messages';
+
+    $sql = "CREATE TABLE $messages_table (
+        id BIGINT(20) NOT NULL AUTO_INCREMENT,
+        channel VARCHAR(100) NOT NULL, 
+        sender_id BIGINT(20) NOT NULL,
+        message TEXT NOT NULL,
+        status ENUM('sent', 'read') DEFAULT 'sent',
+        education_center_id VARCHAR(50) NOT NULL,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        INDEX channel_idx (channel),
+        INDEX education_center_idx (education_center_id)
+    ) $charset_collate;";
+
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
+
+
+// Function 1: Send a Message to a Channel
+function aspire_send_message($channel, $sender_id, $message, $education_center_id) {
+    global $wpdb;
+    $messages_table = $wpdb->prefix . 'aspire_messages';
+
+    $wpdb->insert(
+        $messages_table,
+        [
+            'channel' => sanitize_text_field($channel),
+            'sender_id' => intval($sender_id),
+            'message' => sanitize_text_field($message),
+            'education_center_id' => sanitize_text_field($education_center_id),
+            'status' => 'sent',
+        ],
+        ['%s', '%d', '%s', '%s', '%s']
+    );
+
+    return $wpdb->insert_id;
+}
+
+// Function 2: Get Messages for a User
+function aspire_get_user_messages($user_id) {
+    global $wpdb;
+    $messages_table = $wpdb->prefix . 'aspire_messages';
+
+    $edu_center_id = educational_center_teacher_id();
+    $user = wp_get_current_user();
+    $roles = $user->roles;
+
+    // Channels: center-wide, role-based, and individual
+    $channels = ["{$edu_center_id}_all"];
+    foreach ($roles as $role) {
+        $channels[] = "{$edu_center_id}_{$role}";
+    }
+    $channels[] = "{$edu_center_id}_{$user_id}_[0-9]+"; // Sender-initiated private chats
+    $channels[] = "{$edu_center_id}_[0-9]+_{$user_id}"; // Receiver-initiated private chats
+
+    $placeholders = implode(',', array_fill(0, count($channels) - 2, '%s')) . ',%s,%s';
+    $query = $wpdb->prepare(
+        "SELECT * FROM $messages_table 
+         WHERE education_center_id = %s 
+         AND (channel IN ($placeholders) 
+              OR channel REGEXP %s 
+              OR channel REGEXP %s)
+         ORDER BY timestamp DESC 
+         LIMIT 50",
+        array_merge([$edu_center_id], array_slice($channels, 0, -2), array_slice($channels, -2))
+    );
+
+    return $wpdb->get_results($query);
+}
+
+// Function 3: Mark Messages as Read
+function aspire_mark_messages_read($user_id, $channel) {
+    global $wpdb;
+    $messages_table = $wpdb->prefix . 'aspire_messages';
+
+    $wpdb->update(
+        $messages_table,
+        ['status' => 'read'],
+        ['channel' => $channel, 'status' => 'sent'],
+        ['%s'],
+        ['%s', '%s']
+    );
+}
+
+// Function 4: Get Unread Count
+function aspire_get_unread_count($user_id) {
+    global $wpdb;
+    $messages_table = $wpdb->prefix . 'aspire_messages';
+
+    $edu_center_id = educational_center_teacher_id();
+    $channels = ["{$edu_center_id}_all", "{$edu_center_id}_teacher"];
+    $channels[] = "{$edu_center_id}_{$user_id}_[0-9]+";
+    $channels[] = "{$edu_center_id}_[0-9]+_{$user_id}";
+
+    $placeholders = implode(',', array_fill(0, count($channels) - 2, '%s')) . ',%s,%s';
+    $query = $wpdb->prepare(
+        "SELECT COUNT(*) FROM $messages_table 
+         WHERE education_center_id = %s 
+         AND status = 'sent'
+         AND (channel IN ($placeholders) 
+              OR channel REGEXP %s 
+              OR channel REGEXP %s)",
+        array_merge([$edu_center_id], array_slice($channels, 0, -2), array_slice($channels, -2))
+    );
+
+    return $wpdb->get_var($query);
+}
+
+// Function 5: AJAX Handler for Sending Messages
+add_action('wp_ajax_aspire_send_message', 'aspire_ajax_send_message');
+function aspire_ajax_send_message() {
+    check_ajax_referer('aspire_nonce', 'nonce');
+
+    $edu_center_id = educational_center_teacher_id();
+    $sender_id = get_current_user_id();
+    $message = sanitize_text_field($_POST['message']);
+    $target_type = sanitize_text_field($_POST['target_type']); // 'group' or 'individual'
+    $target_value = sanitize_text_field($_POST['target_value']); // e.g., 'teachers' or teacher/student ID
+
+    if ($target_type === 'individual') {
+        $channel = "{$edu_center_id}_{$sender_id}_{$target_value}";
+    } else {
+        $channel = "{$edu_center_id}_{$target_value}";
+    }
+
+    $message_id = aspire_send_message($channel, $sender_id, $message, $edu_center_id);
+    wp_send_json_success($message_id ? 'Message sent!' : 'Failed to send.');
+}
+
+// Function 6: AJAX Handler for Fetching Messages
+add_action('wp_ajax_aspire_fetch_messages', 'aspire_ajax_fetch_messages');
+function aspire_ajax_fetch_messages() {
+    check_ajax_referer('aspire_nonce', 'nonce');
+    $user_id = get_current_user_id();
+    $selected_channel = sanitize_text_field($_POST['channel'] ?? '');
+
+    $messages = aspire_get_user_messages($user_id);
+    if ($selected_channel) {
+        $messages = array_filter($messages, function($msg) use ($selected_channel) {
+            return $msg->channel === $selected_channel;
+        });
+        aspire_mark_messages_read($user_id, $selected_channel);
+    }
+
+    $output = '';
+    foreach ($messages as $msg) {
+        $sender = get_userdata($msg->sender_id) ?: get_post($msg->sender_id);
+        $sender_name = $sender instanceof WP_User ? $sender->display_name : ($sender ? $sender->post_title : 'Unknown');
+        $output .= '<div class="chat-message ' . ($msg->sender_id == $user_id ? 'sent text-end' : 'received') . ' ' . ($msg->status == 'sent' ? 'unread' : '') . '">';
+        $output .= '<small>' . esc_html($sender_name) . ' - ' . esc_html($msg->timestamp) . '</small>';
+        $output .= '<p>' . esc_html($msg->message) . '</p>';
+        $output .= '</div>';
+    }
+
+    wp_send_json_success(['html' => $output, 'unread' => aspire_get_unread_count($user_id)]);
+}
+
+// Function 7: Shortcode for ProChat Interface
+add_shortcode('aspire_prochat', 'aspire_prochat_shortcode');
+function aspire_prochat_shortcode() {
+    if (!is_user_logged_in()) {
+        return '<p>Please log in to use ProChat.</p>';
+    }
+
+    $edu_center_id = educational_center_teacher_id();
+    $user_id = get_current_user_id();
+    $unread_count = aspire_get_unread_count($user_id);
+
+    ob_start();
+    ?>
+    <div id="aspire-prochat" class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 chat-sidebar p-3">
+                <h4>Inbox <?php if ($unread_count) { ?><span class="badge bg-danger"><?php echo $unread_count; ?></span><?php } ?></h4>
+                <ul id="aspire-channels" class="list-group">
+                    <li class="list-group-item" data-channel="<?php echo esc_attr("{$edu_center_id}_all"); ?>">Everyone in Center</li>
+                    <li class="list-group-item" data-channel="<?php echo esc_attr("{$edu_center_id}_teacher"); ?>">Teachers</li>
+                    <?php
+                    // Fetch individual contacts (teachers/students in the same center)
+                    $contacts = get_posts([
+                        'post_type' => ['teacher', 'students'],
+                        'posts_per_page' => -1,
+                        'meta_key' => 'educational_center_id',
+                        'meta_value' => $edu_center_id,
+                    ]);
+                    foreach ($contacts as $contact) {
+                        if ($contact->ID != $user_id) {
+                            $channel = "{$edu_center_id}_{$user_id}_{$contact->ID}";
+                            echo '<li class="list-group-item" data-channel="' . esc_attr($channel) . '">' . esc_html($contact->post_title) . '</li>';
+                        }
+                    }
+                    ?>
+                </ul>
+            </div>
+            <div class="col-md-9 p-4">
+                <div id="aspire-message-list" class="chat-messages"></div>
+                <form id="aspire-send-form" class="mt-3">
+                    <div class="input-group">
+                        <textarea id="aspire-message-input" class="form-control" placeholder="Type your message..." rows="2" required></textarea>
+                        <select id="aspire-target-type" class="form-select">
+                            <option value="group">Group</option>
+                            <option value="individual">Individual</option>
+                        </select>
+                        <select id="aspire-target-value" class="form-select aspire-group-target">
+                            <option value="all">Everyone in Center</option>
+                            <option value="teacher">Teachers</option>
+                        </select>
+                        <select id="aspire-individual-target" class="form-select aspire-individual-target" style="display:none;">
+                            <?php foreach ($contacts as $contact) {
+                                if ($contact->ID != $user_id) {
+                                    echo '<option value="' . $contact->ID . '">' . esc_html($contact->post_title) . '</option>';
+                                }
+                            } ?>
+                        </select>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i></button>
+                    </div>
+                    <?php wp_nonce_field('aspire_nonce', 'aspire_nonce_field'); ?>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+    jQuery(document).ready(function($) {
+        let selectedChannel = '';
+
+        function fetchMessages(channel) {
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'aspire_fetch_messages',
+                    channel: channel,
+                    nonce: $('#aspire_nonce_field').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#aspire-message-list').html(response.data.html);
+                        $('#aspire-prochat .badge').text(response.data.unread || '');
+                        const chatMessages = document.querySelector('#aspire-message-list');
+                        if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                }
+            });
+        }
+
+        $('#aspire-target-type').change(function() {
+            if ($(this).val() === 'individual') {
+                $('.aspire-group-target').hide();
+                $('.aspire-individual-target').show();
+            } else {
+                $('.aspire-group-target').show();
+                $('.aspire-individual-target').hide();
+            }
+        });
+
+        $('#aspire-channels li').click(function() {
+            $('#aspire-channels li').removeClass('active');
+            $(this).addClass('active');
+            selectedChannel = $(this).data('channel');
+            fetchMessages(selectedChannel);
+        });
+
+        $('#aspire-send-form').submit(function(e) {
+            e.preventDefault();
+            const message = $('#aspire-message-input').val();
+            const targetType = $('#aspire-target-type').val();
+            const targetValue = targetType === 'individual' ? $('#aspire-individual-target').val() : $('#aspire-target-value').val();
+
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'aspire_send_message',
+                    message: message,
+                    target_type: targetType,
+                    target_value: targetValue,
+                    nonce: $('#aspire_nonce_field').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#aspire-message-input').val('');
+                        fetchMessages(selectedChannel || '<?php echo esc_attr("{$edu_center_id}_all"); ?>');
+                    }
+                }
+            });
+        });
+
+        setInterval(() => fetchMessages(selectedChannel || '<?php echo esc_attr("{$edu_center_id}_all"); ?>'), 10000);
+        fetchMessages('<?php echo esc_attr("{$edu_center_id}_all"); ?>'); // Default to "all" channel
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Enqueue jQuery and Bootstrap Icons (assuming you use them)
+add_action('wp_enqueue_scripts', 'aspire_enqueue_scripts');
+function aspire_enqueue_scripts() {
+    wp_enqueue_script('jquery');
+    wp_enqueue_style('bootstrap-icons', 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css');
 }
