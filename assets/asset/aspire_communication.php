@@ -80,6 +80,16 @@ function aspire_communication_shortcode() {
                     case 'groups':
                         echo render_group_management($user_id);
                         break;
+                        case 'communications':
+                                        
+                            echo aspire_admin_prochat_shortcode();
+                        
+                        break;
+                        case 'noticeboard':
+                                        
+                            echo aspire_admin_notice_board_shortcode();
+                        
+                        break;
                     default:
                         echo '<div class="alert alert-warning">Section not found.</div>';
                 }
@@ -763,3 +773,1089 @@ function handle_create_group() {
     wp_redirect(home_url('/institute-dashboard/communication/?section=groups'));
     exit;
 }
+
+
+
+
+// INSTITUTE ADMIN FUNCTIONS
+// INSTITUTE ADMIN FUNCTIONS
+// INSTITUTE ADMIN FUNCTIONS
+// Helper: Check if User is Institute Admin
+function aspire_admin_is_institute_admin($username, $education_center_id) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'institute_admins';
+    $count = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM $table WHERE institute_admin_id = %s AND education_center_id = %s",
+        $username,
+        $education_center_id
+    ));
+    return $count > 0;
+}
+
+// Helper: Get Admin Details
+function aspire_admin_get_admins($education_center_id) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'institute_admins';
+    $admins = $wpdb->get_results($wpdb->prepare(
+        "SELECT institute_admin_id AS id, name FROM $table WHERE education_center_id = %s",
+        $education_center_id
+    ), ARRAY_A);
+    return $admins ?: [];
+}
+
+// Helper: Get Teacher Username (Refined)
+function aspire_teacher_get_username($post_id) {
+    $user_id = get_post_meta($post_id, 'teacher_id', true);
+    if ($user_id) {
+        // Check if teacher_id is a username (e.g., TEA-67d0728cd4ae5)
+        $user = get_user_by('login', $user_id);
+        if ($user) {
+            return $user->user_login;
+        }
+        // Otherwise, treat it as a user ID
+        $user = get_userdata(intval($user_id));
+        if ($user) {
+            return $user->user_login;
+        }
+        error_log("No user found for post_id=$post_id, user_id=$user_id");
+    } else {
+        error_log("No teacher_id meta for post_id=$post_id");
+    }
+    return 'contact_' . $post_id; // Fallback for any contact type
+}
+
+// Admin: Send Message
+function aspire_admin_send_message($sender_id, $receiver_id, $message, $education_center_id) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_messages';
+
+    error_log("Sending message: sender_id=$sender_id, receiver_id=$receiver_id, message=$message, education_center_id=$education_center_id");
+
+    $result = $wpdb->insert(
+        $table,
+        [
+            'sender_id' => $sender_id,
+            'receiver_id' => $receiver_id,
+            'message' => $message,
+            'education_center_id' => $education_center_id,
+            'status' => 'sent',
+        ],
+        ['%s', '%s', '%s', '%s', '%s']
+    );
+
+    return $result !== false;
+}
+
+// Admin: Get Messages
+// function aspire_admin_get_messages($username, $conversation_with = '') {
+//     global $wpdb;
+//     $table = $wpdb->prefix . 'aspire_messages';
+//     $edu_center_id = get_educational_center_data();
+
+//     $query = "SELECT * FROM $table WHERE education_center_id = %s";
+//     $query_args = [$edu_center_id];
+
+//     if ($conversation_with) {
+//         $query .= " AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s))";
+//         $query_args[] = $username;
+//         $query_args[] = $conversation_with;
+//         $query_args[] = $conversation_with;
+//         $query_args[] = $username;
+//     } else {
+//         $query .= " AND (receiver_id = %s OR receiver_id IN ('all', 'institute_admins'))";
+//         $query_args[] = $username;
+//     }
+
+//     $query .= " ORDER BY timestamp DESC LIMIT 50";
+//     $results = $wpdb->get_results($wpdb->prepare($query, $query_args));
+//     error_log("Admin messages for $username with $conversation_with: " . print_r($results, true));
+//     return $results;
+// }
+
+// Admin: Mark Messages as Read
+function aspire_admin_mark_messages_read($username, $conversation_with) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_messages';
+
+    $wpdb->update(
+        $table,
+        ['status' => 'read'],
+        [
+            'receiver_id' => $username,
+            'sender_id' => $conversation_with,
+            'status' => 'sent'
+        ],
+        ['%s'],
+        ['%s', '%s', '%s']
+    );
+}
+
+// Admin: Get Unread Count
+function aspire_admin_get_unread_count($username) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_messages';
+    $edu_center_id = get_educational_center_data();
+
+    $query = $wpdb->prepare(
+        "SELECT COUNT(*) FROM $table 
+         WHERE education_center_id = %s 
+         AND status = 'sent' 
+         AND (receiver_id = %s OR receiver_id IN ('all', 'institute_admins'))",
+        $edu_center_id,
+        $username
+    );
+
+    return $wpdb->get_var($query);
+}
+
+
+// Admin: AJAX Send Message
+add_action('wp_ajax_aspire_admin_send_message', 'aspire_admin_ajax_send_message');
+function aspire_admin_ajax_send_message() {
+    check_ajax_referer('aspire_admin_nonce', 'nonce');
+    $edu_center_id = get_educational_center_data();
+    $user = wp_get_current_user();
+    $sender_id = $user->user_login;
+    $message = sanitize_text_field($_POST['message']);
+    $target_type = sanitize_text_field($_POST['target_type']);
+    $target_value = sanitize_text_field($_POST['target_value']);
+
+    if (!$edu_center_id || !$sender_id || !$message || !$target_type || !$target_value) {
+        wp_send_json_error('Missing required fields.');
+        return;
+    }
+
+    $receiver_id = $target_value; // Directly from dropdown, already a username
+    error_log("AJAX send: sender_id=$sender_id, receiver_id=$receiver_id");
+
+    $success = aspire_admin_send_message($sender_id, $receiver_id, $message, $edu_center_id);
+    wp_send_json($success ? ['success' => 'Message sent!'] : ['error' => 'Failed to send message.']);
+}
+
+// Admin: AJAX Fetch Messages
+add_action('wp_ajax_aspire_admin_fetch_messages', 'aspire_admin_ajax_fetch_messages');
+// function aspire_admin_ajax_fetch_messages() {
+//     check_ajax_referer('aspire_admin_nonce', 'nonce');
+//     $user = wp_get_current_user();
+//     $username = $user->user_login;
+//     $conversation_with = sanitize_text_field($_POST['conversation_with'] ?? '');
+
+//     $messages = aspire_admin_get_messages($username, $conversation_with);
+//     if ($conversation_with) {
+//         aspire_admin_mark_messages_read($username, $conversation_with);
+//     }
+
+//     $output = '';
+//     foreach ($messages as $msg) {
+//         $sender = get_user_by('login', $msg->sender_id);
+//         $sender_name = $sender ? $sender->display_name : 'Unknown';
+//         $output .= '<div class="chat-message ' . ($msg->sender_id === $username ? 'sent text-end' : 'received') . ' ' . ($msg->status == 'sent' ? 'unread' : '') . '">';
+//         $output .= '<small>' . esc_html($sender_name) . ' - ' . esc_html($msg->timestamp) . '</small>';
+//         $output .= '<p>' . esc_html($msg->message) . '</p>';
+//         $output .= '</div>';
+//     }
+
+//     wp_send_json_success(['html' => $output, 'unread' => aspire_admin_get_unread_count($username)]);
+// }
+
+// Admin: AJAX Fetch Conversations
+add_action('wp_ajax_aspire_admin_fetch_conversations', 'aspire_admin_ajax_fetch_conversations');
+function aspire_admin_ajax_fetch_conversations() {
+    check_ajax_referer('aspire_admin_nonce', 'nonce');
+    $user = wp_get_current_user();
+    $username = $user->user_login;
+    $edu_center_id = get_educational_center_data();
+    $active_conversations = aspire_admin_get_active_conversations($username);
+
+    $output = '';
+    $group_names = [
+        'all' => 'Everyone in Center',
+        'institute_admins' => 'Institute Admins'
+    ];
+    foreach ($active_conversations as $conv) {
+        $conv_with = $conv->conversation_with;
+        $name = isset($group_names[$conv_with]) ? $group_names[$conv_with] : 'Unknown';
+        if (!isset($group_names[$conv_with])) {
+            $user = get_user_by('login', $conv_with);
+            $name = $user ? $user->display_name : 'Unknown';
+        }
+        $output .= '<li class="list-group-item" data-conversation-with="' . esc_attr($conv_with) . '">' . esc_html($name) . '</li>';
+    }
+    if (empty($active_conversations)) {
+        $output = '<li class="list-group-item text-muted">No conversations yet.</li>';
+    }
+
+    wp_send_json_success($output);
+}
+
+// Admin: Shortcode (Enhanced Dropdown Labels)
+// function aspire_admin_get_active_conversations($username) {
+//     global $wpdb;
+//     $table = $wpdb->prefix . 'aspire_messages';
+//     $edu_center_id = get_educational_center_data();
+
+//     $query = $wpdb->prepare(
+//         "SELECT 
+//             CASE 
+//                 WHEN sender_id = %s THEN receiver_id 
+//                 ELSE sender_id 
+//             END AS conversation_with,
+//             MAX(timestamp) AS last_message
+//          FROM $table 
+//          WHERE education_center_id = %s 
+//          AND (sender_id = %s OR receiver_id = %s OR receiver_id IN ('all', 'institute_admins'))
+//          GROUP BY conversation_with 
+//          ORDER BY last_message DESC",
+//         $username,
+//         $edu_center_id,
+//         $username,
+//         $username
+//     );
+
+//     $results = $wpdb->get_results($query);
+//     error_log("Admin active conversations for $username: " . print_r($results, true));
+//     return $results;
+// }
+
+// Admin: Get Messages (Updated for Ascending Order)
+// function aspire_admin_get_messages($username, $conversation_with = '') {
+//     global $wpdb;
+//     $table = $wpdb->prefix . 'aspire_messages';
+//     $edu_center_id = get_educational_center_data();
+
+//     $query = "SELECT * FROM $table WHERE education_center_id = %s";
+//     $query_args = [$edu_center_id];
+
+//     if ($conversation_with) {
+//         $query .= " AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s))";
+//         $query_args[] = $username;
+//         $query_args[] = $conversation_with;
+//         $query_args[] = $conversation_with;
+//         $query_args[] = $username;
+//     } else {
+//         $query .= " AND (receiver_id = %s OR receiver_id IN ('all', 'institute_admins'))";
+//         $query_args[] = $username;
+//     }
+
+//     $query .= " ORDER BY timestamp ASC LIMIT 50"; // Changed to ASC for latest at bottom
+//     $results = $wpdb->get_results($wpdb->prepare($query, $query_args));
+//     error_log("Admin messages for $username with $conversation_with: " . print_r($results, true));
+//     return $results;
+// }
+
+// Admin: AJAX Fetch Messages (Updated for Full Names and Order)
+// function aspire_admin_ajax_fetch_messages() {
+//     check_ajax_referer('aspire_admin_nonce', 'nonce');
+//     $user = wp_get_current_user();
+//     $username = $user->user_login;
+//     $conversation_with = sanitize_text_field($_POST['conversation_with'] ?? '');
+
+//     $messages = aspire_admin_get_messages($username, $conversation_with);
+//     if ($conversation_with && !in_array($conversation_with, ['all', 'institute_admins'])) {
+//         aspire_admin_mark_messages_read($username, $conversation_with);
+//     }
+
+//     $contacts = get_posts([
+//         'post_type' => ['teacher', 'students', 'parent'],
+//         'posts_per_page' => -1,
+//         'meta_key' => 'educational_center_id',
+//         'meta_value' => get_educational_center_data(),
+//     ]);
+//     $admins = aspire_admin_get_admins(get_educational_center_data());
+
+//     $output = '';
+//     foreach ($messages as $msg) {
+//         $sender_name = ($msg->sender_id === $username) ? 'You' : null;
+//         if (!$sender_name) {
+//             foreach ($contacts as $contact) {
+//                 if (aspire_teacher_get_username($contact->ID) === $msg->sender_id) {
+//                     if ($contact->post_type === 'teacher') {
+//                         $sender_name = get_post_meta($contact->ID, 'teacher_name', true);
+//                     } elseif ($contact->post_type === 'students') {
+//                         $sender_name = get_post_meta($contact->ID, 'student_name', true);
+//                     } else {
+//                         $sender_name = $contact->post_title;
+//                     }
+//                     break;
+//                 }
+//             }
+//             if (!$sender_name) {
+//                 foreach ($admins as $admin) {
+//                     if ($admin['id'] === $msg->sender_id) {
+//                         $sender_name = $admin['name'];
+//                         break;
+//                     }
+//                 }
+//             }
+//             if (!$sender_name) {
+//                 $sender = get_user_by('login', $msg->sender_id);
+//                 $sender_name = $sender ? $sender->display_name : 'Unknown';
+//             }
+//         }
+//         $initials = strtoupper(substr($sender_name === 'You' ? $user->display_name : $sender_name, 0, 2));
+//         $output .= '<div class="chat-message ' . ($msg->sender_id === $username ? 'sent' : 'received') . ' ' . ($msg->status == 'sent' ? 'unread' : '') . '">';
+//         $output .= '<div class="bubble">';
+//         $output .= '<span class="avatar">' . esc_html($initials) . '</span>';
+//         $output .= '<p>' . esc_html($msg->message) . '</p>';
+//         $output .= '</div>';
+//         $output .= '<div class="meta" data-timestamp="' . esc_attr($msg->timestamp) . '">' . esc_html($sender_name) . ' - ' . esc_html($msg->timestamp) . '</div>';
+//         $output .= '</div>';
+//     }
+
+//     wp_send_json_success(['html' => $output, 'unread' => aspire_admin_get_unread_count($username)]);
+// }
+
+// Admin: Shortcode (Updated with New Chat Button and UI Tweaks)
+// Admin: Get Messages (Updated to Handle Group Messages)
+// function aspire_admin_get_messages($username, $conversation_with = '') {
+//     global $wpdb;
+//     $table = $wpdb->prefix . 'aspire_messages';
+//     $edu_center_id = get_educational_center_data();
+
+//     $query = "SELECT * FROM $table WHERE education_center_id = %s";
+//     $query_args = [$edu_center_id];
+
+//     if ($conversation_with) {
+//         if (in_array($conversation_with, ['all', 'institute_admins'])) {
+//             // Fetch group messages for the selected group
+//             $query .= " AND receiver_id = %s";
+//             $query_args[] = $conversation_with;
+//         } else {
+//             // Fetch individual conversation messages
+//             $query .= " AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s))";
+//             $query_args[] = $username;
+//             $query_args[] = $conversation_with;
+//             $query_args[] = $conversation_with;
+//             $query_args[] = $username;
+//         }
+//     } else {
+//         // Fetch all messages for the user, including applicable groups
+//         $query .= " AND (receiver_id = %s OR receiver_id IN ('all', 'institute_admins'))";
+//         $query_args[] = $username;
+//         $query_args[] = 'all';
+//         $query_args[] = 'institute_admins';
+//     }
+
+//     $query .= " ORDER BY timestamp ASC LIMIT 50";
+//     $results = $wpdb->get_results($wpdb->prepare($query, $query_args));
+//     error_log("Admin messages for $username with $conversation_with: " . print_r($results, true));
+//     return $results;
+// }
+
+// Admin: Shortcode (No changes needed, just ensuring compatibility)
+function aspire_admin_prochat_shortcode() {
+    if (!is_user_logged_in()) {
+        return '<p>Please log in to use this chat.</p>';
+    }
+    
+    $user = wp_get_current_user();
+    $username = $user->user_login;
+    $edu_center_id = get_educational_center_data();
+    
+    if (!aspire_admin_is_institute_admin($username, $edu_center_id)) {
+        return '<p>You do not have the required permissions to use this chat.</p>';
+    }
+    
+    $unread_count = aspire_admin_get_unread_count($username);
+    $active_conversations = aspire_admin_get_active_conversations($username);
+    $contacts = get_posts([
+        'post_type' => ['teacher', 'students', 'parent'],
+        'posts_per_page' => -1,
+        'meta_key' => 'educational_center_id',
+        'meta_value' => $edu_center_id,
+    ]);
+    $admins = aspire_admin_get_admins($edu_center_id);
+
+    ob_start();
+    ?>
+    <div id="aspire-admin-prochat" class="chat-container">
+        <div class="chat-wrapper">
+            <div class="chat-sidebar">
+                <div class="sidebar-header">
+                    <h4>Inbox <span id="unread-badge" class="badge bg-danger"><?php echo $unread_count ?: ''; ?></span></h4>
+                    <input type="text" id="conversation-search" class="form-control" placeholder="Search conversations...">
+                </div>
+                <ul id="aspire-admin-conversations" class="conversation-list">
+                    <?php
+                    $group_names = [
+                        'all' => 'Everyone in Center',
+                        'institute_admins' => 'Institute Admins'
+                    ];
+                    foreach ($active_conversations as $conv) {
+                        $conv_with = $conv->conversation_with;
+                        $name = isset($group_names[$conv_with]) ? $group_names[$conv_with] : null;
+                        if (!$name) {
+                            foreach ($contacts as $contact) {
+                                $contact_username = aspire_teacher_get_username($contact->ID);
+                                if ($contact_username === $conv_with) {
+                                    if ($contact->post_type === 'teacher') {
+                                        $teacher_name = get_post_meta($contact->ID, 'teacher_name', true);
+                                        $teacher_id = get_post_meta($contact->ID, 'teacher_id', true);
+                                        $name = $teacher_name . ' (' . esc_html($teacher_id) . ' - Teacher)';
+                                    } elseif ($contact->post_type === 'students') {
+                                        $student_name = get_post_meta($contact->ID, 'student_name', true);
+                                        $student_id = get_post_meta($contact->ID, 'student_id', true);
+                                        $name = $student_name . ' (' . esc_html($student_id) . ' - Students)';
+                                    } else {
+                                        $name = $contact->post_title . ' (' . ucfirst($contact->post_type) . ')';
+                                    }
+                                    break;
+                                }
+                            }
+                            if (!$name) {
+                                foreach ($admins as $admin) {
+                                    if ($admin['id'] === $conv_with) {
+                                        $name = $admin['name'] . ' (Admin)';
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!$name) {
+                                $user = get_user_by('login', $conv_with);
+                                $name = $user ? $user->display_name : 'Unknown';
+                            }
+                        }
+                        echo '<li class="conversation-item" data-conversation-with="' . esc_attr($conv_with) . '">' . esc_html($name) . '</li>';
+                    }
+                    if (empty($active_conversations)) {
+                        echo '<li class="conversation-item text-muted">No conversations yet.</li>';
+                    }
+                    ?>
+                </ul>
+            </div>
+            <div class="chat-main">
+                <div class="chat-header">
+                    <h5 id="current-conversation">Select a conversation</h5>
+                    <div>
+                        <button id="new-chat" class="btn btn-outline-primary btn-sm">New Chat</button>
+                        <button id="clear-conversation" class="btn btn-outline-secondary btn-sm" style="display:none;">Clear</button>
+                    </div>
+                </div>
+                <div id="aspire-admin-message-list" class="chat-messages"></div>
+                <form id="aspire-admin-send-form" class="chat-form">
+                    <div class="input-group">
+                        <textarea id="aspire-admin-message-input" class="form-control" placeholder="Type your message..." rows="1" required></textarea>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i></button>
+                    </div>
+                    <div id="recipient-select" class="recipient-select" style="display:none;">
+                        <select id="aspire-admin-target-type" class="form-select">
+                            <option value="group">Group</option>
+                            <option value="individual">Individual</option>
+                        </select>
+                        <select id="aspire-admin-target-value" class="form-select aspire-admin-group-target">
+                            <option value="all">Everyone in Center</option>
+                            <option value="institute_admins">Institute Admins</option>
+                        </select>
+                        <select id="aspire-admin-individual-target" class="form-select aspire-admin-individual-target" style="display:none;">
+                            <?php foreach ($contacts as $contact): ?>
+                                <?php 
+                                $contact_username = aspire_teacher_get_username($contact->ID); 
+                                if ($contact_username !== $username): 
+                                    $user_data = get_user_by('login', $contact_username);
+                                    $display_name = $user_data ? $user_data->display_name : $contact->post_title;
+                                    if ($contact->post_type === 'teacher') {
+                                        $teacher_name = get_post_meta($contact->ID, 'teacher_name', true);
+                                        $teacher_id = get_post_meta($contact->ID, 'teacher_id', true);
+                                        $label = $teacher_name . ' (' . esc_html($teacher_id) . ' - ' . ucfirst($contact->post_type) . ')';
+                                    } elseif ($contact->post_type === 'students') {
+                                        $student_name = get_post_meta($contact->ID, 'student_name', true);
+                                        $student_id = get_post_meta($contact->ID, 'student_id', true);
+                                        $label = $student_name . ' (' . esc_html($student_id) . ' - ' . ucfirst($contact->post_type) . ')';
+                                    } else {
+                                        $label = $display_name . ' (' . ucfirst($contact->post_type) . ')';
+                                    }
+                                ?>
+                                    <option value="<?php echo esc_attr($contact_username); ?>">
+                                        <?php echo esc_html($label); ?>
+                                    </option>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                            <?php foreach ($admins as $admin): ?>
+                                <?php if ($admin['id'] !== $username): ?>
+                                    <option value="<?php echo esc_attr($admin['id']); ?>">
+                                        <?php echo esc_html($admin['name'] . ' (Admin @ Center ' . $edu_center_id . ')'); ?>
+                                    </option>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <?php wp_nonce_field('aspire_admin_nonce', 'aspire_admin_nonce_field'); ?>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        .chat-container {
+            font-family: 'Arial', sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .chat-wrapper {
+            display: flex;
+            height: 600px;
+            background: #fff;
+        }
+        .chat-sidebar {
+            width: 300px;
+            background: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .sidebar-header h4 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        #conversation-search {
+            margin-top: 10px;
+            border-radius: 20px;
+        }
+        .conversation-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .conversation-item {
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+        .conversation-item:hover {
+            background: #e9ecef;
+        }
+        .conversation-item.active {
+            background: #007bff;
+            color: white;
+        }
+        .chat-main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            padding: 10px 15px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f1f3f5;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-message {
+            margin-bottom: 15px;
+            max-width: 70%;
+            align-self: flex-start;
+        }
+        .chat-message.sent {
+            align-self: flex-end;
+        }
+        .chat-message .bubble {
+            padding: 10px 15px;
+            border-radius: 15px;
+            position: relative;
+        }
+        .chat-message.sent .bubble {
+            background: #007bff;
+            color: white;
+        }
+        .chat-message.received .bubble {
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .chat-message .meta {
+            font-size: 0.8em;
+            color: #666;
+            margin: 5px 0;
+        }
+        .chat-message.sent .meta {
+            text-align: right;
+        }
+        .chat-form {
+            padding: 15px;
+            background: #fff;
+            border-top: 1px solid #dee2e6;
+        }
+        .chat-form .input-group {
+            align-items: center;
+        }
+        .chat-form textarea {
+            border-radius: 20px;
+            resize: none;
+            padding: 10px 15px;
+        }
+        .chat-form .btn-primary {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+        }
+        .recipient-select {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script>
+    jQuery(document).ready(function($) {
+        let selectedConversation = localStorage.getItem('aspire_admin_selected_conversation') || '';
+        let currentRecipient = '';
+
+        function fetchMessages(conversationWith) {
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'aspire_admin_fetch_messages',
+                    conversation_with: conversationWith,
+                    nonce: $('#aspire_admin_nonce_field').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#aspire-admin-message-list').html(response.data.html);
+                        $('#unread-badge').text(response.data.unread || '');
+                        const chatMessages = document.querySelector('#aspire-admin-message-list');
+                        if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+                        updateTimestamps();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', status, error);
+                }
+            });
+        }
+
+        function updateConversations() {
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'aspire_admin_fetch_conversations',
+                    nonce: $('#aspire_admin_nonce_field').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#aspire-admin-conversations').html(response.data);
+                        if (selectedConversation) {
+                            $(`#aspire-admin-conversations li[data-conversation-with="${selectedConversation}"]`).addClass('active');
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTimestamps() {
+            $('.chat-message .meta').each(function() {
+                const timestamp = $(this).data('timestamp');
+                $(this).text(`${$(this).text().split(' - ')[0]} - ${moment(timestamp).fromNow()}`);
+            });
+        }
+
+        $('#aspire-admin-target-type').change(function() {
+            if ($(this).val() === 'individual') {
+                $('.aspire-admin-group-target').hide();
+                $('.aspire-admin-individual-target').show();
+            } else {
+                $('.aspire-admin-group-target').show();
+                $('.aspire-admin-individual-target').hide();
+            }
+        });
+
+        $(document).on('click', '#aspire-admin-conversations li', function() {
+            $('#aspire-admin-conversations li').removeClass('active');
+            $(this).addClass('active');
+            selectedConversation = $(this).data('conversation-with');
+            currentRecipient = selectedConversation;
+            localStorage.setItem('aspire_admin_selected_conversation', selectedConversation);
+            $('#current-conversation').text($(this).text());
+            $('#clear-conversation').show();
+            $('#new-chat').show();
+            $('#recipient-select').hide();
+            fetchMessages(selectedConversation);
+        });
+
+        $('#clear-conversation').click(function() {
+            selectedConversation = '';
+            currentRecipient = '';
+            localStorage.removeItem('aspire_admin_selected_conversation');
+            $('#current-conversation').text('Select a conversation');
+            $('#clear-conversation').hide();
+            $('#new-chat').show();
+            $('#recipient-select').hide();
+            $('#aspire-admin-message-list').empty();
+            $('#aspire-admin-conversations li').removeClass('active');
+        });
+
+        $('#new-chat').click(function() {
+            selectedConversation = '';
+            currentRecipient = '';
+            localStorage.removeItem('aspire_admin_selected_conversation');
+            $('#current-conversation').text('New Conversation');
+            $('#clear-conversation').show();
+            $('#new-chat').hide();
+            $('#recipient-select').show();
+            $('#aspire-admin-message-list').empty();
+            $('#aspire-admin-conversations li').removeClass('active');
+        });
+
+        $('#aspire-admin-send-form').submit(function(e) {
+            e.preventDefault();
+            const message = $('#aspire-admin-message-input').val();
+            let targetType, targetValue;
+
+            if (currentRecipient) {
+                targetType = currentRecipient.match(/^(all|institute_admins)$/) ? 'group' : 'individual';
+                targetValue = currentRecipient;
+            } else {
+                targetType = $('#aspire-admin-target-type').val();
+                targetValue = targetType === 'individual' ? $('#aspire-admin-individual-target').val() : $('#aspire-admin-target-value').val();
+                currentRecipient = targetValue;
+                $(`#aspire-admin-conversations li[data-conversation-with="${currentRecipient}"]`).addClass('active');
+                $('#current-conversation').text($(`#aspire-admin-conversations li[data-conversation-with="${currentRecipient}"]`).text() || 'New Conversation');
+                $('#clear-conversation').show();
+                $('#new-chat').hide();
+                $('#recipient-select').hide();
+            }
+
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'aspire_admin_send_message',
+                    message: message,
+                    target_type: targetType,
+                    target_value: targetValue,
+                    nonce: $('#aspire_admin_nonce_field').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#aspire-admin-message-input').val('');
+                        fetchMessages(currentRecipient);
+                        updateConversations();
+                    } else {
+                        console.error('Send failed:', response.data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', status, error);
+                }
+            });
+        });
+
+        $('#conversation-search').on('input', function() {
+            const search = $(this).val().toLowerCase();
+            $('.conversation-item').each(function() {
+                const text = $(this).text().toLowerCase();
+                $(this).toggle(text.includes(search));
+            });
+        });
+
+        // Initial load
+        if (selectedConversation) {
+            $(`#aspire-admin-conversations li[data-conversation-with="${selectedConversation}"]`).addClass('active');
+            $('#current-conversation').text($(`#aspire-admin-conversations li[data-conversation-with="${selectedConversation}"]`).text());
+            $('#clear-conversation').show();
+            $('#new-chat').show();
+            $('#recipient-select').hide();
+            fetchMessages(selectedConversation);
+        }
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('aspire_admin_prochat', 'aspire_admin_prochat_shortcode');
+
+// Admin: Get Messages (Simplified and Logged)
+// function aspire_admin_get_messages($username, $conversation_with = '') {
+//     global $wpdb;
+//     $table = $wpdb->prefix . 'aspire_messages';
+//     $edu_center_id = get_educational_center_data();
+
+//     $query = "SELECT * FROM $table WHERE education_center_id = %s";
+//     $query_args = [$edu_center_id];
+
+//     if ($conversation_with) {
+//         // Handle both group and individual conversations
+//         $query .= " AND (receiver_id = %s OR sender_id = %s OR (receiver_id IN ('all', 'institute_admins') AND sender_id != %s))";
+//         $query_args[] = $conversation_with; // Could be 'all', 'institute_admins', or a username
+//         $query_args[] = $conversation_with;
+//         $query_args[] = $username; // Exclude user's own group messages from doubling up
+//     } else {
+//         // Fetch all relevant messages for the user
+//         $query .= " AND (receiver_id = %s OR receiver_id IN ('all', 'institute_admins'))";
+//         $query_args[] = $username;
+//         $query_args[] = 'all';
+//         $query_args[] = 'institute_admins';
+//     }
+
+//     $query .= " ORDER BY timestamp ASC LIMIT 50";
+//     $prepared_query = $wpdb->prepare($query, $query_args);
+//     error_log("Admin query: $prepared_query");
+//     $results = $wpdb->get_results($prepared_query);
+//     error_log("Admin messages for $username with $conversation_with: " . print_r($results, true));
+//     return $results;
+// }
+
+// Admin: AJAX Fetch Messages (Updated Logging)
+// function aspire_admin_ajax_fetch_messages() {
+//     check_ajax_referer('aspire_admin_nonce', 'nonce');
+//     $user = wp_get_current_user();
+//     $username = $user->user_login;
+//     $conversation_with = sanitize_text_field($_POST['conversation_with'] ?? '');
+//     error_log("Fetching messages for $username with conversation_with: $conversation_with");
+
+//     $messages = aspire_admin_get_messages($username, $conversation_with);
+//     if ($conversation_with && !in_array($conversation_with, ['all', 'institute_admins'])) {
+//         aspire_admin_mark_messages_read($username, $conversation_with);
+//     }
+
+//     $contacts = get_posts([
+//         'post_type' => ['teacher', 'students', 'parent'],
+//         'posts_per_page' => -1,
+//         'meta_key' => 'educational_center_id',
+//         'meta_value' => get_educational_center_data(),
+//     ]);
+//     $admins = aspire_admin_get_admins(get_educational_center_data());
+
+//     $output = '';
+//     foreach ($messages as $msg) {
+//         $sender_name = ($msg->sender_id === $username) ? 'You' : null;
+//         if (!$sender_name) {
+//             foreach ($contacts as $contact) {
+//                 if (aspire_teacher_get_username($contact->ID) === $msg->sender_id) {
+//                     if ($contact->post_type === 'teacher') {
+//                         $sender_name = get_post_meta($contact->ID, 'teacher_name', true);
+//                     } elseif ($contact->post_type === 'students') {
+//                         $sender_name = get_post_meta($contact->ID, 'student_name', true);
+//                     } else {
+//                         $sender_name = $contact->post_title;
+//                     }
+//                     break;
+//                 }
+//             }
+//             if (!$sender_name) {
+//                 foreach ($admins as $admin) {
+//                     if ($admin['id'] === $msg->sender_id) {
+//                         $sender_name = $admin['name'];
+//                         break;
+//                     }
+//                 }
+//             }
+//             if (!$sender_name) {
+//                 $sender = get_user_by('login', $msg->sender_id);
+//                 $sender_name = $sender ? $sender->display_name : 'Unknown';
+//             }
+//         }
+//         $initials = strtoupper(substr($sender_name === 'You' ? $user->display_name : $sender_name, 0, 2));
+//         $output .= '<div class="chat-message ' . ($msg->sender_id === $username ? 'sent' : 'received') . ' ' . ($msg->status == 'sent' ? 'unread' : '') . '">';
+//         $output .= '<div class="bubble">';
+//         $output .= '<span class="avatar">' . esc_html($initials) . '</span>';
+//         $output .= '<p>' . esc_html($msg->message) . '</p>';
+//         $output .= '</div>';
+//         $output .= '<div class="meta" data-timestamp="' . esc_attr($msg->timestamp) . '">' . esc_html($sender_name) . ' - ' . esc_html($msg->timestamp) . '</div>';
+//         $output .= '</div>';
+//     }
+
+//     wp_send_json_success(['html' => $output, 'unread' => aspire_admin_get_unread_count($username)]);
+// }
+
+
+// Admin: Get Messages (Separate Group and Individual Messages)
+// function aspire_admin_get_messages($username, $conversation_with = '') {
+//     global $wpdb;
+//     $table = $wpdb->prefix . 'aspire_messages';
+//     $edu_center_id = get_educational_center_data();
+
+//     $query = "SELECT * FROM $table WHERE education_center_id = %s";
+//     $query_args = [$edu_center_id];
+
+//     if ($conversation_with) {
+//         if (in_array($conversation_with, ['all', 'institute_admins'])) {
+//             // Fetch only group messages for the selected group
+//             $query .= " AND receiver_id = %s";
+//             $query_args[] = $conversation_with;
+//         } else {
+//             // Fetch only individual conversation messages
+//             $query .= " AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s))";
+//             $query_args[] = $username;
+//             $query_args[] = $conversation_with;
+//             $query_args[] = $conversation_with;
+//             $query_args[] = $username;
+//         }
+//     } else {
+//         // Fetch all relevant messages for the user, including applicable groups
+//         $query .= " AND (receiver_id = %s OR receiver_id IN ('all', 'institute_admins'))";
+//         $query_args[] = $username;
+//         $query_args[] = 'all';
+//         $query_args[] = 'institute_admins';
+//     }
+
+//     $query .= " ORDER BY timestamp ASC LIMIT 50";
+//     $prepared_query = $wpdb->prepare($query, $query_args);
+//     error_log("Admin query: $prepared_query");
+//     $results = $wpdb->get_results($prepared_query);
+//     error_log("Admin messages for $username with $conversation_with: " . print_r($results, true));
+//     return $results;
+// }
+
+// Admin: AJAX Fetch Messages (No Change Needed)
+function aspire_admin_ajax_fetch_messages() {
+    check_ajax_referer('aspire_admin_nonce', 'nonce');
+    $user = wp_get_current_user();
+    $username = $user->user_login;
+    $conversation_with = sanitize_text_field($_POST['conversation_with'] ?? '');
+    error_log("Fetching messages for $username with conversation_with: $conversation_with");
+
+    $messages = aspire_admin_get_messages($username, $conversation_with);
+    if ($conversation_with && !in_array($conversation_with, ['all', 'institute_admins'])) {
+        aspire_admin_mark_messages_read($username, $conversation_with);
+    }
+
+    $contacts = get_posts([
+        'post_type' => ['teacher', 'students', 'parent'],
+        'posts_per_page' => -1,
+        'meta_key' => 'educational_center_id',
+        'meta_value' => get_educational_center_data(),
+    ]);
+    $admins = aspire_admin_get_admins(get_educational_center_data());
+
+    $output = '';
+    foreach ($messages as $msg) {
+        $sender_name = ($msg->sender_id === $username) ? 'You' : null;
+        if (!$sender_name) {
+            foreach ($contacts as $contact) {
+                if (aspire_teacher_get_username($contact->ID) === $msg->sender_id) {
+                    if ($contact->post_type === 'teacher') {
+                        $sender_name = get_post_meta($contact->ID, 'teacher_name', true);
+                    } elseif ($contact->post_type === 'students') {
+                        $sender_name = get_post_meta($contact->ID, 'student_name', true);
+                    } else {
+                        $sender_name = $contact->post_title;
+                    }
+                    break;
+                }
+            }
+            if (!$sender_name) {
+                foreach ($admins as $admin) {
+                    if ($admin['id'] === $msg->sender_id) {
+                        $sender_name = $admin['name'];
+                        break;
+                    }
+                }
+            }
+            if (!$sender_name) {
+                $sender = get_user_by('login', $msg->sender_id);
+                $sender_name = $sender ? $sender->display_name : 'Unknown';
+            }
+        }
+        $initials = strtoupper(substr($sender_name === 'You' ? $user->display_name : $sender_name, 0, 2));
+        $output .= '<div class="chat-message ' . ($msg->sender_id === $username ? 'sent' : 'received') . ' ' . ($msg->status == 'sent' ? 'unread' : '') . '">';
+        $output .= '<div class="bubble">';
+        $output .= '<span class="avatar">' . esc_html($initials) . '</span>';
+        $output .= '<p>' . esc_html($msg->message) . '</p>';
+        $output .= '</div>';
+        $output .= '<div class="meta" data-timestamp="' . esc_attr($msg->timestamp) . '">' . esc_html($sender_name) . ' - ' . esc_html($msg->timestamp) . '</div>';
+        $output .= '</div>';
+    }
+
+    wp_send_json_success(['html' => $output, 'unread' => aspire_admin_get_unread_count($username)]);
+}
+
+
+// Admin: Get Active Conversations (Fixed to Use sender_id and receiver_id)
+function aspire_admin_get_active_conversations($username) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_messages';
+    $edu_center_id = get_educational_center_data();
+
+    $query = "
+        SELECT DISTINCT receiver_id AS conversation_with 
+        FROM $table 
+        WHERE education_center_id = %s 
+        AND sender_id = %s
+        UNION
+        SELECT DISTINCT sender_id AS conversation_with 
+        FROM $table 
+        WHERE education_center_id = %s 
+        AND receiver_id = %s 
+        AND sender_id != %s
+        UNION
+        SELECT DISTINCT receiver_id AS conversation_with 
+        FROM $table 
+        WHERE education_center_id = %s 
+        AND receiver_id IN ('all', 'institute_admins')
+    ";
+    $query_args = [
+        $edu_center_id, $username,              // First query: user as sender
+        $edu_center_id, $username, $username,   // Second query: user as receiver, exclude self-sent
+        $edu_center_id                          // Third query: group receivers
+    ];
+
+    $prepared_query = $wpdb->prepare($query, $query_args);
+    error_log("Admin active conversations query: $prepared_query");
+    $results = $wpdb->get_results($prepared_query);
+    error_log("Admin active conversations for $username: " . print_r($results, true));
+
+    return $results;
+}
+
+// Admin: Get Messages (Unchanged from Last Refinement)
+function aspire_admin_get_messages($username, $conversation_with = '') {
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_messages';
+    $edu_center_id = get_educational_center_data();
+
+    $query = "SELECT * FROM $table WHERE education_center_id = %s";
+    $query_args = [$edu_center_id];
+
+    if ($conversation_with) {
+        if (in_array($conversation_with, ['all', 'institute_admins'])) {
+            $query .= " AND receiver_id = %s";
+            $query_args[] = $conversation_with;
+        } else {
+            $query .= " AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s))";
+            $query_args[] = $username;
+            $query_args[] = $conversation_with;
+            $query_args[] = $conversation_with;
+            $query_args[] = $username;
+            $query .= " LIMIT 50";
+        }
+    } else {
+        $query .= " AND (receiver_id = %s OR receiver_id IN ('all', 'institute_admins'))";
+        $query_args[] = $username;
+        $query_args[] = 'all';
+        $query_args[] = 'institute_admins';
+    }
+
+    $query .= " ORDER BY timestamp ASC";
+    $prepared_query = $wpdb->prepare($query, $query_args);
+    error_log("Admin query: $prepared_query");
+    $results = $wpdb->get_results($prepared_query);
+    error_log("Admin messages for $username with $conversation_with: " . print_r($results, true));
+    return $results;
+}
+
+// [aspire_admin_ajax_fetch_messages and aspire_admin_prochat_shortcode remain unchanged]
+?>

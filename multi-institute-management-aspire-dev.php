@@ -1287,6 +1287,22 @@ function enqueue_font_awesome() {
 }
 add_action('wp_enqueue_scripts', 'enqueue_font_awesome');
 
+
+//common functions
+
+
+
+function aspire_get_admins($edu_center_id) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'institute_admins';
+    return $wpdb->get_results($wpdb->prepare("SELECT id, name FROM $table WHERE educational_center_id = %s", $edu_center_id), ARRAY_A);
+}
+
+
+
+
+
+
 // function restrict_edit_class_section_access() {
 //     if (is_page('edit-class-section')) {
         

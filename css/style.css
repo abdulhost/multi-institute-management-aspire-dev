@@ -1387,6 +1387,165 @@ font-size: 12px !important;
     font-size: 0.875rem;
 }
 
+/* announcemnt / noticeboard */
 
-/* sidebar */
+/* Common styles for Aspire Notice Board */
+.notice-board-container {
+    max-width: 900px;
+    margin: 30px auto;
+    background: var(--secondary-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+}
 
+.notice-board-header {
+    background: var(--primary-color);
+    color: var(--text-color);
+    padding: 15px 20px;
+    border-radius: 8px 8px 0 0;
+    margin: -20px -20px 20px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.announcement-list {
+    max-height: 500px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.announcement-item {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.3s ease;
+}
+
+.announcement-item:last-child {
+    border-bottom: none;
+}
+
+.announcement-item:hover {
+    background: var(--hover-color);
+    box-shadow: 0 2px 8px var(--hover-shadow-color);
+}
+
+.announcement-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.announcement-meta {
+    font-weight: 600;
+    color: var(--accent-color);
+}
+
+.announcement-message {
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.announcement-timestamp {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.announcement-form {
+    margin-top: 20px;
+    background: #fff;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 6px var(--shadow-color);
+}
+
+.announcement-form .input-group {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.announcement-form textarea {
+    flex: 1;
+    min-height: 80px;
+    resize: vertical;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 1rem;
+    color: var(--text-color);
+    background: var(--secondary-color);
+    transition: border-color 0.3s ease;
+}
+
+.announcement-form textarea:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 5px var(--hover-shadow-color);
+}
+
+.announcement-form .form-select {
+    width: 150px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 1rem;
+    color: var(--text-color);
+    background: var(--secondary-color);
+    transition: border-color 0.3s ease;
+}
+
+.announcement-form .form-select:focus {
+    border-color: var(--accent-color);
+    outline: none;
+}
+
+.announcement-form .btn-primary {
+    background: var(--accent-color);
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    border-radius: 6px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.announcement-form .btn-primary:hover {
+    background: var(--hover-color);
+    color: var(--text-color);
+    transform: translateY(-2px);
+}
+
+.announcement-form .btn-primary:active {
+    background: var(--active-color);
+    transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .notice-board-container {
+        margin: 15px;
+        padding: 15px;
+    }
+
+    .announcement-form .input-group {
+        flex-direction: column;
+    }
+
+    .announcement-form .form-select,
+    .announcement-form .btn-primary {
+        width: 100%;
+    }
+}

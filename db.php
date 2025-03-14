@@ -270,53 +270,59 @@ dbDelta($sql_attendance);
     require_once ABSPATH . 'wp-admin/includes/upgrade.php';
     dbDelta($sql);
 
-    
-// Messages table
-$messages_table = $wpdb->prefix . 'messages';
-$sql = "CREATE TABLE $messages_table (
+    $table = $wpdb->prefix . 'aspire_announcements';
+    $sql = "CREATE TABLE $table (
     id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    sender_id BIGINT(20) UNSIGNED NOT NULL,
-    recipient_id BIGINT(20) UNSIGNED DEFAULT NULL,
-    group_id BIGINT(20) UNSIGNED DEFAULT NULL,
+    sender_id VARCHAR(255) NOT NULL,
+    receiver_id VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
     education_center_id VARCHAR(255) NOT NULL,
-    type ENUM('announcement', 'message', 'group_message') DEFAULT 'message',
-    title VARCHAR(255) DEFAULT NULL,
-    content TEXT NOT NULL,
-    group_target VARCHAR(50) DEFAULT NULL,
-    status ENUM('sent', 'read') DEFAULT 'sent',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    timestamp DATETIME NOT NULL,
     PRIMARY KEY (id),
-    KEY sender_id (sender_id),
-    KEY recipient_id (recipient_id),
-    KEY group_id (group_id)
+    INDEX idx_education_center (education_center_id),
+    INDEX idx_timestamp (timestamp)
 ) $charset_collate;";
-require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+    
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+    dbDelta($sql);
+
+
+
+$charset_collate = $wpdb->get_charset_collate();
+    $messages_table = $wpdb->prefix . 'aspire_messages';
+
+   $sql = " CREATE TABLE IF NOT EXISTS $messages_table (
+        id BIGINT(20) NOT NULL AUTO_INCREMENT,
+        sender_id VARCHAR(50) NOT NULL, /* Username of sender */
+        receiver_id VARCHAR(50) NOT NULL, /* Username of receiver or group name */
+        message TEXT NOT NULL,
+        status ENUM('sent', 'read') DEFAULT 'sent',
+        education_center_id VARCHAR(50) NOT NULL,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        INDEX sender_idx (sender_id),
+        INDEX receiver_idx (receiver_id),
+        INDEX education_center_idx (education_center_id)
+    ) $charset_collate;";
+   dbDelta($sql);
+
+
+$institute_admins = $wpdb->prefix . 'institute_admins';
+
+$sql = "CREATE TABLE IF NOT EXISTS $institute_admins (
+    id BIGINT(20) NOT NULL AUTO_INCREMENT,
+    institute_admin_id VARCHAR(50) NOT NULL, /* Username, e.g., adminC24162EFC0AE */
+    education_center_id VARCHAR(50) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100),
+    PRIMARY KEY (id),
+    UNIQUE KEY (institute_admin_id),
+    INDEX edu_center_idx (education_center_id)
+) $charset_collate;";
+
+require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 dbDelta($sql);
 
-// Groups table
-$groups_table = $wpdb->prefix . 'message_groups';
-$sql = "CREATE TABLE $groups_table (
-    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
-    creator_id BIGINT(20) UNSIGNED NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    KEY creator_id (creator_id)
-) $charset_collate;";
-dbDelta($sql);
-
-// Group members table
-$members_table = $wpdb->prefix . 'message_group_members';
-$sql = "CREATE TABLE $members_table (
-    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    group_id BIGINT(20) UNSIGNED NOT NULL,
-    user_id BIGINT(20) UNSIGNED NOT NULL,
-    PRIMARY KEY (id),
-    UNIQUE KEY group_user (group_id, user_id),
-    KEY group_id (group_id),
-    KEY user_id (user_id)
-) $charset_collate;";
-dbDelta($sql);
 
 }
 
