@@ -6,17 +6,20 @@ if (!defined('ABSPATH')) {
 function edit_exams_institute_dashboard_shortcode() {
     global $wpdb;
     $education_center_id = get_educational_center_data();
-
+    $classes = $wpdb->get_results(
+        $wpdb->prepare("SELECT * FROM {$wpdb->prefix}class_sections WHERE education_center_id = %s", $education_center_id),
+        ARRAY_A
+    );
     if (isset($_POST['edit_exam']) && wp_verify_nonce($_POST['nonce'], 'edit_exam_nonce') && isset($_GET['exam_id'])) {
         $exam_id = intval($_GET['exam_id']);
         $name = sanitize_text_field($_POST['exam_name']);
         $exam_date = sanitize_text_field($_POST['exam_date']);
-        $class_id = !empty($_POST['class_id']) ? intval($_POST['class_id']) : null;
+        $class_name = isset($_POST['class_name']) ? sanitize_text_field($_POST['class_name']) : null;
 
         $wpdb->update($wpdb->prefix . 'exams', [
             'name' => $name,
             'exam_date' => $exam_date,
-            'class_id' => $class_id,
+            'class_id' => $class_name,
         ], ['id' => $exam_id, 'education_center_id' => $education_center_id]);
 
         echo '<div class="alert alert-success">Exam updated successfully!</div>';
@@ -48,9 +51,17 @@ function edit_exams_institute_dashboard_shortcode() {
                     <div class="invalid-feedback">Please select a date.</div>
                 </div>
                 <div class="mb-3">
-                    <label for="class_id" class="form-label">Class ID (Optional)</label>
-                    <input type="number" class="form-control" id="class_id" name="class_id" value="<?php echo esc_attr($exam->class_id); ?>">
-                </div>
+    <label for="class_id" class="form-label">Class</label>
+    <select name="class_name" id="class_id" class="form-select" required>
+        <option value="">-- Select Class --</option>
+        <?php foreach ($classes as $class): ?>
+            <option value="<?php echo esc_attr($class['class_name']); ?>">
+                <?php echo esc_html($class['class_name']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+    <div class="invalid-feedback">Please select a class.</div>
+</div>
                 <?php wp_nonce_field('edit_exam_nonce', 'nonce'); ?>
                 <button type="submit" name="edit_exam" class="btn btn-primary">Update Exam</button>
             </form>

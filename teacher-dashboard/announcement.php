@@ -19,9 +19,12 @@ function aspire_get_announcements($username, $role = 'teacher') {
     $query_args = [$edu_center_id];
 
     if ($role === 'teacher') {
-        $query .= " AND receiver_id IN ('all', 'teachers')";
+        // Teachers see announcements to 'all', 'teachers', or sent by themselves
+        $query .= " AND (receiver_id IN ('all', 'teachers') OR sender_id = %s)";
+        $query_args[] = $username;
     } elseif ($role === 'admin') {
-        $query .= " AND receiver_id IN ('all', 'institute_admins')";
+        // Admins see all announcements in their center
+        // No additional filtering needed
     }
 
     $query .= " ORDER BY timestamp DESC";
@@ -48,6 +51,17 @@ function aspire_send_announcement($sender_id, $receiver_id, $message, $edu_cente
     return $result;
 }
 
+// Shared recipient options
+function aspire_get_recipient_options() {
+    return [
+        'all' => 'Everyone',
+        'teachers' => 'Teachers',
+        'students' => 'Students',
+        'parents' => 'Parents',
+        'institute_admins' => 'Admins'
+    ];
+}
+
 // Teacher Notice Board Shortcode
 function aspire_teacher_notice_board_shortcode() {
     if (!is_user_logged_in()) {
@@ -63,6 +77,7 @@ function aspire_teacher_notice_board_shortcode() {
     }
 
     $announcements = aspire_get_announcements($username, 'teacher');
+    $recipients = aspire_get_recipient_options();
     ob_start();
     ?>
     <div id="aspire-teacher-notice-board" class="notice-board-container">
@@ -73,7 +88,7 @@ function aspire_teacher_notice_board_shortcode() {
                     <div class="announcement-content">
                         <span class="announcement-meta">
                             <?php echo esc_html($ann->sender_id === $username ? 'You' : $ann->sender_id); ?> 
-                            to <?php echo esc_html($ann->receiver_id === 'all' ? 'Everyone' : ucfirst($ann->receiver_id)); ?>
+                            to <?php echo esc_html($recipients[$ann->receiver_id] ?? ucfirst($ann->receiver_id)); ?>
                         </span>
                         <p class="announcement-message"><?php echo esc_html($ann->message); ?></p>
                     </div>
@@ -92,8 +107,9 @@ function aspire_teacher_notice_board_shortcode() {
             <div class="input-group">
                 <textarea id="announcement-input" class="form-control" placeholder="Post a new announcement..." required></textarea>
                 <select id="announcement-target" class="form-select">
-                    <option value="all">Everyone</option>
-                    <option value="teachers">Teachers</option>
+                    <?php foreach ($recipients as $value => $label): ?>
+                        <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+                    <?php endforeach; ?>
                 </select>
                 <button type="submit" class="btn btn-primary">Post</button>
             </div>
@@ -191,6 +207,7 @@ function aspire_admin_notice_board_shortcode() {
     }
 
     $announcements = aspire_get_announcements($username, 'admin');
+    $recipients = aspire_get_recipient_options();
     ob_start();
     ?>
     <div id="aspire-admin-notice-board" class="notice-board-container">
@@ -201,7 +218,7 @@ function aspire_admin_notice_board_shortcode() {
                     <div class="announcement-content">
                         <span class="announcement-meta">
                             <?php echo esc_html($ann->sender_id === $username ? 'You' : $ann->sender_id); ?> 
-                            to <?php echo esc_html($ann->receiver_id === 'all' ? 'Everyone' : ucfirst($ann->receiver_id)); ?>
+                            to <?php echo esc_html($recipients[$ann->receiver_id] ?? ucfirst($ann->receiver_id)); ?>
                         </span>
                         <p class="announcement-message"><?php echo esc_html($ann->message); ?></p>
                     </div>
@@ -220,8 +237,9 @@ function aspire_admin_notice_board_shortcode() {
             <div class="input-group">
                 <textarea id="announcement-input" class="form-control" placeholder="Post a new announcement..." required></textarea>
                 <select id="announcement-target" class="form-select">
-                    <option value="all">Everyone</option>
-                    <option value="institute_admins">Admins</option>
+                    <?php foreach ($recipients as $value => $label): ?>
+                        <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+                    <?php endforeach; ?>
                 </select>
                 <button type="submit" class="btn btn-primary">Post</button>
             </div>
@@ -264,7 +282,7 @@ function aspire_admin_notice_board_shortcode() {
         $('#aspire-admin-announcement-form').on('submit', function(e) {
             e.preventDefault();
             var message = $('#announcement-input').val();
-            var target = $('#ann BETWEENouncement-target').val();
+            var target = $('#announcement-target').val();
             var nonce = $('#aspire_admin_notice_nonce_field').val();
             console.log('Submitting announcement: ' + message + ' to ' + target);
             $.ajax({
@@ -307,13 +325,14 @@ function aspire_teacher_fetch_announcements() {
     $user = wp_get_current_user();
     $username = $user->user_login;
     $announcements = aspire_get_announcements($username, 'teacher');
+    $recipients = aspire_get_recipient_options();
 
     $output = '';
     foreach ($announcements as $ann) {
         $output .= '<div class="announcement-item">';
         $output .= '<div class="announcement-content">';
         $output .= '<span class="announcement-meta">' . esc_html($ann->sender_id === $username ? 'You' : $ann->sender_id) . ' to ';
-        $output .= esc_html($ann->receiver_id === 'all' ? 'Everyone' : ucfirst($ann->receiver_id)) . '</span>';
+        $output .= esc_html($recipients[$ann->receiver_id] ?? ucfirst($ann->receiver_id)) . '</span>';
         $output .= '<p class="announcement-message">' . esc_html($ann->message) . '</p>';
         $output .= '</div>';
         $output .= '<span class="announcement-timestamp" data-timestamp="' . esc_attr($ann->timestamp) . '">' . esc_html($ann->timestamp) . '</span>';
@@ -338,6 +357,7 @@ function aspire_teacher_send_announcement() {
     $edu_center_id = educational_center_teacher_id();
     $message = sanitize_text_field($_POST['message'] ?? '');
     $target = sanitize_text_field($_POST['target'] ?? '');
+    $valid_targets = array_keys(aspire_get_recipient_options());
 
     error_log("Teacher send announcement: username=$username, target=$target, message=$message, nonce=$nonce");
 
@@ -346,7 +366,7 @@ function aspire_teacher_send_announcement() {
         wp_send_json_error(['message' => 'Permission denied']);
     }
 
-    if (!in_array($target, ['all', 'teachers'])) {
+    if (!in_array($target, $valid_targets)) {
         error_log("Teacher send failed: Invalid target - $target");
         wp_send_json_error(['message' => 'Invalid target']);
     }
@@ -373,13 +393,14 @@ function aspire_admin_fetch_announcements() {
     $user = wp_get_current_user();
     $username = $user->user_login;
     $announcements = aspire_get_announcements($username, 'admin');
+    $recipients = aspire_get_recipient_options();
 
     $output = '';
     foreach ($announcements as $ann) {
         $output .= '<div class="announcement-item">';
         $output .= '<div class="announcement-content">';
         $output .= '<span class="announcement-meta">' . esc_html($ann->sender_id === $username ? 'You' : $ann->sender_id) . ' to ';
-        $output .= esc_html($ann->receiver_id === 'all' ? 'Everyone' : ucfirst($ann->receiver_id)) . '</span>';
+        $output .= esc_html($recipients[$ann->receiver_id] ?? ucfirst($ann->receiver_id)) . '</span>';
         $output .= '<p class="announcement-message">' . esc_html($ann->message) . '</p>';
         $output .= '</div>';
         $output .= '<span class="announcement-timestamp" data-timestamp="' . esc_attr($ann->timestamp) . '">' . esc_html($ann->timestamp) . '</span>';
@@ -404,6 +425,7 @@ function aspire_admin_send_announcement() {
     $edu_center_id = get_educational_center_data();
     $message = sanitize_text_field($_POST['message'] ?? '');
     $target = sanitize_text_field($_POST['target'] ?? '');
+    $valid_targets = array_keys(aspire_get_recipient_options());
 
     error_log("Admin send announcement: username=$username, target=$target, message=$message, nonce=$nonce");
 
@@ -412,7 +434,7 @@ function aspire_admin_send_announcement() {
         wp_send_json_error(['message' => 'Permission denied']);
     }
 
-    if (!in_array($target, ['all', 'institute_admins'])) {
+    if (!in_array($target, $valid_targets)) {
         error_log("Admin send failed: Invalid target - $target");
         wp_send_json_error(['message' => 'Invalid target']);
     }

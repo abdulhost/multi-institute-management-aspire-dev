@@ -161,6 +161,38 @@ function aspire_teacher_dashboard_shortcode() {
                                             echo aspire_teacher_notice_board_shortcode();
                                         
                                         break;
+                                        case 'exams':
+                                            if ($action === 'add-exam') {
+                                                echo render_teacher_add_exam($user_id, $teacher);
+                                            } elseif ($action === 'edit-exam') {
+                                                $exam_id = isset($_GET['id']) ? intval($_GET['id']) : null;
+                                                echo render_teacher_edit_exam($user_id, $teacher, $exam_id);
+                                            } elseif ($action === 'delete-exam') {
+                                                $exam_id = isset($_GET['id']) ? intval($_GET['id']) : null;
+                                                echo render_teacher_delete_exam($user_id, $teacher, $exam_id);
+                                            } elseif ($action === 'add-exam-subjects') {
+                                                echo render_teacher_add_exam_subjects($user_id, $teacher);
+                                            } elseif ($action === 'results') {
+                                                echo render_teacher_results($user_id, $teacher);
+                                            } else {
+                                                echo render_teacher_exams($user_id, $teacher);
+                                            }
+                                            break;
+                                        
+                                        case 'attendance':
+                                            if ($action === 'add-attendance') {
+                                                echo render_attendance_add($user_id, $teacher);
+                                            } elseif ($action === 'edit-attendance') {
+                                                $attendance_id = isset($_GET['id']) ? intval($_GET['id']) : null;
+                                                echo render_attendance_edit($user_id, $teacher, $attendance_id);
+                                            } elseif ($action === 'delete-attendance') {
+                                                $attendance_id = isset($_GET['id']) ? intval($_GET['id']) : null;
+                                                handle_attendance_delete($user_id, $attendance_id);
+                                                echo render_attendance_reports($user_id, $teacher);
+                                            } else {
+                                                echo render_attendance_reports($user_id, $teacher);
+                                            }
+                                            break;
                                 
                     default:
                         echo render_teacher_overview($user_id, $teacher);
@@ -2497,137 +2529,7 @@ function aspire_teacher_prochat_shortcode() {
             </div>
         </div>
     </div>
-    <style>
-        .chat-container {
-            font-family: 'Arial', sans-serif;
-            max-width: 1200px;
-            margin: 20px auto;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .chat-wrapper {
-            display: flex;
-            height: 600px;
-            background: #fff;
-        }
-        .chat-sidebar {
-            width: 300px;
-            background: #f8f9fa;
-            border-right: 1px solid #dee2e6;
-            display: flex;
-            flex-direction: column;
-        }
-        .sidebar-header {
-            padding: 15px;
-            border-bottom: 1px solid #dee2e6;
-        }
-        .sidebar-header h4 {
-            margin: 0;
-            font-size: 1.2em;
-        }
-        #conversation-search {
-            margin-top: 10px;
-            border-radius: 20px;
-        }
-        .conversation-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .conversation-item {
-            padding: 15px;
-            cursor: pointer;
-            border-bottom: 1px solid #eee;
-            transition: background 0.2s;
-        }
-        .conversation-item:hover {
-            background: #e9ecef;
-        }
-        .conversation-item.active {
-            background: #007bff;
-            color: white;
-        }
-        .chat-main {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .chat-header {
-            padding: 10px 15px;
-            border-bottom: 1px solid #dee2e6;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .chat-messages {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background: #f1f3f5;
-            display: flex;
-            flex-direction: column;
-        }
-        .chat-message {
-            margin-bottom: 15px;
-            max-width: 70%;
-            align-self: flex-start;
-        }
-        .chat-message.sent {
-            align-self: flex-end;
-        }
-        .chat-message .bubble {
-            padding: 10px 15px;
-            border-radius: 15px;
-            position: relative;
-        }
-        .chat-message.sent .bubble {
-            background: #007bff;
-            color: white;
-        }
-        .chat-message.received .bubble {
-            background: #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .chat-message .meta {
-            font-size: 0.8em;
-            color: #666;
-            margin: 5px 0;
-        }
-        .chat-message.sent .meta {
-            text-align: right;
-        }
-        .chat-form {
-            padding: 15px;
-            background: #fff;
-            border-top: 1px solid #dee2e6;
-        }
-        .chat-form .input-group {
-            alignnor-items: center;
-        }
-        .chat-form textarea {
-            border-radius: 20px;
-            resize: none;
-            padding: 10px 15px;
-        }
-        .chat-form .btn-primary {
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 10px;
-        }
-        .recipient-select {
-            margin-top: 10px;
-            display: flex;
-            gap: 10px;
-        }
-    </style>
+  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script>
     jQuery(document).ready(function($) {

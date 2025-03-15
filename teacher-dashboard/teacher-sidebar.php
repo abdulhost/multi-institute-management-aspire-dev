@@ -113,6 +113,36 @@ $active_section = isset($active_section) ? $active_section : 'overview';
     </div>
   </ul>
 </li>
+<!-- Exams Menu Item -->
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'exams' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-240q66 0 113-47t47-113q0-66-47-113t-113-47q-66 0-113 47t-47 113q0 66 47 113t113 47Zm0-160q-33 0-56.5-23.5T400-400q0-33 23.5-56.5T480-480q33 0 56.5 23.5T560-400q0 33-23.5 56.5T480-320q-33 0-56.5-23.5T400-400q0-33 23.5-56.5T480-480ZM240-120q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm0-160q-33 0-56.5 23.5T160-280q0 33 23.5 56.5T240-200q33 0 56.5-23.5T320-280q0-33-23.5-56.5T240-360Z"/></svg>
+    <span>Exams</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'exams' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'exams' && empty($active_action) ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=exams'); ?>">Manage Exams</a>
+      </li>
+      <li class="<?php echo $active_action == 'add-exam' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=exams&action=add-exam'); ?>">Add Exam</a>
+      </li>
+      <li class="<?php echo $active_action == 'edit-exam' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=exams&action=edit-exam&action=edit-exam'); ?>">Edit Exam</a>
+      </li>
+      <li class="<?php echo $active_action == 'delete-exam' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=exams&action=delete-exam'); ?>">Delete Exam</a>
+      </li>
+      <li class="<?php echo $active_action == 'add-exam-subjects' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=exams&action=add-exam-subjects'); ?>">Add Exam Subjects</a>
+      </li>
+      <li class="<?php echo $active_action == 'results' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=exams&action=results'); ?>">Exam Results</a>
+      </li>
+    </div>
+  </ul>
+</li>
 
 <!-- Communication Menu Item -->
 <li>
@@ -127,10 +157,22 @@ $active_section = isset($active_section) ? $active_section : 'overview';
         <a href="<?php echo home_url('/teacher-dashboard/?section=communication'); ?>">Messages</a>
       </li>
       <li class="<?php echo $active_action == 'view-chat' ? 'active' : ''; ?>">
-        <a href="<?php echo home_url('/teacher-dashboard/?section=communication&action=view-chat&id=' . (isset($_GET['id']) ? intval($_GET['id']) : '')); ?>">View Chat</a>
+        <a href="<?php echo home_url('/teacher-dashboard/?section=communication' . (isset($_GET['id']) ? intval($_GET['id']) : '')); ?>">Chat</a>
       </li>
-      <li class="<?php echo $active_action == 'delete-message' ? 'active' : ''; ?>">
-        <a href="<?php echo home_url('/teacher-dashboard/?section=communication&action=delete-message&id=' . (isset($_GET['id']) ? intval($_GET['id']) : '') . '&contact_id=' . (isset($_GET['contact_id']) ? intval($_GET['contact_id']) : '')); ?>">Delete Message</a>
+    
+    </div>
+  </ul>
+</li>
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'noticeboard' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M720-320q-28 0-47-19t-19-47v-320q0-28 19-47t47-19h320q28 0 47 19t19 47v320q0 28-19 47t-47 19H720Zm0-40h320V-400H720v320Zm0 0q28 0 47-19t19-47v-320q0-28-19-47t-47-19H720q-28 0-47 19t-19 47v320q0 28 19 47t47 19Z"/></svg>
+    <span>Notice Board</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'noticeboard' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'noticeboard' && empty($active_action) ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=noticeboard'); ?>">View Notices</a>
       </li>
     </div>
   </ul>

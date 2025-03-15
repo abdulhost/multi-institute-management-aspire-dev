@@ -596,8 +596,7 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
   <ul class="sub-menu <?php echo $active_section == 'announcements' || $active_section == 'inbox' || $active_section == 'compose' ? 'show' : ''; ?>">
     <div>
       <li class="<?php echo $active_section == 'announcements' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/communication/?section=announcements'); ?>">Announcements</a></li>
-      <li class="<?php echo $active_section == 'inbox' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/communication/?section=inbox'); ?>">Inbox</a></li>
-      <li class="<?php echo $active_section == 'compose' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/communication/?section=compose'); ?>">Compose Message</a></li>
+      <li class="<?php echo $active_section == 'inbox' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard/communication/?section=inbox'); ?>">Chat</a></li>
     </div>
   </ul>
 </li>
