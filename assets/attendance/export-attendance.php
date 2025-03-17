@@ -11,12 +11,18 @@ function export_attendance_shortcode($atts) {
         return '<p>Please log in to access this feature.</p>';
     }
 
-    $current_teacher_id = function_exists('get_current_teacher_id') ? get_current_teacher_id() : get_current_user_id();
-    if (!$current_teacher_id) {
-        return '<p>Unable to identify teacher. Please log in again.</p>';
+    // $current_teacher_id = function_exists('get_current_teacher_id') ? get_current_teacher_id() : get_current_user_id();
+    // if (!$current_teacher_id) {
+    //     return '<p>Unable to identify teacher. Please log in again.</p>';
+    // }
+    if (is_teacher($atts)) { 
+        $educational_center_id = educational_center_teacher_id();
+        $current_teacher_id = aspire_get_current_teacher_id();
+    } else {
+        $educational_center_id = get_educational_center_data();
+        $current_teacher_id = get_current_teacher_id();
     }
-
-    $educational_center_id = get_educational_center_data();
+    // $educational_center_id = get_educational_center_data();
     if (!$educational_center_id) {
         return '<p>Unable to retrieve educational center information.</p>';
     }
@@ -213,9 +219,11 @@ function export_attendance_shortcode($atts) {
      <div class="attendance-main-wrapper" style="display: flex;">
         <!-- <div class="institute-dashboard-wrapper"> -->
             <?php
+              if (is_teacher($atts)) { 
+            } else {
             $active_section = 'export-attendance';
             $main_section = 'student';
-            include(plugin_dir_path(__FILE__) . '../sidebar.php');
+            include(plugin_dir_path(__FILE__) . '../sidebar.php');}
             ?>
     <div class="attendance-frontend">
         <?php echo $error; ?>

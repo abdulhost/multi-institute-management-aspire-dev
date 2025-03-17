@@ -177,6 +177,92 @@ $active_section = isset($active_section) ? $active_section : 'overview';
     </div>
   </ul>
 </li>
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'attendance' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+      <path d="M736-320q0 28-19 47t-47 19H280q-28 0-47-19t-19-47V280q0-28 19-47t47-19h320q28 0 47 19t19 47v400Z"/>
+    </svg>
+    <span>Attendance</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+      <path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/>
+    </svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'attendance' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'attendance' && empty($active_action) ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=attendance'); ?>">Manage Attendance</a>
+      </li>
+      <li class="<?php echo $active_action == 'add-attendance' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=attendance&action=add-attendance'); ?>">Add Attendance</a>
+      </li>
+      <li class="<?php echo $active_action == 'edit-attendance' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=attendance&action=edit-attendance'); ?>">Edit Attendance</a>
+      </li>
+      <li class="<?php echo $active_action == 'bulk-import' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=attendance&action=bulk-import'); ?>">Bulk Import Attendance</a>
+      </li>
+      <li class="<?php echo $active_action == 'export-attendance' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=attendance&action=export-attendance'); ?>">Export Attendance</a>
+      </li>
+    </div>
+  </ul>
+</li>
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'subjects' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+      <path d="M736-320q0 28-19 47t-47 19H280q-28 0-47-19t-19-47V280q0-28 19-47t47-19h320q28 0 47 19t19 47v400Z"/>
+    </svg>
+    <span>Subjects</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+      <path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/>
+    </svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'subjects' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'subjects' && empty($active_action) ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=subjects'); ?>">Manage Subjects</a>
+      </li>
+      <li class="<?php echo $active_action == 'add-subjects' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=subjects&action=add-subjects'); ?>">Add Subjects</a>
+      </li>
+      <li class="<?php echo $active_action == 'edit-subjects' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=subjects&action=edit-subjects'); ?>">Edit Subjects</a>
+      </li>
+      <li class="<?php echo $active_action == 'delete-subjects' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=subjects&action=delete-subjects'); ?>">Delete Subjects</a>
+      </li>
+    
+    </div>
+  </ul>
+</li>
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'parents' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+      <path d="M736-320q0 28-19 47t-47 19H280q-28 0-47-19t-19-47V280q0-28 19-47t47-19h320q28 0 47 19t19 47v400Z"/>
+    </svg>
+    <span>Parents</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+      <path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/>
+    </svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'parents' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'parents' && empty($active_action) ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=parents'); ?>">Manage parents</a>
+      </li>
+      <li class="<?php echo $active_action == 'add-subjects' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=subjects&action=add-subjects'); ?>">Add Subjects</a>
+      </li>
+      <li class="<?php echo $active_action == 'edit-subjects' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=subjects&action=edit-subjects'); ?>">Edit Subjects</a>
+      </li>
+      <li class="<?php echo $active_action == 'delete-subjects' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=subjects&action=delete-subjects'); ?>">Delete Subjects</a>
+      </li>
+    
+    </div>
+  </ul>
+</li>
 
 
     </ul>

@@ -452,9 +452,9 @@ function get_current_teacher_id() {
         return $user->user_email; // Return email for institute admin
     }
 
-    if (in_array('teacher', $user->roles)) {
-        return get_user_meta($user->ID, 'teacher_id', true) ?: $user->ID; // Return teacher_id for teacher
-    }
+    // if (in_array('teacher', $user->roles)) {
+    //     return get_user_meta($user->ID, 'teacher_id', true) ?: $user->ID; // Return teacher_id for teacher
+    // }
 
     return false; // Return false if no matching role
 }
@@ -1194,6 +1194,7 @@ include plugin_dir_path(__FILE__) . 'assets/class-timetable.php';
 include plugin_dir_path(__FILE__) . 'interface.php';
 include plugin_dir_path(__FILE__) . 'subjects_interface.php';
 include plugin_dir_path(__FILE__) . 'db.php';
+include plugin_dir_path(__FILE__) . 'helper-func.php';
 // include plugin_dir_path(__FILE__) . 'test.php';
 
 

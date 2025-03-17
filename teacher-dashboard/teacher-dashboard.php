@@ -46,6 +46,42 @@ function educational_center_teacher_id() {
 
     return get_user_meta($current_user->ID, 'educational_center_id', true) ?: false;
 }
+
+function aspire_get_current_teacher_id() {
+    // Get the current user
+    $user = wp_get_current_user();
+
+    // Check if user is logged in and exists
+    if (!$user || !$user->exists()) {
+        error_log("No current user found or user not logged in.");
+        return null;
+    }
+
+    // Check if the user has the 'teacher' role
+    if (!in_array('teacher', $user->roles)) {
+        error_log("Current user {$user->user_login} is not a teacher.");
+        return null;
+    }
+
+    // The teacher ID is the username (user_login)
+    $teacher_id = $user->user_login;
+
+    error_log("Fetched current teacher ID: $teacher_id");
+    return $teacher_id;
+}
+function is_teacher($user_id) {
+    $user = get_user_by('id', $user_id);
+
+    // Check if user exists
+    if (!$user) {
+        return false; // Return false if the user is not found
+    }
+
+    // Continue with the role check if the user exists
+    return in_array('teacher', (array) $user->roles); // Check if the user has the 'teacher' role
+}
+
+
 // Main Teacher Dashboard Shortcode
 function aspire_teacher_dashboard_shortcode() {
     global $wpdb;
@@ -181,16 +217,45 @@ function aspire_teacher_dashboard_shortcode() {
                                         
                                         case 'attendance':
                                             if ($action === 'add-attendance') {
-                                                echo render_attendance_add($user_id, $teacher);
+                                                echo render_teacher_attendance_add($user_id, $teacher);
                                             } elseif ($action === 'edit-attendance') {
                                                 $attendance_id = isset($_GET['id']) ? intval($_GET['id']) : null;
-                                                echo render_attendance_edit($user_id, $teacher, $attendance_id);
-                                            } elseif ($action === 'delete-attendance') {
-                                                $attendance_id = isset($_GET['id']) ? intval($_GET['id']) : null;
-                                                handle_attendance_delete($user_id, $attendance_id);
-                                                echo render_attendance_reports($user_id, $teacher);
-                                            } else {
-                                                echo render_attendance_reports($user_id, $teacher);
+                                                echo 
+                                                edit_attendance_frontend_shortcode($user_id);
+                                            } elseif ($action === 'bulk-import') {
+                                                echo bulk_import_attendance_shortcode($user_id);
+                                            }
+                                             elseif ($action === 'export-attendance') {
+                                                echo export_attendance_shortcode($user_id);
+                                            }
+                                             else {
+                                                echo render_teacher_attendance_reports($user_id, $teacher, $table_name = 'student_attendance');
+                                            }
+                                            break;
+                                        case 'subjects':
+                                            if ($action === 'add-subjects') {
+                                                echo display_subjects_add($user_id);
+                                            } elseif ($action === 'edit-subjects') {
+                                                echo 
+                                                subjects_manager_page($user_id);
+                                            } elseif ($action === 'delete-subjects') {
+                                                echo delete_subjects_manager_page($user_id);
+                                            } 
+                                             else {
+                                                echo display_subjects_view($user_id);
+                                            }
+                                            break;
+                                        case 'parents':
+                                            if ($action === 'add-subjects') {
+                                                echo display_subjects_add($user_id);
+                                            } elseif ($action === 'edit-subjects') {
+                                                echo 
+                                                subjects_manager_page($user_id);
+                                            } elseif ($action === 'delete-subjects') {
+                                                echo delete_subjects_manager_page($user_id);
+                                            } 
+                                             else {
+                                                echo parents_institute_dashboard_shortcode($user_id);
                                             }
                                             break;
                                 
@@ -2052,26 +2117,6 @@ function aspire_is_institute_admin($username, $education_center_id) {
     return $count > 0;
 }
 
-// Helper: Get Teacher Username (Refined)
-// function aspire_teacher_get_username($post_id) {
-//     $user_id = get_post_meta($post_id, 'teacher_id', true);
-//     if ($user_id) {
-//         // Check if teacher_id is a username (e.g., TEA-67d0728cd4ae5)
-//         $user = get_user_by('login', $user_id);
-//         if ($user) {
-//             return $user->user_login;
-//         }
-//         // Otherwise, treat it as a user ID
-//         $user = get_userdata(intval($user_id));
-//         if ($user) {
-//             return $user->user_login;
-//         }
-//         error_log("No user found for post_id=$post_id, user_id=$user_id");
-//     } else {
-//         error_log("No teacher_id meta for post_id=$post_id");
-//     }
-//     return 'contact_' . $post_id; // Fallback for any contact type
-// }
 
 // Helper: Get Institute Admins
 function aspire_teacher_get_admins($education_center_id) {
@@ -2106,31 +2151,6 @@ function aspire_teacher_send_message($sender_id, $receiver_id, $message, $educat
     return $result !== false;
 }
 
-// Teacher: Get Messages
-// function aspire_teacher_get_messages($username, $conversation_with = '') {
-//     global $wpdb;
-//     $table = $wpdb->prefix . 'aspire_messages';
-//     $edu_center_id = educational_center_teacher_id();
-
-//     $query = "SELECT * FROM $table WHERE education_center_id = %s";
-//     $query_args = [$edu_center_id];
-
-//     if ($conversation_with) {
-//         $query .= " AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s))";
-//         $query_args[] = $username;
-//         $query_args[] = $conversation_with;
-//         $query_args[] = $conversation_with;
-//         $query_args[] = $username;
-//     } else {
-//         $query .= " AND (receiver_id = %s OR receiver_id IN ('all', 'teachers'))";
-//         $query_args[] = $username;
-//     }
-
-//     $query .= " ORDER BY timestamp DESC LIMIT 50";
-//     $results = $wpdb->get_results($wpdb->prepare($query, $query_args));
-//     error_log("Teacher messages for $username with $conversation_with: " . print_r($results, true));
-//     return $results;
-// }
 
 // Teacher: Mark Messages as Read
 function aspire_teacher_mark_messages_read($username, $conversation_with) {
@@ -2202,29 +2222,8 @@ function aspire_teacher_ajax_send_message() {
 
 // Teacher: AJAX Fetch Messages
 add_action('wp_ajax_aspire_teacher_fetch_messages', 'aspire_teacher_ajax_fetch_messages');
-// function aspire_teacher_ajax_fetch_messages() {
-//     check_ajax_referer('aspire_teacher_nonce', 'nonce');
-//     $user = wp_get_current_user();
-//     $username = $user->user_login;
-//     $conversation_with = sanitize_text_field($_POST['conversation_with'] ?? '');
 
-//     $messages = aspire_teacher_get_messages($username, $conversation_with);
-//     if ($conversation_with && !in_array($conversation_with, ['all', 'teachers', 'institute_admins'])) {
-//         aspire_teacher_mark_messages_read($username, $conversation_with);
-//     }
 
-//     $output = '';
-//     foreach ($messages as $msg) {
-//         $sender = get_user_by('login', $msg->sender_id);
-//         $sender_name = $sender ? $sender->display_name : 'Unknown';
-//         $output .= '<div class="chat-message ' . ($msg->sender_id === $username ? 'sent text-end' : 'received') . ' ' . ($msg->status == 'sent' ? 'unread' : '') . '">';
-//         $output .= '<small>' . esc_html($sender_name) . ' - ' . esc_html($msg->timestamp) . '</small>';
-//         $output .= '<p>' . esc_html($msg->message) . '</p>';
-//         $output .= '</div>';
-//     }
-
-//     wp_send_json_success(['html' => $output, 'unread' => aspire_teacher_get_unread_count($username)]);
-// }
 
 // Teacher: AJAX Fetch Conversations
 add_action('wp_ajax_aspire_teacher_fetch_conversations', 'aspire_teacher_ajax_fetch_conversations');
@@ -2256,130 +2255,7 @@ function aspire_teacher_ajax_fetch_conversations() {
 
     wp_send_json_success($output);
 }
-// Teacher: Get Active Conversations (Updated)
-// function aspire_teacher_get_active_conversations($username) {
-//     global $wpdb;
-//     $table = $wpdb->prefix . 'aspire_messages';
-//     $edu_center_id = educational_center_teacher_id();
-//     $user = wp_get_current_user();
-//     $is_teacher = aspire_is_teacher($user);
-//     $is_admin = aspire_is_institute_admin($username, $edu_center_id);
 
-//     $group_receivers = ['all'];
-//     if ($is_teacher) $group_receivers[] = 'teachers';
-//     if ($is_admin) $group_receivers[] = 'institute_admins';
-
-//     $placeholders = implode(',', array_fill(0, count($group_receivers), '%s'));
-//     $query_args = array_merge([$username, $edu_center_id, $username, $username], $group_receivers);
-
-//     $query = $wpdb->prepare(
-//         "SELECT 
-//             CASE 
-//                 WHEN sender_id = %s THEN receiver_id 
-//                 ELSE sender_id 
-//             END AS conversation_with,
-//             MAX(timestamp) AS last_message
-//          FROM $table 
-//          WHERE education_center_id = %s 
-//          AND (sender_id = %s OR receiver_id = %s OR receiver_id IN ($placeholders))
-//          GROUP BY conversation_with 
-//          ORDER BY last_message DESC",
-//         $query_args
-//     );
-
-//     $results = $wpdb->get_results($query);
-//     error_log("Teacher active conversations for $username: " . print_r($results, true));
-//     return $results;
-// }
-
-
-// Teacher: Get Messages (Updated for Ascending Order)
-// function aspire_teacher_get_messages($username, $conversation_with = '') {
-//     global $wpdb;
-//     $table = $wpdb->prefix . 'aspire_messages';
-//     $edu_center_id = educational_center_teacher_id();
-
-//     $query = "SELECT * FROM $table WHERE education_center_id = %s";
-//     $query_args = [$edu_center_id];
-
-//     if ($conversation_with) {
-//         $query .= " AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s))";
-//         $query_args[] = $username;
-//         $query_args[] = $conversation_with;
-//         $query_args[] = $conversation_with;
-//         $query_args[] = $username;
-//     } else {
-//         $query .= " AND (receiver_id = %s OR receiver_id IN ('all', 'teachers'))";
-//         $query_args[] = $username;
-//     }
-
-//     $query .= " ORDER BY timestamp ASC LIMIT 50"; // Changed to ASC for latest at bottom
-//     $results = $wpdb->get_results($wpdb->prepare($query, $query_args));
-//     error_log("Teacher messages for $username with $conversation_with: " . print_r($results, true));
-//     return $results;
-// }
-
-// Teacher: AJAX Fetch Messages (Updated for Full Names and Order)
-// function aspire_teacher_ajax_fetch_messages() {
-//     check_ajax_referer('aspire_teacher_nonce', 'nonce');
-//     $user = wp_get_current_user();
-//     $username = $user->user_login;
-//     $conversation_with = sanitize_text_field($_POST['conversation_with'] ?? '');
-
-//     $messages = aspire_teacher_get_messages($username, $conversation_with);
-//     if ($conversation_with && !in_array($conversation_with, ['all', 'teachers', 'institute_admins'])) {
-//         aspire_teacher_mark_messages_read($username, $conversation_with);
-//     }
-
-//     $contacts = get_posts([
-//         'post_type' => ['teacher', 'students', 'parent'],
-//         'posts_per_page' => -1,
-//         'meta_key' => 'educational_center_id',
-//         'meta_value' => educational_center_teacher_id(),
-//     ]);
-//     $admins = aspire_teacher_get_admins(educational_center_teacher_id());
-
-//     $output = '';
-//     foreach ($messages as $msg) {
-//         $sender_name = ($msg->sender_id === $username) ? 'You' : null;
-//         if (!$sender_name) {
-//             foreach ($contacts as $contact) {
-//                 if (aspire_teacher_get_username($contact->ID) === $msg->sender_id) {
-//                     if ($contact->post_type === 'teacher') {
-//                         $sender_name = get_post_meta($contact->ID, 'teacher_name', true);
-//                     } elseif ($contact->post_type === 'students') {
-//                         $sender_name = get_post_meta($contact->ID, 'student_name', true);
-//                     } else {
-//                         $sender_name = $contact->post_title;
-//                     }
-//                     break;
-//                 }
-//             }
-//             if (!$sender_name) {
-//                 foreach ($admins as $admin) {
-//                     if ($admin['id'] === $msg->sender_id) {
-//                         $sender_name = $admin['name'];
-//                         break;
-//                     }
-//                 }
-//             }
-//             if (!$sender_name) {
-//                 $sender = get_user_by('login', $msg->sender_id);
-//                 $sender_name = $sender ? $sender->display_name : 'Unknown';
-//             }
-//         }
-//         $initials = strtoupper(substr($sender_name === 'You' ? $user->display_name : $sender_name, 0, 2));
-//         $output .= '<div class="chat-message ' . ($msg->sender_id === $username ? 'sent' : 'received') . ' ' . ($msg->status == 'sent' ? 'unread' : '') . '">';
-//         $output .= '<div class="bubble">';
-//         $output .= '<span class="avatar">' . esc_html($initials) . '</span>';
-//         $output .= '<p>' . esc_html($msg->message) . '</p>';
-//         $output .= '</div>';
-//         $output .= '<div class="meta" data-timestamp="' . esc_attr($msg->timestamp) . '">' . esc_html($sender_name) . ' - ' . esc_html($msg->timestamp) . '</div>';
-//         $output .= '</div>';
-//     }
-
-//     wp_send_json_success(['html' => $output, 'unread' => aspire_teacher_get_unread_count($username)]);
-// }
 
 // Teacher: Shortcode (Updated with New Chat Button and UI Tweaks)
 function aspire_teacher_prochat_shortcode() {
@@ -2700,78 +2576,6 @@ function aspire_teacher_prochat_shortcode() {
     return ob_get_clean();
 }
 add_shortcode('aspire_teacher_prochat', 'aspire_teacher_prochat_shortcode');
-// Teacher: AJAX Fetch Messages (Updated for UI)
-// function aspire_teacher_ajax_fetch_messages() {
-//     check_ajax_referer('aspire_teacher_nonce', 'nonce');
-//     $user = wp_get_current_user();
-//     $username = $user->user_login;
-//     $conversation_with = sanitize_text_field($_POST['conversation_with'] ?? '');
-
-//     $messages = aspire_teacher_get_messages($username, $conversation_with);
-//     if ($conversation_with && !in_array($conversation_with, ['all', 'teachers', 'institute_admins'])) {
-//         aspire_teacher_mark_messages_read($username, $conversation_with);
-//     }
-
-//     $output = '';
-//     foreach ($messages as $msg) {
-//         $sender = get_user_by('login', $msg->sender_id);
-//         $sender_name = $sender ? $sender->display_name : 'Unknown';
-//         $initials = $sender ? strtoupper(substr($sender_name, 0, 2)) : '??';
-//         $output .= '<div class="chat-message ' . ($msg->sender_id === $username ? 'sent' : 'received') . ' ' . ($msg->status == 'sent' ? 'unread' : '') . '">';
-//         $output .= '<div class="bubble">';
-//         $output .= '<span class="avatar">' . esc_html($initials) . '</span>';
-//         $output .= '<p>' . esc_html($msg->message) . '</p>';
-//         $output .= '</div>';
-//         $output .= '<div class="meta" data-timestamp="' . esc_attr($msg->timestamp) . '">' . esc_html($sender_name) . ' - ' . esc_html($msg->timestamp) . '</div>';
-//         $output .= '</div>';
-//     }
-
-//     wp_send_json_success(['html' => $output, 'unread' => aspire_teacher_get_unread_count($username)]);
-// }
-
-// Teacher: Get Messages (Separate Group and Individual Messages)
-// function aspire_teacher_get_messages($username, $conversation_with = '') {
-//     global $wpdb;
-//     $table = $wpdb->prefix . 'aspire_messages';
-//     $edu_center_id = educational_center_teacher_id();
-//     $user = wp_get_current_user();
-//     $is_teacher = aspire_is_teacher($user);
-//     $is_admin = aspire_is_institute_admin($username, $edu_center_id);
-
-//     $query = "SELECT * FROM $table WHERE education_center_id = %s";
-//     $query_args = [$edu_center_id];
-
-//     if ($conversation_with) {
-//         if (in_array($conversation_with, ['all', 'teachers', 'institute_admins'])) {
-//             // Fetch only group messages for the selected group
-//             $query .= " AND receiver_id = %s";
-//             $query_args[] = $conversation_with;
-//         } else {
-//             // Fetch only individual conversation messages
-//             $query .= " AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s))";
-//             $query_args[] = $username;
-//             $query_args[] = $conversation_with;
-//             $query_args[] = $conversation_with;
-//             $query_args[] = $username;
-//         }
-//     } else {
-//         // Fetch all relevant messages for the user, including applicable groups
-//         $group_receivers = ['all'];
-//         if ($is_teacher) $group_receivers[] = 'teachers';
-//         if ($is_admin) $group_receivers[] = 'institute_admins';
-//         $placeholders = implode(',', array_fill(0, count($group_receivers), '%s'));
-//         $query .= " AND (receiver_id = %s OR receiver_id IN ($placeholders))";
-//         $query_args[] = $username;
-//         $query_args = array_merge($query_args, $group_receivers);
-//     }
-
-//     $query .= " ORDER BY timestamp ASC LIMIT 50";
-//     $prepared_query = $wpdb->prepare($query, $query_args);
-//     error_log("Teacher query: $prepared_query");
-//     $results = $wpdb->get_results($prepared_query);
-//     error_log("Teacher messages for $username with $conversation_with: " . print_r($results, true));
-//     return $results;
-// }
 
 // Teacher: AJAX Fetch Messages (No Change Needed)
 function aspire_teacher_ajax_fetch_messages() {
@@ -2923,4 +2727,270 @@ function aspire_teacher_get_messages($username, $conversation_with = '') {
     $results = $wpdb->get_results($prepared_query);
     error_log("Teacher messages for $username with $conversation_with: " . print_r($results, true));
     return $results;
+}
+
+
+
+// Attendance Reports Rendering Function
+// REST API Registration
+// REST API Registration (Namespaced for Teachers)
+add_action('rest_api_init', function () {
+    register_rest_route('teacher_attendance/v1', '/fetch', array(
+        'methods' => 'POST',
+        'callback' => function (WP_REST_Request $request) {
+            $educational_center_id = educational_center_teacher_id(); // Assumes this function exists
+            $table_name = 'student_attendance'; // Unique table name to avoid conflicts
+            if (is_string($educational_center_id) && strpos($educational_center_id, '<p>') === 0) {
+                return ['success' => false, 'data' => ['html' => $educational_center_id]];
+            }
+            return fetch_teacher_attendance_data_helper($request, $educational_center_id, $table_name);
+        },
+        'permission_callback' => function () {
+            return current_user_can('read');
+        },
+    ));
+});
+
+// Attendance Reports Rendering Function (Namespaced for Teachers)
+function render_teacher_attendance_reports($user_id, $teacher, $table_name = 'student_attendance') {
+    global $wpdb;
+    $full_table_name = $wpdb->prefix . $table_name;
+
+    $educational_center_id = educational_center_teacher_id(); // Assumes this function exists
+    if (is_string($educational_center_id) && strpos($educational_center_id, '<p>') === 0) {
+        return $educational_center_id;
+    }
+
+    $classes = $wpdb->get_col($wpdb->prepare("SELECT DISTINCT class FROM $full_table_name WHERE education_center_id = %s", $educational_center_id));
+    $sections = $wpdb->get_col($wpdb->prepare("SELECT DISTINCT section FROM $full_table_name WHERE education_center_id = %s", $educational_center_id));
+    $dates = $wpdb->get_results($wpdb->prepare("SELECT DISTINCT YEAR(date) AS year, MONTH(date) AS month FROM $full_table_name WHERE education_center_id = %s ORDER BY year DESC, month DESC", $educational_center_id));
+
+    // Generate nonce and REST URL
+    $nonce = wp_create_nonce('wp_rest');
+    $rest_url = rest_url('teacher_attendance/v1/fetch');
+
+    ob_start();
+    ?>
+    <div class="card shadow-sm border-0">
+        <div class="card-header">
+            <h3 class="card-title">Teacher Attendance Reports</h3>
+        </div>
+        <div class="card-body">
+            <div class="search-filters">
+                <input type="text" id="teacher-search-student-id" placeholder="Student ID">
+                <input type="text" id="teacher-search-student-name" placeholder="Student Name">
+                <select id="teacher-search-class">
+                    <option value="">All Classes</option>
+                    <?php foreach ($classes as $class) : ?>
+                        <option value="<?php echo esc_attr($class); ?>"><?php echo esc_html($class); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <select id="teacher-search-section">
+                    <option value="">All Sections</option>
+                    <?php foreach ($sections as $section) : ?>
+                        <option value="<?php echo esc_attr($section); ?>"><?php echo esc_html($section); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <select id="teacher-search-month">
+                    <option value="">All Months</option>
+                    <?php
+                    $month_names = [1 => 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                    foreach ($dates as $date) {
+                        echo '<option value="' . esc_attr($date->month) . '" data-year="' . esc_attr($date->year) . '">' . esc_html($month_names[$date->month] . ' ' . $date->year) . '</option>';
+                    }
+                    ?>
+                </select>
+                <button id="teacher-search-button">Search</button>
+            </div>
+            <div class="actions">
+                <button id="teacher-bulk-import-button">Bulk Import</button>
+                <button id="teacher-add-attendance-button">Add Attendance</button>
+            </div>
+            <p style="font-size: 12px; color: #666; margin-top: 5px;">Select a month to view the full attendance report.</p>
+            <div class="attendance-table-wrapper" id="teacher-attendance-table-container">
+                <p class="loading-message">Loading attendance data...</p>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .attendance-table-wrapper .loading-message .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ccc;
+            border-top: 2px solid #333;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 5px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #teacher-attendance-table th.weekend {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+    </style>
+
+    <script>
+    jQuery(document).ready(function($) {
+        // Debounce function to prevent excessive AJAX calls
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        // Reusable attendance table loader
+        function loadTeacherAttendanceTable(options = {}) {
+            const defaults = {
+                classSelector: '#teacher-search-class',
+                sectionSelector: '#teacher-search-section',
+                monthSelector: '#teacher-search-month',
+                studentIdSelector: '#teacher-search-student-id',
+                studentNameSelector: '#teacher-search-student-name',
+                containerSelector: '#teacher-attendance-table-container',
+                url: '<?php echo esc_js($rest_url); ?>',
+                nonce: '<?php echo esc_js($nonce); ?>'
+            };
+            const settings = { ...defaults, ...options };
+
+            const classVal = $(settings.classSelector).val() || '';
+            const sectionVal = $(settings.sectionSelector).val() || '';
+            const monthVal = $(settings.monthSelector).val() || '';
+            const yearVal = monthVal ? $(settings.monthSelector + ' option:selected').data('year') || '' : '';
+            const studentIdVal = $(settings.studentIdSelector).val() || '';
+            const studentNameVal = $(settings.studentNameSelector).val() || '';
+
+            $.ajax({
+                url: settings.url,
+                method: 'POST',
+                data: {
+                    class: classVal,
+                    section: sectionVal,
+                    month: monthVal,
+                    year: yearVal,
+                    student_id: studentIdVal,
+                    student_name: studentNameVal
+                },
+                headers: {
+                    'X-WP-Nonce': settings.nonce
+                },
+                beforeSend: function() {
+                    $(settings.containerSelector).html('<p class="loading-message"><span class="spinner"></span> Loading attendance data...</p>');
+                },
+                success: function(response) {
+                    if (response.success && response.data && response.data.html) {
+                        $(settings.containerSelector).html(response.data.html);
+                    } else {
+                        $(settings.containerSelector).html('<p>No data returned. Please adjust your filters.</p>');
+                        console.log('Unexpected response:', response);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    let errorMsg = 'Error loading data';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg += ': ' + xhr.responseJSON.message;
+                    } else {
+                        errorMsg += ': ' + error;
+                    }
+                    $(settings.containerSelector).html('<p>' + errorMsg + '</p>');
+                    console.log('AJAX Error:', xhr.responseText);
+                }
+            });
+        }
+
+        // Initialize with default settings
+        const debouncedLoadAttendance = debounce(loadTeacherAttendanceTable, 300);
+        loadTeacherAttendanceTable(); // Load on page load
+
+        // Bind events
+        $('#teacher-search-class, #teacher-search-section, #teacher-search-month, #teacher-search-student-id, #teacher-search-student-name').on('change', debouncedLoadAttendance);
+        $('#teacher-search-button').on('click', debouncedLoadAttendance);
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+//add attendance
+
+
+function render_attendance_edit($user_id, $teacher, $attendance_id) {
+    if (!$attendance_id || get_post_meta($attendance_id, 'teacher_id', true) != $user_id) {
+        return '<div class="alert alert-danger">Invalid attendance ID or permission denied.</div>';
+    }
+
+    $attendance = get_post($attendance_id);
+    $class_id = get_post_meta($attendance_id, 'class_id', true);
+    $students = get_post_meta($class_id, 'student_ids', true) ?: [];
+    $records = get_post_meta($attendance_id, 'attendance_records', true) ?: [];
+
+    if (isset($_POST['edit_attendance']) && wp_verify_nonce($_POST['attendance_nonce'], 'edit_attendance')) {
+        $attendance_date = sanitize_text_field($_POST['attendance_date']);
+        $records = $_POST['attendance_records'] ?? [];
+
+        wp_update_post(['ID' => $attendance_id, 'post_title' => "Attendance - $attendance_date"]);
+        update_post_meta($attendance_id, 'attendance_date', $attendance_date);
+        update_post_meta($attendance_id, 'attendance_records', $records);
+        echo '<div class="alert alert-success">Attendance updated successfully! <a href="?section=attendance">Back to list</a></div>';
+        return ob_get_clean();
+    }
+
+    ob_start();
+    ?>
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title m-0"><i class="bi bi-calendar-check me-2"></i>Edit Attendance</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="attendance_date" class="form-label">Date</label>
+                    <input type="date" name="attendance_date" id="attendance_date" class="form-control" value="<?php echo esc_attr(get_post_meta($attendance_id, 'attendance_date', true)); ?>" required>
+                </div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($students as $student_id): 
+                            $student_name = get_post_meta($student_id, 'student_name', true);
+                        ?>
+                            <tr>
+                                <td><?php echo esc_html($student_name); ?></td>
+                                <td>
+                                    <select name="attendance_records[<?php echo $student_id; ?>]" class="form-select">
+                                        <option value="present" <?php selected($records[$student_id], 'present'); ?>>Present</option>
+                                        <option value="absent" <?php selected($records[$student_id], 'absent'); ?>>Absent</option>
+                                        <option value="late" <?php selected($records[$student_id], 'late'); ?>>Late</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <?php wp_nonce_field('edit_attendance', 'attendance_nonce'); ?>
+                <div class="d-flex gap-2">
+                    <button type="submit" name="edit_attendance" class="btn btn-primary">Update Attendance</button>
+                    <a href="?section=attendance" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function handle_attendance_delete($user_id, $attendance_id) {
+    if ($attendance_id && get_post_meta($attendance_id, 'teacher_id', true) == $user_id) {
+        wp_delete_post($attendance_id, true);
+    }
 }

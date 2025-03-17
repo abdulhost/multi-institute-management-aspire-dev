@@ -323,6 +323,37 @@ $sql = "CREATE TABLE IF NOT EXISTS $institute_admins (
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 dbDelta($sql);
 
+$table_name = $wpdb->prefix . 'student_attendance';
+$charset_collate = $wpdb->get_charset_collate();
+
+$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+    sa_id mediumint(9) NOT NULL AUTO_INCREMENT,
+    education_center_id varchar(255) NOT NULL,
+    student_id VARCHAR(50) NOT NULL,
+    student_name VARCHAR(255) NOT NULL,
+    class varchar(255) NOT NULL,
+    section text NOT NULL,
+    date DATE NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    teacher_id VARCHAR(50) NOT NULL,
+    subject VARCHAR(50) ,
+    PRIMARY KEY (sa_id),
+    INDEX (student_id, date)
+) $charset_collate;";
+
+$table_name = $wpdb->prefix . 'subjects';
+$charset_collate = $wpdb->get_charset_collate();
+
+$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+    subject_id mediumint(9) NOT NULL AUTO_INCREMENT,
+    education_center_id varchar(255) NOT NULL,
+    subject_name VARCHAR(50) NOT NULL,
+    teacher_id VARCHAR(50) NOT NULL,
+    PRIMARY KEY (subject_id)
+) $charset_collate;"; // Removed the extra comma here
+
+require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+dbDelta($sql);
 
 }
 

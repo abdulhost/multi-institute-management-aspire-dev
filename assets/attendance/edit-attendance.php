@@ -10,12 +10,14 @@ function edit_attendance_frontend_shortcode($atts) {
         return '<p>Please log in to access this feature.</p>';
     }
 
-    $current_teacher_id = function_exists('get_current_teacher_id') ? get_current_teacher_id() : get_current_user_id();
-    if (!$current_teacher_id) {
-        return '<p>Unable to identify teacher. Please log in again.</p>';
+    if (is_teacher($atts)) { 
+        $educational_center_id = educational_center_teacher_id();
+        $current_teacher_id = aspire_get_current_teacher_id();
+    } else {
+        $educational_center_id = get_educational_center_data();
+        $current_teacher_id = get_current_teacher_id();
     }
-
-    $educational_center_id = get_educational_center_data();
+    
     if (!$educational_center_id) {
         return '<p>Unable to retrieve educational center information.</p>';
     }
@@ -86,8 +88,11 @@ function edit_attendance_frontend_shortcode($atts) {
     ?>
     <div class="attendance-main-wrapper" style="display: flex;">
         <?php
-        $active_section = 'update-attendance';
-        include(plugin_dir_path(__FILE__) . '../sidebar.php');
+        if (is_teacher($atts)) { 
+        } else {
+            $active_section = 'update-attendance';
+            include(plugin_dir_path(__FILE__) . '../sidebar.php');
+        }
         ?>
         <div class="attendance-frontend">
             <?php echo $output; ?>
@@ -275,7 +280,10 @@ function handle_edit_attendance_submission() {
         'subject' => sanitize_text_field($_POST['subject_name'])
     ];
 
-    $educational_center_id = get_educational_center_data();
+    // Get these values from POST since they're now consistently available
+    $educational_center_id = sanitize_text_field($_POST['edu_center_id']);
+    $current_teacher_id = sanitize_text_field($_POST['teacher_id']);
+
     if ($data['education_center_id'] !== $educational_center_id) {
         $message = 'Invalid educational center ID.';
         $type = 'error';
