@@ -69,14 +69,28 @@ function fetch_fees_data($request) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'student_fees';
     $params = $request->get_params();
-    $educational_center_id = get_educational_center_data();
-    
-    if (!$educational_center_id) {
-        return array(
-            'success' => false,
-            'data' => array('html' => '<p>Educational center ID not found</p>')
-        );
-    }
+    // $educational_center_id = get_educational_center_data();
+     // Get current user
+     $current_user = wp_get_current_user();
+     // $is_teacher_user = is_teacher($current_user->ID);
+   
+     if (is_teacher($current_user->ID)) { 
+         $educational_center_id = educational_center_teacher_id();
+         $current_teacher_id = aspire_get_current_teacher_id();
+     } else {
+         $educational_center_id = get_educational_center_data();
+         $current_teacher_id = get_current_teacher_id();
+     }
+     
+     if (!$educational_center_id) {
+         return '<p>Unable to retrieve educational center information.</p>';
+     }
+    // if (!$educational_center_id) {
+    //     return array(
+    //         'success' => false,
+    //         'data' => array('html' => '<p>Educational center ID not found</p>')
+    //     );
+    // }
 
     $student_id = sanitize_text_field($params['student_id'] ?? '');
     $student_name = sanitize_text_field($params['student_name'] ?? '');
@@ -368,12 +382,23 @@ function fetch_fees_data($request) {
 // Frontend Interface
 function fees_institute_dashboard_shortcode() {
     global $wpdb;
-    $educational_center_id = get_educational_center_data();
+    // $educational_center_id = get_educational_center_data();
 
-    if (empty($educational_center_id)) {
-        return '<p>No Educational Center found.</p>';
+    // Get current user
+    $current_user = wp_get_current_user();
+    // $is_teacher_user = is_teacher($current_user->ID);
+  
+    if (is_teacher($current_user->ID)) { 
+        $educational_center_id = educational_center_teacher_id();
+        $current_teacher_id = aspire_get_current_teacher_id();
+    } else {
+        $educational_center_id = get_educational_center_data();
+        $current_teacher_id = get_current_teacher_id();
     }
-
+    
+    if (!$educational_center_id) {
+        return '<p>Unable to retrieve educational center information.</p>';
+    }
     $years = $wpdb->get_col($wpdb->prepare(
         "SELECT DISTINCT SUBSTRING(month_year, 1, 4) AS year FROM {$wpdb->prefix}student_fees WHERE education_center_id = %s ORDER BY year DESC",
         $educational_center_id
@@ -383,15 +408,7 @@ function fees_institute_dashboard_shortcode() {
     ?>
     <div class="attendance-main-wrapper">
         <div class="form-container attendance-content-wrapper">
-            <div class="custom-wrap">
-                <div class="dashboard-header" style="margin-bottom: 15px;">
-                    <a href="<?php echo esc_url(home_url('/institute-dashboard/fees/?section=add-fees')); ?>" 
-                       class="add-fee-btn">+ Add Fee</a>
-                </div>
-                <div class="actions" style="margin-bottom: 20px;">
-                    <button id="bulk-import-button">Bulk Import</button>
-                </div>
-            </div>  
+          
             <div class="fees-management">
                 <h2>Fees Management</h2>
                 <div class="filters-card">

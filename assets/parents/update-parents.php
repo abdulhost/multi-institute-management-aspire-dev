@@ -1,29 +1,54 @@
 <?php
 // parent-list.php
-function edit_parents_institute_dashboard_shortcode() {
-    $current_user = wp_get_current_user();
-    $admin_id = $current_user->user_login;
+// Prevent direct access to this file
+if (!defined('ABSPATH')) {
+    exit;
+}
 
-    $educational_center = get_posts(array(
-        'post_type' => 'educational-center',
-        'meta_key' => 'admin_id',
-        'meta_value' => $admin_id,
-        'posts_per_page' => 1,
-    ));
-
-    if (empty($educational_center)) {
-        return '<p>No Educational Center found for this Admin ID.</p>';
+function edit_parents_institute_dashboard_shortcode($atts) {
+    if (!is_user_logged_in()) {
+        return '<p>Please log in to access this feature.</p>';
     }
 
-    $educational_center_id = get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
-    require_once(ABSPATH . 'wp-admin/includes/image.php');
+    // Get current user
+    $current_user = wp_get_current_user();
+    $is_teacher_user = is_teacher($current_user->ID);
+    
+    // Determine educational_center_id and teacher_id based on user type
+    if ($is_teacher_user) { 
+        $educational_center_id = educational_center_teacher_id();
+        $current_teacher_id = aspire_get_current_teacher_id();
+    } else {
+        $educational_center_id = get_educational_center_data();
+        $current_teacher_id = get_current_teacher_id();
+    }
 
+    if (empty($educational_center_id)) {
+        return '<p>No Educational Center found for this user.</p>';
+    }
+
+    // Handle parent deletion
+    if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['parent_post_id'])) {
+        $parent_post_id = intval($_GET['parent_post_id']);
+        $stored_edu_center_id = get_post_meta($parent_post_id, 'educational_center_id', true);
+        if ($stored_edu_center_id === $educational_center_id && wp_delete_post($parent_post_id, true)) {
+            $redirect_url = $is_teacher_user ? home_url('/teacher-dashboard/?section=parents&action=edit-parents') : home_url('/institute-dashboard/edit-parents');
+            wp_redirect($redirect_url);
+            exit;
+        } else {
+            echo '<p class="error-message">Error deleting parent or insufficient permissions.</p>';
+        }
+    }
+
+    require_once(ABSPATH . 'wp-admin/includes/image.php');
     ob_start();
     ?>
     <div class="attendance-main-wrapper" style="display: flex;">
         <?php
-        $active_section = 'update-parent';
-        include(plugin_dir_path(__FILE__) . '../sidebar.php');
+        if (!$is_teacher_user) {
+            $active_section = 'update-parent';
+            include(plugin_dir_path(__FILE__) . '../sidebar.php');
+        }
         ?>
         <div class="form-container attendance-entry-wrapper attendance-content-wrapper">
             <div class="form-group search-form">
@@ -92,8 +117,12 @@ function edit_parents_institute_dashboard_shortcode() {
                                            data-parent-current-address="' . esc_attr($parent_current_address) . '"
                                            data-parent-permanent-address="' . esc_attr($parent_permanent_address) . '"
                                            data-profile-picture="' . esc_attr($profile_picture_url) . '">Edit</a> |
-                                        <a href="?action=delete&parent_post_id=' . $parent->ID . '" onclick="return confirm(\'Are you sure you want to delete this parent?\')">Delete</a>
-                                    </td>
+                                      <button class="button button-secondary delete-parent-btn"
+                                                data-parent-post-id="' . esc_attr($parent->ID) . '"
+                                                data-edu-center-id="' . esc_attr($educational_center_id) . '"
+                                                data-nonce="' . wp_create_nonce('delete_parent_' . $parent->ID) . '">Delete</button>
+                                        <span class="delete-message" style="display: none; margin-left: 10px;"></span>
+                                          </td>
                                   </tr>';
                             }
                         } else {
@@ -112,6 +141,8 @@ function edit_parents_institute_dashboard_shortcode() {
             <form id="edit-parent-form" method="POST" action="<?php echo admin_url('admin-post.php'); ?>" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="edit_parent_submission">
                 <input type="hidden" name="parent_post_id" id="edit_parent_post_id">
+                <input type="hidden" name="educational_center_id" value="<?php echo esc_attr($educational_center_id); ?>">
+                <input type="hidden" name="redirect_url" value="<?php echo esc_attr($is_teacher_user ? home_url('/teacher-dashboard/?section=parents&action=edit-parents') : home_url('/institute-dashboard/edit-parents')); ?>">
                 <div class="form-section">
                     <div class="section-header" onclick="toggleSection('edit-basic-details')">
                         <h4>Basic Details</h4>
@@ -131,6 +162,7 @@ function edit_parents_institute_dashboard_shortcode() {
                     </div>
                 </div>
 
+                <!-- Other form sections remain unchanged for brevity -->
                 <div class="form-section">
                     <div class="section-header" onclick="toggleSection('edit-personal-details')">
                         <h4>Personal Details</h4>
@@ -211,9 +243,8 @@ function edit_parents_institute_dashboard_shortcode() {
         </div>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script>
-    $(document).ready(function() {
+    jQuery(document).ready(function($) {
         $('#search_text_parent').keyup(function() {
             var searchText = $(this).val().toLowerCase();
             $('#parents-table tbody tr').each(function() {
@@ -292,6 +323,55 @@ function edit_parents_institute_dashboard_shortcode() {
                 $('#edit-profile-picture-img').hide();
             }
         });
+
+    $(document).on('click', '.delete-parent-btn', function(e) {
+            e.preventDefault();
+
+            var $button = $(this);
+            var parentPostId = $button.data('parent-post-id');
+            var eduCenterId = $button.data('edu-center-id');
+            var nonce = $button.data('nonce');
+            var $row = $button.closest('tr');
+            var $message = $row.find('.delete-message');
+
+            if (!confirm('Are you sure you want to delete this parent?')) {
+                return;
+            }
+
+            $button.prop('disabled', true);
+            $message.hide().removeClass('success error').text('Deleting...').show();
+
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                type: 'POST',
+                data: {
+                    action: 'delete_parent',
+                    parent_post_id: parentPostId,
+                    educational_center_id: eduCenterId,
+                    nonce: nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $message.text(response.data).addClass('success').show();
+                        setTimeout(function() {
+                            $row.fadeOut(300, function() {
+                                $(this).remove();
+                                if ($('#parents-table tbody tr').length === 0) {
+                                    $('#parents-table').replaceWith('<tr><td colspan="4">No parents found for this Educational Center.</td></tr>');
+                                }
+                            });
+                        }, 1000);
+                    } else {
+                        $message.text(response.data).addClass('error').show();
+                        $button.prop('disabled', false);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $message.text('Error occurred while deleting: ' + error).addClass('error').show();
+                    $button.prop('disabled', false);
+                }
+            });
+        });
     });
 
     function toggleSection(sectionId) {
@@ -311,4 +391,182 @@ function edit_parents_institute_dashboard_shortcode() {
 }
 
 add_shortcode('edit_parents_institute_dashboard', 'edit_parents_institute_dashboard_shortcode');
-?>
+
+function handle_parent_update_submission() {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['edit_parent']) || !isset($_POST['action']) || $_POST['action'] !== 'edit_parent_submission') {
+        return;
+    }
+
+    if (!is_user_logged_in()) {
+        wp_die('Please log in to update parent information.');
+        return;
+    }
+
+    $current_user = wp_get_current_user();
+    $is_teacher_user = is_teacher($current_user->ID);
+
+    // Determine educational_center_id and teacher_id based on user type
+    if ($is_teacher_user) { 
+        $educational_center_id = educational_center_teacher_id();
+        $current_teacher_id = aspire_get_current_teacher_id();
+    } else {
+        $educational_center_id = get_educational_center_data();
+        $current_teacher_id = get_current_teacher_id();
+    }
+
+    if (empty($educational_center_id)) {
+        wp_die('No Educational Center found for this user.');
+        return;
+    }
+
+    $parent_post_id = isset($_POST['parent_post_id']) ? intval($_POST['parent_post_id']) : 0;
+    if ($parent_post_id <= 0) {
+        wp_die('Invalid parent post ID: ' . $parent_post_id);
+        return;
+    }
+
+    $post = get_post($parent_post_id);
+    if (!$post || $post->post_type !== 'parent') {
+        wp_die('Parent post not found or invalid post type for ID: ' . $parent_post_id);
+        return;
+    }
+
+    // Verify the post belongs to this educational_center_id
+    $stored_edu_center_id = get_post_meta($parent_post_id, 'educational_center_id', true);
+    $form_edu_center_id = sanitize_text_field($_POST['educational_center_id'] ?? '');
+    if ($stored_edu_center_id !== $educational_center_id || ($form_edu_center_id && $form_edu_center_id !== $stored_edu_center_id)) {
+        wp_die('You do not have permission to update this parent.');
+        return;
+    }
+
+    if (!current_user_can('edit_posts')) {
+        wp_die('Insufficient permissions to update parent information.');
+        return;
+    }
+
+    $fields = array(
+        'parent_student_ids' => sanitize_text_field($_POST['parent_student_ids'] ?? ''),
+        'parent_name' => sanitize_text_field($_POST['parent_name'] ?? ''),
+        'parent_email' => sanitize_email($_POST['parent_email'] ?? ''),
+        'parent_phone_number' => sanitize_text_field($_POST['parent_phone_number'] ?? ''),
+        'teacher_gender' => sanitize_text_field($_POST['teacher_gender'] ?? ''),
+        'parent_religion' => sanitize_text_field($_POST['parent_religion'] ?? ''),
+        'parent_blood_group' => sanitize_text_field($_POST['parent_blood_group'] ?? ''),
+        'parent_date_of_birth' => sanitize_text_field($_POST['parent_date_of_birth'] ?? ''),
+        'parent_height' => sanitize_text_field($_POST['parent_height'] ?? ''),
+        'parent_weight' => sanitize_text_field($_POST['parent_weight'] ?? ''),
+        'parent_current_address' => sanitize_textarea_field($_POST['parent_current_address'] ?? ''),
+        'parent_permanent_address' => sanitize_textarea_field($_POST['parent_permanent_address'] ?? ''),
+    );
+
+    foreach ($fields as $meta_key => $value) {
+        $old_value = get_post_meta($parent_post_id, $meta_key, true);
+        if ($old_value !== $value) { // Only update if the value has changed
+            $updated = update_post_meta($parent_post_id, $meta_key, $value);
+            if ($updated === false) {
+                global $wpdb;
+                $last_error = $wpdb->last_error;
+                error_log("Failed to update meta_key: $meta_key for post ID: $parent_post_id");
+                error_log("Old value: " . print_r($old_value, true));
+                error_log("New value: " . print_r($value, true));
+                error_log("DB error: " . ($last_error ? $last_error : 'None reported'));
+                error_log("Current user ID: " . get_current_user_id());
+                wp_die("Failed to update " . esc_html($meta_key) . ". Check debug.log for details.");
+                return;
+            }
+        }
+    }
+
+    // Handle other updates (post title, file upload)
+    $parent_id = sanitize_text_field($_POST['parent_id'] ?? '');
+    wp_update_post(array('ID' => $parent_post_id, 'post_title' => $parent_id));
+
+    if (!empty($_FILES['parent_profile_photo']['name'])) {
+        $file = $_FILES['parent_profile_photo'];
+        $upload = wp_handle_upload($file, array('test_form' => false));
+        if (isset($upload['file'])) {
+            $attachment_id = wp_insert_attachment(array(
+                'post_mime_type' => $upload['type'],
+                'post_title' => preg_replace('/\.[^.]+$/', '', basename($upload['file'])),
+                'post_content' => '',
+                'post_status' => 'inherit'
+            ), $upload['file']);
+            wp_update_attachment_metadata($attachment_id, wp_generate_attachment_metadata($attachment_id, $upload['file']));
+            update_post_meta($parent_post_id, 'parent_profile_photo', $attachment_id);
+        }
+    }
+
+    // Redirect based on user type
+    $redirect_url = sanitize_text_field($_POST['redirect_url'] ?? ($is_teacher_user ? home_url('/teacher-dashboard/?section=parents&action=edit-parents') : home_url('/institute-dashboard/edit-parents')));
+    wp_redirect($redirect_url);
+    exit;
+}
+
+add_action('admin_post_edit_parent_submission', 'handle_parent_update_submission');
+add_action('admin_post_nopriv_edit_parent_submission', 'handle_parent_update_submission');
+
+// AJAX handler for parent deletion
+add_action('wp_ajax_delete_parent', 'ajax_delete_parent');
+function ajax_delete_parent() {
+    // Check nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'delete_parent_' . $_POST['parent_post_id'])) {
+        wp_send_json_error('Security check failed.');
+        return;
+    }
+
+    // Only proceed if user is logged in
+    if (!is_user_logged_in()) {
+        wp_send_json_error('Please log in to delete parent information.');
+        return;
+    }
+
+    $current_user = wp_get_current_user();
+    $is_teacher_user = is_teacher($current_user->ID);
+
+    // Determine educational_center_id
+    if ($is_teacher_user) { 
+        $educational_center_id = educational_center_teacher_id();
+    } else {
+        $educational_center_id = get_educational_center_data();
+    }
+
+    $form_edu_center_id = sanitize_text_field($_POST['educational_center_id'] ?? '');
+    if (empty($educational_center_id) || $educational_center_id !== $form_edu_center_id) {
+        wp_send_json_error('Invalid or mismatched Educational Center ID.');
+        return;
+    }
+
+    $parent_post_id = intval($_POST['parent_post_id'] ?? 0);
+    if ($parent_post_id <= 0) {
+        wp_send_json_error('Invalid parent post ID.');
+        return;
+    }
+
+    // Verify the post exists and is of type 'parent'
+    $post = get_post($parent_post_id);
+    if (!$post || $post->post_type !== 'parent') {
+        wp_send_json_error('Parent post not found or invalid post type.');
+        return;
+    }
+
+    // Verify the post belongs to this educational_center_id
+    $stored_edu_center_id = get_post_meta($parent_post_id, 'educational_center_id', true);
+    if ($stored_edu_center_id != $educational_center_id) {
+        wp_send_json_error('You do not have permission to delete this parent.');
+        return;
+    }
+
+    // Check if user has permission to delete posts
+    // if (!current_user_can('delete_posts')) {
+    //     wp_send_json_error('You do not have permission to delete this parent.');
+    //     return;
+    // }
+
+    // Attempt to delete the post
+    if (wp_delete_post($parent_post_id, true)) {
+        wp_send_json_success('Parent deleted successfully!');
+    } else {
+        error_log('Failed to delete parent post ID: ' . $parent_post_id);
+        wp_send_json_error('Error deleting parent.');
+    }
+}

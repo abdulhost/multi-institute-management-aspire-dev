@@ -246,19 +246,47 @@ function aspire_teacher_dashboard_shortcode() {
                                             }
                                             break;
                                         case 'parents':
-                                            if ($action === 'add-subjects') {
-                                                echo display_subjects_add($user_id);
-                                            } elseif ($action === 'edit-subjects') {
+                                            if ($action === 'add-parents') {
+                                                echo add_parents_institute_dashboard_shortcode($user_id);
+                                            } elseif ($action === 'edit-parents') {
                                                 echo 
-                                                subjects_manager_page($user_id);
-                                            } elseif ($action === 'delete-subjects') {
-                                                echo delete_subjects_manager_page($user_id);
+                                                edit_parents_institute_dashboard_shortcode($user_id);
+                                            } elseif ($action === 'delete-parents') {
+                                                echo delete_parents_institute_dashboard_shortcode($user_id);
                                             } 
                                              else {
                                                 echo parents_institute_dashboard_shortcode($user_id);
                                             }
                                             break;
                                 
+                                        case 'fees':
+                                                echo fees_institute_dashboard_shortcode();
+                                            break;
+                                        case 'transport-fees':
+                                                echo view_transport_fees_shortcode();
+                                            break;
+                                        case 'transport-enrollments':
+                                                echo view_transport_enrollments_shortcode();
+                                            break;
+                                        case 'view-reports':
+                                                echo aspire_reports_dashboard_shortcode($user_id);
+                                            break;
+                                        case 'generate-reports':
+                                                echo aspire_reports_dashboard_shortcode($user_id);
+                                            break;
+                                            case 'timetable':
+                                                if ($action === 'add-parents') {
+                                                    echo add_parents_institute_dashboard_shortcode($user_id);
+                                                } elseif ($action === 'edit-parents') {
+                                                    echo 
+                                                    edit_parents_institute_dashboard_shortcode($user_id);
+                                                } elseif ($action === 'delete-parents') {
+                                                    echo delete_parents_institute_dashboard_shortcode($user_id);
+                                                } 
+                                                 else {
+                                                    echo aspire_timetable_management_shortcode();                                                }
+                                                break;
+                                    
                     default:
                         echo render_teacher_overview($user_id, $teacher);
                 }

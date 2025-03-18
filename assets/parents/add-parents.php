@@ -1,13 +1,37 @@
 <?php
 // addparents.php
-function add_parents_institute_dashboard_shortcode() {
+// Prevent direct access to this file
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+function add_parents_institute_dashboard_shortcode($atts) {
+    if (!is_user_logged_in()) {
+        return '<p>Please log in to access this feature.</p>';
+    }
+
+    // Determine educational_center_id and teacher_id based on user type
+    if (is_teacher($atts)) { 
+        $educational_center_id = educational_center_teacher_id();
+        $current_teacher_id = aspire_get_current_teacher_id();
+    } else {
+        $educational_center_id = get_educational_center_data();
+        $current_teacher_id = get_current_teacher_id();
+    }
+
+    if (empty($educational_center_id)) {
+        return '<p>No Educational Center found for this user.</p>';
+    }
+
     // Start output buffering
     ob_start();
     ?>
     <div class="attendance-main-wrapper" style="display: flex;">
         <?php
+          if (is_teacher($atts)) { 
+        } else {
         $active_section = 'add-parent';
-        include plugin_dir_path(__FILE__) . '../sidebar.php'; // Adjust path as needed
+        include plugin_dir_path(__FILE__) . '../sidebar.php';} // Adjust path as needed
         ?>
         <div class="form-container attendance-entry-wrapper attendance-content-wrapper">
             <!-- Add Parent Form (Hidden by default) -->
@@ -23,7 +47,7 @@ function add_parents_institute_dashboard_shortcode() {
                         <div class="section-content" id="basic-details">
                             <label for="parent_id">Parent ID (Auto-generated):</label>
                             <input type="text" name="parent_id" value="<?php echo 'PAR-' . uniqid(); ?>" readonly>
-                            <input type="hidden" name="educational_center_id" value="<?php echo esc_attr(get_educational_center_data()); ?>">
+                            <input type="hidden" name="educational_center_id" value="<?php echo esc_attr($educational_center_id); ?>">
                             <label for="parent_student_ids">Student IDs:</label>
                             <input type="text" name="parent_student_ids">
                             <label for="parent_name">Parent Full Name:</label>
@@ -120,4 +144,140 @@ function add_parents_institute_dashboard_shortcode() {
 }
 
 add_shortcode('add_parents_institute_dashboard', 'add_parents_institute_dashboard_shortcode');
-?>
+
+function handle_add_parent_submission($atts = []) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_parent'])) {
+        // Determine educational_center_id and teacher_id based on user type
+        $current_user = wp_get_current_user();
+        if (!$current_user->exists()) {
+            echo '<p>Please log in to access this feature.</p>';
+            return;
+        }
+        if (is_teacher($atts)) { 
+            $educational_center_id = educational_center_teacher_id();
+            $current_teacher_id = aspire_get_current_teacher_id();
+        } else {
+            $educational_center_id = get_educational_center_data();
+            $current_teacher_id = get_current_teacher_id();
+        }
+
+        if (empty($educational_center_id)) {
+            echo '<p>No Educational Center found for this user.</p>';
+            return;
+        }
+
+        // Use the educational_center_id from the form if provided, otherwise fallback to determined value
+        $educational_center_id = isset($_POST['educational_center_id']) ? sanitize_text_field($_POST['educational_center_id']) : $educational_center_id;
+
+        $gender = isset($_POST['teacher_gender']) ? sanitize_text_field($_POST['teacher_gender']) : '';
+        $attachment_id = null;
+
+        if (isset($_FILES['parent_profile_photo']) && $_FILES['parent_profile_photo']['error'] === 0) {
+            $file = $_FILES['parent_profile_photo'];
+            $allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif'];
+            $max_file_size = 500 * 1024;
+
+            $file_type = mime_content_type($file['tmp_name']);
+            if (!in_array($file_type, $allowed_mime_types)) {
+                echo 'Invalid file type. Please upload a JPEG, PNG, or GIF image.';
+                return;
+            }
+
+            if ($file['size'] > $max_file_size) {
+                echo 'File size exceeds the 500KB limit.';
+                return;
+            }
+
+            $upload_dir = wp_upload_dir();
+            $file_name = 'profile_' . uniqid() . '.' . pathinfo($file['name'], PATHINFO_EXTENSION);
+            $target_path = $upload_dir['path'] . '/' . $file_name;
+
+            if (move_uploaded_file($file['tmp_name'], $target_path)) {
+                $file_url = $upload_dir['url'] . '/' . $file_name;
+                $attachment = array(
+                    'guid' => $file_url,
+                    'post_mime_type' => $file_type,
+                    'post_title' => sanitize_text_field($file_name),
+                    'post_content' => '',
+                    'post_status' => 'inherit',
+                );
+
+                $attachment_id = wp_insert_attachment($attachment, $target_path);
+                if (!is_wp_error($attachment_id)) {
+                    $attachment_metadata = wp_generate_attachment_metadata($attachment_id, $target_path);
+                    wp_update_attachment_metadata($attachment_id, $attachment_metadata);
+                } else {
+                    echo 'Error creating media attachment.';
+                    return;
+                }
+            } else {
+                echo 'Error uploading the file.';
+                return;
+            }
+        }
+
+        $parent_id = sanitize_text_field($_POST['parent_id']);
+        $parent_student_ids = sanitize_text_field($_POST['parent_student_ids']);
+        $parent_name = sanitize_text_field($_POST['parent_name']);
+        $parent_email = sanitize_email($_POST['parent_email']);
+        $parent_phone_number = sanitize_text_field($_POST['parent_phone_number']);
+        $parent_religion = sanitize_text_field($_POST['parent_religion']);
+        $parent_blood_group = sanitize_text_field($_POST['parent_blood_group']);
+        $parent_date_of_birth = sanitize_text_field($_POST['parent_date_of_birth']);
+        $parent_height = isset($_POST['parent_height']) ? sanitize_text_field($_POST['parent_height']) : '';
+        $parent_weight = isset($_POST['parent_weight']) ? sanitize_text_field($_POST['parent_weight']) : '';
+        $parent_current_address = isset($_POST['parent_current_address']) ? sanitize_textarea_field($_POST['parent_current_address']) : '';
+        $parent_permanent_address = isset($_POST['parent_permanent_address']) ? sanitize_textarea_field($_POST['parent_permanent_address']) : '';
+
+        $parent_post_id = wp_insert_post(array(
+            'post_title' => $parent_id,
+            'post_type' => 'parent',
+            'post_status' => 'publish',
+            'meta_input' => array(
+                'parent_id' => $parent_id,
+                'parent_student_ids' => $parent_student_ids,
+                'parent_name' => $parent_name,
+                'parent_email' => $parent_email,
+                'educational_center_id' => $educational_center_id,
+                'parent_phone_number' => $parent_phone_number,
+                'teacher_gender' => $gender,
+                'parent_religion' => $parent_religion,
+                'parent_blood_group' => $parent_blood_group,
+                'parent_date_of_birth' => $parent_date_of_birth,
+                'parent_height' => $parent_height,
+                'parent_weight' => $parent_weight,
+                'parent_current_address' => $parent_current_address,
+                'parent_permanent_address' => $parent_permanent_address,
+            ),
+        ));
+     
+        if ($parent_post_id && $attachment_id) {
+            update_field('field_67c2c10841064', $attachment_id, $parent_post_id); // ACF field key for parent_profile_photo
+           // Redirect based on whether the user is a teacher or not
+           if (is_teacher($current_user->ID)) {
+        wp_redirect(home_url('/teacher-dashboard/?section=parents'));
+    } else {
+        wp_redirect(home_url('/institute-dashboard/parents'));
+    }
+    exit;
+        } elseif ($parent_post_id) {           
+           // Redirect based on whether the user is a teacher or not
+           if (is_teacher($current_user->ID)) {
+        wp_redirect(home_url('/teacher-dashboard/?section=parents'));
+    } else {
+        wp_redirect(home_url('/institute-dashboard/parents'));
+    }
+    exit;
+
+        } else {
+            echo '<p class="error-message">Error adding parent.</p>';
+        }
+    }
+
+   
+}
+
+// Hook the function to run on init
+add_action('init', 'handle_add_parent_submission');
+
+

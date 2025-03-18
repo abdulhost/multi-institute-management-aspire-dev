@@ -8,20 +8,144 @@ use Dompdf\Options;
 
 function aspire_timetable_management_shortcode() {
     global $wpdb;
-    $education_center_id = get_educational_center_data();
+    $current_user = wp_get_current_user();
+
+    // Handle AJAX request at the top level
+    if (isset($_POST['timetable_action']) && $_POST['timetable_action'] === 'fetch_timetable') {
+        header('Content-Type: application/json');
+        error_log('AJAX handler reached with POST: ' . print_r($_POST, true)); // Debug
+
+        $nonce = sanitize_text_field($_POST['nonce'] ?? '');
+        if (!wp_verify_nonce($nonce, 'timetable_nonce')) {
+            ob_clean();
+            wp_send_json_error(['message' => 'Invalid nonce']);
+            exit;
+        }
+
+        $education_center_id = is_teacher($current_user->ID) ? 
+            educational_center_teacher_id() : 
+            get_educational_center_data();
+        
+        $class_id = isset($_POST['class_id']) ? intval($_POST['class_id']) : 0;
+        $filter_section = isset($_POST['filter_section']) ? sanitize_text_field($_POST['filter_section']) : '';
+
+        $where_clause = '';
+        $params = [$education_center_id];
+        if ($class_id) {
+            $where_clause .= " AND t.class_id = %d";
+            $params[] = $class_id;
+        }
+        if ($filter_section) {
+            $where_clause .= " AND t.section = %s";
+            $params[] = $filter_section;
+        }
+
+        $timetable = $wpdb->get_results($wpdb->prepare(
+            "SELECT t.*, c.class_name, s.subject_name 
+             FROM {$wpdb->prefix}timetables t 
+             JOIN {$wpdb->prefix}class_sections c ON t.class_id = c.id 
+             LEFT JOIN {$wpdb->prefix}subjects s ON t.subject_id = s.subject_id 
+             WHERE t.education_center_id = %s" . $where_clause . " ORDER BY t.day, t.start_time",
+            $params
+        ));
+
+        if ($wpdb->last_error) {
+            ob_clean();
+            wp_send_json_error(['message' => 'Database error: ' . $wpdb->last_error]);
+            exit;
+        }
+
+        $classes = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}class_sections WHERE education_center_id = %s",
+            $education_center_id
+        ));
+
+        $sections_data = [];
+        foreach ($classes as $class) {
+            if (!is_object($class) || !isset($class->id) || !isset($class->sections)) {
+                continue;
+            }
+            $sections_data[$class->id] = array_filter(explode(',', $class->sections));
+        }
+
+        ob_start();
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $time_slots = [];
+        foreach ($timetable as $slot) {
+            if (!is_object($slot) || !isset($slot->start_time) || !isset($slot->end_time)) {
+                continue;
+            }
+            $time_slots[$slot->start_time . '-' . $slot->end_time] = true;
+        }
+        ksort($time_slots);
+        $time_slot_array = array_keys($time_slots);
+        ?>
+        <table class="table table-bordered" style="background-color: #fff;">
+            <thead class="table-dark" style="background-color: #007bff; color: white;">
+                <tr>
+                    <th style="width: 100px;">Day</th>
+                    <?php foreach ($time_slot_array as $time_range) : ?>
+                        <th><?php echo esc_html($time_range); ?></th>
+                    <?php endforeach; ?>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (empty($timetable)) : ?>
+                    <tr><td colspan="<?php echo count($time_slot_array) + 1; ?>" class="text-center">No timetable slots found.</td></tr>
+                <?php else : ?>
+                    <?php foreach ($days as $day) : ?>
+                        <tr>
+                            <td class="bg-light font-weight-bold"><?php echo $day; ?></td>
+                            <?php foreach ($time_slot_array as $time_range) : 
+                                [$start, $end] = explode('-', $time_range);
+                                $found = false;
+                                foreach ($timetable as $slot) :
+                                    if (!is_object($slot)) continue;
+                                    if ($slot->day === $day && $slot->start_time === $start && $slot->end_time === $end) : ?>
+                                        <td style="background-color: #e9f7ef;">
+                                            <?php echo esc_html($slot->class_name . ' (' . $slot->section . ') - ' . ($slot->subject_name ?: 'N/A')); ?>
+                                        </td>
+                                        <?php $found = true;
+                                        break;
+                                    endif;
+                                endforeach;
+                                if (!$found) : ?>
+                                    <td class="text-muted">-</td>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+        <?php
+        $table_html = ob_get_clean();
+
+        ob_clean();
+        wp_send_json_success([
+            'table_html' => $table_html,
+            'sections_data' => $sections_data
+        ]);
+        exit;
+    }
+
+    // Regular page load logic
+    $education_center_id = is_teacher($current_user->ID) ? 
+        educational_center_teacher_id() : 
+        get_educational_center_data();
     $timetable_table = $wpdb->prefix . 'timetables';
     $class_table = $wpdb->prefix . 'class_sections';
     $subject_table = $wpdb->prefix . 'subjects';
 
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">No Educational Center found.</div>';
+        return '<div class="alert alert-danger">No Educational Center found...</div>';
     }
 
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'timetable-list';
     $class_id = isset($_GET['class_id']) ? intval($_GET['class_id']) : 0;
     $filter_section = isset($_GET['filter_section']) ? sanitize_text_field($_GET['filter_section']) : '';
 
-    // Generate PDF
+    // Generate PDF (unchanged)
     if ($section === 'timetable-list' && isset($_GET['action']) && $_GET['action'] === 'generate_pdf') {
         while (ob_get_level()) {
             ob_end_clean();
@@ -43,7 +167,7 @@ function aspire_timetable_management_shortcode() {
             $where_clause .= " AND t.section = %s";
             $params[] = $filter_section;
         }
-        
+
         $timetable = $wpdb->get_results($wpdb->prepare(
             "SELECT t.*, c.class_name, s.subject_name 
              FROM $timetable_table t 
@@ -69,6 +193,10 @@ function aspire_timetable_management_shortcode() {
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         $time_slots = [];
         foreach ($timetable as $slot) {
+            if (!is_object($slot) || !isset($slot->start_time) || !isset($slot->end_time)) {
+                error_log('Invalid timetable slot: ' . print_r($slot, true));
+                continue;
+            }
             $time_slots[$slot->start_time . '-' . $slot->end_time] = true;
         }
         ksort($time_slots);
@@ -165,6 +293,10 @@ function aspire_timetable_management_shortcode() {
                 [$start, $end] = explode('-', $time_range);
                 $found = false;
                 foreach ($timetable as $slot) {
+                    if (!is_object($slot)) {
+                        error_log('Non-object timetable slot: ' . print_r($slot, true));
+                        continue;
+                    }
                     if ($slot->day === $day && $slot->start_time === $start && $slot->end_time === $end) {
                         $html .= '<td class="subject">' . esc_html($slot->class_name . ' (' . $slot->section . ') - ' . ($slot->subject_name ?: 'N/A')) . '</td>';
                         $found = true;
@@ -199,7 +331,7 @@ function aspire_timetable_management_shortcode() {
             exit;
         } catch (Exception $e) {
             error_log('Dompdf Error: ' . $e->getMessage());
-            wp_die('Error generating PDF: ' . $e->getMessage());
+            wp_die('Error generating PDF: ' . esc_html($e->getMessage()));
         }
     }
 
@@ -208,8 +340,10 @@ function aspire_timetable_management_shortcode() {
     <div class="container-fluid">
         <div class="row">
             <?php 
-            $active_section = str_replace('-', '-', $section);
-            include plugin_dir_path(__FILE__) . 'sidebar.php';
+            if (!is_teacher($current_user->ID)) {
+                $active_section = str_replace('-', '-', $section);
+                include plugin_dir_path(__FILE__) . 'sidebar.php';
+            }
             ?>
             <div class="col-md-9 p-4">
                 <?php
@@ -227,7 +361,7 @@ function aspire_timetable_management_shortcode() {
                         echo timetable_delete_shortcode();
                         break;
                     default:
-                        echo '<div class="alert alert-warning">Section not found.</div>';
+                        echo timetable_list_shortcode();
                 }
                 ?>
             </div>
@@ -238,40 +372,28 @@ function aspire_timetable_management_shortcode() {
 }
 add_shortcode('aspire_timetable_management', 'aspire_timetable_management_shortcode');
 
-// List Timetable
 function timetable_list_shortcode() {
     global $wpdb;
-    $education_center_id = get_educational_center_data();
+    $current_user = wp_get_current_user();
+
+    // Initial page load
+    $education_center_id = is_teacher($current_user->ID) ? 
+        educational_center_teacher_id() : 
+        get_educational_center_data();
+    
     $class_id = isset($_GET['class_id']) ? intval($_GET['class_id']) : 0;
     $filter_section = isset($_GET['filter_section']) ? sanitize_text_field($_GET['filter_section']) : '';
-    
+
     $classes = $wpdb->get_results($wpdb->prepare(
         "SELECT * FROM {$wpdb->prefix}class_sections WHERE education_center_id = %s",
         $education_center_id
     ));
 
-    $where_clause = '';
-    $params = [$education_center_id];
-    if ($class_id) {
-        $where_clause .= " AND t.class_id = %d";
-        $params[] = $class_id;
-    }
-    if ($filter_section) {
-        $where_clause .= " AND t.section = %s";
-        $params[] = $filter_section;
-    }
-    
-    $timetable = $wpdb->get_results($wpdb->prepare(
-        "SELECT t.*, c.class_name, s.subject_name 
-         FROM {$wpdb->prefix}timetables t 
-         JOIN {$wpdb->prefix}class_sections c ON t.class_id = c.id 
-         LEFT JOIN {$wpdb->prefix}subjects s ON t.subject_id = s.subject_id 
-         WHERE t.education_center_id = %s" . $where_clause . " ORDER BY t.day, t.start_time",
-        $params
-    ));
-
     $sections_data = [];
     foreach ($classes as $class) {
+        if (!is_object($class) || !isset($class->id) || !isset($class->sections)) {
+            continue;
+        }
         $sections_data[$class->id] = array_filter(explode(',', $class->sections));
     }
 
@@ -281,13 +403,13 @@ function timetable_list_shortcode() {
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h3 class="card-title">Timetable Directory</h3>
             <div>
-                <select id="classFilter" class="form-select d-inline-block w-auto" onchange="filterTimetable()">
+                <select id="classFilter" class="form-select d-inline-block w-auto">
                     <option value="0">All Classes</option>
                     <?php foreach ($classes as $class) : ?>
                         <option value="<?php echo $class->id; ?>" <?php selected($class_id, $class->id); ?>><?php echo esc_html($class->class_name); ?></option>
                     <?php endforeach; ?>
                 </select>
-                <select id="sectionFilter" class="form-select d-inline-block w-auto" onchange="filterTimetable()">
+                <select id="sectionFilter" class="form-select d-inline-block w-auto">
                     <option value="">All Sections</option>
                     <?php if ($class_id && !empty($sections_data[$class_id])) : 
                         foreach ($sections_data[$class_id] as $sec) : ?>
@@ -299,55 +421,8 @@ function timetable_list_shortcode() {
             </div>
         </div>
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" style="background-color: #fff;">
-                    <thead class="table-dark" style="background-color: #007bff; color: white;">
-                        <tr>
-                            <th style="width: 100px;">Day</th>
-                            <?php
-                            $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                            $time_slots = [];
-                            foreach ($timetable as $slot) {
-                                $time_slots[$slot->start_time . '-' . $slot->end_time] = true;
-                            }
-                            ksort($time_slots);
-                            $time_slot_array = array_keys($time_slots);
-                            foreach ($time_slot_array as $time_range) {
-                                echo '<th>' . esc_html($time_range) . '</th>';
-                            }
-                            ?>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        if (empty($timetable)) {
-                            echo '<tr><td colspan="' . (count($time_slot_array) + 1) . '" class="text-center">No timetable slots found.</td></tr>';
-                        } else {
-                            foreach ($days as $day) {
-                                echo '<tr>';
-                                echo '<td class="bg-light font-weight-bold">' . $day . '</td>';
-                                foreach ($time_slot_array as $time_range) {
-                                    [$start, $end] = explode('-', $time_range);
-                                    $found = false;
-                                    foreach ($timetable as $slot) {
-                                        if ($slot->day === $day && $slot->start_time === $start && $slot->end_time === $end) {
-                                            echo '<td style="background-color: #e9f7ef;">';
-                                            echo esc_html($slot->class_name . ' (' . $slot->section . ') - ' . ($slot->subject_name ?: 'N/A'));
-                                            echo '</td>';
-                                            $found = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!$found) {
-                                        echo '<td class="text-muted">-</td>';
-                                    }
-                                }
-                                echo '</tr>';
-                            }
-                        }
-                        ?>
-                    </tbody>
-                </table>
+            <div class="table-responsive" id="timetable-container">
+                <!-- Table will be loaded here via AJAX -->
             </div>
             <div class="mt-3">
                 <a href="?section=timetable-add" class="btn btn-primary">Add New Slot</a>
@@ -356,8 +431,11 @@ function timetable_list_shortcode() {
             </div>
         </div>
     </div>
+
     <script>
         const sectionsData = <?php echo json_encode($sections_data); ?>;
+        const nonce = '<?php echo wp_create_nonce('timetable_nonce'); ?>';
+        const currentUrl = '<?php echo esc_url(add_query_arg('section', 'timetable-list', get_permalink())); ?>';
 
         function updateSections() {
             const classFilter = document.getElementById('classFilter');
@@ -380,36 +458,72 @@ function timetable_list_shortcode() {
             }
         }
 
-        function filterTimetable() {
+        function fetchTimetable() {
             const classId = document.getElementById('classFilter').value;
             const section = document.getElementById('sectionFilter').value;
-            const url = new URL(window.location.href);
-            
-            url.searchParams.set('section', 'timetable-list');
-            if (classId === '0') {
-                url.searchParams.delete('class_id');
-            } else {
-                url.searchParams.set('class_id', classId);
-            }
-            if (section === '') {
-                url.searchParams.delete('filter_section');
-            } else {
-                url.searchParams.set('filter_section', section);
-            }
-            window.location.href = url.toString();
+            const container = document.getElementById('timetable-container');
+
+            container.innerHTML = '<p>Loading...</p>';
+
+            fetch(currentUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `timetable_action=fetch_timetable&nonce=${nonce}&class_id=${classId}&filter_section=${encodeURIComponent(section)}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(text => {
+    console.log('Raw response:', text);
+    try {
+        const data = JSON.parse(text);
+        if (data.success) {
+            container.innerHTML = data.data.table_html;
+            Object.assign(sectionsData, data.data.sections_data);
+            updateSections();
+        } else {
+            container.innerHTML = '<p>Error: ' + (data.data?.message || 'Unknown error') + '</p>';
+        }
+    } catch (e) {
+        console.error('Parse error:', e);
+        container.innerHTML = '<p>Server returned invalid data. Check console for details.</p>';
+    }
+})
+            .catch(error => {
+                console.error('Fetch error:', error);
+                container.innerHTML = '<p>Error loading timetable: ' + error.message + '</p>';
+            });
         }
 
-        document.getElementById('classFilter').addEventListener('change', updateSections);
+        document.getElementById('classFilter').addEventListener('change', () => {
+            updateSections();
+            fetchTimetable();
+        });
+        document.getElementById('sectionFilter').addEventListener('change', fetchTimetable);
+        
+        // Initial load
         updateSections();
+        fetchTimetable();
     </script>
     <?php
     return ob_get_clean();
 }
 
-// Add Timetable Slot
+// Add Timetable Slot (unchanged)
 function timetable_add_shortcode() {
     global $wpdb;
-    $education_center_id = get_educational_center_data();
+    $current_user = wp_get_current_user();
+
+    if (is_teacher($current_user->ID)) {
+        $education_center_id = educational_center_teacher_id();
+    } else {
+        $education_center_id = get_educational_center_data();
+    }
     $timetable_table = $wpdb->prefix . 'timetables';
 
     if (isset($_POST['submit_timetable']) && wp_verify_nonce($_POST['nonce'], 'timetable_nonce')) {
@@ -446,7 +560,7 @@ function timetable_add_shortcode() {
                     'end_time' => $end_time,
                     'education_center_id' => $education_center_id
                 ], ['%d', '%s', '%d', '%s', '%s', '%s', '%s']);
-                wp_redirect(add_query_arg(['section' => 'timetable-list'], home_url('/institute-dashboard/time-table')));
+                wp_redirect(add_query_arg(['section' => 'timetable-list'], remove_query_arg(['action'], home_url('/institute-dashboard/time-table'))));
                 exit;
             }
         }
@@ -456,6 +570,10 @@ function timetable_add_shortcode() {
     $subjects = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}subjects WHERE education_center_id = '$education_center_id' OR education_center_id IS NULL");
     $sections_data = [];
     foreach ($classes as $class) {
+        if (!is_object($class) || !isset($class->id) || !isset($class->sections)) {
+            error_log('Invalid class data in add: ' . print_r($class, true));
+            continue;
+        }
         $sections_data[$class->id] = array_filter(explode(',', $class->sections));
     }
 
@@ -541,10 +659,16 @@ function timetable_add_shortcode() {
     return ob_get_clean();
 }
 
-// Edit Timetable Slot
+// Edit Timetable Slot (unchanged)
 function timetable_edit_shortcode() {
     global $wpdb;
-    $education_center_id = get_educational_center_data();
+    $current_user = wp_get_current_user();
+
+    if (is_teacher($current_user->ID)) {
+        $education_center_id = educational_center_teacher_id();
+    } else {
+        $education_center_id = get_educational_center_data();
+    }
     $timetable_table = $wpdb->prefix . 'timetables';
     $timetable_id = isset($_GET['timetable_id']) ? intval($_GET['timetable_id']) : 0;
     $class_id_filter = isset($_GET['class_id']) ? intval($_GET['class_id']) : 0;
@@ -596,7 +720,7 @@ function timetable_edit_shortcode() {
                     $redirect_args = ['section' => 'timetable-list'];
                     if ($class_id_filter) $redirect_args['class_id'] = $class_id_filter;
                     if ($section_filter) $redirect_args['filter_section'] = $section_filter;
-                    wp_redirect(add_query_arg($redirect_args, home_url('/institute-dashboard/time-tables')));
+                    wp_redirect(add_query_arg($redirect_args, remove_query_arg(['action'], home_url('/institute-dashboard/time-tables'))));
                     exit;
                 }
             }
@@ -606,6 +730,10 @@ function timetable_edit_shortcode() {
         $subjects = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}subjects WHERE education_center_id = '$education_center_id' OR education_center_id IS NULL");
         $sections_data = [];
         foreach ($classes as $class) {
+            if (!is_object($class) || !isset($class->id) || !isset($class->sections)) {
+                error_log('Invalid class data in edit: ' . print_r($class, true));
+                continue;
+            }
             $sections_data[$class->id] = array_filter(explode(',', $class->sections));
         }
 
@@ -744,6 +872,10 @@ function timetable_edit_shortcode() {
                                 echo '<tr><td colspan="8">No timetable slots available.</td></tr>';
                             } else {
                                 foreach ($timetable as $slot) {
+                                    if (!is_object($slot)) {
+                                        error_log('Non-object timetable slot in edit list: ' . print_r($slot, true));
+                                        continue;
+                                    }
                                     echo '<tr>';
                                     echo '<td>' . esc_html($slot->timetable_id) . '</td>';
                                     echo '<td>' . esc_html($slot->day) . '</td>';
@@ -768,10 +900,16 @@ function timetable_edit_shortcode() {
     }
 }
 
-// Delete Timetable Slot
+// Delete Timetable Slot (unchanged)
 function timetable_delete_shortcode() {
     global $wpdb;
-    $education_center_id = get_educational_center_data();
+    $current_user = wp_get_current_user();
+
+    if (is_teacher($current_user->ID)) {
+        $education_center_id = educational_center_teacher_id();
+    } else {
+        $education_center_id = get_educational_center_data();
+    }
     $timetable_id = isset($_GET['timetable_id']) ? intval($_GET['timetable_id']) : 0;
     $class_id_filter = isset($_GET['class_id']) ? intval($_GET['class_id']) : 0;
     $section_filter = isset($_GET['filter_section']) ? sanitize_text_field($_GET['filter_section']) : '';
@@ -839,6 +977,10 @@ function timetable_delete_shortcode() {
                                 echo '<tr><td colspan="8">No timetable slots available.</td></tr>';
                             } else {
                                 foreach ($timetable as $slot) {
+                                    if (!is_object($slot)) {
+                                        error_log('Non-object timetable slot in delete list: ' . print_r($slot, true));
+                                        continue;
+                                    }
                                     echo '<tr>';
                                     echo '<td>' . esc_html($slot->timetable_id) . '</td>';
                                     echo '<td>' . esc_html($slot->day) . '</td>';

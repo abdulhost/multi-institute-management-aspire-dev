@@ -1,29 +1,30 @@
 <?php
 // parent-list.php
-function delete_parents_institute_dashboard_shortcode() {
-    $current_user = wp_get_current_user();
-    $admin_id = $current_user->user_login;
-
-    $educational_center = get_posts(array(
-        'post_type' => 'educational-center',
-        'meta_key' => 'admin_id',
-        'meta_value' => $admin_id,
-        'posts_per_page' => 1,
-    ));
-
-    if (empty($educational_center)) {
-        return '<p>No Educational Center found for this Admin ID.</p>';
+function delete_parents_institute_dashboard_shortcode($atts) {
+ 
+    if (is_teacher($atts)) { 
+        $educational_center_id = educational_center_teacher_id();
+        $current_teacher_id = aspire_get_current_teacher_id();
+    } else {
+        $educational_center_id = get_educational_center_data();
+        $current_teacher_id = get_current_teacher_id();
+    }
+    
+    if (!$educational_center_id) {
+        return '<p>Unable to retrieve educational center information.</p>';
     }
 
-    $educational_center_id = get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
+    // $educational_center_id = get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
     require_once(ABSPATH . 'wp-admin/includes/image.php');
 
     ob_start();
     ?>
     <div class="attendance-main-wrapper" style="display: flex;">
         <?php
+        if (is_teacher($atts)) { 
+        } else {
         $active_section = 'delete-parent';
-        include(plugin_dir_path(__FILE__) . '../sidebar.php');
+        include(plugin_dir_path(__FILE__) . '../sidebar.php');}
         ?>
         <div class="form-container attendance-entry-wrapper attendance-content-wrapper">
             <div class="form-group search-form">
@@ -58,14 +59,19 @@ function delete_parents_institute_dashboard_shortcode() {
                                 $parent_id = get_post_meta($parent->ID, 'parent_id', true);
                                 $parent_email = get_post_meta($parent->ID, 'parent_email', true);
                                 $parent_phone_number = get_post_meta($parent->ID, 'parent_phone_number', true);
-
+                             
                                 echo '<tr class="parent-row">
                                     <td>' . esc_html($parent_id) . '</td>
                                     <td>' . esc_html($parent_email) . '</td>
                                     <td>' . esc_html($parent_phone_number) . '</td>
                                     <td>
-                                        <a href="?action=delete&parent_post_id=' . $parent->ID . '" onclick="return confirm(\'Are you sure you want to delete this parent?\')">Delete</a>
-                                    </td>
+                                       
+                                      <button class="button button-secondary delete-parent-btn"
+                                                data-parent-post-id="' . esc_attr($parent->ID) . '"
+                                                data-edu-center-id="' . esc_attr($educational_center_id) . '"
+                                                data-nonce="' . wp_create_nonce('delete_parent_' . $parent->ID) . '">Delete</button>
+                                        <span class="delete-message" style="display: none; margin-left: 10px;"></span>
+                                          </td>
                                   </tr>';
                             }
                         } else {
@@ -90,6 +96,54 @@ function delete_parents_institute_dashboard_shortcode() {
                     $(this).show();
                 } else {
                     $(this).hide();
+                }
+            });
+        });
+        $(document).on('click', '.delete-parent-btn', function(e) {
+            e.preventDefault();
+
+            var $button = $(this);
+            var parentPostId = $button.data('parent-post-id');
+            var eduCenterId = $button.data('edu-center-id');
+            var nonce = $button.data('nonce');
+            var $row = $button.closest('tr');
+            var $message = $row.find('.delete-message');
+
+            if (!confirm('Are you sure you want to delete this parent?')) {
+                return;
+            }
+
+            $button.prop('disabled', true);
+            $message.hide().removeClass('success error').text('Deleting...').show();
+
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                type: 'POST',
+                data: {
+                    action: 'delete_parent',
+                    parent_post_id: parentPostId,
+                    educational_center_id: eduCenterId,
+                    nonce: nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $message.text(response.data).addClass('success').show();
+                        setTimeout(function() {
+                            $row.fadeOut(300, function() {
+                                $(this).remove();
+                                if ($('#parents-table tbody tr').length === 0) {
+                                    $('#parents-table').replaceWith('<tr><td colspan="4">No parents found for this Educational Center.</td></tr>');
+                                }
+                            });
+                        }, 1000);
+                    } else {
+                        $message.text(response.data).addClass('error').show();
+                        $button.prop('disabled', false);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $message.text('Error occurred while deleting: ' + error).addClass('error').show();
+                    $button.prop('disabled', false);
                 }
             });
         });

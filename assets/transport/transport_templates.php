@@ -19,15 +19,25 @@ function fetch_transport_enrollments_data($request) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'transport_enrollments';
     $params = $request->get_params();
-    $educational_center_id = get_educational_center_data(); // Assuming this function exists
+    // $educational_center_id = get_educational_center_data(); // Assuming this function exists
 
-    if (!$educational_center_id) {
-        return array(
-            'success' => false,
-            'data' => array('html' => '<p>Educational center ID not found</p>')
-        );
-    }
+    // if (!$educational_center_id) {
+    //     return array(
+    //         'success' => false,
+    //         'data' => array('html' => '<p>Educational center ID not found</p>')
+    //     );
+    // }
+ // Get current user
+ $current_user = wp_get_current_user();
+ // $is_teacher_user = is_teacher($current_user->ID);
 
+ if (is_teacher($current_user->ID)) { 
+     $educational_center_id = educational_center_teacher_id();
+     $current_teacher_id = aspire_get_current_teacher_id();
+ } else {
+     $educational_center_id = get_educational_center_data();
+     $current_teacher_id = get_current_teacher_id();
+ }
     $student_id = sanitize_text_field($params['student_id'] ?? '');
     $student_name = sanitize_text_field($params['student_name'] ?? '');
     $year = !empty($params['year']) ? intval($params['year']) : '';
@@ -203,12 +213,22 @@ function fetch_transport_enrollments_data($request) {
 // Frontend Interface for Transport Enrollments
 function view_transport_enrollments_shortcode() {
     global $wpdb;
-    $educational_center_id = get_educational_center_data();
+    // $educational_center_id = get_educational_center_data();
 
-    if (empty($educational_center_id)) {
-        return '<p>No Educational Center found.</p>';
-    }
+    // if (empty($educational_center_id)) {
+    //     return '<p>No Educational Center found.</p>';
+    // }
+ // Get current user
+ $current_user = wp_get_current_user();
+ // $is_teacher_user = is_teacher($current_user->ID);
 
+ if (is_teacher($current_user->ID)) { 
+     $educational_center_id = educational_center_teacher_id();
+     $current_teacher_id = aspire_get_current_teacher_id();
+ } else {
+     $educational_center_id = get_educational_center_data();
+     $current_teacher_id = get_current_teacher_id();
+ }
     $years = $wpdb->get_col($wpdb->prepare(
         "SELECT DISTINCT YEAR(enrollment_date) AS year FROM {$wpdb->prefix}transport_enrollments WHERE education_center_id = %s ORDER BY year DESC",
         $educational_center_id
@@ -218,15 +238,7 @@ function view_transport_enrollments_shortcode() {
     ?>
     <div class="attendance-main-wrapper">
         <div class="form-container attendance-content-wrapper">
-            <div class="custom-wrap">
-                <div class="dashboard-header" style="margin-bottom: 15px;">
-                    <a href="<?php echo esc_url(home_url('/institute-dashboard/transport-enrollments/?section=add-transport-enrollments')); ?>" 
-                       class="add-fee-btn">+ Add Enrollment</a>
-                </div>
-                <div class="actions" style="margin-bottom: 20px;">
-                    <button id="bulk-import-button" class="btn btn-secondary">Bulk Import</button>
-                </div>
-            </div>  
+           
             <div class="enrollments-management">
                 <h2>Transport Enrollments Management</h2>
                 <div class="filters-card">
