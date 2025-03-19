@@ -423,44 +423,55 @@ $active_section = isset($active_section) ? $active_section : 'overview';
       <li class="<?php echo $active_action == 'add-inventory' ? 'active' : ''; ?>">
         <a href="<?php echo home_url('/teacher-dashboard/?section=inventory&action=add-inventory'); ?>">Add Inventory</a>
       </li>
-      <li class="<?php echo $active_action == 'edit-timetable' ? 'active' : ''; ?>">
+      <li class="<?php echo $active_action == 'edit-inventory' ? 'active' : ''; ?>">
         <a href="<?php echo home_url('/teacher-dashboard/?section=inventory&action=edit-inventory'); ?>">Edit Inventory</a>
       </li>
     
-      <li class="<?php echo $active_action == 'delete-timetable' ? 'active' : ''; ?>">
-        <a href="<?php echo home_url('/teacher-dashboard/?section=inventory&action=delete-inventory'); ?>">Delete Inventory</a>
+      
+    
+    </div>
+  </ul>
+</li>
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'library' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+      <path d="M736-320q0 28-19 47t-47 19H280q-28 0-47-19t-19-47V280q0-28 19-47t47-19h320q28 0 47 19t19 47v400Z"/>
+    </svg>
+    <span>Library</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+      <path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/>
+    </svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'library' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'timetable' && empty($active_action) ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=library'); ?>">Manage Library</a>
+      </li> 
+      
+       <li class="<?php echo $active_action == 'library-transaction' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=library&action=library-transaction'); ?>">Library Transaction</a>
+      </li>
+       <li class="<?php echo $active_action == 'library-issued' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=library&action=library-issued'); ?>">Library Overdue</a>
+      </li>
+      <li class="<?php echo $active_action == 'add-library' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=library&action=add-library'); ?>">Add Library</a>
+      </li>
+      <li class="<?php echo $active_action == 'edit-library' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=library&action=edit-library'); ?>">Edit Library</a>
+      </li>
+      <li class="<?php echo $active_action == 'delete-library' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=library&action=delete-library'); ?>">Delete Library</a>
       </li>
     
     </div>
   </ul>
 </li>
+
+<?php
+// Usage in template
+echo '<a href="' . get_secure_logout_url_by_role() . '">Log Out</a>';
+?>
     </ul>
     
 </nav>
-
-<!-- <style>
-#sidebar { background: #343a40; color: #e8eaed; padding: 20px; min-height: 100vh; }
-#sidebar ul { list-style: none; padding: 0; }
-#sidebar li { margin-bottom: 10px; }
-#sidebar a, #sidebar .dropdown-btn { display: flex; align-items: center; color: #e8eaed; text-decoration: none; padding: 10px; border-radius: 5px; }
-#sidebar a:hover, #sidebar .dropdown-btn:hover { background: #495057; }
-#sidebar .active { background: #007bff; }
-#sidebar .sub-menu { display: none; padding-left: 20px; }
-#sidebar .sub-menu.show { display: block; }
-#sidebar .dropdown-btn { background: none; border: none; width: 100%; text-align: left; }
-#sidebar .dropdown-btn.rotate svg:last-child { transform: rotate(180deg); }
-#sidebar svg { margin-right: 10px; }
-.logo-title-section { display: flex; align-items: center; margin-bottom: 20px; }
-#toggle-btn { background: none; border: none; margin-left: auto; }
-</style> -->
-
-<!-- <script>
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('collapsed');
-}
-function toggleSubMenu(button) {
-    button.classList.toggle('rotate');
-    const subMenu = button.nextElementSibling;
-    subMenu.classList.toggle('show');
-}
-</script> -->

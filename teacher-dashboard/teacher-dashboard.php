@@ -300,23 +300,38 @@ function aspire_teacher_dashboard_shortcode() {
                                                     echo departments_list_shortcode();                                                }
                                                 break;
                       case 'inventory':
-                                                if ($action === 'add-inventory') {
-                                                    echo inventory_add_shortcode();
-                                                } elseif ($action === 'edit-inventory') {
-                                                    echo 
-                                                    edit_department_shortcode();
-                                                } elseif ($action === 'delete-inventory') {
-                                                    echo delete_department_shortcode();
-                                                
-                                                } elseif ($action === 'inventory-issued') {
-                                                    echo inventory_issued_shortcode();
-                                               
-                                                } elseif ($action === 'inventory-transaction') {
-                                                    echo inventory_transaction_shortcode();
-                                                } 
-                                                 else {
-                                                    echo inventory_list_shortcode();                                                }
-                                                break;
+                            if ($action === 'add-inventory') {
+                                echo inventory_add_shortcode();
+                            } elseif ($action === 'edit-inventory') {
+                                echo 
+                                inventory_edit_shortcode();
+                            }elseif ($action === 'inventory-issued') {
+                                echo inventory_issued_shortcode();
+                            
+                            } elseif ($action === 'inventory-transaction') {
+                                echo inventory_transaction_shortcode();
+                            } 
+                                else {
+                                echo inventory_list_shortcode();                                                }
+                            break;
+                      case 'library':
+                            if ($action === 'add-library') {
+                                echo library_add_shortcode();
+                            } elseif ($action === 'edit-library') {
+                                echo 
+                                library_edit_shortcode();
+                            } elseif ($action === 'delete-library') {
+                                echo library_delete_shortcode();
+                            
+                            } elseif ($action === 'library-issued') {
+                                echo library_overdue_shortcode();
+                            
+                            } elseif ($action === 'library-transaction') {
+                                echo library_transaction_shortcode();
+                            } 
+                                else {
+                                echo library_list_shortcode();}
+                            break;
                                     
                     default:
                         echo render_teacher_overview($user_id, $teacher);
