@@ -318,11 +318,15 @@ function handle_edit_attendance_submission() {
     }
 
     // Redirect back with message
-    $redirect_url = add_query_arg(
-        array('message' => urlencode($message), 'type' => $type),
-        wp_get_referer() ?: home_url('/institute-dashboard/edit-attendance/')
-    );
-    wp_safe_redirect($redirect_url);
+    // $redirect_url = add_query_arg(
+    //     array('message' => urlencode($message), 'type' => $type),
+    //     // wp_get_referer() ?: home_url('/institute-dashboard/edit-attendance/')
+    //     // Redirect to the same page
+
+    // );
+    wp_redirect($_SERVER['REQUEST_URI']);
+
+    // wp_safe_redirect($redirect_url);
     exit;
 }
 

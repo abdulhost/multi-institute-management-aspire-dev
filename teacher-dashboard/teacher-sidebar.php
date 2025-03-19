@@ -355,17 +355,80 @@ $active_section = isset($active_section) ? $active_section : 'overview';
   </button>
   <ul class="sub-menu <?php echo $active_section == 'timetable' ? 'show' : ''; ?>">
     <div>
-      <li class="<?php echo $active_section == 'parents' && empty($active_action) ? 'active' : ''; ?>">
+      <li class="<?php echo $active_section == 'timetable' && empty($active_action) ? 'active' : ''; ?>">
         <a href="<?php echo home_url('/teacher-dashboard/?section=timetable'); ?>">Manage Timetable</a>
       </li>
-      <li class="<?php echo $active_action == 'add-parents' ? 'active' : ''; ?>">
-        <a href="<?php echo home_url('/teacher-dashboard/?section=parents&action=add-parents'); ?>">Add Parents</a>
+      <li class="<?php echo $active_action == 'add-timetable' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=timetable&action=add-timetable'); ?>">Add Timetable</a>
       </li>
-      <li class="<?php echo $active_action == 'edit-parents' ? 'active' : ''; ?>">
-        <a href="<?php echo home_url('/teacher-dashboard/?section=parents&action=edit-parents'); ?>">Edit Parents</a>
+      <li class="<?php echo $active_action == 'edit-timetable' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=timetable&action=edit-timetable'); ?>">Edit Timetable</a>
       </li>
-      <li class="<?php echo $active_action == 'delete-parents' ? 'active' : ''; ?>">
-        <a href="<?php echo home_url('/teacher-dashboard/?section=parents&action=delete-parents'); ?>">Delete Parents</a>
+      <li class="<?php echo $active_action == 'delete-timetable' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=timetable&action=delete-timetable'); ?>">Delete Timetable</a>
+      </li>
+    
+    </div>
+  </ul>
+</li>
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'department' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+      <path d="M736-320q0 28-19 47t-47 19H280q-28 0-47-19t-19-47V280q0-28 19-47t47-19h320q28 0 47 19t19 47v400Z"/>
+    </svg>
+    <span>Department</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+      <path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/>
+    </svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'department' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'timetable' && empty($active_action) ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=department'); ?>">Manage Department</a>
+      </li>
+      <li class="<?php echo $active_action == 'add-department' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=department&action=add-department'); ?>">Add Department</a>
+      </li>
+      <li class="<?php echo $active_action == 'edit-timetable' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=department&action=edit-department'); ?>">Edit Department</a>
+      </li>
+      <li class="<?php echo $active_action == 'delete-timetable' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=department&action=delete-department'); ?>">Delete Department</a>
+      </li>
+    
+    </div>
+  </ul>
+</li>
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'inventory' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+      <path d="M736-320q0 28-19 47t-47 19H280q-28 0-47-19t-19-47V280q0-28 19-47t47-19h320q28 0 47 19t19 47v400Z"/>
+    </svg>
+    <span>Inventory</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+      <path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/>
+    </svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'inventory' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'timetable' && empty($active_action) ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=inventory'); ?>">Manage Inventory</a>
+      </li> 
+       <li class="<?php echo $active_action == 'inventory-issued' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=inventory&action=inventory-issued'); ?>">Inventory Issued</a>
+      </li>
+       <li class="<?php echo $active_action == 'inventory-transaction' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=inventory&action=inventory-transaction'); ?>">Inventory Transaction</a>
+      </li>
+      <li class="<?php echo $active_action == 'add-inventory' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=inventory&action=add-inventory'); ?>">Add Inventory</a>
+      </li>
+      <li class="<?php echo $active_action == 'edit-timetable' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=inventory&action=edit-inventory'); ?>">Edit Inventory</a>
+      </li>
+    
+      <li class="<?php echo $active_action == 'delete-timetable' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=inventory&action=delete-inventory'); ?>">Delete Inventory</a>
       </li>
     
     </div>

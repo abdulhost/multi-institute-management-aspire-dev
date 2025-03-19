@@ -274,17 +274,48 @@ function aspire_teacher_dashboard_shortcode() {
                                         case 'generate-reports':
                                                 echo aspire_reports_dashboard_shortcode($user_id);
                                             break;
-                                            case 'timetable':
-                                                if ($action === 'add-parents') {
-                                                    echo add_parents_institute_dashboard_shortcode($user_id);
-                                                } elseif ($action === 'edit-parents') {
+                      case 'timetable':
+                                                if ($action === 'add-timetable') {
+                                                    echo timetable_add_shortcode();
+                                                } elseif ($action === 'edit-timetable') {
                                                     echo 
-                                                    edit_parents_institute_dashboard_shortcode($user_id);
-                                                } elseif ($action === 'delete-parents') {
-                                                    echo delete_parents_institute_dashboard_shortcode($user_id);
+                                                    timetable_edit_shortcode();
+                                                } elseif ($action === 'delete-timetable') {
+                                                    echo timetable_delete_shortcode();
                                                 } 
                                                  else {
                                                     echo aspire_timetable_management_shortcode();                                                }
+                                                break;
+                                    
+                      case 'department':
+                                                if ($action === 'add-department') {
+                                                    echo add_department_shortcode();
+                                                } elseif ($action === 'edit-department') {
+                                                    echo 
+                                                    edit_department_shortcode();
+                                                } elseif ($action === 'delete-department') {
+                                                    echo delete_department_shortcode();
+                                                } 
+                                                 else {
+                                                    echo departments_list_shortcode();                                                }
+                                                break;
+                      case 'inventory':
+                                                if ($action === 'add-inventory') {
+                                                    echo inventory_add_shortcode();
+                                                } elseif ($action === 'edit-inventory') {
+                                                    echo 
+                                                    edit_department_shortcode();
+                                                } elseif ($action === 'delete-inventory') {
+                                                    echo delete_department_shortcode();
+                                                
+                                                } elseif ($action === 'inventory-issued') {
+                                                    echo inventory_issued_shortcode();
+                                               
+                                                } elseif ($action === 'inventory-transaction') {
+                                                    echo inventory_transaction_shortcode();
+                                                } 
+                                                 else {
+                                                    echo inventory_list_shortcode();                                                }
                                                 break;
                                     
                     default:
