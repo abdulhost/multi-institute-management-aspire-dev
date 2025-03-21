@@ -51,26 +51,7 @@ function aspire_inventory_management_shortcode() {
 }
 add_shortcode('aspire_inventory_management', 'aspire_inventory_management_shortcode');
 
-// Utility: Generate unique IDs (unchanged)
-function generate_unique_id($wpdb, $table_name, $prefix, $education_center_id) {
-    $max_attempts = 5;
-    for ($attempt = 1; $attempt <= $max_attempts; $attempt++) {
-        $time_part = substr(str_replace('.', '', microtime(true)), -10);
-        $random_part = strtoupper(substr(bin2hex(random_bytes(1)), 0, 2));
-        $id = $prefix . $time_part . $random_part;
 
-        $exists = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM $table_name WHERE " . ($prefix === 'ITEM-' ? 'item_id' : 'book_id') . " = %s AND education_center_id = %s",
-            $id, $education_center_id
-        ));
-
-        if ($exists == 0) {
-            return $id;
-        }
-        usleep(10000);
-    }
-    return new WP_Error('id_generation_failed', 'Unable to generate a unique ID.');
-}
 
 // Inventory List Shortcode
 function inventory_list_shortcode() {
@@ -496,7 +477,8 @@ function inventory_add_shortcode() {
         educational_center_teacher_id() : 
         get_educational_center_data();
     $table_name = $wpdb->prefix . 'inventory';
-    $new_item_id = generate_unique_id($wpdb, $table_name, 'ITEM-', $education_center_id);
+    // $new_item_id = generate_unique_id($wpdb, 'ITEM-', $education_center_id,, $table_name);
+    $new_item_id = get_unique_id_for_role('inventory', $education_center_id);
     $message = is_wp_error($new_item_id) ? '<div class="alert alert-danger">' . esc_html($new_item_id->get_error_message()) . '</div>' : '';
 
     ob_start();

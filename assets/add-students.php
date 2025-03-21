@@ -33,6 +33,7 @@ function add_students_institute_dashboard_shortcode() {
         $wpdb->prepare("SELECT * FROM $table_name WHERE education_center_id = %s", $educational_center_id),
         ARRAY_A
     );
+    $new_student_id = get_unique_id_for_role('students', $educational_center_id);
 
     // Start output buffering
     ob_start();
@@ -57,18 +58,18 @@ function add_students_institute_dashboard_shortcode() {
                 <!-- Class Dropdown -->
                 <label for="class_name">Class:</label>
                 <select name="class_name" id="class_nameadd" required>
-                    <option value="">Select Class</option>
-                    <?php foreach ($class_sections as $row) : ?>
-                        <option value="<?php echo esc_attr($row['class_name']); ?>"><?php echo esc_html($row['class_name']); ?></option>
-                    <?php endforeach; ?>
-                </select>
+    <option value="">Select Class</option>
+    <?php foreach ($class_sections as $row) : ?>
+        <?php $normalized_class = strtolower(trim($row['class_name'])); ?>
+        <option value="<?php echo esc_attr($normalized_class); ?>"><?php echo esc_html($row['class_name']); ?></option>
+    <?php endforeach; ?>
+</select>
+<label for="section">Section:</label>
 
-                <!-- Section Dropdown -->
-                <label for="section">Section:</label>
-                <select name="section" id="sectionadd" required disabled>
-                    <option value="">Select Class First</option>
-                </select>
-                <br>
+<select name="section" id="sectionadds" disabled>
+    <option value="">Select Class First</option>
+</select>
+<br>
                 <!-- Student Details -->
                 <label for="admission_number">Admission Number</label>
                 <input type="text" name="admission_number" required>
@@ -85,7 +86,7 @@ function add_students_institute_dashboard_shortcode() {
                 <!-- Hidden field for educational center ID -->
                 <input type="hidden" name="educational_center_id" value="<?php echo esc_attr($educational_center_id); ?>">
                 <label for="student_id">Student ID (Auto-generated)</label>
-                <input type="text" name="student_id" value="<?php echo 'STU-' . uniqid(); ?>" readonly>
+                <input type="text" name="student_id" value="<?php echo esc_attr($new_student_id); ?>" readonly>
                 <br>
                 <!-- Roll Number -->
                 <label for="roll_number">Roll Number:</label>
@@ -188,22 +189,27 @@ jQuery(document).ready(function($) {
     var sectionsData = {};
     <?php
     foreach ($class_sections as $row) {
-        echo 'sectionsData["' . esc_attr($row['class_name']) . '"] = ' . json_encode(explode(',', $row['sections'])) . ';';
+        $normalized_class = strtolower(trim($row['class_name']));
+        $sections = !empty($row['sections']) ? explode(',', $row['sections']) : [];
+        echo 'sectionsData["' . esc_attr($normalized_class) . '"] = ' . json_encode($sections) . ';';
     }
     ?>
 
     $('#class_nameadd').change(function() {
         var selectedClass = $(this).val();
-        var sectionSelect = $('#sectionadd');
-
-        if (selectedClass && sectionsData[selectedClass]) {
-            sectionSelect.html('<option value="">Select Section</option>');
+        var sectionSelect = $('#sectionadds');
+          if (selectedClass && sectionsData[selectedClass] && sectionsData[selectedClass].length > 0) {
+            sectionSelect.empty();
+            sectionSelect.append('<option value="">Select Section</option>');
             sectionsData[selectedClass].forEach(function(section) {
                 sectionSelect.append('<option value="' + section + '">' + section + '</option>');
             });
             sectionSelect.prop('disabled', false);
         } else {
-            sectionSelect.html('<option value="">Select Class First</option>').prop('disabled', true);
+            sectionSelect.empty();
+            sectionSelect.append('<option value="">No Sections Available</option>');
+            sectionSelect.prop('disabled', true);
+       
         }
     });
 
