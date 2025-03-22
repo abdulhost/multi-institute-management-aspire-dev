@@ -256,6 +256,7 @@ dbDelta($sql_attendance);
         homework_id BIGINT(20) NOT NULL AUTO_INCREMENT,
         education_center_id VARCHAR(255) NOT NULL,
         teacher_id VARCHAR(255) NOT NULL,
+        subject_id BIGINT(20),
         class_name VARCHAR(255) NOT NULL,
         section VARCHAR(50) NOT NULL,
         title VARCHAR(255) NOT NULL,

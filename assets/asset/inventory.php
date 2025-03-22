@@ -12,13 +12,19 @@ function aspire_inventory_management_shortcode() {
         return '<div class="alert alert-danger">No Educational Center found.</div>';
     }
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'inventory-list';
+    $current_user = wp_get_current_user();
+    $user_id = $current_user->ID;
+    $action = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : '';
 
     ob_start();
     ?>
     <div class="container-fluid" style="background: linear-gradient(135deg, #e6ffe6, #ccffcc); min-height: 100vh;">
         <div class="row">
             <?php 
+                        $active_section = $section;
+
             $active_section = $section;
+            
             include plugin_dir_path(__FILE__) . '../sidebar.php';
             ?>
             <div class="col-md-9 p-4">
@@ -39,6 +45,20 @@ function aspire_inventory_management_shortcode() {
                     case 'inventory-issued':
                         echo inventory_issued_shortcode();
                         break;
+                        case 'homework':
+                            if ($action === 'add-homework') {
+                                echo render_homework_add($user_id, $user_id);
+                            } elseif ($action === 'edit-homework') {
+                                $homework_id = isset($_GET['id']) ? intval($_GET['id']) : null;
+                                echo render_homework_edit($user_id, $user_id, $homework_id);
+                            } elseif ($action === 'delete-homework') {
+                                $homework_id = isset($_GET['id']) ? intval($_GET['id']) : null;
+                                handle_homework_delete($user_id, $homework_id);
+                                echo render_homework_assignments($user_id, $user_id);
+                            } else {
+                                echo render_homework_assignments($user_id, $user_id);
+                            }
+                            break;
                     default:
                         echo inventory_list_shortcode(); // Default to list view
                 }

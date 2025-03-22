@@ -400,7 +400,30 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
     </div>
   </ul>
 </li>
-
+<!-- Homework Menu Item -->
+<li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'homework' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-240q66 0 113-47t47-113q0-66-47-113t-113-47q-66 0-113 47t-47 113q0 66 47 113t113 47Zm0-160q-33 0-56.5-23.5T400-400q0-33 23.5-56.5T480-480q33 0 56.5 23.5T560-400q0 33-23.5 56.5T480-320q-33 0-56.5-23.5T400-400q0-33 23.5-56.5T480-480Z"/></svg>
+    <span>Homework</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'homework' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'homework' && empty($active_action) ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/institute-dashboard/inventory/?section=homework'); ?>">Homework Assignments</a>
+      </li>
+      <li class="<?php echo $active_action == 'add-homework' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=homework&action=add-homework'); ?>">Add Homework</a>
+      </li>
+      <li class="<?php echo $active_action == 'edit-homework' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=homework&action=edit-homework&id=' . (isset($_GET['id']) ? intval($_GET['id']) : '')); ?>">Edit Homework</a>
+      </li>
+      <li class="<?php echo $active_action == 'delete-homework' ? 'active' : ''; ?>">
+        <a href="<?php echo home_url('/teacher-dashboard/?section=homework&action=delete-homework&id=' . (isset($_GET['id']) ? intval($_GET['id']) : '')); ?>">Delete Homework</a>
+      </li>
+    </div>
+  </ul>
+</li>
 <li>
   <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'view-teachers' || $active_section == 'add-teacher' || $active_section == 'update-teacher' || $active_section == 'delete-teacher' ? 'rotate' : ''; ?>">
     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M520-640v-160q0-17 11.5-28.5T560-840h240q17 0 28.5 11.5T840-800v160q0 17-11.5 28.5T800-600H560q-17 0-28.5-11.5T520-640ZM120-480v-320q0-17 11.5-28.5T160-840h240q17 0 28.5 11.5T440-800v320q0 17-11.5 28.5T400-440H160q-17 0-28.5-11.5T120-480Zm400 320v-320q0-17 11.5-28.5T560-520h240q17 0 28.5 11.5T840-480v320q0 17-11.5 28.5T800-120H560q-17 0-28.5-11.5T520-160Zm-400 0v-160q0-17 11.5-28.5T160-360h240q17 0 28.5 11.5T440-320v160q0 17-11.5 28.5T400-120H160q-17 0-28.5-11.5T120-160Zm80-360h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/></svg>
@@ -409,7 +432,7 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
   </button>
   <ul class="sub-menu <?php echo $active_section == 'view-teachers' || $active_section == 'add-teacher' || $active_section == 'update-teacher' || $active_section == 'delete-teacher' ? 'show' : ''; ?>">
     <div>
-      <li class="<?php echo $active_section == 'view-teachers' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/teacher')); ?>">View Teachers</a></li>
+      <li class="<?php echo $active_section == 'view-teachers' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/teachers')); ?>">View Teachers</a></li>
       <li class="<?php echo $active_section == 'add-teacher' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/add-teachers')); ?>">Add New Teacher</a></li>
       <li class="<?php echo $active_section == 'update-teacher' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/edit-teachers/')); ?>">Update Teacher</a></li>
       <li class="<?php echo $active_section == 'delete-teacher' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/delete-teacher')); ?>">Delete Teacher</a></li>

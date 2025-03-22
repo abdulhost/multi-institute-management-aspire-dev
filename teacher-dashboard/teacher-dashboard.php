@@ -1750,28 +1750,50 @@ function render_student_edit($user_id, $teacher, $student_id = null) {
 function render_homework_assignments($user_id, $teacher) {
     global $wpdb;
 
-    $education_center_id = educational_center_teacher_id();
+    $current_user = wp_get_current_user();
+    $teacher_or_not = is_teacher($current_user->ID);
+    
+    if ($teacher_or_not != FALSE) { 
+        $education_center_id = educational_center_teacher_id();
+        $current_teacher_id = aspire_get_current_teacher_id();
+    } else {
+        $education_center_id = get_educational_center_data();
+        $current_teacher_id = null;
+    }
+
     if (empty($education_center_id)) {
         return '<div class="alert alert-danger">Error: Could not fetch Education Center ID.</div>';
     }
 
     $homework_table = $wpdb->prefix . 'homework';
-    $homeworks = $wpdb->get_results(
-        $wpdb->prepare(
-            "SELECT * FROM $homework_table WHERE teacher_id = %d AND education_center_id = %s",
-            $user_id,
-            $education_center_id
-        )
-    );
+    $subjects_table = $wpdb->prefix . 'subjects';
+    
+    if ($teacher_or_not != FALSE) { 
+        $homeworks = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT h.*, s.subject_name 
+                 FROM $homework_table h 
+                 LEFT JOIN $subjects_table s ON h.subject_id = s.subject_id 
+                 WHERE h.teacher_id = %s AND h.education_center_id = %s",
+                $current_teacher_id,
+                $education_center_id
+            )
+        );
+    } else {
+        $homeworks = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT h.*, s.subject_name 
+                 FROM $homework_table h 
+                 LEFT JOIN $subjects_table s ON h.subject_id = s.subject_id 
+                 WHERE h.education_center_id = %s",
+                $education_center_id
+            )
+        );
+    }
 
     ob_start();
     ?>
     <div class="attendance-main-wrapper" style="display: flex;">
-        <?php
-        $active_section = 'homework';
-        $active_action = '';
-        include plugin_dir_path(__FILE__) . 'teacher-sidebar.php';
-        ?>
         <div style="display: block; width: 100%;">
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -1786,6 +1808,7 @@ function render_homework_assignments($user_id, $teacher) {
                             <thead>
                                 <tr>
                                     <th>Title</th>
+                                    <th>Subject</th>
                                     <th>Class</th>
                                     <th>Section</th>
                                     <th>Due Date</th>
@@ -1797,6 +1820,7 @@ function render_homework_assignments($user_id, $teacher) {
                                 <?php foreach ($homeworks as $homework): ?>
                                     <tr>
                                         <td><?php echo esc_html($homework->title); ?></td>
+                                        <td><?php echo esc_html($homework->subject_name ?: 'N/A'); ?></td>
                                         <td><?php echo esc_html($homework->class_name); ?></td>
                                         <td><?php echo esc_html($homework->section); ?></td>
                                         <td><?php echo esc_html($homework->due_date); ?></td>
@@ -1827,7 +1851,7 @@ function render_homework_assignments($user_id, $teacher) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    this.closest('tr').querySelector('td:nth-child(5)').textContent = 'completed';
+                    this.closest('tr').querySelector('td:nth-child(6)').textContent = 'completed';
                     this.disabled = true;
                 } else {
                     alert('Error marking homework as complete.');
@@ -1844,15 +1868,34 @@ function render_homework_assignments($user_id, $teacher) {
 function render_homework_add($user_id, $teacher) {
     global $wpdb;
 
-    $education_center_id = educational_center_teacher_id();
+    $current_user = wp_get_current_user();
+    $teacher_or_not = is_teacher($current_user->ID);
+    
+    if ($teacher_or_not != FALSE) { 
+        $education_center_id = educational_center_teacher_id();
+        $current_teacher_id = aspire_get_current_teacher_id();
+    } else {
+        $education_center_id = get_educational_center_data();
+        $current_teacher_id = null;
+    }
+
     if (empty($education_center_id)) {
         return '<div class="alert alert-danger">Error: Could not fetch Education Center ID.</div>';
     }
 
     $class_sections_table = $wpdb->prefix . 'class_sections';
+    $subjects_table = $wpdb->prefix . 'subjects';
+    
     $classes = $wpdb->get_results(
         $wpdb->prepare(
             "SELECT * FROM $class_sections_table WHERE education_center_id = %s",
+            $education_center_id
+        )
+    );
+    
+    $subjects = $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT * FROM $subjects_table WHERE education_center_id = %s",
             $education_center_id
         )
     );
@@ -1863,8 +1906,9 @@ function render_homework_add($user_id, $teacher) {
         $due_date = sanitize_text_field($_POST['due_date'] ?? '');
         $class_name = sanitize_text_field($_POST['class_name'] ?? '');
         $section = sanitize_text_field($_POST['section'] ?? '');
+        $subject_id = intval($_POST['subject_id'] ?? 0);
 
-        if (empty($title) || empty($description) || empty($due_date) || empty($class_name) || empty($section)) {
+        if (empty($title) || empty($description) || empty($due_date) || empty($class_name) || empty($section) || empty($subject_id)) {
             return '<div class="alert alert-danger">All fields are required.</div>';
         }
 
@@ -1873,7 +1917,8 @@ function render_homework_add($user_id, $teacher) {
             $homework_table,
             [
                 'education_center_id' => $education_center_id,
-                'teacher_id' => $user_id,
+                'teacher_id' => $current_teacher_id ?: null,
+                'subject_id' => $subject_id,
                 'class_name' => $class_name,
                 'section' => $section,
                 'title' => $title,
@@ -1881,12 +1926,19 @@ function render_homework_add($user_id, $teacher) {
                 'due_date' => $due_date,
                 'status' => 'active'
             ],
-            ['%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s']
+            ['%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s']
         );
 
         if ($inserted) {
-            wp_redirect(home_url('/teacher-dashboard/?section=homework'));
-            exit;
+            // wp_redirect(home_url('/teacher-dashboard/?section=homework'));
+            // exit;
+            if ($teacher_or_not != FALSE) { 
+                wp_redirect(home_url('/teacher-dashboard/?section=homework'));
+                exit;}
+                else{
+                    wp_redirect(home_url('/institute-dashboard/inventory/?section=homework'));
+                    exit;
+                }
         } else {
             return '<div class="alert alert-danger">Error assigning homework: ' . esc_html($wpdb->last_error) . '</div>';
         }
@@ -1895,11 +1947,6 @@ function render_homework_add($user_id, $teacher) {
     ob_start();
     ?>
     <div class="attendance-main-wrapper" style="display: flex;">
-        <?php
-        $active_section = 'homework';
-        $active_action = 'add-homework';
-        include plugin_dir_path(__FILE__) . 'teacher-sidebar.php';
-        ?>
         <div style="display: block; width: 100%;">
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-primary text-white">
@@ -1910,6 +1957,15 @@ function render_homework_add($user_id, $teacher) {
                         <div class="mb-3">
                             <label for="homework_title" class="form-label">Title</label>
                             <input type="text" name="homework_title" id="homework_title" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject_id" class="form-label">Subject</label>
+                            <select name="subject_id" id="subject_id" class="form-select" required>
+                                <option value="">Select a Subject</option>
+                                <?php foreach ($subjects as $subject): ?>
+                                    <option value="<?php echo esc_attr($subject->subject_id); ?>"><?php echo esc_html($subject->subject_name); ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="homework_description" class="form-label">Description</label>
@@ -1978,7 +2034,17 @@ function render_homework_add($user_id, $teacher) {
 function render_homework_edit($user_id, $teacher, $homework_id = null) {
     global $wpdb;
 
-    $education_center_id = educational_center_teacher_id();
+    $current_user = wp_get_current_user();
+    $teacher_or_not = is_teacher($current_user->ID);
+    
+    if ($teacher_or_not != FALSE) { 
+        $education_center_id = educational_center_teacher_id();
+        $current_teacher_id = aspire_get_current_teacher_id();
+    } else {
+        $education_center_id = get_educational_center_data();
+        $current_teacher_id = null;
+    }
+
     if (empty($education_center_id)) {
         return '<div class="alert alert-danger">Error: Could not fetch Education Center ID.</div>';
     }
@@ -1988,14 +2054,28 @@ function render_homework_edit($user_id, $teacher, $homework_id = null) {
     }
 
     $homework_table = $wpdb->prefix . 'homework';
-    $homework = $wpdb->get_row(
+    $subjects_table = $wpdb->prefix . 'subjects';
+    
+    $query = $teacher_or_not != FALSE ?
         $wpdb->prepare(
-            "SELECT * FROM $homework_table WHERE homework_id = %d AND teacher_id = %d AND education_center_id = %s",
+            "SELECT h.*, s.subject_name 
+             FROM $homework_table h 
+             LEFT JOIN $subjects_table s ON h.subject_id = s.subject_id 
+             WHERE h.homework_id = %d AND h.teacher_id = %s AND h.education_center_id = %s",
             $homework_id,
-            $user_id,
+            $current_teacher_id,
             $education_center_id
-        )
-    );
+        ) :
+        $wpdb->prepare(
+            "SELECT h.*, s.subject_name 
+             FROM $homework_table h 
+             LEFT JOIN $subjects_table s ON h.subject_id = s.subject_id 
+             WHERE h.homework_id = %d AND h.education_center_id = %s",
+            $homework_id,
+            $education_center_id
+        );
+    
+    $homework = $wpdb->get_row($query);
 
     if (!$homework) {
         return '<div class="alert alert-danger">Homework not found or permission denied.</div>';
@@ -2008,6 +2088,13 @@ function render_homework_edit($user_id, $teacher, $homework_id = null) {
             $education_center_id
         )
     );
+    
+    $subjects = $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT * FROM $subjects_table WHERE education_center_id = %s",
+            $education_center_id
+        )
+    );
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_homework']) && wp_verify_nonce($_POST['homework_nonce'], 'edit_homework')) {
         $title = sanitize_text_field($_POST['homework_title'] ?? '');
@@ -2015,10 +2102,15 @@ function render_homework_edit($user_id, $teacher, $homework_id = null) {
         $due_date = sanitize_text_field($_POST['due_date'] ?? '');
         $class_name = sanitize_text_field($_POST['class_name'] ?? '');
         $section = sanitize_text_field($_POST['section'] ?? '');
+        $subject_id = intval($_POST['subject_id'] ?? 0);
 
-        if (empty($title) || empty($description) || empty($due_date) || empty($class_name) || empty($section)) {
+        if (empty($title) || empty($description) || empty($due_date) || empty($class_name) || empty($section) || empty($subject_id)) {
             return '<div class="alert alert-danger">All fields are required.</div>';
         }
+
+        $where = $teacher_or_not != FALSE ?
+            ['homework_id' => $homework_id, 'teacher_id' => $current_teacher_id, 'education_center_id' => $education_center_id] :
+            ['homework_id' => $homework_id, 'education_center_id' => $education_center_id];
 
         $updated = $wpdb->update(
             $homework_table,
@@ -2027,16 +2119,24 @@ function render_homework_edit($user_id, $teacher, $homework_id = null) {
                 'description' => $description,
                 'due_date' => $due_date,
                 'class_name' => $class_name,
-                'section' => $section
+                'section' => $section,
+                'subject_id' => $subject_id
             ],
-            ['homework_id' => $homework_id, 'teacher_id' => $user_id, 'education_center_id' => $education_center_id],
-            ['%s', '%s', '%s', '%s', '%s'],
-            ['%d', '%d', '%s']
+            $where,
+            ['%s', '%s', '%s', '%s', '%s', '%d'],
+            $teacher_or_not != FALSE ? ['%d', '%s', '%s'] : ['%d', '%s']
         );
 
         if ($updated !== false) {
-            wp_redirect(home_url('/teacher-dashboard/?section=homework'));
-            exit;
+            // wp_redirect(home_url('/teacher-dashboard/?section=homework'));
+            // exit;
+            if ($teacher_or_not != FALSE) { 
+                wp_redirect(home_url('/teacher-dashboard/?section=homework'));
+                exit;}
+                else{
+                    wp_redirect(home_url('/institute-dashboard/inventory/?section=homework'));
+                    exit;
+                }
         } else {
             return '<div class="alert alert-danger">Error updating homework: ' . esc_html($wpdb->last_error) . '</div>';
         }
@@ -2045,11 +2145,6 @@ function render_homework_edit($user_id, $teacher, $homework_id = null) {
     ob_start();
     ?>
     <div class="attendance-main-wrapper" style="display: flex;">
-        <?php
-        $active_section = 'homework';
-        $active_action = 'edit-homework';
-        include plugin_dir_path(__FILE__) . 'teacher-sidebar.php';
-        ?>
         <div style="display: block; width: 100%;">
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-primary text-white">
@@ -2060,6 +2155,15 @@ function render_homework_edit($user_id, $teacher, $homework_id = null) {
                         <div class="mb-3">
                             <label for="homework_title" class="form-label">Title</label>
                             <input type="text" name="homework_title" id="homework_title" class="form-control" value="<?php echo esc_attr($homework->title); ?>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject_id" class="form-label">Subject</label>
+                            <select name="subject_id" id="subject_id" class="form-select" required>
+                                <option value="">Select a Subject</option>
+                                <?php foreach ($subjects as $subject): ?>
+                                    <option value="<?php echo esc_attr($subject->subject_id); ?>" <?php selected($homework->subject_id, $subject->subject_id); ?>><?php echo esc_html($subject->subject_name); ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="homework_description" class="form-label">Description</label>
@@ -2132,17 +2236,31 @@ function render_homework_edit($user_id, $teacher, $homework_id = null) {
 
 function handle_homework_delete($user_id, $homework_id) {
     global $wpdb;
-
-    $education_center_id = educational_center_teacher_id();
+    
+    $current_user = wp_get_current_user();
+    $teacher_or_not = is_teacher($current_user->ID);
+    
+    if ($teacher_or_not != FALSE) { 
+        $education_center_id = educational_center_teacher_id();
+        $current_teacher_id = aspire_get_current_teacher_id();
+    } else {
+        $education_center_id = get_educational_center_data();
+        $current_teacher_id = null;
+    }
+    
     if (empty($education_center_id)) {
         return;
     }
 
     $homework_table = $wpdb->prefix . 'homework';
+    $where = $teacher_or_not != FALSE ?
+        ['homework_id' => $homework_id, 'teacher_id' => $current_teacher_id, 'education_center_id' => $education_center_id] :
+        ['homework_id' => $homework_id, 'education_center_id' => $education_center_id];
+
     $wpdb->delete(
         $homework_table,
-        ['homework_id' => $homework_id, 'teacher_id' => $user_id, 'education_center_id' => $education_center_id],
-        ['%d', '%d', '%s']
+        $where,
+        $teacher_or_not != FALSE ? ['%d', '%s', '%s'] : ['%d', '%s']
     );
 }
 
@@ -2152,18 +2270,32 @@ function mark_homework_complete_callback() {
 
     check_ajax_referer('mark_homework', 'nonce');
     $homework_id = intval($_POST['homework_id'] ?? 0);
-    $user_id = get_current_user_id();
-    $education_center_id = educational_center_teacher_id();
+    
+    $current_user = wp_get_current_user();
+    $teacher_or_not = is_teacher($current_user->ID);
+    
+    if ($teacher_or_not != FALSE) { 
+        $education_center_id = educational_center_teacher_id();
+        $current_teacher_id = aspire_get_current_teacher_id();
+    } else {
+        $education_center_id = get_educational_center_data();
+        $current_teacher_id = null;
+    }
 
     if ($homework_id && $education_center_id) {
         $homework_table = $wpdb->prefix . 'homework';
+        $where = $teacher_or_not != FALSE ?
+            ['homework_id' => $homework_id, 'teacher_id' => $current_teacher_id, 'education_center_id' => $education_center_id] :
+            ['homework_id' => $homework_id, 'education_center_id' => $education_center_id];
+
         $updated = $wpdb->update(
             $homework_table,
             ['status' => 'completed'],
-            ['homework_id' => $homework_id, 'teacher_id' => $user_id, 'education_center_id' => $education_center_id],
+            $where,
             ['%s'],
-            ['%d', '%d', '%s']
+            $teacher_or_not != FALSE ? ['%d', '%s', '%s'] : ['%d', '%s']
         );
+        
         if ($updated !== false) {
             wp_send_json_success();
         }
