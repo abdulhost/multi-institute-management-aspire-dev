@@ -2307,11 +2307,12 @@ function mark_homework_complete_callback() {
 // Activation: Create messages table
 // TEACHER FUNCTIONS
 // Helper: Check if User is a Teacher
+// Helper: Check if user is a teacher
 function aspire_is_teacher($user) {
-    return in_array('teacher', $user->roles);
+    return in_array('teacher', (array) $user->roles);
 }
 
-// Helper: Check if User is an Institute Admin (for dual roles)
+// Helper: Check if User is an Institute Admin
 function aspire_is_institute_admin($username, $education_center_id) {
     global $wpdb;
     $table = $wpdb->prefix . 'institute_admins';
@@ -2322,7 +2323,6 @@ function aspire_is_institute_admin($username, $education_center_id) {
     ));
     return $count > 0;
 }
-
 
 // Helper: Get Institute Admins
 function aspire_teacher_get_admins($education_center_id) {
@@ -2335,12 +2335,13 @@ function aspire_teacher_get_admins($education_center_id) {
     return $admins ?: [];
 }
 
+
 // Teacher: Send Message
 function aspire_teacher_send_message($sender_id, $receiver_id, $message, $education_center_id) {
     global $wpdb;
     $table = $wpdb->prefix . 'aspire_messages';
 
-    error_log("Sending message: sender_id=$sender_id, receiver_id=$receiver_id, message=$message, education_center_id=$education_center_id");
+    error_log("Teacher sending message: sender_id=$sender_id, receiver_id=$receiver_id, message=$message, education_center_id=$education_center_id");
 
     $result = $wpdb->insert(
         $table,
@@ -2350,13 +2351,16 @@ function aspire_teacher_send_message($sender_id, $receiver_id, $message, $educat
             'message' => $message,
             'education_center_id' => $education_center_id,
             'status' => 'sent',
+            'timestamp' => current_time('mysql'),
         ],
-        ['%s', '%s', '%s', '%s', '%s']
+        ['%s', '%s', '%s', '%s', '%s', '%s']
     );
 
+    if ($result === false) {
+        error_log("Insert failed: " . $wpdb->last_error);
+    }
     return $result !== false;
 }
-
 
 // Teacher: Mark Messages as Read
 function aspire_teacher_mark_messages_read($username, $conversation_with) {
@@ -2400,85 +2404,94 @@ function aspire_teacher_get_unread_count($username) {
         $query_args
     );
 
-    return $wpdb->get_var($query);
+    return (int) $wpdb->get_var($query);
 }
 
 // Teacher: AJAX Send Message
 add_action('wp_ajax_aspire_teacher_send_message', 'aspire_teacher_ajax_send_message');
 function aspire_teacher_ajax_send_message() {
+    error_log("aspire_teacher_ajax_send_message function called");
     check_ajax_referer('aspire_teacher_nonce', 'nonce');
+
     $edu_center_id = educational_center_teacher_id();
     $user = wp_get_current_user();
     $sender_id = $user->user_login;
-    $message = sanitize_text_field($_POST['message']);
-    $target_type = sanitize_text_field($_POST['target_type']);
-    $target_value = sanitize_text_field($_POST['target_value']);
+    $message = sanitize_text_field($_POST['message'] ?? '');
+    $target_value = sanitize_text_field($_POST['target_value'] ?? '');
 
-    if (!$edu_center_id || !$sender_id || !$message || !$target_type || !$target_value) {
-        wp_send_json_error('Missing required fields.');
+    if (!$edu_center_id || !$sender_id || !$message || !$target_value) {
+        error_log("Missing fields: edu_center_id=$edu_center_id, sender_id=$sender_id, message=$message, target_value=$target_value");
+        wp_send_json_error(['error' => 'Missing required fields']);
         return;
     }
 
-    $receiver_id = $target_value; // Directly from dropdown, already a username
-    error_log("AJAX send: sender_id=$sender_id, receiver_id=$receiver_id");
+    $group_types = ['all', 'teachers', 'institute_admins'];
+    $success = false;
+    
+    if (in_array($target_value, $group_types)) {
+        $receiver_id = $target_value;
+        error_log("AJAX send group: sender_id=$sender_id, receiver_id=$receiver_id");
+        $success = aspire_teacher_send_message($sender_id, $receiver_id, $message, $edu_center_id);
+    } else {
+        $receiver_id = $target_value;
+        error_log("AJAX send individual: sender_id=$sender_id, receiver_id=$receiver_id");
+        $success = aspire_teacher_send_message($sender_id, $receiver_id, $message, $edu_center_id);
+    }
 
-    $success = aspire_teacher_send_message($sender_id, $receiver_id, $message, $edu_center_id);
-    wp_send_json($success ? ['success' => 'Message sent!'] : ['error' => 'Failed to send message.']);
+    if ($success) {
+        wp_send_json_success(['success' => 'Message sent!']);
+    } else {
+        wp_send_json_error(['error' => 'Failed to send message']);
+    }
 }
 
 // Teacher: AJAX Fetch Messages
 add_action('wp_ajax_aspire_teacher_fetch_messages', 'aspire_teacher_ajax_fetch_messages');
-
-
-
-// Teacher: AJAX Fetch Conversations
-add_action('wp_ajax_aspire_teacher_fetch_conversations', 'aspire_teacher_ajax_fetch_conversations');
-function aspire_teacher_ajax_fetch_conversations() {
+function aspire_teacher_ajax_fetch_messages() {
+    ob_start();
     check_ajax_referer('aspire_teacher_nonce', 'nonce');
+
     $user = wp_get_current_user();
     $username = $user->user_login;
-    $edu_center_id = educational_center_teacher_id();
-    $active_conversations = aspire_teacher_get_active_conversations($username);
+    $conversation_with = sanitize_text_field($_POST['conversation_with'] ?? '');
 
-    $output = '';
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_messages';
+    $edu_center_id = educational_center_teacher_id();
+    
+    $group_types = ['all', 'teachers', 'institute_admins'];
     $group_names = [
         'all' => 'Everyone in Center',
         'teachers' => 'Teachers',
         'institute_admins' => 'Institute Admins'
     ];
-    foreach ($active_conversations as $conv) {
-        $conv_with = $conv->conversation_with;
-        $name = isset($group_names[$conv_with]) ? $group_names[$conv_with] : 'Unknown';
-        if (!isset($group_names[$conv_with])) {
-            $user = get_user_by('login', $conv_with);
-            $name = $user ? $user->display_name : 'Unknown';
+
+    $query = "SELECT * FROM $table WHERE education_center_id = %s";
+    $query_args = [$edu_center_id];
+
+    if ($conversation_with) {
+        if (in_array($conversation_with, $group_types)) {
+            $query .= " AND (";
+            $query .= " (receiver_id = %s)"; // Messages sent to this group
+            $query .= " OR (sender_id = %s AND receiver_id = %s)"; // Messages sent by user to this group
+            $query .= ")";
+            $query .= " LIMIT 50";
+            $query_args[] = $conversation_with;
+            $query_args[] = $username;
+            $query_args[] = $conversation_with;
+        } else {
+            $query .= " AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s)) LIMIT 50";
+            $query_args[] = $username;
+            $query_args[] = $conversation_with;
+            $query_args[] = $conversation_with;
+            $query_args[] = $username;
+            aspire_teacher_mark_messages_read($username, $conversation_with);
         }
-        $output .= '<li class="list-group-item" data-conversation-with="' . esc_attr($conv_with) . '">' . esc_html($name) . '</li>';
-    }
-    if (empty($active_conversations)) {
-        $output = '<li class="list-group-item text-muted">No conversations yet.</li>';
     }
 
-    wp_send_json_success($output);
-}
+    $prepared_query = $wpdb->prepare($query, $query_args);
+    $messages = $wpdb->get_results($prepared_query);
 
-
-// Teacher: Shortcode (Updated with New Chat Button and UI Tweaks)
-function aspire_teacher_prochat_shortcode() {
-    if (!is_user_logged_in()) {
-        return '<p>Please log in to use this chat.</p>';
-    }
-    
-    $user = wp_get_current_user();
-    $username = $user->user_login;
-    $edu_center_id = educational_center_teacher_id();
-    
-    if (!aspire_is_teacher($user)) {
-        return '<p>You do not have the required permissions to use this chat.</p>';
-    }
-    
-    $unread_count = aspire_teacher_get_unread_count($username);
-    $active_conversations = aspire_teacher_get_active_conversations($username);
     $contacts = get_posts([
         'post_type' => ['teacher', 'students', 'parent'],
         'posts_per_page' => -1,
@@ -2486,7 +2499,179 @@ function aspire_teacher_prochat_shortcode() {
         'meta_value' => $edu_center_id,
     ]);
     $admins = aspire_teacher_get_admins($edu_center_id);
+
+    $contact_map = [];
+    foreach ($contacts as $contact) {
+        if ($contact->post_type === 'teacher') {
+            $contact_id = get_post_meta($contact->ID, 'teacher_id', true);
+            $teacher_name = get_post_meta($contact->ID, 'teacher_name', true);
+            $label = "$teacher_name ($contact_id - Teacher)";
+        } elseif ($contact->post_type === 'students') {
+            $contact_id = get_post_meta($contact->ID, 'student_id', true);
+            $student_name = get_post_meta($contact->ID, 'student_name', true);
+            $label = "$student_name ($contact_id - Student)";
+        } else {
+            $contact_id = get_post_meta($contact->ID, 'parent_id', true) ?: $contact->post_title;
+            $label = "$contact->post_title ($contact_id - Parent)";
+        }
+        if ($contact_id) {
+            $contact_map[$contact_id] = $label;
+        }
+    }
+    foreach ($admins as $admin) {
+        $contact_map[$admin['id']] = "{$admin['name']} (Admin)";
+    }
+
+    $output = '';
+    foreach ($messages as $msg) {
+        if (in_array($msg->receiver_id, $group_types)) {
+            $sender_name = ($msg->sender_id === $username) ? 'You' : ($contact_map[$msg->sender_id] ?? (get_user_by('login', $msg->sender_id)->display_name ?? 'Unknown'));
+            $receiver_display = "Group: " . ($group_names[$msg->receiver_id] ?? $msg->receiver_id);
+        } else {
+            $sender_name = ($msg->sender_id === $username) ? 'You' : ($contact_map[$msg->sender_id] ?? (get_user_by('login', $msg->sender_id)->display_name ?? 'Unknown'));
+            $receiver_display = $contact_map[$msg->receiver_id] ?? (get_user_by('login', $msg->receiver_id)->display_name ?? 'Unknown');
+        }
+        
+        $initials = strtoupper(substr($sender_name === 'You' ? $user->display_name : $sender_name, 0, 2));
+        $output .= '<div class="chat-message ' . ($msg->sender_id === $username ? 'sent' : 'received') . ' ' . ($msg->status === 'sent' ? 'unread' : '') . '">';
+        $output .= '<div class="bubble">';
+        $output .= '<span class="avatar">' . esc_html($initials) . '</span>';
+        $output .= '<p>' . esc_html($msg->message) . '</p>';
+        $output .= '</div>';
+        $timestamp = $msg->timestamp ?? 'N/A';
+        $output .= '<div class="meta" data-timestamp="' . esc_attr($timestamp) . '">' . 
+                  esc_html($sender_name) . ' to ' . esc_html($receiver_display) . ' - ' . esc_html($timestamp) . 
+                  '</div>';
+        $output .= '</div>';
+    }
+
+    ob_end_clean();
+    wp_send_json_success(['html' => $output, 'unread' => aspire_teacher_get_unread_count($username)]);
+}
+
+// Teacher: AJAX Fetch Conversations
+add_action('wp_ajax_aspire_teacher_fetch_conversations', 'aspire_teacher_ajax_fetch_conversations');
+function aspire_teacher_ajax_fetch_conversations() {
+    ob_start();
+    check_ajax_referer('aspire_teacher_nonce', 'nonce');
+    $user = wp_get_current_user();
+    $username = $user->user_login;
+    $edu_center_id = educational_center_teacher_id();
     $is_teacher = aspire_is_teacher($user);
+    $is_admin = aspire_is_institute_admin($username, $edu_center_id);
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_messages';
+    $group_names = [
+        'all' => 'Everyone in Center',
+        'teachers' => 'Teachers',
+        'institute_admins' => 'Institute Admins'
+    ];
+
+    $group_receivers = ['all'];
+    if ($is_teacher) $group_receivers[] = 'teachers';
+    if ($is_admin) $group_receivers[] = 'institute_admins';
+    $placeholders = implode(',', array_fill(0, count($group_receivers), '%s'));
+
+    $query = "
+        SELECT DISTINCT receiver_id AS conversation_with 
+        FROM $table 
+        WHERE education_center_id = %s 
+        AND sender_id = %s
+        UNION
+        SELECT DISTINCT sender_id AS conversation_with 
+        FROM $table 
+        WHERE education_center_id = %s 
+        AND receiver_id = %s 
+        AND sender_id NOT IN ($placeholders)
+        UNION
+        SELECT DISTINCT receiver_id AS conversation_with 
+        FROM $table 
+        WHERE education_center_id = %s 
+        AND receiver_id IN ($placeholders)
+        AND sender_id != %s
+    ";
+    $query_args = array_merge(
+        [$edu_center_id, $username],
+        [$edu_center_id, $username],
+        $group_receivers,
+        [$edu_center_id],
+        $group_receivers,
+        [$username]
+    );
+    $active_conversations = $wpdb->get_results($wpdb->prepare($query, $query_args));
+
+    $contacts = get_posts([
+        'post_type' => ['teacher', 'students', 'parent'],
+        'posts_per_page' => -1,
+        'meta_key' => 'educational_center_id',
+        'meta_value' => $edu_center_id,
+    ]);
+    $admins = aspire_teacher_get_admins($edu_center_id);
+
+    $contact_map = [];
+    foreach ($contacts as $contact) {
+        if ($contact->post_type === 'teacher') {
+            $contact_id = get_post_meta($contact->ID, 'teacher_id', true);
+            $teacher_name = get_post_meta($contact->ID, 'teacher_name', true);
+            $label = "$teacher_name ($contact_id - Teacher)";
+        } elseif ($contact->post_type === 'students') {
+            $contact_id = get_post_meta($contact->ID, 'student_id', true);
+            $student_name = get_post_meta($contact->ID, 'student_name', true);
+            $label = "$student_name ($contact_id - Student)";
+        } else {
+            $contact_id = get_post_meta($contact->ID, 'parent_id', true) ?: $contact->post_title;
+            $label = "$contact->post_title ($contact_id - Parent)";
+        }
+        if ($contact_id) {
+            $contact_map[$contact_id] = $label;
+        }
+    }
+    foreach ($admins as $admin) {
+        $contact_map[$admin['id']] = "{$admin['name']} (Admin)";
+    }
+
+    $output = '';
+    $has_conversations = false;
+    foreach ($active_conversations as $conv) {
+        $conv_with = $conv->conversation_with;
+        if (isset($group_names[$conv_with])) {
+            $name = "Group: " . $group_names[$conv_with];
+        } else {
+            $name = $contact_map[$conv_with] ?? (get_user_by('login', $conv_with)->display_name ?? 'Unknown');
+        }
+        $output .= '<li class="conversation-item" data-conversation-with="' . esc_attr($conv_with) . '">' . esc_html($name) . '</li>';
+        $has_conversations = true;
+    }
+    if (!$has_conversations) {
+        $output = '<li class="conversation-item text-muted">No conversations yet.</li>';
+    }
+
+    ob_end_clean();
+    wp_send_json_success($output);
+}
+
+// Teacher: Shortcode
+function aspire_teacher_prochat_shortcode() {
+    if (!is_user_logged_in()) {
+        return '<p>Please log in to use this chat.</p>';
+    }
+    
+    $user = wp_get_current_user();
+    if (!aspire_is_teacher($user)) {
+        return '<p>You do not have the required permissions to use this chat.</p>';
+    }
+    
+    $username = $user->user_login;
+    $edu_center_id = educational_center_teacher_id();
+    $unread_count = aspire_teacher_get_unread_count($username);
+    $contacts = get_posts([
+        'post_type' => ['teacher', 'students', 'parent'],
+        'posts_per_page' => -1,
+        'meta_key' => 'educational_center_id',
+        'meta_value' => $edu_center_id,
+    ]);
+    $admins = aspire_teacher_get_admins($edu_center_id);
     $is_admin = aspire_is_institute_admin($username, $edu_center_id);
 
     ob_start();
@@ -2496,56 +2681,8 @@ function aspire_teacher_prochat_shortcode() {
             <div class="chat-sidebar">
                 <div class="sidebar-header">
                     <h4>Inbox <span id="unread-badge" class="badge bg-danger"><?php echo $unread_count ?: ''; ?></span></h4>
-                    <input type="text" id="conversation-search" class="form-control" placeholder="Search conversations...">
                 </div>
-                <ul id="aspire-teacher-conversations" class="conversation-list">
-                    <?php
-                    $group_names = [
-                        'all' => 'Everyone in Center',
-                        'teachers' => 'Teachers',
-                        'institute_admins' => 'Institute Admins'
-                    ];
-                    foreach ($active_conversations as $conv) {
-                        $conv_with = $conv->conversation_with;
-                        $name = isset($group_names[$conv_with]) ? $group_names[$conv_with] : null;
-                        if (!$name) {
-                            foreach ($contacts as $contact) {
-                                $contact_username = aspire_teacher_get_username($contact->ID);
-                                if ($contact_username === $conv_with) {
-                                    if ($contact->post_type === 'teacher') {
-                                        $teacher_name = get_post_meta($contact->ID, 'teacher_name', true);
-                                        $teacher_id = get_post_meta($contact->ID, 'teacher_id', true);
-                                        $name = $teacher_name . ' (' . esc_html($teacher_id) . ' - Teacher)';
-                                    } elseif ($contact->post_type === 'students') {
-                                        $student_name = get_post_meta($contact->ID, 'student_name', true);
-                                        $student_id = get_post_meta($contact->ID, 'student_id', true);
-                                        $name = $student_name . ' (' . esc_html($student_id) . ' - Students)';
-                                    } else {
-                                        $name = $contact->post_title . ' (' . ucfirst($contact->post_type) . ')';
-                                    }
-                                    break;
-                                }
-                            }
-                            if (!$name) {
-                                foreach ($admins as $admin) {
-                                    if ($admin['id'] === $conv_with) {
-                                        $name = $admin['name'] . ' (Admin)';
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!$name) {
-                                $user = get_user_by('login', $conv_with);
-                                $name = $user ? $user->display_name : 'Unknown';
-                            }
-                        }
-                        echo '<li class="conversation-item" data-conversation-with="' . esc_attr($conv_with) . '">' . esc_html($name) . '</li>';
-                    }
-                    if (empty($active_conversations)) {
-                        echo '<li class="conversation-item text-muted">No conversations yet.</li>';
-                    }
-                    ?>
-                </ul>
+                <ul id="aspire-teacher-conversations" class="conversation-list"></ul>
             </div>
             <div class="chat-main">
                 <div class="chat-header">
@@ -2562,48 +2699,41 @@ function aspire_teacher_prochat_shortcode() {
                         <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i></button>
                     </div>
                     <div id="recipient-select" class="recipient-select" style="display:none;">
-                        <select id="aspire-teacher-target-type" class="form-select">
-                            <option value="group">Group</option>
-                            <option value="individual">Individual</option>
-                        </select>
-                        <select id="aspire-teacher-target-value" class="form-select aspire-teacher-group-target">
-                            <option value="all">Everyone in Center</option>
-                            <option value="teachers">Teachers</option>
+                        <select id="aspire-teacher-target-value" class="form-select">
+                            <option value="">Select a recipient</option>
+                            <option value="all">All</option>
+                            <option value="teachers">All Teachers</option>
                             <?php if ($is_admin): ?>
-                                <option value="institute_admins">Institute Admins</option>
+                                <option value="institute_admins">All Admins</option>
                             <?php endif; ?>
-                        </select>
-                        <select id="aspire-teacher-individual-target" class="form-select aspire-teacher-individual-target" style="display:none;">
-                            <?php foreach ($contacts as $contact): ?>
-                                <?php 
-                                $contact_username = aspire_teacher_get_username($contact->ID); 
-                                if ($contact_username !== $username): 
-                                    $user_data = get_user_by('login', $contact_username);
-                                    $display_name = $user_data ? $user_data->display_name : $contact->post_title;
-                                    if ($contact->post_type === 'teacher') {
-                                        $teacher_name = get_post_meta($contact->ID, 'teacher_name', true);
-                                        $teacher_id = get_post_meta($contact->ID, 'teacher_id', true);
-                                        $label = $teacher_name . ' (' . esc_html($teacher_id) . ' - ' . ucfirst($contact->post_type) . ')';
-                                    } elseif ($contact->post_type === 'students') {
-                                        $student_name = get_post_meta($contact->ID, 'student_name', true);
-                                        $student_id = get_post_meta($contact->ID, 'student_id', true);
-                                        $label = $student_name . ' (' . esc_html($student_id) . ' - ' . ucfirst($contact->post_type) . ')';
-                                    } else {
-                                        $label = $display_name . ' (' . ucfirst($contact->post_type) . ')';
-                                    }
-                                ?>
-                                    <option value="<?php echo esc_attr($contact_username); ?>">
-                                        <?php echo esc_html($label); ?>
-                                    </option>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-                            <?php foreach ($admins as $admin): ?>
-                                <?php if ($admin['id'] !== $username): ?>
-                                    <option value="<?php echo esc_attr($admin['id']); ?>">
-                                        <?php echo esc_html($admin['name'] . ' (Admin @ Center ' . $edu_center_id . ')'); ?>
-                                    </option>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
+                            <?php
+                            $unique_contacts = [];
+                            foreach ($contacts as $contact) {
+                                if ($contact->post_type === 'teacher') {
+                                    $contact_id = get_post_meta($contact->ID, 'teacher_id', true);
+                                    $teacher_name = get_post_meta($contact->ID, 'teacher_name', true);
+                                    $label = "$teacher_name ($contact_id - Teacher)";
+                                } elseif ($contact->post_type === 'students') {
+                                    $contact_id = get_post_meta($contact->ID, 'student_id', true);
+                                    $student_name = get_post_meta($contact->ID, 'student_name', true);
+                                    $label = "$student_name ($contact_id - Student)";
+                                } else {
+                                    $contact_id = get_post_meta($contact->ID, 'parent_id', true) ?: $contact->post_title;
+                                    $label = "$contact->post_title ($contact_id - Parent)";
+                                }
+                                if (!$contact_id || $contact_id === $username) continue;
+                                if (!isset($unique_contacts[$contact_id])) {
+                                    $unique_contacts[$contact_id] = $label;
+                                    echo '<option value="' . esc_attr($contact_id) . '">' . esc_html($label) . '</option>';
+                                }
+                            }
+                            foreach ($admins as $admin) {
+                                if ($admin['id'] !== $username && !isset($unique_contacts[$admin['id']])) {
+                                    $unique_contacts[$admin['id']] = true;
+                                    echo '<option value="' . esc_attr($admin['id']) . '">' . esc_html($admin['name'] . ' (Admin)') . '</option>';
+                                }
+                            }
+                            ?>
                         </select>
                     </div>
                     <?php wp_nonce_field('aspire_teacher_nonce', 'aspire_teacher_nonce_field'); ?>
@@ -2611,7 +2741,32 @@ function aspire_teacher_prochat_shortcode() {
             </div>
         </div>
     </div>
-  
+
+    <style>
+        .chat-loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .chat-loading.active {
+            display: block;
+        }
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script>
     jQuery(document).ready(function($) {
@@ -2619,6 +2774,7 @@ function aspire_teacher_prochat_shortcode() {
         let currentRecipient = '';
 
         function fetchMessages(conversationWith) {
+            $('#aspire-teacher-message-list').html('<div class="chat-loading active"><div class="spinner"></div><p>Loading messages...</p></div>');
             $.ajax({
                 url: '<?php echo admin_url('admin-ajax.php'); ?>',
                 method: 'POST',
@@ -2634,9 +2790,13 @@ function aspire_teacher_prochat_shortcode() {
                         const chatMessages = document.querySelector('#aspire-teacher-message-list');
                         if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
                         updateTimestamps();
+                    } else {
+                        $('#aspire-teacher-message-list').html('<p>Error loading messages.</p>');
+                        console.error('Fetch messages failed:', response.data);
                     }
                 },
                 error: function(xhr, status, error) {
+                    $('#aspire-teacher-message-list').html('<p>Network error occurred.</p>');
                     console.error('AJAX error:', status, error);
                 }
             });
@@ -2656,7 +2816,12 @@ function aspire_teacher_prochat_shortcode() {
                         if (selectedConversation) {
                             $(`#aspire-teacher-conversations li[data-conversation-with="${selectedConversation}"]`).addClass('active');
                         }
+                    } else {
+                        console.error('Failed to fetch conversations:', response.data);
                     }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', status, error);
                 }
             });
         }
@@ -2667,16 +2832,6 @@ function aspire_teacher_prochat_shortcode() {
                 $(this).text(`${$(this).text().split(' - ')[0]} - ${moment(timestamp).fromNow()}`);
             });
         }
-
-        $('#aspire-teacher-target-type').change(function() {
-            if ($(this).val() === 'individual') {
-                $('.aspire-teacher-group-target').hide();
-                $('.aspire-teacher-individual-target').show();
-            } else {
-                $('.aspire-teacher-group-target').show();
-                $('.aspire-teacher-individual-target').hide();
-            }
-        });
 
         $(document).on('click', '#aspire-teacher-conversations li', function() {
             $('#aspire-teacher-conversations li').removeClass('active');
@@ -2713,25 +2868,18 @@ function aspire_teacher_prochat_shortcode() {
             $('#recipient-select').show();
             $('#aspire-teacher-message-list').empty();
             $('#aspire-teacher-conversations li').removeClass('active');
+            $('#aspire-teacher-target-value').val('');
         });
 
         $('#aspire-teacher-send-form').submit(function(e) {
             e.preventDefault();
-            const message = $('#aspire-teacher-message-input').val();
-            let targetType, targetValue;
+            const message = $('#aspire-teacher-message-input').val().trim();
+            if (!message) return;
 
-            if (currentRecipient) {
-                targetType = currentRecipient.match(/^(all|teachers|institute_admins)$/) ? 'group' : 'individual';
-                targetValue = currentRecipient;
-            } else {
-                targetType = $('#aspire-teacher-target-type').val();
-                targetValue = targetType === 'individual' ? $('#aspire-teacher-individual-target').val() : $('#aspire-teacher-target-value').val();
-                currentRecipient = targetValue;
-                $(`#aspire-teacher-conversations li[data-conversation-with="${currentRecipient}"]`).addClass('active');
-                $('#current-conversation').text($(`#aspire-teacher-conversations li[data-conversation-with="${currentRecipient}"]`).text() || 'New Conversation');
-                $('#clear-conversation').show();
-                $('#new-chat').hide();
-                $('#recipient-select').hide();
+            let targetValue = $('#recipient-select').is(':visible') ? $('#aspire-teacher-target-value').val() : currentRecipient;
+            if (!targetValue) {
+                alert('Please select a recipient.');
+                return;
             }
 
             $.ajax({
@@ -2740,34 +2888,33 @@ function aspire_teacher_prochat_shortcode() {
                 data: {
                     action: 'aspire_teacher_send_message',
                     message: message,
-                    target_type: targetType,
                     target_value: targetValue,
                     nonce: $('#aspire_teacher_nonce_field').val()
                 },
                 success: function(response) {
                     if (response.success) {
                         $('#aspire-teacher-message-input').val('');
+                        if ($('#recipient-select').is(':visible')) {
+                            currentRecipient = targetValue;
+                            $('#current-conversation').text($(`#aspire-teacher-target-value option[value="${targetValue}"]`).text());
+                            $('#clear-conversation').show();
+                            $('#new-chat').hide();
+                            $('#recipient-select').hide();
+                        }
                         fetchMessages(currentRecipient);
-                        updateConversations();
+                        setTimeout(updateConversations, 500);
                     } else {
-                        console.error('Send failed:', response.data);
+                        alert('Failed to send message: ' + (response.data?.error || 'Unknown error'));
                     }
                 },
                 error: function(xhr, status, error) {
                     console.error('AJAX error:', status, error);
+                    alert('Network error occurred. Please try again.');
                 }
             });
         });
 
-        $('#conversation-search').on('input', function() {
-            const search = $(this).val().toLowerCase();
-            $('.conversation-item').each(function() {
-                const text = $(this).text().toLowerCase();
-                $(this).toggle(text.includes(search));
-            });
-        });
-
-        // Initial load
+        updateConversations();
         if (selectedConversation) {
             $(`#aspire-teacher-conversations li[data-conversation-with="${selectedConversation}"]`).addClass('active');
             $('#current-conversation').text($(`#aspire-teacher-conversations li[data-conversation-with="${selectedConversation}"]`).text());
@@ -2782,159 +2929,175 @@ function aspire_teacher_prochat_shortcode() {
     return ob_get_clean();
 }
 add_shortcode('aspire_teacher_prochat', 'aspire_teacher_prochat_shortcode');
-
 // Teacher: AJAX Fetch Messages (No Change Needed)
-function aspire_teacher_ajax_fetch_messages() {
-    check_ajax_referer('aspire_teacher_nonce', 'nonce');
-    $user = wp_get_current_user();
-    $username = $user->user_login;
-    $conversation_with = sanitize_text_field($_POST['conversation_with'] ?? '');
-    error_log("Fetching messages for $username with conversation_with: $conversation_with");
+// function aspire_teacher_ajax_fetch_messages() {
+//     check_ajax_referer('aspire_teacher_nonce', 'nonce');
+//     $user = wp_get_current_user();
+//     $username = $user->user_login;
+//     $conversation_with = sanitize_text_field($_POST['conversation_with'] ?? '');
+//     error_log("Fetching messages for $username with conversation_with: $conversation_with");
 
-    $messages = aspire_teacher_get_messages($username, $conversation_with);
-    if ($conversation_with && !in_array($conversation_with, ['all', 'teachers', 'institute_admins'])) {
-        aspire_teacher_mark_messages_read($username, $conversation_with);
-    }
+//     $messages = aspire_teacher_get_messages($username, $conversation_with);
+//     if ($conversation_with && !in_array($conversation_with, ['all', 'teachers', 'institute_admins'])) {
+//         aspire_teacher_mark_messages_read($username, $conversation_with);
+//     }
 
-    $contacts = get_posts([
-        'post_type' => ['teacher', 'students', 'parent'],
-        'posts_per_page' => -1,
-        'meta_key' => 'educational_center_id',
-        'meta_value' => educational_center_teacher_id(),
-    ]);
-    $admins = aspire_teacher_get_admins(educational_center_teacher_id());
+//     $contacts = get_posts([
+//         'post_type' => ['teacher', 'students', 'parent'],
+//         'posts_per_page' => -1,
+//         'meta_key' => 'educational_center_id',
+//         'meta_value' => educational_center_teacher_id(),
+//     ]);
+//     $admins = aspire_teacher_get_admins(educational_center_teacher_id());
 
-    $output = '';
-    foreach ($messages as $msg) {
-        $sender_name = ($msg->sender_id === $username) ? 'You' : null;
-        if (!$sender_name) {
-            foreach ($contacts as $contact) {
-                if (aspire_teacher_get_username($contact->ID) === $msg->sender_id) {
-                    if ($contact->post_type === 'teacher') {
-                        $sender_name = get_post_meta($contact->ID, 'teacher_name', true);
-                    } elseif ($contact->post_type === 'students') {
-                        $sender_name = get_post_meta($contact->ID, 'student_name', true);
-                    } else {
-                        $sender_name = $contact->post_title;
-                    }
-                    break;
-                }
-            }
-            if (!$sender_name) {
-                foreach ($admins as $admin) {
-                    if ($admin['id'] === $msg->sender_id) {
-                        $sender_name = $admin['name'];
-                        break;
-                    }
-                }
-            }
-            if (!$sender_name) {
-                $sender = get_user_by('login', $msg->sender_id);
-                $sender_name = $sender ? $sender->display_name : 'Unknown';
-            }
-        }
-        $initials = strtoupper(substr($sender_name === 'You' ? $user->display_name : $sender_name, 0, 2));
-        $output .= '<div class="chat-message ' . ($msg->sender_id === $username ? 'sent' : 'received') . ' ' . ($msg->status == 'sent' ? 'unread' : '') . '">';
-        $output .= '<div class="bubble">';
-        $output .= '<span class="avatar">' . esc_html($initials) . '</span>';
-        $output .= '<p>' . esc_html($msg->message) . '</p>';
-        $output .= '</div>';
-        $output .= '<div class="meta" data-timestamp="' . esc_attr($msg->timestamp) . '">' . esc_html($sender_name) . ' - ' . esc_html($msg->timestamp) . '</div>';
-        $output .= '</div>';
-    }
+//     $output = '';
+//     foreach ($messages as $msg) {
+//         $sender_name = ($msg->sender_id === $username) ? 'You' : null;
+//         if (!$sender_name) {
+//             foreach ($contacts as $contact) {
+//                 if (aspire_teacher_get_username($contact->ID) === $msg->sender_id) {
+//                     if ($contact->post_type === 'teacher') {
+//                         $sender_name = get_post_meta($contact->ID, 'teacher_name', true);
+//                     } elseif ($contact->post_type === 'students') {
+//                         $sender_name = get_post_meta($contact->ID, 'student_name', true);
+//                     } else {
+//                         $sender_name = $contact->post_title;
+//                     }
+//                     break;
+//                 }
+//             }
+//             if (!$sender_name) {
+//                 foreach ($admins as $admin) {
+//                     if ($admin['id'] === $msg->sender_id) {
+//                         $sender_name = $admin['name'];
+//                         break;
+//                     }
+//                 }
+//             }
+//             if (!$sender_name) {
+//                 $sender = get_user_by('login', $msg->sender_id);
+//                 $sender_name = $sender ? $sender->display_name : 'Unknown';
+//             }
+//         }
+//         $initials = strtoupper(substr($sender_name === 'You' ? $user->display_name : $sender_name, 0, 2));
+//         $output .= '<div class="chat-message ' . ($msg->sender_id === $username ? 'sent' : 'received') . ' ' . ($msg->status == 'sent' ? 'unread' : '') . '">';
+//         $output .= '<div class="bubble">';
+//         $output .= '<span class="avatar">' . esc_html($initials) . '</span>';
+//         $output .= '<p>' . esc_html($msg->message) . '</p>';
+//         $output .= '</div>';
+//         $output .= '<div class="meta" data-timestamp="' . esc_attr($msg->timestamp) . '">' . esc_html($sender_name) . ' - ' . esc_html($msg->timestamp) . '</div>';
+//         $output .= '</div>';
+//     }
 
-    wp_send_json_success(['html' => $output, 'unread' => aspire_teacher_get_unread_count($username)]);
-}
+//     wp_send_json_success(['html' => $output, 'unread' => aspire_teacher_get_unread_count($username)]);
+// }
 
-// Teacher: Get Active Conversations (Fixed to Use sender_id and receiver_id)
-function aspire_teacher_get_active_conversations($username) {
-    global $wpdb;
-    $table = $wpdb->prefix . 'aspire_messages';
-    $edu_center_id = educational_center_teacher_id();
-    $user = wp_get_current_user();
-    $is_teacher = aspire_is_teacher($user);
-    $is_admin = aspire_is_institute_admin($username, $edu_center_id);
+// // Teacher: Get Active Conversations (Fixed to Use sender_id and receiver_id)
+// function aspire_teacher_get_active_conversations($username) {
+//     global $wpdb;
+//     $table = $wpdb->prefix . 'aspire_messages';
+//     $edu_center_id = educational_center_teacher_id();
+//     $user = wp_get_current_user();
+//     $is_teacher = aspire_is_teacher($user);
+//     $is_admin = aspire_is_institute_admin($username, $edu_center_id);
 
-    $group_receivers = ['all'];
-    if ($is_teacher) $group_receivers[] = 'teachers';
-    if ($is_admin) $group_receivers[] = 'institute_admins';
-    $placeholders = implode(',', array_fill(0, count($group_receivers), '%s'));
+//     $group_receivers = ['all'];
+//     if ($is_teacher) $group_receivers[] = 'teachers';
+//     if ($is_admin) $group_receivers[] = 'institute_admins';
+//     $placeholders = implode(',', array_fill(0, count($group_receivers), '%s'));
 
-    // Union distinct receivers (when user is sender) and senders (when user is receiver) with group receivers
-    $query = "
-        SELECT DISTINCT receiver_id AS conversation_with 
-        FROM $table 
-        WHERE education_center_id = %s 
-        AND sender_id = %s
-        UNION
-        SELECT DISTINCT sender_id AS conversation_with 
-        FROM $table 
-        WHERE education_center_id = %s 
-        AND receiver_id = %s 
-        AND sender_id != %s
-        UNION
-        SELECT DISTINCT receiver_id AS conversation_with 
-        FROM $table 
-        WHERE education_center_id = %s 
-        AND receiver_id IN ($placeholders)
-    ";
-    $query_args = array_merge(
-        [$edu_center_id, $username],              // First query: user as sender
-        [$edu_center_id, $username, $username],   // Second query: user as receiver, exclude self-sent
-        [$edu_center_id],                         // Third query: group receivers
-        $group_receivers
-    );
+//     // Union distinct receivers (when user is sender) and senders (when user is receiver) with group receivers
+//     $query = "
+//         SELECT DISTINCT receiver_id AS conversation_with 
+//         FROM $table 
+//         WHERE education_center_id = %s 
+//         AND sender_id = %s
+//         UNION
+//         SELECT DISTINCT sender_id AS conversation_with 
+//         FROM $table 
+//         WHERE education_center_id = %s 
+//         AND receiver_id = %s 
+//         AND sender_id != %s
+//         UNION
+//         SELECT DISTINCT receiver_id AS conversation_with 
+//         FROM $table 
+//         WHERE education_center_id = %s 
+//         AND receiver_id IN ($placeholders)
+//     ";
+//     $query_args = array_merge(
+//         [$edu_center_id, $username],              // First query: user as sender
+//         [$edu_center_id, $username, $username],   // Second query: user as receiver, exclude self-sent
+//         [$edu_center_id],                         // Third query: group receivers
+//         $group_receivers
+//     );
 
-    $prepared_query = $wpdb->prepare($query, $query_args);
-    error_log("Teacher active conversations query: $prepared_query");
-    $results = $wpdb->get_results($prepared_query);
-    error_log("Teacher active conversations for $username: " . print_r($results, true));
+//     $prepared_query = $wpdb->prepare($query, $query_args);
+//     error_log("Teacher active conversations query: $prepared_query");
+//     $results = $wpdb->get_results($prepared_query);
+//     error_log("Teacher active conversations for $username: " . print_r($results, true));
 
-    return $results;
-}
+//     return $results;
+// }
 
-// Teacher: Get Messages (Unchanged from Last Refinement)
-function aspire_teacher_get_messages($username, $conversation_with = '') {
-    global $wpdb;
-    $table = $wpdb->prefix . 'aspire_messages';
-    $edu_center_id = educational_center_teacher_id();
-    $user = wp_get_current_user();
-    $is_teacher = aspire_is_teacher($user);
-    $is_admin = aspire_is_institute_admin($username, $edu_center_id);
+// // Teacher: Get Messages (Unchanged from Last Refinement)
+// function aspire_teacher_get_messages($username, $conversation_with = '') {
+//     global $wpdb;
+//     $table = $wpdb->prefix . 'aspire_messages';
+//     $edu_center_id = educational_center_teacher_id();
+//     $user = wp_get_current_user();
+//     $is_teacher = aspire_is_teacher($user);
+//     $is_admin = aspire_is_institute_admin($username, $edu_center_id);
 
-    $query = "SELECT * FROM $table WHERE education_center_id = %s";
-    $query_args = [$edu_center_id];
+//     // Base query
+//     $query = "SELECT * FROM $table WHERE education_center_id = %s";
+//     $query_args = [$edu_center_id];
 
-    if ($conversation_with) {
-        if (in_array($conversation_with, ['all', 'teachers', 'institute_admins'])) {
-            $query .= " AND receiver_id = %s";
-            $query_args[] = $conversation_with;
-        } else {
-            $query .= " AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s))";
-            $query_args[] = $username;
-            $query_args[] = $conversation_with;
-            $query_args[] = $conversation_with;
-            $query_args[] = $username;
-            $query .= " LIMIT 50";
-        }
-    } else {
-        $group_receivers = ['all'];
-        if ($is_teacher) $group_receivers[] = 'teachers';
-        if ($is_admin) $group_receivers[] = 'institute_admins';
-        $placeholders = implode(',', array_fill(0, count($group_receivers), '%s'));
-        $query .= " AND (receiver_id = %s OR receiver_id IN ($placeholders))";
-        $query_args[] = $username;
-        $query_args = array_merge($query_args, $group_receivers);
-    }
+//     if ($conversation_with) {
+//         if (in_array($conversation_with, ['all', 'teachers', 'institute_admins'])) {
+//             $query .= " AND receiver_id = %s";
+//             $query_args[] = $conversation_with;
+//         } else {
+//             $query .= " AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s))";
+//             $query_args[] = $username;
+//             $query_args[] = $conversation_with;
+//             $query_args[] = $conversation_with;
+//             $query_args[] = $username;
+//             $query .= " LIMIT 50";
+//         }
+//     } else {
+//         $group_receivers = ['all'];
+//         if ($is_teacher) $group_receivers[] = 'teachers';
+//         if ($is_admin) $group_receivers[] = 'institute_admins';
+//         $placeholders = implode(',', array_fill(0, count($group_receivers), '%s'));
+//         $query .= " AND (receiver_id = %s OR receiver_id IN ($placeholders))";
+//         $query_args[] = $username;
+//         $query_args = array_merge($query_args, $group_receivers);
+//     }
 
-    $query .= " ORDER BY timestamp ASC";
-    $prepared_query = $wpdb->prepare($query, $query_args);
-    error_log("Teacher query: $prepared_query");
-    $results = $wpdb->get_results($prepared_query);
-    error_log("Teacher messages for $username with $conversation_with: " . print_r($results, true));
-    return $results;
-}
+//     // Check if 'timestamp' column exists; use a fallback if not
+//     $columns = $wpdb->get_col("SHOW COLUMNS FROM $table");
+//     if (in_array('timestamp', $columns)) {
+//         $query .= " ORDER BY timestamp ASC";
+//     } else {
+//         // Fallback: Order by 'id' or assume auto-incrementing primary key if timestamp is missing
+//         if (in_array('id', $columns)) {
+//             $query .= " ORDER BY id ASC";
+//         }
+//         error_log("Warning: 'timestamp' column missing in $table; falling back to 'id' or no sorting.");
+//     }
 
+//     $prepared_query = $wpdb->prepare($query, $query_args);
+//     error_log("Teacher query: $prepared_query");
+    
+//     $results = $wpdb->get_results($prepared_query);
+//     if ($wpdb->last_error) {
+//         error_log("Database error: " . $wpdb->last_error);
+//         return new WP_Error('db_error', 'Failed to fetch messages: ' . $wpdb->last_error);
+//     }
+
+//     error_log("Teacher messages for $username with $conversation_with: " . print_r($results, true));
+//     return $results ?: [];
+// }
 
 
 // Attendance Reports Rendering Function
