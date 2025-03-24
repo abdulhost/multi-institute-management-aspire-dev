@@ -169,8 +169,14 @@ function aspire_student_dashboard_shortcode() {
                     case 'noticeboard':
                         echo aspire_student_notice_board_shortcode(); // Placeholder for noticeboard
                         break;
+                    case 'library':
+                        echo student_library_transactions_shortcode($student); // Placeholder for noticeboard
+                        break;
                     case 'fees':
-                        echo render_student_fees($user_id, $student);
+                        echo student_fees_shortcode($student);
+                        break;
+                    case 'transport':
+                        echo student_transport_fees_shortcode($student);
                         break;
                     default:
                         echo render_student_overview($user_id, $student);
@@ -2257,12 +2263,6 @@ $exam_data = $wpdb->get_results($wpdb->prepare($exam_query, $student_id, $educat
 // Helper: Check if user is a student
 // Helper: Check if user is a student
 
-if (!function_exists('educational_center_student_id')) {
-    function educational_center_student_id() {
-        return 'AFC46B9CEE17'; // Adjust as needed
-    }
-}
-
 function aspire_is_student($user) {
     return in_array('student', $user->roles);
 }
@@ -2849,3 +2849,1132 @@ function aspire_student_ajax_fetch_conversations() {
     ob_end_clean();
     wp_send_json_success($output);
 }
+
+//noticeboard
+// Student Notice Board Shortcode
+function aspire_student_notice_board_shortcode() {
+    if (!is_user_logged_in()) {
+        return '<p>Please log in to view the notice board.</p>';
+    }
+    
+    $user = wp_get_current_user();
+    $username = $user->user_login;
+    $edu_center_id = get_educational_center_data();
+    
+    if (!aspire_is_student($user)) {
+        return '<p>You do not have permission to view this notice board.</p>';
+    }
+
+    $announcements = aspire_get_announcements_student($username, 'student');
+    $recipients = aspire_get_recipient_options();
+    ob_start();
+    ?>
+    <div id="aspire-student-notice-board" class="notice-board-container">
+        <div class="notice-board-header">Student Notice Board</div>
+        <div id="announcement-list" class="announcement-list">
+            <?php foreach ($announcements as $ann): ?>
+                <div class="announcement-item">
+                    <div class="announcement-content">
+                        <span class="announcement-meta">
+                            <?php echo esc_html($ann->sender_id); ?> 
+                            to <?php echo esc_html($recipients[$ann->receiver_id] ?? ucfirst($ann->receiver_id)); ?>
+                        </span>
+                        <p class="announcement-message"><?php echo esc_html($ann->message); ?></p>
+                    </div>
+                    <span class="announcement-timestamp" data-timestamp="<?php echo esc_attr($ann->timestamp); ?>">
+                        <?php echo esc_html($ann->timestamp); ?>
+                    </span>
+                </div>
+            <?php endforeach; ?>
+            <?php if (empty($announcements)): ?>
+                <div class="announcement-item">
+                    <p class="announcement-message text-muted">No announcements yet.</p>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php
+    $script = "
+    jQuery(document).ready(function($) {
+        function fetchAnnouncements() {
+            $.ajax({
+                url: '" . admin_url('admin-ajax.php') . "',
+                method: 'POST',
+                data: {
+                    action: 'aspire_student_fetch_announcements',
+                    nonce: '" . wp_create_nonce('aspire_student_notice_nonce') . "'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#announcement-list').html(response.data.html);
+                        updateTimestamps();
+                    } else {
+                        console.log('Fetch failed: ' + (response.data ? response.data.message : 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('AJAX fetch error: ' + error);
+                }
+            });
+        }
+
+        function updateTimestamps() {
+            $('.announcement-timestamp').each(function() {
+                const timestamp = $(this).data('timestamp');
+                if (typeof moment !== 'undefined') {
+                    $(this).text(moment(timestamp).fromNow());
+                } else {
+                    console.log('Moment.js not loaded');
+                }
+            });
+        }
+
+        fetchAnnouncements();
+        setInterval(fetchAnnouncements, 30000);
+        updateTimestamps();
+    });
+    ";
+    wp_add_inline_script('moment', $script, 'after');
+    return ob_get_clean();
+}
+add_shortcode('aspire_student_notice_board', 'aspire_student_notice_board_shortcode');
+
+// Student AJAX Handler
+function aspire_student_fetch_announcements() {
+    check_ajax_referer('aspire_student_notice_nonce', 'nonce');
+    $user = wp_get_current_user();
+    $username = $user->user_login;
+    $announcements = aspire_get_announcements_student($username, 'student');
+    $recipients = aspire_get_recipient_options();
+
+    $output = '';
+    foreach ($announcements as $ann) {
+        $output .= '<div class="announcement-item">';
+        $output .= '<div class="announcement-content">';
+        $output .= '<span class="announcement-meta">' . esc_html($ann->sender_id) . ' to ';
+        $output .= esc_html($recipients[$ann->receiver_id] ?? ucfirst($ann->receiver_id)) . '</span>';
+        $output .= '<p class="announcement-message">' . esc_html($ann->message) . '</p>';
+        $output .= '</div>';
+        $output .= '<span class="announcement-timestamp" data-timestamp="' . esc_attr($ann->timestamp) . '">' . esc_html($ann->timestamp) . '</span>';
+        $output .= '</div>';
+    }
+    if (empty($announcements)) {
+        $output = '<div class="announcement-item"><p class="announcement-message text-muted">No announcements yet.</p></div>';
+    }
+    wp_send_json_success(['html' => $output]);
+}
+add_action('wp_ajax_aspire_student_fetch_announcements', 'aspire_student_fetch_announcements');
+
+// Modified shared function to include student role
+function aspire_get_announcements_student($username, $role ) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_announcements';
+    $edu_center_id = educational_center_student_id();
+
+    $query = "SELECT * FROM $table WHERE education_center_id = %s";
+    $query_args = [$edu_center_id];
+
+  
+        $query .= " AND receiver_id IN ('all', 'students')";
+    
+
+    $query .= " ORDER BY timestamp DESC";
+    $prepared_query = $wpdb->prepare($query, $query_args);
+    error_log("$role announcements query: $prepared_query");
+    $results = $wpdb->get_results($prepared_query);
+    error_log("$role announcements for $username: " . print_r($results, true));
+    return $results;
+}
+
+//library
+function student_library_transactions_shortcode($student) {
+    global $wpdb;
+
+    // Get the current logged-in user
+    $current_user = wp_get_current_user();
+    if (!$current_user->ID) {
+        return '<div class="alert alert-warning">Please log in to view your library transactions.</div>';
+    }
+
+    $student_id = get_post_meta($student->ID, 'student_id', true);
+    
+
+    if (empty($student_id)) {
+        return '<div class="alert alert-warning">No student ID associated with your account. Contact support.</div>';
+    }
+
+    // Get educational center ID
+    $education_center_id = educational_center_student_id();
+
+    // Verify student exists in the 'students' post type
+    $student_exists = get_posts([
+        'post_type' => 'students',
+        'posts_per_page' => 1,
+        'meta_query' => [
+            [
+                'key' => 'student_id',
+                'value' => $student_id,
+                'compare' => '='
+            ],
+            [
+                'key' => 'educational_center_id',
+                'value' => $education_center_id,
+                'compare' => '='
+            ]
+        ]
+    ]);
+
+    if (empty($student_exists)) {
+        return '<div class="alert alert-warning">Student ID ' . esc_html($student_id) . ' not found or does not belong to this educational center.</div>';
+    }
+
+    $trans_table = $wpdb->prefix . 'library_transactions';
+    $library_table = $wpdb->prefix . 'library';
+
+    // Fetch all transactions for the student (no initial filter applied)
+    $transactions = $wpdb->get_results($wpdb->prepare(
+        "SELECT t.*, l.title 
+         FROM $trans_table t 
+         JOIN $library_table l ON t.book_id = l.book_id 
+         WHERE l.education_center_id = %s AND t.user_id = %s AND t.user_type = 'Student' 
+         ORDER BY t.issue_date DESC",
+        $education_center_id,
+        $student_id
+    ));
+
+    ob_start();
+    ?>
+    <div class="card shadow-lg" style="border: 3px solid #28a745; background: #f4fff4;">
+        <div class="card-header bg-success text-white" style="border-radius: 15px 15px 0 0;">
+            <h3 class="card-title mb-0"><i class="bi bi-book me-2"></i>Your Library Transactions (Student ID: <?php echo esc_html($student_id); ?>)</h3>
+        </div>
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <p class="text-muted">"View all books issued to you, including pending and returned"</p>
+                <div class="d-flex align-items-center">
+                    <select id="transactionFilter" class="form-select me-2" style="width: 150px;">
+                        <option value="all" selected>All Transactions</option>
+                        <option value="pending">Pending</option>
+                        <option value="returned">Returned</option>
+                    </select>
+                    <button id="exportCsv" class="btn btn-outline-success">Export to CSV</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="studentTransactionTable" class="table table-striped" style="border-radius: 10px; overflow: hidden;">
+                    <thead style="background: #e6ffe6;">
+                        <tr>
+                            <th class="sortable" data-sort="book_id">Book ID</th>
+                            <th class="sortable" data-sort="title">Title</th>
+                            <th class="sortable" data-sort="issue_date">Issue Date</th>
+                            <th class="sortable" data-sort="due_date">Due Date</th>
+                            <th>Days Remaining/Overdue</th>
+                            <th>Return Date</th>
+                            <th>Fine (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if (empty($transactions)) {
+                            echo '<tr><td colspan="7" class="text-center py-4">No transactions found.</td></tr>';
+                        } else {
+                            $total_fine = 0;
+                            foreach ($transactions as $trans) {
+                                $is_overdue = !$trans->return_date && strtotime($trans->due_date) < current_time('timestamp');
+                                $days_diff = $is_overdue 
+                                    ? max(0, (current_time('timestamp') - strtotime($trans->due_date)) / (60 * 60 * 24)) 
+                                    : ($trans->return_date ? 0 : max(0, (strtotime($trans->due_date) - current_time('timestamp')) / (60 * 60 * 24)));
+                                $fine = $trans->return_date ? $trans->fine : ($is_overdue ? $days_diff * 0.50 : 0);
+                                $total_fine += $fine;
+
+                                echo '<tr data-returned="' . ($trans->return_date ? 'true' : 'false') . '">';
+                                echo '<td>' . esc_html($trans->book_id) . '</td>';
+                                echo '<td>' . esc_html($trans->title) . '</td>';
+                                echo '<td>' . esc_html($trans->issue_date) . '</td>';
+                                echo '<td>' . esc_html($trans->due_date) . '</td>';
+                                echo '<td>';
+                                if ($trans->return_date) {
+                                    echo '<span class="badge bg-success">Returned</span>';
+                                } elseif ($is_overdue) {
+                                    echo '<span class="badge bg-danger">Overdue by ' . floor($days_diff) . ' days</span>';
+                                } else {
+                                    echo '<span class="badge bg-info">' . floor($days_diff) . ' days remaining</span>';
+                                }
+                                echo '</td>';
+                                echo '<td>' . ($trans->return_date ? esc_html($trans->return_date) : '<span class="badge bg-warning">Pending</span>') . '</td>';
+                                echo '<td>' . number_format($fine, 2) . ($trans->return_date ? '' : ' (Pending)') . '</td>';
+                                echo '</tr>';
+                            }
+                            // Summary row (always visible)
+                            echo '<tr class="table-info" id="totalFineRow">';
+                            echo '<td colspan="6" class="text-end fw-bold">Total Fine Owed:</td>';
+                            echo '<td id="totalFine">' . number_format($total_fine, 2) . '</td>';
+                            echo '</tr>';
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = document.getElementById('studentTransactionTable');
+            const tbody = table.querySelector('tbody');
+            const filterSelect = document.getElementById('transactionFilter');
+            const rows = Array.from(tbody.querySelectorAll('tr:not(#totalFineRow)')); // Exclude summary row
+            const totalFineCell = document.getElementById('totalFine');
+
+            // Filter function
+            function applyFilter() {
+                const filter = filterSelect.value;
+                let visibleFineTotal = 0;
+
+                rows.forEach(row => {
+                    const isReturned = row.dataset.returned === 'true';
+                    let shouldShow = false;
+
+                    if (filter === 'all') {
+                        shouldShow = true;
+                    } else if (filter === 'pending' && !isReturned) {
+                        shouldShow = true;
+                    } else if (filter === 'returned' && isReturned) {
+                        shouldShow = true;
+                    }
+
+                    row.style.display = shouldShow ? '' : 'none';
+                    if (shouldShow) {
+                        const fineText = row.cells[6].textContent.split(' ')[0]; // Extract numeric fine
+                        visibleFineTotal += parseFloat(fineText) || 0;
+                    }
+                });
+
+                // Update total fine
+                totalFineCell.textContent = visibleFineTotal.toFixed(2);
+            }
+
+            // Apply filter on change
+            filterSelect.addEventListener('change', applyFilter);
+
+            // Initial filter application
+            applyFilter();
+
+            // Table Sorting
+            const headers = table.querySelectorAll('.sortable');
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    const sortKey = header.dataset.sort;
+                    const isAsc = header.classList.toggle('asc');
+                    header.classList.toggle('desc', !isAsc);
+
+                    const visibleRows = rows.filter(row => row.style.display !== 'none');
+                    visibleRows.sort((a, b) => {
+                        const aValue = a.cells[[...headers].findIndex(h => h.dataset.sort === sortKey)].textContent;
+                        const bValue = b.cells[[...headers].findIndex(h => h.dataset.sort === sortKey)].textContent;
+                        return isAsc ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                    });
+
+                    visibleRows.forEach(row => tbody.insertBefore(row, tbody.querySelector('#totalFineRow')));
+                });
+            });
+
+            // Export to CSV
+            document.getElementById('exportCsv').addEventListener('click', function() {
+                const visibleRows = rows.filter(row => row.style.display !== 'none');
+                const allRows = [...visibleRows, tbody.querySelector('#totalFineRow')];
+                const csvContent = allRows.map(row => {
+                    const cols = Array.from(row.cells).map(cell => `"${cell.textContent.trim().replace(/"/g, '""')}"`);
+                    return cols.join(',');
+                }).join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'student_<?php echo esc_js($student_id); ?>_transactions.csv';
+                link.click();
+            });
+        });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('student_library_transactions', 'student_library_transactions_shortcode');
+
+
+function get_educational_center_data_student($educational_center_id) {
+    $current_user = wp_get_current_user();
+    // $educational_center_id = educational_center_student_id(); 
+
+    $args = array(
+        'post_type' => 'educational-center',
+        'meta_query' => array(
+            array(
+                'key' => 'educational_center_id',
+                'value' => $educational_center_id,
+                'compare' => '='
+            )
+        ),
+        'posts_per_page' => 1,
+        'post_status' => 'publish'
+    );
+    $query = new WP_Query($args);
+    if ($query->have_posts()) {
+        $query->the_post();
+        $post_id = get_the_ID();
+        $education_center_id = get_field('educational_center_id', $post_id) ?: $post_id;
+        $institute_name = get_the_title($post_id);
+        $logo = get_field('institute_logo', $post_id);
+        $logo_url = is_array($logo) && isset($logo['url']) ? esc_url($logo['url']) : ($logo ? wp_get_attachment_url($logo) : '');
+        wp_reset_postdata();
+        return array(
+            'id' => $education_center_id,
+            'name' => $institute_name,
+            'logo_url' => $logo_url
+        );
+    }
+    return false;
+}
+
+//fees
+function student_fees_shortcode($student) {
+    global $wpdb;
+
+    // Get the current logged-in user
+    $current_user = wp_get_current_user();
+    if (!$current_user->ID) {
+        return '<div class="alert alert-warning">Please log in to view your fee details.</div>';
+    }
+
+    $student_id = get_post_meta($student->ID, 'student_id', true);
+
+
+    if (empty($student_id)) {
+        return '<div class="alert alert-warning">No student ID associated with your account. Contact support.</div>';
+    }
+
+    // Get educational center ID and details
+    $education_center_id = educational_center_student_id();
+    $center_data = get_educational_center_data_student($education_center_id);
+
+    if (!$center_data) {
+        return '<div class="alert alert-warning">Educational center data not found.</div>';
+    }
+
+    $institute_name = $center_data['name'];
+    $institute_logo = $center_data['logo_url']; // Web-accessible URL
+
+    // Verify student exists
+    $student_exists = get_posts([
+        'post_type' => 'students',
+        'posts_per_page' => 1,
+        'meta_query' => [
+            ['key' => 'student_id', 'value' => $student_id, 'compare' => '='],
+            ['key' => 'educational_center_id', 'value' => $education_center_id, 'compare' => '=']
+        ]
+    ]);
+
+    if (empty($student_exists)) {
+        return '<div class="alert alert-warning">Student ID ' . esc_html($student_id) . ' not found or does not belong to this educational center.</div>';
+    }
+
+    $student_post = $student_exists[0];
+    $student_name = get_the_title($student_post->ID);
+    $student_class = get_post_meta($student_post->ID, 'class', true) ?: 'Unknown Class';
+    $student_section = get_post_meta($student_post->ID, 'section', true) ?: 'Unknown Section';
+    $admission_date = get_post_meta($student_post->ID, 'admission_date', true) ?: date('Y-m');
+
+    $table_name = $wpdb->prefix . 'student_fees';
+    $template_table = $wpdb->prefix . 'fee_templates';
+
+    // Fetch fees
+    $fees = $wpdb->get_results($wpdb->prepare(
+        "SELECT sf.*, ft.name AS template_name 
+         FROM $table_name sf 
+         LEFT JOIN $template_table ft ON sf.template_id = ft.id 
+         WHERE sf.education_center_id = %s AND sf.student_id = %s 
+         ORDER BY sf.month_year",
+        $education_center_id,
+        $student_id
+    ));
+
+    // Pending months calculation
+    $current_date = new DateTime(date('Y-m-01'));
+    $admission_date_obj = new DateTime(date('Y-m-01', strtotime($admission_date)));
+    $pending_months = [];
+    $paid_months = [];
+    $interval = DateInterval::createFromDateString('1 month');
+    $period = new DatePeriod($admission_date_obj, $interval, $current_date);
+
+    foreach ($fees as $fee) {
+        if ($fee->status === 'paid') {
+            $paid_months[] = $fee->month_year;
+        }
+    }
+
+    foreach ($period as $dt) {
+        $month_year = $dt->format('Y-m');
+        if (!in_array($month_year, $paid_months)) {
+            $pending_months[] = $month_year;
+        }
+    }
+
+    ob_start();
+    ?>
+    <div class="card shadow-lg" style="border: 3px solid #28a745; background: #f4fff4;">
+        <div class="card-header bg-success text-white" style="border-radius: 15px 15px 0 0;">
+            <h3 class="card-title mb-0"><i class="bi bi-wallet me-2"></i>Your Fee Details (Student ID: <?php echo esc_html($student_id); ?>)</h3>
+        </div>
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <p class="text-muted">"View your fee status for <?php echo esc_html($student_name); ?> (Class: <?php echo esc_html($student_class . ' - ' . $student_section); ?>)"</p>
+                <div class="d-flex align-items-center">
+                    <select id="feeFilter" class="form-select me-2" style="width: 150px;">
+                        <option value="all" selected>All Fees</option>
+                        <option value="paid">Paid</option>
+                        <option value="pending">Pending</option>
+                        <option value="overdue">Overdue</option>
+                    </select>
+                    <button id="exportCsv" class="btn btn-outline-success me-2">Export to CSV</button>
+                    <button id="downloadAllReceipts" class="btn btn-primary">Download All Receipts</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="studentFeesTable" class="table table-striped" style="border-radius: 10px; overflow: hidden;">
+                    <thead style="background: #e6ffe6;">
+                        <tr>
+                            <th class="sortable" data-sort="month_year">Month</th>
+                            <th class="sortable" data-sort="template_name">Fee Type</th>
+                            <th class="sortable" data-sort="amount">Amount</th>
+                            <th class="sortable" data-sort="status">Status</th>
+                            <th>Payment Method</th>
+                            <th>Paid Date</th>
+                            <th>Receipt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if (empty($fees)) {
+                            echo '<tr><td colspan="7" class="text-center py-4">No fee records found.</td></tr>';
+                        } else {
+                            $total_amount = 0;
+                            $total_paid = 0;
+                            foreach ($fees as $index => $fee) {
+                                $total_amount += floatval($fee->amount);
+                                if ($fee->status === 'paid') {
+                                    $total_paid += floatval($fee->amount);
+                                }
+                                echo '<tr data-status="' . esc_attr($fee->status) . '">';
+                                echo '<td>' . esc_html(date('F Y', strtotime($fee->month_year))) . '</td>';
+                                echo '<td>' . esc_html($fee->template_name ?: 'N/A') . '</td>';
+                                echo '<td>' . esc_html(number_format(floatval($fee->amount), 2)) . '</td>';
+                                echo '<td><span class="badge bg-' . ($fee->status === 'paid' ? 'success' : ($fee->status === 'pending' ? 'warning' : 'danger')) . '">' . esc_html(ucfirst($fee->status)) . '</span></td>';
+                                echo '<td>' . esc_html($fee->payment_method ?: 'N/A') . '</td>';
+                                echo '<td>' . esc_html($fee->paid_date ?: 'N/A') . '</td>';
+                                echo '<td>';
+                                if ($fee->status === 'paid') {
+                                    echo '<button class="download-receipt-btn btn btn-sm btn-primary" data-index="' . $index . '">Download</button>';
+                                } else {
+                                    echo 'N/A';
+                                }
+                                echo '</td>';
+                                echo '</tr>';
+                            }
+                            echo '<tr class="table-info" id="totalRow">';
+                            echo '<td colspan="2" class="text-end fw-bold">Total Amount:</td>';
+                            echo '<td>' . esc_html(number_format($total_amount, 2)) . '</td>';
+                            echo '<td colspan="2" class="text-end fw-bold">Total Paid:</td>';
+                            echo '<td id="totalPaid">' . esc_html(number_format($total_paid, 2)) . '</td>';
+                            echo '<td></td>';
+                            echo '</tr>';
+                            echo '<tr class="table-warning" id="pendingRow">';
+                            echo '<td colspan="7">';
+                            echo '<div class="pending-months-toggle">';
+                            echo '<strong>Pending Months (' . count($pending_months) . '):</strong> ';
+                            if (empty($pending_months)) {
+                                echo 'None';
+                            } else {
+                                echo '<button class="toggle-pending-btn btn btn-link p-0 ml-2" style="text-decoration: none;">Show</button>';
+                                echo '<div class="pending-months-list" style="display: none; margin-top: 5px;">';
+                                foreach ($pending_months as $month) {
+                                    echo '<div>' . esc_html(date('F Y', strtotime($month))) . '</div>';
+                                }
+                                echo '</div>';
+                            }
+                            echo '</div>';
+                            echo '</td>';
+                            echo '</tr>';
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = document.getElementById('studentFeesTable');
+            const tbody = table.querySelector('tbody');
+            const filterSelect = document.getElementById('feeFilter');
+            const rows = Array.from(tbody.querySelectorAll('tr:not(#totalRow):not(#pendingRow)'));
+            const totalPaidCell = document.getElementById('totalPaid');
+
+            // Filter function
+            function applyFilter() {
+                const filter = filterSelect.value;
+                let visiblePaidTotal = 0;
+                rows.forEach(row => {
+                    const status = row.dataset.status;
+                    let shouldShow = filter === 'all' || filter === status;
+                    row.style.display = shouldShow ? '' : 'none';
+                    if (shouldShow && status === 'paid') {
+                        visiblePaidTotal += parseFloat(row.cells[2].textContent.replace(/[^0-9.]/g, '')) || 0;
+                    }
+                });
+                totalPaidCell.textContent = visiblePaidTotal.toFixed(2);
+            }
+            filterSelect.addEventListener('change', applyFilter);
+            applyFilter();
+
+            // Table Sorting
+            const headers = table.querySelectorAll('.sortable');
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    const sortKey = header.dataset.sort;
+                    const isAsc = header.classList.toggle('asc');
+                    header.classList.toggle('desc', !isAsc);
+                    const visibleRows = rows.filter(row => row.style.display !== 'none');
+                    visibleRows.sort((a, b) => {
+                        const aValue = a.cells[[...headers].findIndex(h => h.dataset.sort === sortKey)].textContent;
+                        const bValue = b.cells[[...headers].findIndex(h => h.dataset.sort === sortKey)].textContent;
+                        return isAsc ? aValue.localeCompare(bValue, { numeric: true }) : bValue.localeCompare(aValue, { numeric: true });
+                    });
+                    visibleRows.forEach(row => tbody.insertBefore(row, tbody.querySelector('#totalRow')));
+                });
+            });
+
+            // Toggle Pending Months
+            const toggleBtn = document.querySelector('.toggle-pending-btn');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    const list = document.querySelector('.pending-months-list');
+                    const isVisible = list.style.display === 'block';
+                    list.style.display = isVisible ? 'none' : 'block';
+                    this.textContent = isVisible ? 'Show' : 'Hide';
+                });
+            }
+
+            // Export to CSV
+            document.getElementById('exportCsv').addEventListener('click', function() {
+                const visibleRows = rows.filter(row => row.style.display !== 'none');
+                const allRows = [...visibleRows, tbody.querySelector('#totalRow'), tbody.querySelector('#pendingRow')];
+                const csvContent = [
+                    '"Month","Fee Type","Amount","Status","Payment Method","Paid Date","Receipt"',
+                    ...allRows.map(row => Array.from(row.cells).map(cell => `"${cell.textContent.trim().replace(/"/g, '""')}"`).join(','))
+                ].join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'student_<?php echo esc_js($student_id); ?>_fees.csv';
+                link.click();
+            });
+
+            // Helper function to style and add PDF content
+            function generateReceipt(doc, isSingle = false, row = null) {
+                const logoUrl = '<?php echo esc_js($institute_logo); ?>';
+                const pageWidth = doc.internal.pageSize.width;
+                const pageHeight = doc.internal.pageSize.height;
+                const margin = 10; // 10mm margin
+                const borderColor = [26, 43, 95]; // #1a2b5f
+
+                // Page border
+                doc.setDrawColor(...borderColor);
+                doc.setLineWidth(1); // 4px equivalent in mm
+                doc.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin);
+
+                // Header
+                if (logoUrl) {
+                    try {
+                        doc.addImage(logoUrl, 'PNG', (pageWidth - 24) / 2, 15, 24, 24); // 60px = ~24mm
+                    } catch (e) {
+                        console.log('Logo loading failed:', e);
+                        doc.setFontSize(10);
+                        doc.text('No logo available', (pageWidth - 20) / 2, 20, { align: 'center' });
+                    }
+                }
+                doc.setFontSize(18);
+                doc.setTextColor(...borderColor);
+                doc.text('<?php echo esc_js(strtoupper($institute_name)); ?>', pageWidth / 2, 45, { align: 'center' });
+                doc.setFontSize(12);
+                doc.setTextColor(102); // #666
+                doc.text('Fee Receipt', pageWidth / 2, 55, { align: 'center' });
+                doc.setDrawColor(...borderColor);
+                doc.line(margin + 5, 60, pageWidth - margin - 5, 60); // Border-bottom equivalent
+
+                // Details Table
+                const details = [
+                    ['Student Name', '<?php echo esc_js($student_name); ?>'],
+                    ['Student ID', '<?php echo esc_js($student_id); ?>'],
+                    ['Class/Course', '<?php echo esc_js($student_class . ' - ' . $student_section); ?>'],
+                    ['Date', '<?php echo date('Y-m-d'); ?>'],
+                    ...(isSingle ? [['Month', row.cells[0].textContent.trim()]] : [])
+                ];
+                let y = 70;
+                details.forEach(([label, value]) => {
+                    doc.setFillColor(245, 245, 245); // #f5f5f5
+                    doc.rect(margin + 5, y, 50, 6, 'F');
+                    doc.setTextColor(...borderColor);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(label, margin + 7, y + 4);
+                    doc.setTextColor(51); // #333
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(value, margin + 60, y + 4);
+                    y += 6;
+                });
+
+                // Fees Table
+                const body = isSingle
+                    ? [Array.from(row.cells).slice(0, 6).map(cell => cell.textContent.trim())]
+                    : rows.filter(r => r.dataset.status === 'paid').map(r => Array.from(r.cells).slice(0, 6).map(cell => cell.textContent.trim()));
+                if (!isSingle) {
+                    body.push(['Total Paid', '', '<?php echo esc_js(number_format($total_paid, 2)); ?>', '', '', '']);
+                }
+                doc.autoTable({
+                    startY: y + 10,
+                    head: [['Month', 'Fee Type', 'Amount', 'Status', 'Payment Method', 'Paid Date']],
+                    body: body,
+                    theme: 'striped',
+                    styles: {
+                        fontSize: 11,
+                        cellPadding: 2,
+                        overflow: 'linebreak',
+                        halign: 'center',
+                        textColor: [51, 51, 51] // #333
+                    },
+                    headStyles: {
+                        fillColor: borderColor,
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold'
+                    },
+                    alternateRowStyles: { fillColor: [249, 249, 249] }, // #f9f9f9
+                    didParseCell: function(data) {
+                        if (!isSingle && data.row.index === body.length - 1) {
+                            data.cell.styles.fillColor = [230, 240, 250]; // #e6f0fa
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                });
+
+                // Footer
+                const finalY = doc.lastAutoTable.finalY || y + 10;
+                doc.setFontSize(9);
+                doc.setTextColor(102); // #666
+                doc.text(`This is an Online Generated Receipt issued by <?php echo esc_js($institute_name); ?>`, pageWidth / 2, finalY + 20, { align: 'center' });
+                doc.text('Generated on <?php echo date('Y-m-d'); ?>', pageWidth / 2, finalY + 25, { align: 'center' });
+                doc.text('___________________________', pageWidth / 2, finalY + 35, { align: 'center' });
+                doc.text('Registrar / Authorized Signatory', pageWidth / 2, finalY + 40, { align: 'center' });
+                doc.text('Managed by Instituto Educational Center Management System', pageWidth / 2, finalY + 45, { align: 'center' });
+            }
+
+            // Download All Paid Receipts
+            document.getElementById('downloadAllReceipts').addEventListener('click', function() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+                generateReceipt(doc);
+                doc.save('fee_receipt_<?php echo esc_js($student_id); ?>_<?php echo date('Ymd'); ?>.pdf');
+            });
+
+            // Individual Receipt Download
+            document.querySelectorAll('.download-receipt-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = this.dataset.index;
+                    const row = rows[index];
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+                    generateReceipt(doc, true, row);
+                    const month = row.cells[0].textContent.trim().replace(/\s+/g, '_');
+                    doc.save(`fee_receipt_<?php echo esc_js($student_id); ?>_${month}.pdf`);
+                });
+            });
+        });
+    </script>
+    <!-- Include jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('student_fees', 'student_fees_shortcode');
+
+//transport fees
+function student_transport_fees_shortcode($student) {
+    global $wpdb;
+
+    // Get the current logged-in user
+    $current_user = wp_get_current_user();
+    if (!$current_user->ID) {
+        return '<div class="alert alert-warning">Please log in to view your transport fee details.</div>';
+    }
+
+    $student_id = get_post_meta($student->ID, 'student_id', true);
+
+
+    // Get educational center ID and details
+    $education_center_id = educational_center_student_id(); // Assuming this returns the student's center ID
+    $center_data = get_educational_center_data_student($education_center_id);
+
+    if (!$center_data) {
+        return '<div class="alert alert-warning">Educational center data not found.</div>';
+    }
+
+    $institute_name = $center_data['name'];
+    $institute_logo = $center_data['logo_url']; // Web-accessible URL
+
+    // Verify student exists
+    $student_exists = get_posts([
+        'post_type' => 'students',
+        'posts_per_page' => 1,
+        'meta_query' => [
+            ['key' => 'student_id', 'value' => $student_id, 'compare' => '='],
+            ['key' => 'educational_center_id', 'value' => $education_center_id, 'compare' => '=']
+        ]
+    ]);
+
+    if (empty($student_exists)) {
+        return '<div class="alert alert-warning">Student ID ' . esc_html($student_id) . ' not found or does not belong to this educational center.</div>';
+    }
+
+    $student_post = $student_exists[0];
+    $student_name = get_the_title($student_post->ID);
+    $student_class = get_post_meta($student_post->ID, 'class', true) ?: 'Unknown Class';
+    $student_section = get_post_meta($student_post->ID, 'section', true) ?: 'Unknown Section';
+    $enrollment_date = $wpdb->get_var($wpdb->prepare(
+        "SELECT enrollment_date FROM {$wpdb->prefix}transport_enrollments WHERE student_id = %s AND education_center_id = %s ORDER BY enrollment_date ASC LIMIT 1",
+        $student_id,
+        $education_center_id
+    )) ?: date('Y-m');
+
+    $table_name = $wpdb->prefix . 'transport_fees';
+    $template_table = $wpdb->prefix . 'fee_templates';
+
+    // Fetch transport fees for this student
+    $fees = $wpdb->get_results($wpdb->prepare(
+        "SELECT tf.*, ft.name AS template_name 
+         FROM $table_name tf 
+         LEFT JOIN $template_table ft ON tf.template_id = ft.id 
+         WHERE tf.education_center_id = %s AND tf.student_id = %s 
+         ORDER BY tf.month_year",
+        $education_center_id,
+        $student_id
+    ));
+
+    // Pending months calculation
+    $current_date = new DateTime(date('Y-m-01'));
+    $enrollment_date_obj = new DateTime(date('Y-m-01', strtotime($enrollment_date)));
+    $pending_months = [];
+    $paid_months = [];
+    $interval = DateInterval::createFromDateString('1 month');
+    $period = new DatePeriod($enrollment_date_obj, $interval, $current_date);
+
+    foreach ($fees as $fee) {
+        if ($fee->status === 'paid') {
+            $paid_months[] = $fee->month_year;
+        }
+    }
+
+    foreach ($period as $dt) {
+        $month_year = $dt->format('Y-m');
+        if (!in_array($month_year, $paid_months)) {
+            $pending_months[] = $month_year;
+        }
+    }
+
+    ob_start();
+    ?>
+    <div class="card shadow-lg" style="border: 3px solid #28a745; background: #f4fff4;">
+        <div class="card-header bg-success text-white" style="border-radius: 15px 15px 0 0;">
+            <h3 class="card-title mb-0"><i class="bi bi-bus-front me-2"></i>Your Transport Fee Details (Student ID: <?php echo esc_html($student_id); ?>)</h3>
+        </div>
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <p class="text-muted">"View your transport fee status for <?php echo esc_html($student_name); ?> (Class: <?php echo esc_html($student_class . ' - ' . $student_section); ?>)"</p>
+                <div class="d-flex align-items-center">
+                    <select id="feeFilter" class="form-select me-2" style="width: 150px;">
+                        <option value="all" selected>All Fees</option>
+                        <option value="paid">Paid</option>
+                        <option value="pending">Pending</option>
+                        <option value="overdue">Overdue</option>
+                    </select>
+                    <button id="exportCsv" class="btn btn-outline-success me-2">Export to CSV</button>
+                    <button id="downloadAllReceipts" class="btn btn-primary">Download All Receipts</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="transportFeesTable" class="table table-striped" style="border-radius: 10px; overflow: hidden;">
+                    <thead style="background: #e6ffe6;">
+                        <tr>
+                            <th class="sortable" data-sort="month_year">Month</th>
+                            <th class="sortable" data-sort="template_name">Fee Type</th>
+                            <th class="sortable" data-sort="amount">Amount</th>
+                            <th class="sortable" data-sort="status">Status</th>
+                            <th>Payment Method</th>
+                            <th>Paid Date</th>
+                            <th>Receipt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if (empty($fees)) {
+                            echo '<tr><td colspan="7" class="text-center py-4">No transport fee records found.</td></tr>';
+                        } else {
+                            $total_amount = 0;
+                            $total_paid = 0;
+                            foreach ($fees as $index => $fee) {
+                                $total_amount += floatval($fee->amount);
+                                if ($fee->status === 'paid') {
+                                    $total_paid += floatval($fee->amount);
+                                }
+                                echo '<tr data-status="' . esc_attr($fee->status) . '">';
+                                echo '<td>' . esc_html(date('F Y', strtotime($fee->month_year))) . '</td>';
+                                echo '<td>' . esc_html($fee->template_name ?: 'N/A') . '</td>';
+                                echo '<td>' . esc_html(number_format(floatval($fee->amount), 2)) . '</td>';
+                                echo '<td><span class="badge bg-' . ($fee->status === 'paid' ? 'success' : ($fee->status === 'pending' ? 'warning' : 'danger')) . '">' . esc_html(ucfirst($fee->status)) . '</span></td>';
+                                echo '<td>' . esc_html($fee->payment_method ?: 'N/A') . '</td>';
+                                echo '<td>' . esc_html($fee->paid_date ?: 'N/A') . '</td>';
+                                echo '<td>';
+                                if ($fee->status === 'paid') {
+                                    echo '<button class="download-receipt-btn btn btn-sm btn-primary" data-index="' . $index . '">Download</button>';
+                                } else {
+                                    echo 'N/A';
+                                }
+                                echo '</td>';
+                                echo '</tr>';
+                            }
+                            echo '<tr class="table-info" id="totalRow">';
+                            echo '<td colspan="2" class="text-end fw-bold">Total Amount:</td>';
+                            echo '<td>' . esc_html(number_format($total_amount, 2)) . '</td>';
+                            echo '<td colspan="2" class="text-end fw-bold">Total Paid:</td>';
+                            echo '<td id="totalPaid">' . esc_html(number_format($total_paid, 2)) . '</td>';
+                            echo '<td></td>';
+                            echo '</tr>';
+                            echo '<tr class="table-warning" id="pendingRow">';
+                            echo '<td colspan="7">';
+                            echo '<div class="pending-months-toggle">';
+                            echo '<strong>Pending Months (' . count($pending_months) . '):</strong> ';
+                            if (empty($pending_months)) {
+                                echo 'None';
+                            } else {
+                                echo '<button class="toggle-pending-btn btn btn-link p-0 ml-2" style="text-decoration: none;">Show</button>';
+                                echo '<div class="pending-months-list" style="display: none; margin-top: 5px;">';
+                                foreach ($pending_months as $month) {
+                                    echo '<div>' . esc_html(date('F Y', strtotime($month))) . '</div>';
+                                }
+                                echo '</div>';
+                            }
+                            echo '</div>';
+                            echo '</td>';
+                            echo '</tr>';
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = document.getElementById('transportFeesTable');
+            const tbody = table.querySelector('tbody');
+            const filterSelect = document.getElementById('feeFilter');
+            const rows = Array.from(tbody.querySelectorAll('tr:not(#totalRow):not(#pendingRow)'));
+            const totalPaidCell = document.getElementById('totalPaid');
+
+            // Filter function
+            function applyFilter() {
+                const filter = filterSelect.value;
+                let visiblePaidTotal = 0;
+                rows.forEach(row => {
+                    const status = row.dataset.status;
+                    let shouldShow = filter === 'all' || filter === status;
+                    row.style.display = shouldShow ? '' : 'none';
+                    if (shouldShow && status === 'paid') {
+                        visiblePaidTotal += parseFloat(row.cells[2].textContent.replace(/[^0-9.]/g, '')) || 0;
+                    }
+                });
+                totalPaidCell.textContent = visiblePaidTotal.toFixed(2);
+            }
+            filterSelect.addEventListener('change', applyFilter);
+            applyFilter();
+
+            // Table Sorting
+            const headers = table.querySelectorAll('.sortable');
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    const sortKey = header.dataset.sort;
+                    const isAsc = header.classList.toggle('asc');
+                    header.classList.toggle('desc', !isAsc);
+                    const visibleRows = rows.filter(row => row.style.display !== 'none');
+                    visibleRows.sort((a, b) => {
+                        const aValue = a.cells[[...headers].findIndex(h => h.dataset.sort === sortKey)].textContent;
+                        const bValue = b.cells[[...headers].findIndex(h => h.dataset.sort === sortKey)].textContent;
+                        return isAsc ? aValue.localeCompare(bValue, { numeric: true }) : bValue.localeCompare(aValue, { numeric: true });
+                    });
+                    visibleRows.forEach(row => tbody.insertBefore(row, tbody.querySelector('#totalRow')));
+                });
+            });
+
+            // Toggle Pending Months
+            const toggleBtn = document.querySelector('.toggle-pending-btn');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    const list = document.querySelector('.pending-months-list');
+                    const isVisible = list.style.display === 'block';
+                    list.style.display = isVisible ? 'none' : 'block';
+                    this.textContent = isVisible ? 'Show' : 'Hide';
+                });
+            }
+
+            // Export to CSV
+            document.getElementById('exportCsv').addEventListener('click', function() {
+                const visibleRows = rows.filter(row => row.style.display !== 'none');
+                const allRows = [...visibleRows, tbody.querySelector('#totalRow'), tbody.querySelector('#pendingRow')];
+                const csvContent = [
+                    '"Month","Fee Type","Amount","Status","Payment Method","Paid Date","Receipt"',
+                    ...allRows.map(row => Array.from(row.cells).map(cell => `"${cell.textContent.trim().replace(/"/g, '""')}"`).join(','))
+                ].join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'transport_fees_<?php echo esc_js($student_id); ?>.csv';
+                link.click();
+            });
+
+            // Helper function to style and add PDF content
+            function generateReceipt(doc, isSingle = false, row = null) {
+                const logoUrl = '<?php echo esc_js($institute_logo); ?>';
+                const pageWidth = doc.internal.pageSize.width;
+                const pageHeight = doc.internal.pageSize.height;
+                const margin = 10; // 10mm margin
+                const borderColor = [26, 43, 95]; // #1a2b5f
+
+                // Page border
+                doc.setDrawColor(...borderColor);
+                doc.setLineWidth(1); // 4px equivalent in mm
+                doc.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin);
+
+                // Header
+                if (logoUrl) {
+                    try {
+                        doc.addImage(logoUrl, 'PNG', (pageWidth - 24) / 2, 15, 24, 24); // 60px = ~24mm
+                    } catch (e) {
+                        console.log('Logo loading failed:', e);
+                        doc.setFontSize(10);
+                        doc.text('No logo available', (pageWidth - 20) / 2, 20, { align: 'center' });
+                    }
+                }
+                doc.setFontSize(18);
+                doc.setTextColor(...borderColor);
+                doc.text('<?php echo esc_js(strtoupper($institute_name)); ?>', pageWidth / 2, 45, { align: 'center' });
+                doc.setFontSize(12);
+                doc.setTextColor(102); // #666
+                doc.text('Transport Fee Receipt', pageWidth / 2, 55, { align: 'center' });
+                doc.setDrawColor(...borderColor);
+                doc.line(margin + 5, 60, pageWidth - margin - 5, 60); // Border-bottom equivalent
+
+                // Details Table
+                const details = [
+                    ['Student Name', '<?php echo esc_js($student_name); ?>'],
+                    ['Student ID', '<?php echo esc_js($student_id); ?>'],
+                    ['Class/Course', '<?php echo esc_js($student_class . ' - ' . $student_section); ?>'],
+                    ['Date', '<?php echo date('Y-m-d'); ?>'],
+                    ...(isSingle ? [['Month', row.cells[0].textContent.trim()]] : [])
+                ];
+                let y = 70;
+                details.forEach(([label, value]) => {
+                    doc.setFillColor(245, 245, 245); // #f5f5f5
+                    doc.rect(margin + 5, y, 50, 6, 'F');
+                    doc.setTextColor(...borderColor);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(label, margin + 7, y + 4);
+                    doc.setTextColor(51); // #333
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(value, margin + 60, y + 4);
+                    y += 6;
+                });
+
+                // Fees Table
+                const body = isSingle
+                    ? [Array.from(row.cells).slice(0, 6).map(cell => cell.textContent.trim())]
+                    : rows.filter(r => r.dataset.status === 'paid').map(r => Array.from(r.cells).slice(0, 6).map(cell => cell.textContent.trim()));
+                if (!isSingle) {
+                    body.push(['Total Paid', '', '<?php echo esc_js(number_format($total_paid, 2)); ?>', '', '', '']);
+                }
+                doc.autoTable({
+                    startY: y + 10,
+                    head: [['Month', 'Fee Type', 'Amount', 'Status', 'Payment Method', 'Paid Date']],
+                    body: body,
+                    theme: 'striped',
+                    styles: {
+                        fontSize: 11,
+                        cellPadding: 2,
+                        overflow: 'linebreak',
+                        halign: 'center',
+                        textColor: [51, 51, 51] // #333
+                    },
+                    headStyles: {
+                        fillColor: borderColor,
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold'
+                    },
+                    alternateRowStyles: { fillColor: [249, 249, 249] }, // #f9f9f9
+                    didParseCell: function(data) {
+                        if (!isSingle && data.row.index === body.length - 1) {
+                            data.cell.styles.fillColor = [230, 240, 250]; // #e6f0fa
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                });
+
+                // Footer
+                const finalY = doc.lastAutoTable.finalY || y + 10;
+                doc.setFontSize(9);
+                doc.setTextColor(102); // #666
+                doc.text(`This is an Online Generated Receipt issued by <?php echo esc_js($institute_name); ?>`, pageWidth / 2, finalY + 20, { align: 'center' });
+                doc.text('Generated on <?php echo date('Y-m-d'); ?>', pageWidth / 2, finalY + 25, { align: 'center' });
+                doc.text('___________________________', pageWidth / 2, finalY + 35, { align: 'center' });
+                doc.text('Registrar / Authorized Signatory', pageWidth / 2, finalY + 40, { align: 'center' });
+                doc.text('Managed by Instituto Educational Center Management System', pageWidth / 2, finalY + 45, { align: 'center' });
+            }
+
+            // Download All Paid Receipts
+            document.getElementById('downloadAllReceipts').addEventListener('click', function() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+                generateReceipt(doc);
+                doc.save('transport_fee_receipt_<?php echo esc_js($student_id); ?>_<?php echo date('Ymd'); ?>.pdf');
+            });
+
+            // Individual Receipt Download
+            document.querySelectorAll('.download-receipt-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = this.dataset.index;
+                    const row = rows[index];
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+                    generateReceipt(doc, true, row);
+                    const month = row.cells[0].textContent.trim().replace(/\s+/g, '_');
+                    doc.save(`transport_fee_receipt_<?php echo esc_js($student_id); ?>_${month}.pdf`);
+                });
+            });
+        });
+    </script>
+    <!-- Include jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <!-- Bootstrap Icons for UI -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('student_transport_fees', 'student_transport_fees_shortcode');

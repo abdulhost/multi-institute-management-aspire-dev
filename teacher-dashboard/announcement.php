@@ -26,6 +26,7 @@ function aspire_get_announcements($username, $role = 'teacher') {
         // Admins see all announcements in their center
         // No additional filtering needed
     }
+    
 
     $query .= " ORDER BY timestamp DESC";
     $prepared_query = $wpdb->prepare($query, $query_args);
