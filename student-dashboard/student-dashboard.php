@@ -5,36 +5,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-
-// // Enqueue Styles and Scripts
-// add_action('wp_enqueue_scripts', 'aspire_teacher_dashboard_enqueue');
-// function aspire_teacher_dashboard_enqueue() {
-//     wp_enqueue_style('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css');
-//     wp_enqueue_style('bootstrap-icons', 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css');
-//     wp_enqueue_style('fullcalendar', 'https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css');
-//     wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js', ['jquery'], null, true);
-//     wp_enqueue_script('fullcalendar', 'https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js', [], null, true);
-//     wp_add_inline_style('bootstrap', '
-//         .dashboard-card { transition: transform 0.2s; border-radius: 10px; }
-//         .dashboard-card:hover { transform: scale(1.05); }
-//         .profile-avatar { width: 150px; height: 150px; object-fit: cover; border: 3px solid #007bff; border-radius: 50%; }
-//         .form-section { margin-bottom: 15px; }
-//         .section-header { cursor: pointer; background: #f1f1f1; padding: 10px; border-radius: 5px; }
-//         .section-content { padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 5px; }
-
-//         .chat-sidebar { overflow-y: auto; border-right: 1px solid #ddd; background: #f8f9fa; }
-//         .chat-message { padding: 10px; margin: 5px 0; border-radius: 8px; max-width: 70%; position: relative; }
-//         .chat-message.sent { background: #d4edda; align-self: flex-end; }
-//         .chat-message.received { background: #e9ecef; align-self: flex-start; }
-//         .chat-header { background: #007bff; color: white; padding: 10px; }
-//         .unread { font-weight: bold; background: #cce5ff; }
-//         .chat-container { display: flex; flex-direction: column;  }
-//         .chat-messages { flex-grow: 1; overflow-y: auto; padding: 15px; }
-   
-    
-//         ');
-// }
-
 // Function to retrieve Educational Center ID for a student
 function educational_center_student_id() {
     if (!is_user_logged_in()) {
@@ -177,6 +147,9 @@ function aspire_student_dashboard_shortcode() {
                         break;
                     case 'transport':
                         echo student_transport_fees_shortcode($student);
+                        break;
+                    case 'inventory':
+                        echo student_inventory_transactions_shortcode($student);
                         break;
                     default:
                         echo render_student_overview($user_id, $student);
@@ -3978,3 +3951,198 @@ function student_transport_fees_shortcode($student) {
     return ob_get_clean();
 }
 add_shortcode('student_transport_fees', 'student_transport_fees_shortcode');
+
+//inventory
+function student_inventory_transactions_shortcode($student) {
+    global $wpdb;
+
+    // Get the current logged-in user
+    $current_user = wp_get_current_user();
+    if (!$current_user->ID) {
+        return '<div class="alert alert-warning">Please log in to view your inventory transactions.</div>';
+    }
+
+    $student_id = get_post_meta($student->ID, 'student_id', true);
+    
+    if (empty($student_id)) {
+        return '<div class="alert alert-warning">No student ID associated with your account. Contact support.</div>';
+    }
+
+    // Get educational center ID
+    $education_center_id = educational_center_student_id();
+
+    // Verify student exists in the 'students' post type
+    $student_exists = get_posts([
+        'post_type' => 'students',
+        'posts_per_page' => 1,
+        'meta_query' => [
+            [
+                'key' => 'student_id',
+                'value' => $student_id,
+                'compare' => '='
+            ],
+            [
+                'key' => 'educational_center_id',
+                'value' => $education_center_id,
+                'compare' => '='
+            ]
+        ]
+    ]);
+
+    if (empty($student_exists)) {
+        return '<div class="alert alert-warning">Student ID ' . esc_html($student_id) . ' not found or does not belong to this educational center.</div>';
+    }
+
+    $trans_table = $wpdb->prefix . 'inventory_transactions';
+    $inventory_table = $wpdb->prefix . 'inventory';
+
+    // Fetch all transactions for the student
+    $transactions = $wpdb->get_results($wpdb->prepare(
+        "SELECT t.*, i.name 
+         FROM $trans_table t 
+         JOIN $inventory_table i ON t.item_id = i.item_id 
+         WHERE i.education_center_id = %s AND t.user_id = %s AND t.user_type = 'Student' 
+         ORDER BY t.date DESC",
+        $education_center_id,
+        $student_id
+    ));
+
+    ob_start();
+    ?>
+    <div class="card shadow-lg" style="border: 3px solid #17a2b8; background: #f0faff;">
+        <div class="card-header bg-info text-white" style="border-radius: 15px 15px 0 0;">
+            <h3 class="card-title mb-0"><i class="bi bi-box-seam me-2"></i>Your Inventory Transactions (Student ID: <?php echo esc_html($student_id); ?>)</h3>
+        </div>
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <p class="text-muted">"View all items issued to you, including pending and returned"</p>
+                <div class="d-flex align-items-center">
+                    <select id="transactionFilter" class="form-select me-2" style="width: 150px;">
+                        <option value="all" selected>All Transactions</option>
+                        <option value="pending">Pending</option>
+                        <option value="returned">Returned</option>
+                        <option value="issued">Issued</option>
+                    </select>
+                    <button id="exportCsv" class="btn btn-outline-info">Export to CSV</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="studentInventoryTable" class="table table-striped" style="border-radius: 10px; overflow: hidden;">
+                    <thead style="background: #e6f3ff;">
+                        <tr>
+                            <th class="sortable" data-sort="item_id">Item ID</th>
+                            <th class="sortable" data-sort="name">Item Name</th>
+                            <th class="sortable" data-sort="action">Action</th>
+                            <th class="sortable" data-sort="date">Transaction Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if (empty($transactions)) {
+                            echo '<tr><td colspan="5" class="text-center py-4">No inventory transactions found.</td></tr>';
+                        } else {
+                            foreach ($transactions as $trans) {
+                                $status_badge = $trans->status === 'Completed' ? 'bg-success' : 'bg-warning';
+                                $is_returned = $trans->action === 'Return' && $trans->status === 'Completed';
+                                $is_issued = $trans->action === 'Issue' && $trans->status === 'Completed' && !$wpdb->get_var($wpdb->prepare(
+                                    "SELECT COUNT(*) FROM $trans_table WHERE item_id = %s AND user_id = %s AND action = 'Return' AND status = 'Completed'",
+                                    $trans->item_id,
+                                    $student_id
+                                ));
+
+                                echo '<tr data-status="' . esc_attr($trans->status) . '" data-action="' . esc_attr($trans->action) . '" data-returned="' . ($is_returned ? 'true' : 'false') . '" data-issued="' . ($is_issued ? 'true' : 'false') . '">';
+                                echo '<td>' . esc_html($trans->item_id) . '</td>';
+                                echo '<td>' . esc_html($trans->name) . '</td>';
+                                echo '<td>' . esc_html($trans->action) . '</td>';
+                                echo '<td>' . esc_html($trans->date) . '</td>';
+                                echo '<td><span class="badge ' . $status_badge . '">' . esc_html($trans->status) . '</span></td>';
+                                echo '</tr>';
+                            }
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = document.getElementById('studentInventoryTable');
+            const tbody = table.querySelector('tbody');
+            const filterSelect = document.getElementById('transactionFilter');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            // Filter function
+            function applyFilter() {
+                const filter = filterSelect.value;
+
+                rows.forEach(row => {
+                    const status = row.dataset.status;
+                    const action = row.dataset.action;
+                    const isReturned = row.dataset.returned === 'true';
+                    const isIssued = row.dataset.issued === 'true';
+                    let shouldShow = false;
+
+                    if (filter === 'all') {
+                        shouldShow = true;
+                    } else if (filter === 'pending' && status === 'Pending') {
+                        shouldShow = true;
+                    } else if (filter === 'returned' && isReturned) {
+                        shouldShow = true;
+                    } else if (filter === 'issued' && isIssued) {
+                        shouldShow = true;
+                    }
+
+                    row.style.display = shouldShow ? '' : 'none';
+                });
+            }
+
+            // Apply filter on change
+            filterSelect.addEventListener('change', applyFilter);
+
+            // Initial filter application
+            applyFilter();
+
+            // Table Sorting
+            const headers = table.querySelectorAll('.sortable');
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    const sortKey = header.dataset.sort;
+                    const isAsc = header.classList.toggle('asc');
+                    header.classList.toggle('desc', !isAsc);
+
+                    const visibleRows = rows.filter(row => row.style.display !== 'none');
+                    visibleRows.sort((a, b) => {
+                        const aValue = a.cells[[...headers].findIndex(h => h.dataset.sort === sortKey)].textContent;
+                        const bValue = b.cells[[...headers].findIndex(h => h.dataset.sort === sortKey)].textContent;
+                        return isAsc ? aValue.localeCompare(bValue, { numeric: sortKey === 'item_id' }) : bValue.localeCompare(aValue, { numeric: sortKey === 'item_id' });
+                    });
+
+                    visibleRows.forEach(row => tbody.appendChild(row));
+                });
+            });
+
+            // Export to CSV
+            document.getElementById('exportCsv').addEventListener('click', function() {
+                const visibleRows = rows.filter(row => row.style.display !== 'none');
+                const csvContent = [
+                    '"Item ID","Item Name","Action","Transaction Date","Status"',
+                    ...visibleRows.map(row => Array.from(row.cells).map(cell => `"${cell.textContent.trim().replace(/"/g, '""')}"`).join(','))
+                ].join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'student_<?php echo esc_js($student_id); ?>_inventory_transactions.csv';
+                link.click();
+            });
+        });
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('student_inventory_transactions', 'student_inventory_transactions_shortcode');
