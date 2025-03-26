@@ -269,6 +269,14 @@ function custom_login_processing($user_type_configs = []) {
             'post_type' => 'students',
             'meta_key' => 'student_id',
         ],
+        'parent' => [
+            'prefix' => 'PAR-',
+            'role' => 'parent',
+            'redirect' => '/parent-dashboard/',
+            'validate_edu_center' => true,
+            'post_type' => 'parent',
+            'meta_key' => 'parent_id',
+        ],
     ];
 
     // Validate and merge configurations
@@ -746,6 +754,12 @@ function get_unique_id_for_role($role_type, $center_id = '') {
             'entity_name' => $wpdb->prefix . 'inventory',
             'prefix'      => 'ITEM-',
             'field_name'  => 'item_id', 
+        ],
+        'parents' => [
+            'type'        => 'post_type',
+            'entity_name' => 'parent',
+            'prefix'      => 'PAR-',
+            'field_name'  => 'parent_id', 
         ],
         'book' => [
             'type'        => 'table',
@@ -1435,6 +1449,7 @@ include_files_from_directory('assets/exam');
 include_files_from_directory('assets/asset');
 include_files_from_directory('teacher-dashboard');
 include_files_from_directory('student-dashboard');
+include_files_from_directory('parent-dashboard');
 
 // Include all other necessary files
 include plugin_dir_path(__FILE__) . 'assets/edit-classes.php';

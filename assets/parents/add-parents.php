@@ -22,6 +22,7 @@ function add_parents_institute_dashboard_shortcode($atts) {
     if (empty($educational_center_id)) {
         return '<p>No Educational Center found for this user.</p>';
     }
+    $new_parent_id = get_unique_id_for_role('parents', $educational_center_id);
 
     // Start output buffering
     ob_start();
@@ -46,7 +47,7 @@ function add_parents_institute_dashboard_shortcode($atts) {
                         </div>
                         <div class="section-content" id="basic-details">
                             <label for="parent_id">Parent ID (Auto-generated):</label>
-                            <input type="text" name="parent_id" value="<?php echo 'PAR-' . uniqid(); ?>" readonly>
+                            <input type="text" name="parent_id" value="<?php echo esc_attr($new_parent_id); ?>" readonly>
                             <input type="hidden" name="educational_center_id" value="<?php echo esc_attr($educational_center_id); ?>">
                             <label for="parent_student_ids">Student IDs:</label>
                             <input type="text" name="parent_student_ids">
@@ -251,28 +252,39 @@ function handle_add_parent_submission($atts = []) {
             ),
         ));
      
-        if ($parent_post_id && $attachment_id) {
-            update_field('field_67c2c10841064', $attachment_id, $parent_post_id); // ACF field key for parent_profile_photo
-           // Redirect based on whether the user is a teacher or not
-           if (is_teacher($current_user->ID)) {
-        wp_redirect(home_url('/teacher-dashboard/?section=parents'));
-    } else {
-        wp_redirect(home_url('/institute-dashboard/parents'));
-    }
-    exit;
-        } elseif ($parent_post_id) {           
-           // Redirect based on whether the user is a teacher or not
-           if (is_teacher($current_user->ID)) {
-        wp_redirect(home_url('/teacher-dashboard/?section=parents'));
-    } else {
-        wp_redirect(home_url('/institute-dashboard/parents'));
-    }
-    exit;
+    //     if ($parent_post_id && $attachment_id) {
+    //         update_field('field_67c2c10841064', $attachment_id, $parent_post_id); // ACF field key for parent_profile_photo
+    //        // Redirect based on whether the user is a teacher or not
+    //        if (is_teacher($current_user->ID)) {
+    //     wp_redirect(home_url('/teacher-dashboard/?section=parents'));
+    // } else {
+    //     wp_redirect(home_url('/institute-dashboard/parents'));
+    // }
+    // exit;
+    //     } elseif ($parent_post_id) {           
+    //        // Redirect based on whether the user is a teacher or not
+    //        if (is_teacher($current_user->ID)) {
+    //     wp_redirect(home_url('/teacher-dashboard/?section=parents'));
+    // } else {
+    //     wp_redirect(home_url('/institute-dashboard/parents'));
+    // }
+    // exit;
 
-        } else {
+    //     }
+    if ($parent_post_id) {
+        // Handle attachment if it exists
+        if ($attachment_id) {
+            update_field('field_67c2c10841064', $attachment_id, $parent_post_id); // ACF field key for teacher_profile_photo
+        }
+        $role='parent';
+        register_user_with_role($parent_id, $parent_email, $parent_name, $parent_phone_number, $role, $educational_center_id);
+        wp_redirect($_SERVER['REQUEST_URI']);
+        exit;
+    }
+    else {
             echo '<p class="error-message">Error adding parent.</p>';
         }
-    }
+        }
 
    
 }

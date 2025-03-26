@@ -1690,3 +1690,23 @@ font-size: 12px !important;
 .table-responsive { max-height: 400px; overflow-y: auto; }
 .inline-input { width: 100%; border: none; background: transparent; padding: 0; }
 .inline-input:focus { outline: none; border-bottom: 1px solid #007bff; }
+
+
+/* child-styles.css */
+.child-component { max-width: 1200px; margin: 20px auto; }
+.card-header { display: flex; justify-content: space-between; align-items: center; }
+.attendance-table-wrapper, .timetable-wrapper { overflow-x: auto; border: 1px solid #e5e5e5; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); background: #fff; padding: 15px; }
+.table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+.table th, .table td { padding: 10px; text-align: center; border: 1px solid #e5e5e5; }
+.table th { color: #fff; }
+.table tr:nth-child(even) { background: #f9f9f9; }
+.attendance-table th { background: #28a745; }
+.attendance-table .present { color: #28a745; font-weight: bold; }
+.attendance-table .late { color: #ffc107; font-weight: bold; }
+.attendance-table .absent { color: #dc3545; font-weight: bold; }
+.summary-row { background: #e6ffe6; font-weight: bold; }
+.timetable-table th { background: #6c757d; }
+.day-section { margin-bottom: 30px; }
+.day-section h4 { color: #6c757d; margin-bottom: 10px; }
+.filters { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+.loading { text-align: center; padding: 20px; color: #6c757d; }

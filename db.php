@@ -96,7 +96,7 @@ function my_education_erp_create_db() {
     ) $charset_collate;";
     dbDelta($sql);
 
-    // Exam Results Table (No foreign keys for now)
+    // Exam Results Table 
     $sql = "CREATE TABLE $exam_results_table (
         id BIGINT(20) NOT NULL AUTO_INCREMENT,
         exam_id VARCHAR(255) NOT NULL,

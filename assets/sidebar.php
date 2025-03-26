@@ -463,7 +463,7 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
   </button>
   <ul class="sub-menu <?php echo $active_section == 'view-parents' || $active_section == 'add-parent' || $active_section == 'update-parent' || $active_section == 'delete-parent' ? 'show' : ''; ?>">
     <div>
-      <li class="<?php echo $active_section == 'view-parents' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/parent')); ?>">View Parents</a></li>
+      <li class="<?php echo $active_section == 'view-parents' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/parents')); ?>">View Parents</a></li>
       <li class="<?php echo $active_section == 'add-parent' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/add-parents')); ?>">Add New Parent</a></li>
       <li class="<?php echo $active_section == 'update-parent' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/edit-parents/')); ?>">Update Parent</a></li>
       <li class="<?php echo $active_section == 'delete-parent' ? 'active' : ''; ?>"><a href="<?php echo esc_url(home_url('/institute-dashboard/delete-parent')); ?>">Delete Parent</a></li>
