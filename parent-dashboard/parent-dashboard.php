@@ -72,8 +72,12 @@ function aspire_parent_dashboard_shortcode() {
             $active_action = $action;
             include plugin_dir_path(__FILE__) . 'parent-sidebar.php';
             ?>
-            <div class="col-md-9 p-4">
+            
+            <div class="main-content">
                 <?php
+                ob_start();
+                echo render_parent_header($parent_post); 
+               
                 switch ($section) {
                     case 'overview':
                         echo render_parent_overview($current_user, $parent_post->ID);
@@ -114,6 +118,108 @@ function aspire_parent_dashboard_shortcode() {
 }
 add_shortcode('aspire_parent_dashboard', 'aspire_parent_dashboard_shortcode');
 
+//header
+function render_parent_header($parent_user) {
+    $user_name = esc_html($parent_user->display_name);
+    $user_email = esc_html($parent_user->user_email);
+    $avatar_url = get_avatar_url($parent_user->ID, ['size' => 40]);
+    $profile_link = esc_url(get_permalink(get_page_by_path('parent-profile')));
+    $logout_link = wp_logout_url(home_url());
+    $dashboard_link = esc_url(home_url('/parent-dashboard'));
+
+    ob_start();
+    ?>
+    <header class="parent-header">
+        <div class="header-container">
+            <!-- Left: Branding & Navigation -->
+            <div class="header-left">
+                <a href="<?php echo $dashboard_link; ?>" class="header-logo">
+                    <i class="fas fa-graduation-cap logo-icon"></i>
+                    <span class="logo-text">Parent Portal</span>
+                </a>
+                <nav class="header-nav">
+                    <a href="<?php echo $dashboard_link; ?>" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    <a href="#" class="nav-link"><i class="fas fa-calendar-check"></i> Timetable</a>
+                    <a href="#" class="nav-link"><i class="fas fa-book-open"></i> Exams</a>
+                    <a href="#" class="nav-link"><i class="fas fa-chart-bar"></i> Results</a>
+                </nav>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="header-right">
+                <div class="header-search">
+                    <input type="text" placeholder="Search..." class="search-input" aria-label="Search">
+                    <button class="search-btn" aria-label="Search"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="header-messages">
+                    <button class="action-btn messages-btn" aria-label="Messages">
+                        <i class="fas fa-envelope"></i>
+                        <span class="action-badge">2</span>
+                    </button>
+                    <div class="dropdown messages-dropdown">
+                        <div class="dropdown-header">
+                            <span>Messages</span>
+                            <a href="#" class="mark-read">Mark all as read</a>
+                        </div>
+                        <ul class="dropdown-list">
+                            <li><div class="msg-content"><span class="msg-sender">Teacher Sarah</span><span class="msg-preview">Assignment due...</span></div><span class="msg-time">5m ago</span></li>
+                            <li><div class="msg-content"><span class="msg-sender">Admin</span><span class="msg-preview">Fee payment...</span></div><span class="msg-time">1h ago</span></li>
+                        </ul>
+                        <a href="#" class="dropdown-footer">See All Messages</a>
+                    </div>
+                </div>
+                <div class="header-notifications">
+                    <button class="action-btn notifications-btn" aria-label="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="action-badge">3</span>
+                    </button>
+                    <div class="dropdown notifications-dropdown">
+                        <div class="dropdown-header">
+                            <span>Notifications</span>
+                            <a href="#" class="mark-read">Clear all</a>
+                        </div>
+                        <ul class="dropdown-list">
+                            <li><span class="notif-text">Exam schedule updated</span><span class="notif-time">10m ago</span></li>
+                            <li><span class="notif-text">New result published</span><span class="notif-time">1h ago</span></li>
+                            <li><span class="notif-text">Parent meeting scheduled</span><span class="notif-time">1d ago</span></li>
+                        </ul>
+                        <a href="#" class="dropdown-footer">See All Notifications</a>
+                    </div>
+                </div>
+                <div class="header-profile">
+                    <div class="profile-toggle">
+                        <img src="<?php echo esc_url($avatar_url); ?>" alt="Profile" class="profile-avatar">
+                        <span class="user-name"><?php echo $user_name; ?></span>
+                        <i class="fas fa-chevron-down profile-arrow"></i>
+                    </div>
+                    <div class="dropdown profile-dropdown">
+                        <div class="profile-header">
+                            <img src="<?php echo esc_url($avatar_url); ?>" alt="Profile" class="profile-avatar-large">
+                            <div class="profile-info">
+                                <span class="profile-name"><?php echo $user_name; ?></span>
+                                <span class="profile-email"><?php echo $user_email; ?></span>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <a href="<?php echo $profile_link; ?>" class="profile-link"><i class="fas fa-user-circle"></i> My Profile</a>
+                            <a href="<?php echo $dashboard_link; ?>" class="profile-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                            <a href="#" class="profile-link"><i class="fas fa-cog"></i> Settings</a>
+                            <a href="<?php echo $logout_link; ?>" class="profile-link logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+                <button class="mobile-menu-toggle" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    <?php
+    return ob_get_clean();
+}
+add_action('wp_enqueue_scripts', function() {
+    wp_enqueue_style('google-fonts', 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap', [], null);
+});
 // Feature 1: Overview
 
 function render_parent_overview($parent_user, $parent_post_id) {
@@ -168,9 +274,7 @@ function render_parent_overview($parent_user, $parent_post_id) {
         return '<div class="alert alert-warning">No valid student records found for your children.</div>';
     }
 
-    $nonce = wp_create_nonce('parent_overview_nonce');
-
-    ob_start();
+    $nonce = wp_create_nonce('parent_overview_nonce');          
     ?>
     <div class="parent-dashboard">
         <div class="dashboard-header">
@@ -198,240 +302,6 @@ function render_parent_overview($parent_user, $parent_post_id) {
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     </div>
-
-    <style>
-        :root {
-            --primary-color: #87CEEB; /* Sky Blue */
-            --secondary-color: #F8F8FF; /* Ghost White */
-            --accent-color: #4682B4; /* Steel Blue */
-            --text-color: #333;
-            --hover-color: #B0E0E6; /* Powder Blue */
-            --active-color: #ADD8E6; /* Light Blue */
-            --border-color: #cfcfcf;
-            --shadow-color: rgba(0, 0, 0, 0.1);
-            --hover-shadow-color: rgba(0, 115, 230, 0.2);
-            --success-color: #2e7d32;
-            --error-color: #c62828;
-        }
-
-        .parent-dashboard {
-            max-width: 1200px;
-            margin: 20px auto;
-            font-family: 'Arial', sans-serif;
-            background: var(--secondary-color);
-            border-radius: 8px;
-            box-shadow: 0 2px 4px var(--shadow-color);
-        }
-
-        .dashboard-header {
-            background: var(--accent-color);
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 8px 8px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .dashboard-header h3 {
-            margin: 0;
-            font-size: 1.4em;
-            font-weight: 500;
-        }
-
-        .icon-home:before {
-            content: '\f015';
-            font-family: "Font Awesome 6 Free";
-            font-weight: 900;
-            margin-right: 8px;
-        }
-
-        .child-selector {
-            padding: 12px 20px;
-            background: #fff;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .child-selector label {
-            font-weight: 600;
-            color: var(--text-color);
-            margin-right: 10px;
-        }
-
-        .child-selector select {
-            padding: 6px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 1em;
-            background: var(--secondary-color);
-            color: var(--text-color);
-            min-width: 200px;
-            transition: border-color 0.3s;
-        }
-
-        .child-selector select:hover,
-        .child-selector select:focus {
-            border-color: var(--accent-color);
-            outline: none;
-        }
-
-        .dashboard-content {
-            padding: 20px;
-            background: #fff;
-            border-radius: 0 0 8px 8px;
-            min-height: 300px;
-        }
-
-        .loading {
-            text-align: center;
-            color: var(--text-color);
-            opacity: 0.7;
-        }
-
-        .overview-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .overview-card {
-            background: var(--secondary-color);
-            padding: 15px;
-            border-radius: 6px;
-            border-left: 3px solid;
-            transition: box-shadow 0.3s;
-        }
-
-        .overview-card:hover {
-            box-shadow: 0 4px 8px var(--hover-shadow-color);
-        }
-
-        .card-student { border-color: var(--primary-color); }
-        .card-attendance { border-color: var(--success-color); }
-        .card-exams { border-color: #e67e22; }
-        .card-homework { border-color: #9b59b6; }
-        .card-fees { border-color: var(--error-color); }
-        .card-transport { border-color: #f1c40f; }
-        .card-library { border-color: #16a085; }
-        .card-results { border-color: #8e44ad; }
-        .card-notices { border-color: #d35400; }
-        .card-timetable { border-color: var(--accent-color); }
-        .card-progress { border-color: #27ae60; }
-
-        .overview-card h5 {
-            margin: 0 0 10px;
-            font-size: 1.1em;
-            color: var(--accent-color);
-            font-weight: 600;
-        }
-
-        .overview-card p {
-            margin: 5px 0;
-            color: var(--text-color);
-            font-size: 0.95em;
-        }
-
-        .status-badge {
-            padding: 3px 6px;
-            border-radius: 10px;
-            color: #fff;
-            font-size: 0.8em;
-            display: inline-block;
-        }
-
-        .status-present { background: var(--success-color); }
-        .status-absent { background: var(--error-color); }
-        .status-completed { background: var(--success-color); }
-        .status-pending { background: #f1c40f; }
-        .status-paid { background: var(--success-color); }
-        .status-overdue { background: var(--error-color); }
-
-        .expandable {
-            cursor: pointer;
-            color: var(--accent-color);
-            font-size: 0.9em;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .expandable:hover {
-            color: var(--hover-color);
-        }
-
-        .expandable-content {
-            display: none;
-            margin-top: 8px;
-        }
-
-        .export-tools {
-            grid-column: 1 / -1;
-            text-align: right;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        .export-btn {
-            background: none;
-            border: none;
-            color: var(--accent-color);
-            font-size: 1.2em;
-            cursor: pointer;
-            padding: 5px;
-            position: relative;
-            transition: color 0.3s, transform 0.2s;
-        }
-
-        .export-btn:hover {
-            color: var(--hover-color);
-            transform: scale(1.1);
-        }
-
-        .export-btn:active {
-            color: var(--active-color);
-            transform: scale(0.95);
-        }
-
-        .export-btn .tooltip {
-            visibility: hidden;
-            background: var(--accent-color);
-            color: #fff;
-            text-align: center;
-            border-radius: 4px;
-            padding: 4px 8px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            right: 50%;
-            transform: translateX(50%);
-            font-size: 0.8em;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .export-btn:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        @media (max-width: 600px) {
-            .child-selector select { width: 100%; }
-            .dashboard-header { flex-direction: column; align-items: flex-start; }
-            .dashboard-header span { margin-top: 5px; font-size: 0.9em; }
-            .overview-grid { grid-template-columns: 1fr; }
-            .export-tools { justify-content: center; }
-        }
-
-        @media print {
-            .export-tools, .child-selector, .dashboard-header { display: none; }
-            .dashboard-content { padding: 0; }
-            .overview-grid { grid-template-columns: 1fr; gap: 10px; }
-            .overview-card { border: none; box-shadow: none; page-break-inside: avoid; }
-        }
-    </style>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const select = document.getElementById('child_select');
@@ -1165,7 +1035,7 @@ function render_parent_profile($parent_user, $parent_post_id) {
 
                 <!-- Child Info with Add/Remove -->
                 <div class="profile-card child-management">
-                    <h5>Linked Children</h5>
+                <h5>Linked Children</h5>
                     <ul class="student-list">
                         <?php foreach ($children as $child): ?>
                             <li data-student-id="<?php echo esc_attr($child->student_id); ?>">
@@ -1185,180 +1055,6 @@ function render_parent_profile($parent_user, $parent_post_id) {
         <!-- External Libraries -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     </div>
-
-    <style>
-        :root {
-            --primary-color: #87CEEB;
-            --secondary-color: #F8F8FF;
-            --accent-color: #4682B4;
-            --text-color: #333;
-            --hover-color: #B0E0E6;
-            --active-color: #ADD8E6;
-            --border-color: #cfcfcf;
-            --shadow-color: rgba(0, 0, 0, 0.1);
-            --hover-shadow-color: rgba(0, 115, 230, 0.2);
-            --success-color: #2e7d32;
-            --error-color: #c62828;
-        }
-
-        .parent-profile {
-            max-width: 1200px;
-            margin: 20px auto;
-            font-family: 'Arial', sans-serif;
-            background: var(--secondary-color);
-            border-radius: 8px;
-            box-shadow: 0 2px 4px var(--shadow-color);
-        }
-
-        .profile-header {
-            background: var(--accent-color);
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 8px 8px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .profile-header h3 {
-            margin: 0;
-            font-size: 1.4em;
-            font-weight: 500;
-        }
-
-        .profile-section {
-            padding: 20px;
-            background: #fff;
-            border-radius: 0 0 8px 8px;
-        }
-
-        .profile-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-        }
-
-        .profile-card {
-            background: var(--secondary-color);
-            padding: 15px;
-            border-radius: 6px;
-            border-left: 3px solid var(--primary-color);
-            transition: box-shadow 0.3s;
-        }
-
-        .profile-card:hover {
-            box-shadow: 0 4px 8px var(--hover-shadow-color);
-        }
-
-        .profile-card h5 {
-            margin: 0 0 10px;
-            font-size: 1.1em;
-            color: var(--accent-color);
-            font-weight: 600;
-        }
-
-        .profile-card p {
-            margin: 5px 0;
-            color: var(--text-color);
-            font-size: 0.95em;
-        }
-
-        .edit-contact-btn {
-            background: var(--accent-color);
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .edit-contact-btn:hover {
-            background: var(--hover-color);
-        }
-
-        .update-profile-form {
-            margin-top: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 10px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            color: var(--text-color);
-        }
-
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 6px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 1em;
-        }
-
-        .form-group textarea {
-            height: 80px;
-            resize: vertical;
-        }
-
-        .submit-btn, .cancel-btn, .remove-student-btn, #add-student-btn {
-            background: var(--accent-color);
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-right: 10px;
-            transition: background 0.3s;
-        }
-
-        .submit-btn:hover, .cancel-btn:hover, .remove-student-btn:hover, #add-student-btn:hover {
-            background: var(--hover-color);
-        }
-
-        .cancel-btn, .remove-student-btn {
-            background: #ccc;
-        }
-
-        .cancel-btn:hover, .remove-student-btn:hover {
-            background: #bbb;
-        }
-
-        .student-list {
-            list-style: none;
-            padding: 0;
-            margin: 10px 0;
-        }
-
-        .student-list li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .add-student {
-            margin-top: 10px;
-            display: flex;
-            gap: 10px;
-        }
-
-        #new_student_id {
-            flex-grow: 1;
-            padding: 6px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-        }
-
-        @media (max-width: 600px) {
-            .profile-grid { grid-template-columns: 1fr; }
-            .add-student { flex-direction: column; }
-        }
-    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -1693,7 +1389,7 @@ function render_child_selection($parent_user, $parent_post_id) {
                 <?php foreach ($children as $child): ?>
                     <div class="child-tab card <?php echo $child->student_id === $default_student_id ? 'bg-info text-white' : 'bg-light'; ?>" 
                          data-student-id="<?php echo esc_attr($child->student_id); ?>">
-                        <div class="card-body p-2">
+                        <div class="card-bod p-2">
                             <span class="child-name"><?php echo esc_html($child->name); ?></span>
                             <span class="child-id">(<?php echo esc_html($child->student_id); ?>)</span>
                         </div>
@@ -1741,20 +1437,6 @@ function render_child_selection($parent_user, $parent_post_id) {
             </div>
         </div>
     </div>
-
-    <style>
-        .child-selection { max-width: 1200px; margin: 20px auto; }
-        .child-tab { cursor: pointer; transition: all 0.3s; }
-        .child-tab:hover { background-color: #e9ecef; }
-        .child-tab.bg-info:hover { background-color: #17a2b8; }
-        .child-detail-card { background: #f8f9fa; border-left: 4px solid #17a2b8; }
-        .action-btn { display: flex; align-items: center; gap: 5px; }
-        #child-content { background: #fff; border-left: 4px solid #17a2b8; min-height: 200px; overflow-x: auto; }
-        #child-content table { width: 100%; border-collapse: collapse; }
-        #child-content th, #child-content td { padding: 8px; border: 1px solid #ddd; text-align: left; }
-        #child-content th { background: #17a2b8; color: #fff; }
-        #child-content tr:nth-child(even) { background: #f9f9f9; }
-    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -2319,9 +2001,9 @@ function render_child_timetable($parent_user, $parent_post_id) {
 
     ob_start();
     ?>
-    <div class="child-timetable card shadow-lg" style="border: 3px solid #6c757d; background: #f8f9fa;">
-        <div class="card-header bg-secondary text-white" style="border-radius: 15px 15px 0 0;">
-            <h3 class="card-title m-0"><i class="bi bi-calendar me-2"></i>Child Timetable</h3>
+  <div class="child-timetable">
+        <div class="timetable-header">
+            <h3><i class="fas fa-calendar-alt"></i> Child Timetable</h3>
             <span><?php echo esc_html(date('l, F j, Y')); ?></span>
         </div>
         <div class="card-body p-4">
@@ -2348,23 +2030,6 @@ function render_child_timetable($parent_user, $parent_post_id) {
             <div id="timetable-content" class="timetable-table-wrapper"></div>
         </div>
     </div>
-
-    <style>
-        .timetable-table-wrapper { overflow-x: auto; border: 1px solid #e5e5e5; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); background: #fff; }
-        .timetable-table { width: 100%; border-collapse: collapse; }
-        .timetable-table th, .timetable-table td { padding: 12px; text-align: center; border: 1px solid #e5e5e5; min-width: 100px; }
-        .timetable-table th { background: #6c757d; color: #fff; font-weight: bold; }
-        .timetable-table .day-column { background: #f5f5f5; font-weight: bold; width: 80px; }
-        .timetable-table tr:nth-child(even) { background: #f9f9f9; }
-        .timetable-table .subject { background: #e9f7ef; }
-        .timetable-table .empty { color: #6c757d; }
-        .export-tools { display: flex; justify-content: flex-end; gap: 15px; margin-bottom: 15px; }
-        .export-btn { background: none; border: none; color: #4682B4; font-size: 1.3em; cursor: pointer; padding: 5px; transition: color 0.3s, transform 0.2s; position: relative; }
-        .export-btn:hover { color: #B0E0E6; transform: scale(1.1); }
-        .export-btn .tooltip { visibility: hidden; background: #4682B4; color: #fff; border-radius: 4px; padding: 4px 8px; position: absolute; z-index: 1; bottom: 125%; right: 50%; transform: translateX(50%); font-size: 0.8em; opacity: 0; transition: opacity 0.3s; }
-        .export-btn:hover .tooltip { visibility: visible; opacity: 1; }
-        .child-select-wrapper { position: relative; display: inline-block; }
-    </style>
 
     <script>
        
@@ -2671,14 +2336,14 @@ function render_child_exams($parent_user, $parent_post_id) {
 
     ob_start();
     ?>
-    <div class="child-exams card shadow-lg" style="border: 3px solid #dc3545; background: #f8f9fa;">
-        <div class="card-header bg-danger text-white" style="border-radius: 15px 15px 0 0;">
+   <div class="child-exams card shadow-lg" >
+        <div class="card-header bg-danger text-white">
             <h3 class="card-title m-0"><i class="bi bi-clipboard-check me-2"></i>Child Exams</h3>
             <span><?php echo esc_html(date('l, F j, Y')); ?></span>
         </div>
-        <div class="card-body p-4">
+        <div class="card-body">
             <div class="exam-filters mb-4 d-flex gap-3 flex-wrap">
-                <div class="child-select-wrapper position-relative">
+                <div class="child-select-wrapper">
                     <select id="child-select" class="form-select w-auto">
                         <option value="">Select a Child</option>
                         <?php
@@ -2707,21 +2372,14 @@ function render_child_exams($parent_user, $parent_post_id) {
             </div>
         </div>
     </div>
-
-    <style>
-        .exams-table-wrapper { overflow-x: auto; border: 1px solid #e5e5e5; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); background: #fff; }
-        .exams-table { width: 100%; border-collapse: collapse; }
-        .exams-table th, .exams-table td { padding: 12px; text-align: center; border: 1px solid #e5e5e5; }
-        .exams-table th { background: #dc3545; color: #fff; font-weight: bold; }
-        .exams-table tr:nth-child(even) { background: #f9f9f9; }
-        .export-tools { display: flex; justify-content: flex-end; gap: 15px; margin-bottom: 15px; }
-        .export-btn { background: none; border: none; color: #4682B4; font-size: 1.3em; cursor: pointer; padding: 5px; transition: color 0.3s, transform 0.2s; position: relative; }
-        .export-btn:hover { color: #B0E0E6; transform: scale(1.1); }
-        .export-btn .tooltip { visibility: hidden; background: #4682B4; color: #fff; border-radius: 4px; padding: 4px 8px; position: absolute; z-index: 1; bottom: 125%; right: 50%; transform: translateX(50%); font-size: 0.8em; opacity: 0; transition: opacity 0.3s; }
-        .export-btn:hover .tooltip { visibility: visible; opacity: 1; }
-        .child-select-wrapper { position: relative; display: inline-block; }
-    </style>
-
+    <!-- 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script> -->
+   
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const childSelect = document.getElementById('child-select');
@@ -3091,8 +2749,8 @@ function render_child_results($parent_user, $parent_post_id) {
 
     ob_start();
     ?>
-    <div class="child-results card shadow-lg" style="border: 3px solid #007bff; background: #f8f9fa;">
-        <div class="card-header bg-primary text-white" style="border-radius: 15px 15px 0 0;">
+    <div class="child-results card shadow-lg">
+        <div class="card-header bg-primary text-white" >
             <h3 class="card-title mb-0"><i class="bi bi-award me-2"></i>Child Results</h3>
             <span><?php echo esc_html(date('l, F j, Y')); ?></span>
         </div>
@@ -3125,22 +2783,6 @@ function render_child_results($parent_user, $parent_post_id) {
             </div>
         </div>
     </div>
-
-    <style>
-        .results-table-wrapper { overflow-x: auto; border: 1px solid #e5e5e5; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); background: #fff; }
-        .results-table { width: 100%; border-collapse: collapse; }
-        .results-table th, .results-table td { padding: 12px; text-align: center; border: 1px solid #e5e5e5; }
-        .results-table th { background: #007bff; color: #fff; font-weight: bold; }
-        .results-table tr:nth-child(even) { background: #f9f9f9; }
-        .results-table tfoot { font-weight: bold; background: #e6f3ff; }
-        .export-tools { display: flex; justify-content: flex-end; gap: 15px; margin-bottom: 15px; }
-        .export-btn { background: none; border: none; color: #4682B4; font-size: 1.3em; cursor: pointer; padding: 5px; transition: color 0.3s, transform 0.2s; position: relative; }
-        .export-btn:hover { color: #B0E0E6; transform: scale(1.1); }
-        .export-btn .tooltip { visibility: hidden; background: #4682B4; color: #fff; border-radius: 4px; padding: 4px 8px; position: absolute; z-index: 1; bottom: 125%; right: 50%; transform: translateX(50%); font-size: 0.8em; opacity: 0; transition: opacity 0.3s; }
-        .export-btn:hover .tooltip { visibility: visible; opacity: 1; }
-        .child-select-wrapper { position: relative; display: inline-block; }
-    </style>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const childSelect = document.getElementById('child-select');
@@ -3647,7 +3289,9 @@ function get_child_exams_for_results_callback() {
     wp_send_json_success(['exams' => $exams]);
     exit;
 }
-
+add_action('wp_enqueue_scripts', function() {
+    wp_enqueue_style('parent-dashboard', plugin_dir_url(__FILE__) . 'style.css', [], '1.0.0');
+});
 add_action('wp_enqueue_scripts', function() {
     // Enqueue jsPDF and its autotable plugin
     wp_enqueue_script('jspdf', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', [], '2.5.1', true);
@@ -3655,23 +3299,3 @@ add_action('wp_enqueue_scripts', function() {
     // Enqueue custom pdf-helper.js
     wp_enqueue_script('pdf-helper', plugin_dir_url(__FILE__) . 'js/pdf-helper.js', ['jspdf', 'jspdf-autotable'], '1.0', true);
 });
-// include plugin_dir_path(__FILE__) . 'pdf-helper.js';
-// add_action('wp_enqueue_scripts', function() {
-//     wp_enqueue_script('pdf-helper', plugin_dir_url(__FILE__) . 'pdf-helper.js', ['jspdf', 'jspdf-autotable'], '1.0', true);
-// });
-
-// Placeholder function for educational center data (replace with actual implementation)
-// function get_educational_center_data($education_center_id) {
-//     $center = get_posts([
-//         'post_type' => 'educational-center',
-//         'meta_query' => [['key' => 'educational_center_id', 'value' => $education_center_id]],
-//         'posts_per_page' => 1
-//     ])[0];
-//     if ($center) {
-//         return [
-//             'name' => get_the_title($center->ID),
-//             'logo_url' => get_field('institute_logo', $center->ID) ?: ''
-//         ];
-//     }
-//     return ['name' => 'Unknown Institute', 'logo_url' => ''];
-// }
