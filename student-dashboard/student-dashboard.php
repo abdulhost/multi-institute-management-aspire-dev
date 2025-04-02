@@ -2232,10 +2232,6 @@ $exam_data = $wpdb->get_results($wpdb->prepare($exam_query, $student_id, $educat
 //
 // communication
 // Helper: Check if user is a student
-// Helper: Check if user is a student
-// Helper: Check if user is a student
-// Helper: Check if user is a student
-
 function aspire_is_student($user) {
     return in_array('student', $user->roles);
 }

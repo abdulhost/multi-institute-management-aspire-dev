@@ -70,14 +70,15 @@ function aspire_parent_dashboard_shortcode() {
             <?php 
             $active_section = $section;
             $active_action = $action;
+            echo render_parent_header($parent_post->ID); 
+               
             include plugin_dir_path(__FILE__) . 'parent-sidebar.php';
             ?>
             
             <div class="main-content">
                 <?php
                 ob_start();
-                echo render_parent_header($parent_post); 
-               
+              
                 switch ($section) {
                     case 'overview':
                         echo render_parent_overview($current_user, $parent_post->ID);
@@ -106,6 +107,20 @@ function aspire_parent_dashboard_shortcode() {
                                 case 'results':
                                     echo render_child_results($current_user, $parent_post->ID);
                                     break;
+                                case 'fees':
+                                    echo render_parent_fees($current_user,  $parent_post->ID);break;
+                                case 'parent_calendar':
+                                    echo render_parent_calendar($current_user,  $parent_post->ID);break;
+                                case 'transport_fees':
+                                    echo render_parent_transport_fees($current_user,  $parent_post->ID);
+                                    break;
+                                    case 'notice_board':
+                                        echo render_parent_notice_board($current_user, $parent_post->ID);
+                                        break;
+                                        case 'communication':
+                                            echo render_parent_communication($current_user, $parent_post->ID);
+                                            break;
+                                        
                     default:
                         echo render_parent_overview($current_user, $parent_post->ID);
                 }
@@ -120,108 +135,685 @@ add_shortcode('aspire_parent_dashboard', 'aspire_parent_dashboard_shortcode');
 
 //header
 function render_parent_header($parent_user) {
-    $user_name = esc_html($parent_user->display_name);
-    $user_email = esc_html($parent_user->user_email);
-    $avatar_url = get_avatar_url($parent_user->ID, ['size' => 40]);
-    $profile_link = esc_url(get_permalink(get_page_by_path('parent-profile')));
+    global $wpdb;
+
+    // Ensure $parent_user is a WP_User object
+    if (!($parent_user instanceof WP_User)) {
+        $parent_user = wp_get_current_user();
+    }
+    $username = $parent_user->user_login;
+
+    // Fetch parent post meta
+    $parent_post = get_posts([
+        'post_type' => 'parent',
+        'meta_key' => 'parent_id',
+        'meta_value' => $username,
+        'posts_per_page' => 1,
+    ]);
+    $parent_post_id = $parent_post ? $parent_post[0]->ID : null;
+
+    $user_name = $parent_post_id ? get_post_meta($parent_post_id, 'parent_name', true) : $parent_user->display_name;
+    $user_email = $parent_post_id ? get_post_meta($parent_post_id, 'parent_email', true) : $parent_user->user_email;
+    $avatar_url = $parent_post_id ? wp_get_attachment_url(get_post_meta($parent_post_id, 'parent_profile_photo', true)) : 'https://via.placeholder.com/150';
+
+    $profile_link = esc_url(home_url('/parent-dashboard?section=profile'));
     $logout_link = wp_logout_url(home_url());
     $dashboard_link = esc_url(home_url('/parent-dashboard'));
+    $communication_link = esc_url(home_url('/parent-dashboard?section=communication'));
+    $notifications_link = esc_url(home_url('/parent-dashboard?section=notice_board'));
+    $settings_link = esc_url(home_url('/parent-dashboard?section=settings'));
+    $edu_center_id = educational_center_parent_id();
+    $seven_days_ago = date('Y-m-d H:i:s', strtotime('-7 days'));
+
+    // Messages count and data
+    $messages_table = $wpdb->prefix . 'aspire_messages';
+    $messages_count = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) 
+         FROM $messages_table 
+         WHERE education_center_id = %s 
+         AND (receiver_id = %s OR receiver_id IN ('all', 'parents')) 
+         AND status = 'sent' 
+         AND sender_id != %s 
+         AND timestamp > %s",
+        $edu_center_id, $username, $username, $seven_days_ago
+    ));
+
+    $unread_messages = $wpdb->get_results($wpdb->prepare(
+        "SELECT sender_id, message, timestamp 
+         FROM $messages_table 
+         WHERE education_center_id = %s 
+         AND (receiver_id = %s OR receiver_id IN ('all', 'parents')) 
+         AND status = 'sent' 
+         AND sender_id != %s 
+         AND timestamp > %s 
+         ORDER BY timestamp DESC 
+         LIMIT 5",
+        $edu_center_id, $username, $username, $seven_days_ago
+    ));
+
+    // Notifications count and data
+    $announcements_table = $wpdb->prefix . 'aspire_announcements';
+    $notifications_count = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) 
+         FROM $announcements_table 
+         WHERE education_center_id = %s 
+         AND receiver_id IN ('all', 'parents') 
+         AND timestamp > %s",
+        $edu_center_id, $seven_days_ago
+    ));
+
+    $unread_announcements = $wpdb->get_results($wpdb->prepare(
+        "SELECT sender_id, message, timestamp 
+         FROM $announcements_table 
+         WHERE education_center_id = %s 
+         AND receiver_id IN ('all', 'parents') 
+         AND timestamp > %s 
+         ORDER BY timestamp DESC 
+         LIMIT 5",
+        $edu_center_id, $seven_days_ago
+    ));
 
     ob_start();
     ?>
     <header class="parent-header">
         <div class="header-container">
-            <!-- Left: Branding & Navigation -->
             <div class="header-left">
                 <a href="<?php echo $dashboard_link; ?>" class="header-logo">
-                    <i class="fas fa-graduation-cap logo-icon"></i>
-                    <span class="logo-text">Parent Portal</span>
+                    <img decoding="async" class="logo-image" src="<?php echo plugin_dir_url(__FILE__) . '../logo instituto.jpg'; ?>">
+                    <span class="logo-text">Instituto</span>
                 </a>
-                <nav class="header-nav">
-                    <a href="<?php echo $dashboard_link; ?>" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                    <a href="#" class="nav-link"><i class="fas fa-calendar-check"></i> Timetable</a>
-                    <a href="#" class="nav-link"><i class="fas fa-book-open"></i> Exams</a>
-                    <a href="#" class="nav-link"><i class="fas fa-chart-bar"></i> Results</a>
-                </nav>
-            </div>
-
-            <!-- Right: Actions -->
-            <div class="header-right">
                 <div class="header-search">
-                    <input type="text" placeholder="Search..." class="search-input" aria-label="Search">
-                    <button class="search-btn" aria-label="Search"><i class="fas fa-search"></i></button>
-                </div>
-                <div class="header-messages">
-                    <button class="action-btn messages-btn" aria-label="Messages">
-                        <i class="fas fa-envelope"></i>
-                        <span class="action-badge">2</span>
-                    </button>
-                    <div class="dropdown messages-dropdown">
-                        <div class="dropdown-header">
-                            <span>Messages</span>
-                            <a href="#" class="mark-read">Mark all as read</a>
-                        </div>
-                        <ul class="dropdown-list">
-                            <li><div class="msg-content"><span class="msg-sender">Teacher Sarah</span><span class="msg-preview">Assignment due...</span></div><span class="msg-time">5m ago</span></li>
-                            <li><div class="msg-content"><span class="msg-sender">Admin</span><span class="msg-preview">Fee payment...</span></div><span class="msg-time">1h ago</span></li>
-                        </ul>
-                        <a href="#" class="dropdown-footer">See All Messages</a>
+                    <input type="text" placeholder="Search" class="search-input" id="header-search-input" aria-label="Search">
+                    <div class="search-dropdown" id="search-results">
+                        <ul class="results-list" id="search-results-list"></ul>
                     </div>
                 </div>
-                <div class="header-notifications">
-                    <button class="action-btn notifications-btn" aria-label="Notifications">
-                        <i class="fas fa-bell"></i>
-                        <span class="action-badge">3</span>
-                    </button>
-                    <div class="dropdown notifications-dropdown">
-                        <div class="dropdown-header">
-                            <span>Notifications</span>
-                            <a href="#" class="mark-read">Clear all</a>
-                        </div>
-                        <ul class="dropdown-list">
-                            <li><span class="notif-text">Exam schedule updated</span><span class="notif-time">10m ago</span></li>
-                            <li><span class="notif-text">New result published</span><span class="notif-time">1h ago</span></li>
-                            <li><span class="notif-text">Parent meeting scheduled</span><span class="notif-time">1d ago</span></li>
-                        </ul>
-                        <a href="#" class="dropdown-footer">See All Notifications</a>
-                    </div>
-                </div>
-                <div class="header-profile">
-                    <div class="profile-toggle">
-                        <img src="<?php echo esc_url($avatar_url); ?>" alt="Profile" class="profile-avatar">
-                        <span class="user-name"><?php echo $user_name; ?></span>
-                        <i class="fas fa-chevron-down profile-arrow"></i>
-                    </div>
-                    <div class="dropdown profile-dropdown">
-                        <div class="profile-header">
-                            <img src="<?php echo esc_url($avatar_url); ?>" alt="Profile" class="profile-avatar-large">
-                            <div class="profile-info">
-                                <span class="profile-name"><?php echo $user_name; ?></span>
-                                <span class="profile-email"><?php echo $user_email; ?></span>
+            </div>
+            <div class="header-right">
+                <nav class="header-nav">
+                    <a href="<?php echo $dashboard_link; ?>" class="nav-item active">Dashboard</a>
+                    <a href="#" class="nav-item">Exams</a>
+                    <a href="#" class="nav-item">Reports</a>
+                    <a href="<?php echo $communication_link; ?>" class="nav-item">Messages</a>
+                </nav>
+                <div class="header-actions">
+                    <!-- Quick Links Dropdown -->
+                    <div class="header-quick-links">
+                        <a href="#" class="action-btn" id="quick-links-toggle">
+                            <i class="fas fa-link fa-lg"></i>
+                        </a>
+                        <div class="dropdown quick-links-dropdown" id="quick-links-dropdown">
+                            <div class="dropdown-header">
+                                <span>Quick Links</span>
                             </div>
-                        </div>
-                        <div class="profile-actions">
-                            <a href="<?php echo $profile_link; ?>" class="profile-link"><i class="fas fa-user-circle"></i> My Profile</a>
-                            <a href="<?php echo $dashboard_link; ?>" class="profile-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                            <a href="#" class="profile-link"><i class="fas fa-cog"></i> Settings</a>
-                            <a href="<?php echo $logout_link; ?>" class="profile-link logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                            <ul class="dropdown-list">
+                                <li><a href="<?php echo esc_url(home_url('/parent-dashboard?section=calendar')); ?>" class="dropdown-link">Calendar</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/parent-dashboard?section=fees')); ?>" class="dropdown-link">Fees</a></li>
+                                <li><a href="https://support.instituto.edu" target="_blank" class="dropdown-link">Support</a></li>
+                            </ul>
                         </div>
                     </div>
+
+                    <!-- Messages Dropdown -->
+                    <div class="header-messages">
+                        <a href="<?php echo $communication_link; ?>" class="action-btn" id="messages-toggle">
+                            <i class="fas fa-envelope fa-lg"></i>
+                            <span class="action-badge <?php echo $messages_count ? '' : 'd-none'; ?>" id="messages-count">
+                                <?php echo esc_html($messages_count ?: 0); ?>
+                            </span>
+                        </a>
+                        <div class="dropdown messages-dropdown" id="messages-dropdown">
+                            <div class="dropdown-header">
+                                <span>Messages (Last 7 Days)</span>
+                            </div>
+                            <ul class="dropdown-list">
+                                <?php if (!empty($unread_messages)): ?>
+                                    <?php foreach ($unread_messages as $msg): ?>
+                                        <li>
+                                            <span class="msg-content">
+                                                <span class="msg-sender"><?php echo esc_html($msg->sender_id); ?></span>:
+                                                <span class="msg-preview"><?php echo esc_html(wp_trim_words($msg->message, 5, '...')); ?></span>
+                                            </span>
+                                            <span class="msg-time"><?php echo esc_html(date('M d, Y', strtotime($msg->timestamp))); ?></span>
+                                        </li>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <li><span class="msg-preview">No new messages</span></li>
+                                <?php endif; ?>
+                            </ul>
+                            <?php if (!empty($unread_messages)): ?>
+                                <a href="<?php echo $communication_link; ?>" class="dropdown-footer">View All Messages</a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- Notifications Dropdown -->
+                    <div class="header-notifications">
+                        <a href="<?php echo $notifications_link; ?>" class="action-btn" id="notifications-toggle">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="action-badge <?php echo $notifications_count ? '' : 'd-none'; ?>" id="notifications-count">
+                                <?php echo esc_html($notifications_count ?: 0); ?>
+                            </span>
+                        </a>
+                        <div class="dropdown notifications-dropdown" id="notifications-dropdown">
+                            <div class="dropdown-header">
+                                <span>Notifications (Last 7 Days)</span>
+                            </div>
+                            <ul class="dropdown-list">
+                                <?php if (!empty($unread_announcements)): ?>
+                                    <?php foreach ($unread_announcements as $ann): ?>
+                                        <li>
+                                            <span class="msg-content">
+                                                <span class="msg-sender"><?php echo esc_html($ann->sender_id); ?></span>:
+                                                <span class="notif-text"><?php echo esc_html(wp_trim_words($ann->message, 5, '...')); ?></span>
+                                            </span>
+                                            <span class="notif-time"><?php echo esc_html(date('M d, Y', strtotime($ann->timestamp))); ?></span>
+                                        </li>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <li><span class="notif-text">No new notifications</span></li>
+                                <?php endif; ?>
+                            </ul>
+                            <?php if (!empty($unread_announcements)): ?>
+                                <a href="<?php echo $notifications_link; ?>" class="dropdown-footer">View All Notifications</a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- Settings -->
+                    <div class="header-settings">
+                        <a href="<?php echo $settings_link; ?>" class="action-btn" id="settings-toggle">
+                            <i class="fas fa-cog fa-lg"></i>
+                        </a>
+                    </div>
+
+                    <!-- Help/Support -->
+                    <div class="header-help">
+                        <a href="https://support.instituto.edu" target="_blank" class="action-btn" id="help-toggle">
+                            <i class="fas fa-question-circle fa-lg"></i>
+                        </a>
+                    </div>
+
+                    <!-- Dark Mode Toggle -->
+                    <div class="header-dark-mode">
+                        <button class="action-btn" id="dark-mode-toggle">
+                            <i class="fas fa-moon fa-lg"></i>
+                        </button>
+                    </div>
+
+                    <!-- Profile Dropdown -->
+                    <div class="header-profile">
+                        <div class="profile-toggle" id="profile-toggle">
+                            <img decoding="async" src="<?php echo esc_url($avatar_url); ?>" alt="Profile" class="profile-img">
+                            <i class="fas fa-caret-down profile-arrow"></i>
+                        </div>
+                        <div class="action-dropdown profile-dropdown" id="profile-dropdown">
+                            <div class="profile-info">
+                                <img decoding="async" src="<?php echo esc_url($avatar_url); ?>" alt="Profile" class="profile-img-large">
+                                <div>
+                                    <span class="profile-name"><?php echo esc_html($user_name); ?></span><br>
+                                    <span class="profile-email"><?php echo esc_html($user_email); ?></span>
+                                </div>
+                            </div>
+                            <ul class="dropdown-list">
+                                <li><a href="<?php echo $profile_link; ?>" class="profile-link">Profile</a></li>
+                                <li><a href="<?php echo $logout_link; ?>" class="profile-link logout">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle Navigation">
+                        <i class="fas fa-bars"></i>
+                    </button>
                 </div>
-                <button class="mobile-menu-toggle" aria-label="Menu">
-                    <i class="fas fa-bars"></i>
-                </button>
             </div>
         </div>
     </header>
+
+    <!-- Refined CSS Enhancements (Unchanged from your version) -->
+    <style>
+        /* Enhance existing action-btn for icons */
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px; /* Space between icon and badge */
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: var(--accent-color);
+            font-size: 1.3rem;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn i {
+            font-size: 1.2rem; /* Ensure icons are visible */
+        }
+
+        .action-btn:hover {
+            background: var(--hover-color);
+            color: var(--accent-color);
+        }
+
+        /* Refine action-badge (Messages & Notifications count) */
+        .action-badge {
+            background: var(--primary-color); /* Sky Blue */
+            color: var(--text-color);
+            padding: 2px 6px;
+            font-size: 0.75rem;
+            border-radius: 50%;
+            position: relative;
+            top: -5px;
+            left: -5px;
+        }
+
+        .action-badge.d-none {
+            display: none; /* Hide when no count */
+        }
+
+        /* Dropdown visibility */
+        .dropdown {
+    display: block; /* Change to block but hide with opacity/visibility */
+    position: absolute;
+    top: 100%; /* Position below the toggle */
+    left: 50%; /* Start at the center of the parent */
+    transform: translateX(-50%); /* Center it */
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    width: 300px;
+    padding: 15px;
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease; /* Only transition opacity */
+    }
+
+    .dropdown.visible {
+    opacity: 1;
+    visibility: visible;
+    }
+    .header-messages,
+    .header-notifications,
+    .header-quick-links,
+    .header-profile {
+    position: relative;
+    }.header-profile .dropdown {
+    left: auto;
+    right: 0;
+    transform: none; /* Remove centering for right-aligned dropdowns */
+    }
+       
+
+        /* Dropdown list items */
+        .dropdown-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #f7f7f7;
+        }
+
+        .dropdown-list li:hover {
+            background: var(--hover-color);
+        }
+
+        .dropdown-list li:last-child {
+            border-bottom: none;
+        }
+
+        .msg-content, .notif-text {
+            flex: 1;
+            color: var(--text-color);
+        }
+
+        .msg-sender {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .msg-time, .notif-time {
+            color: #888;
+            font-size: 0.85rem;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        /* Dropdown footer */
+        .dropdown-footer {
+            display: block;
+            text-align: center;
+            color: #fff;
+            font-size: 0.9rem;
+            padding: 10px;
+            background: var(--accent-color);
+            border-radius: 0 0 15px 15px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .dropdown-footer:hover {
+            background: var(--hover-color);
+        }
+
+        /* Added styles for new features */
+        .quick-links-dropdown .dropdown-list li a {
+            color: var(--text-color);
+            text-decoration: none;
+            display: block;
+            padding: 6px 0;
+        }
+
+        .quick-links-dropdown .dropdown-list li a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Dark Mode (Optional) */
+        .dark-mode .parent-header {
+            background: #333;
+            color: #fff;
+        }
+
+        .dark-mode .header-logo,
+        .dark-mode .nav-item,
+        .dark-mode .action-btn {
+            color: #fff;
+        }
+
+        .dark-mode .dropdown {
+            background: #444;
+            color: #fff;
+        }
+
+        .dark-mode .dropdown-list li {
+            border-bottom: 1px solid #555;
+        }
+
+        .dark-mode .dropdown-footer {
+            background: var(--primary-color);
+        }.dropdown {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+    }
+
+    .dropdown.visible {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.2s ease;
+    }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const fontAwesomeLink = document.createElement('link');
+        fontAwesomeLink.rel = 'stylesheet';
+        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';
+        fontAwesomeLink.crossOrigin = 'anonymous';
+        fontAwesomeLink.onload = () => console.log('Font Awesome loaded');
+        fontAwesomeLink.onerror = () => console.error('Failed to load Font Awesome');
+        document.head.appendChild(fontAwesomeLink);
+
+        const searchInput = document.getElementById('header-search-input');
+        const searchResults = document.getElementById('search-results');
+        const navToggle = document.getElementById('nav-toggle');
+        const headerNav = document.querySelector('.header-nav');
+        const messagesToggle = document.getElementById('messages-toggle');
+        const messagesDropdown = document.getElementById('messages-dropdown');
+        const notificationsToggle = document.getElementById('notifications-toggle');
+        const notificationsDropdown = document.getElementById('notifications-dropdown');
+        const quickLinksToggle = document.getElementById('quick-links-toggle');
+        const quickLinksDropdown = document.getElementById('quick-links-dropdown');
+        const settingsToggle = document.getElementById('settings-toggle');
+        const helpToggle = document.getElementById('help-toggle');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const profileToggle = document.getElementById('profile-toggle');
+        const profileDropdown = document.getElementById('profile-dropdown');
+
+        let activeDropdown = null;
+
+        function toggleDropdown(toggle, dropdown, isLink = false) {
+    // Hover behavior
+    toggle.addEventListener('mouseenter', () => {
+        closeAllDropdowns();
+        dropdown.classList.add('visible');
+        activeDropdown = dropdown;
+    });
+
+    dropdown.addEventListener('mouseenter', () => {
+        dropdown.classList.add('visible');
+        activeDropdown = dropdown;
+    });
+
+    toggle.addEventListener('mouseleave', () => {
+        dropdown.addEventListener('mouseleave', () => {
+            dropdown.classList.remove('visible');
+            activeDropdown = null;
+        });
+    });
+
+    // Click behavior (optional, for touch devices or explicit toggle)
+    if (!isLink) {
+        toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (dropdown.classList.contains('visible')) {
+                dropdown.classList.remove('visible');
+                activeDropdown = null;
+            } else {
+                closeAllDropdowns();
+                dropdown.classList.add('visible');
+                activeDropdown = dropdown;
+            }
+        });
+    }
+    }
+        function closeAllDropdowns() {
+            [messagesDropdown, notificationsDropdown, quickLinksDropdown, profileDropdown, searchResults].forEach(dropdown => {
+                if (dropdown) dropdown.classList.remove('visible');
+            });
+            activeDropdown = null;
+        }
+
+        if (searchInput && searchResults) {
+            let debounceTimer;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    const query = this.value.trim();
+                    if (query.length < 2) {
+                        searchResults.classList.remove('visible');
+                        return;
+                    }
+
+                    searchResults.querySelector('.results-list').innerHTML = '<li>Loading...</li>';
+                    searchResults.classList.add('visible');
+
+                    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({
+                            action: 'search_dashboard_sections',
+                            query: query
+                        }).toString()
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const resultsList = searchResults.querySelector('.results-list');
+                        resultsList.innerHTML = '';
+                        if (data.success && data.data.length > 0) {
+                            data.data.forEach(item => {
+                                resultsList.innerHTML += `<li><a href="${item.url}">${item.title}</a></li>`;
+                            });
+                        } else {
+                            resultsList.innerHTML = '<li>No results found</li>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Search error:', error);
+                        searchResults.querySelector('.results-list').innerHTML = '<li>Error fetching results</li>';
+                    });
+                }, 150);
+            });
+        }
+
+        if (navToggle && headerNav) {
+            navToggle.addEventListener('click', () => {
+                headerNav.classList.toggle('visible');
+            });
+        }
+
+        if (messagesToggle && messagesDropdown) {
+            toggleDropdown(messagesToggle, messagesDropdown, true); // True for link behavior
+        }
+
+        if (notificationsToggle && notificationsDropdown) {
+            toggleDropdown(notificationsToggle, notificationsDropdown, true); // True for link behavior
+        }
+
+        if (quickLinksToggle && quickLinksDropdown) {
+            toggleDropdown(quickLinksToggle, quickLinksDropdown);
+        }
+
+        if (settingsToggle) {
+            // Settings is just a link, no dropdown
+        }
+
+        if (helpToggle) {
+            // Help is just a link, no dropdown
+        }
+
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                darkModeToggle.querySelector('i').classList.toggle('fa-moon', !isDark);
+                darkModeToggle.querySelector('i').classList.toggle('fa-sun', isDark);
+            });
+        }
+
+        if (profileToggle && profileDropdown) {
+            toggleDropdown(profileToggle, profileDropdown);
+        }
+
+        document.addEventListener('click', (e) => {
+            if (searchInput && searchResults && !searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.remove('visible');
+            }
+            if (activeDropdown && !activeDropdown.contains(e.target) && !e.target.closest('.action-btn, .profile-toggle')) {
+                activeDropdown.classList.remove('visible');
+                activeDropdown = null;
+            }
+        });
+    });
+
+    jQuery(document).ready(function($) {
+        $('a[href*="section=communication"]').on('click', function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'aspire_parent_mark_messages_read',
+                    nonce: '<?php echo wp_create_nonce('aspire_parent_header_nonce'); ?>'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#messages-count').text('0').addClass('d-none');
+                        $('#messages-dropdown .dropdown-list').html('<li><span class="msg-preview">No new messages</span></li>');
+                        $('#messages-dropdown .dropdown-footer').remove();
+                        window.location.href = '<?php echo $communication_link; ?>';
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error marking messages as read:', error);
+                }
+            });
+        });
+
+        $('a[href*="section=notice_board"]').on('click', function(e) {
+            e.preventDefault();
+            $('#notifications-count').text('0').addClass('d-none');
+            $('#notifications-dropdown .dropdown-list').html('<li><span class="notif-text">No new notifications</span></li>');
+            $('#notifications-dropdown .dropdown-footer').remove();
+            window.location.href = '<?php echo $notifications_link; ?>';
+        });
+    });
+    </script>
     <?php
     return ob_get_clean();
 }
-add_action('wp_enqueue_scripts', function() {
-    wp_enqueue_style('google-fonts', 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap', [], null);
-});
-// Feature 1: Overview
 
+// AJAX Handlers (unchanged)
+add_action('wp_ajax_search_dashboard_sections', 'search_dashboard_sections_callback');
+function search_dashboard_sections_callback() {
+    $query = isset($_POST['query']) ? sanitize_text_field($_POST['query']) : '';
+    $sections = [
+        ['title' => 'Dashboard', 'url' => esc_url(home_url('/parent-dashboard')), 'keywords' => ['dashboard', 'home']],
+        ['title' => 'Profile', 'url' => esc_url(home_url('/parent-dashboard?section=profile')), 'keywords' => ['profile', 'account']],
+        ['title' => 'Exams', 'url' => esc_url(home_url('/parent-dashboard?section=exams')), 'keywords' => ['exams', 'tests']],
+        ['title' => 'Reports', 'url' => esc_url(home_url('/parent-dashboard?section=reports')), 'keywords' => ['reports', 'grades']],
+        ['title' => 'Communication', 'url' => esc_url(home_url('/parent-dashboard?section=communication')), 'keywords' => ['messages', 'chat']],
+        ['title' => 'Notice Board', 'url' => esc_url(home_url('/parent-dashboard?section=notice_board')), 'keywords' => ['notices', 'announcements']]
+    ];
+
+    $results = [];
+    if (!empty($query)) {
+        foreach ($sections as $section) {
+            if (stripos($section['title'], $query) !== false || array_reduce($section['keywords'], fn($carry, $kw) => $carry || stripos($kw, $query) !== false, false)) {
+                $results[] = ['title' => $section['title'], 'url' => $section['url']];
+            }
+        }
+    }
+    wp_send_json_success($results);
+    wp_die();
+}
+
+add_action('wp_ajax_aspire_parent_mark_messages_read', 'aspire_parent_mark_messages_read');
+function aspire_parent_mark_messages_read() {
+    check_ajax_referer('aspire_parent_header_nonce', 'nonce');
+
+    global $wpdb;
+    $user = wp_get_current_user();
+    $username = $user->user_login;
+    $edu_center_id = educational_center_parent_id();
+    $seven_days_ago = date('Y-m-d H:i:s', strtotime('-7 days'));
+
+    $messages_table = $wpdb->prefix . 'aspire_messages';
+    $wpdb->query($wpdb->prepare(
+        "UPDATE $messages_table 
+         SET status = 'read' 
+         WHERE education_center_id = %s 
+         AND receiver_id = %s 
+         AND status = 'sent' 
+         AND timestamp > %s",
+        $edu_center_id, $username, $seven_days_ago
+    ));
+
+    $wpdb->query($wpdb->prepare(
+        "UPDATE $messages_table 
+         SET status = 'read' 
+         WHERE education_center_id = %s 
+         AND receiver_id IN ('all', 'parents') 
+         AND status = 'sent' 
+         AND sender_id != %s 
+         AND timestamp > %s",
+        $edu_center_id, $username, $seven_days_ago
+    ));
+
+    wp_send_json_success();
+}
+
+// Enqueue jQuery only
+add_action('wp_enqueue_scripts', function() {
+    wp_enqueue_script('jquery', 'https://code.jquery.com/jquery-3.6.0.min.js', [], '3.6.0', true);
+});
+
+
+// Feature 1: Overview
 function render_parent_overview($parent_user, $parent_post_id) {
     global $wpdb;
 
@@ -1491,8 +2083,8 @@ function render_child_selection($parent_user, $parent_post_id) {
             });
         });
     </script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"> -->
     <?php
     return ob_get_clean();
 }
@@ -2211,12 +2803,12 @@ function render_child_timetable($parent_user, $parent_post_id) {
             childSelect.addEventListener('change', loadTimetable);
         });
     </script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script> -->
     <?php
     return ob_get_clean();
 }
@@ -3289,6 +3881,1432 @@ function get_child_exams_for_results_callback() {
     wp_send_json_success(['exams' => $exams]);
     exit;
 }
+
+//noticeboard
+function render_parent_notice_board($parent_user, $parent_post_id) {
+    global $wpdb;
+
+    $educational_center_id = educational_center_parent_id();
+    if (empty($educational_center_id)) {
+        return '<div class="alert alert-danger">No Educational Center found for this parent account.</div>';
+    }
+
+    // Fetch announcements directly from wp_aspire_announcements
+    $table = $wpdb->prefix . 'aspire_announcements';
+    $query = $wpdb->prepare(
+        "SELECT sender_id, receiver_id, message, timestamp 
+         FROM $table 
+         WHERE education_center_id = %s 
+         AND receiver_id IN ('all', 'students', 'parents') 
+         ORDER BY timestamp DESC 
+         LIMIT 10",
+        $educational_center_id
+    );
+
+    $announcements = $wpdb->get_results($query);
+
+    if ($wpdb->last_error) {
+        error_log('render_parent_notice_board: SQL Error - ' . $wpdb->last_error);
+        return '<div class="alert alert-danger">Database error: ' . esc_html($wpdb->last_error) . '</div>';
+    }
+
+    // Recipient labels (based on your sample code)
+    $recipients = [
+        'all' => 'Everyone',
+        'students' => 'Students',
+        'parents' => 'Parents',
+        'teachers' => 'Teachers',
+        'institute_admins' => 'Institute Admins'
+    ];
+
+    ob_start();
+    ?>
+    <div class="parent-notice-board card shadow-lg">
+        <div class="card-header bg-info text-white">
+            <h3 class="card-title mb-0"><i class="fas fa-bell me-2"></i>Notice Board</h3>
+            <span><?php echo esc_html(date('l, F j, Y')); ?></span>
+        </div>
+        <div class="card-body p-4">
+            <div id="notice-board-content" class="notice-board-content announcement-list">
+                <?php if ($announcements): ?>
+                    <?php foreach ($announcements as $ann): ?>
+                        <div class="notice-item announcement-item">
+                            <div class="notice-header announcement-content">
+                                <span class="notice-meta announcement-meta">
+                                    <?php echo esc_html($ann->sender_id); ?> 
+                                    to <?php echo esc_html($recipients[$ann->receiver_id] ?? ucfirst($ann->receiver_id)); ?>
+                                </span>
+                                <p class="notice-content announcement-message"><?php echo esc_html($ann->message); ?></p>
+                            </div>
+                            <span class="notice-date announcement-timestamp" data-timestamp="<?php echo esc_attr($ann->timestamp); ?>">
+                                <?php echo esc_html(date('M d, Y H:i', strtotime($ann->timestamp))); ?>
+                            </span>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p class="text-muted">No announcements available.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function updateTimestamps() {
+            document.querySelectorAll('.notice-date').forEach(span => {
+                const timestamp = span.dataset.timestamp;
+                if (typeof moment !== 'undefined') {
+                    span.textContent = moment(timestamp).fromNow();
+                } else {
+                    console.log('Moment.js not loaded');
+                }
+            });
+        }
+
+        // Update timestamps on load
+        updateTimestamps();
+
+        // Auto-refresh the page every 30 seconds
+        setInterval(() => {
+            window.location.reload();
+        }, 30000);
+    });
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <?php
+    return ob_get_clean();
+}
+
+// Helper function to get username
+function aspire_parent_get_username($post_id) {
+    $user_id = get_post_field('post_author', $post_id);
+    $user = get_user_by('id', $user_id);
+    $username = $user ? $user->user_login : '';
+    error_log("aspire_parent_get_username: post_id=$post_id, user_id=$user_id, username=$username");
+    return $username;
+}
+
+// Main function for parent communication section
+function render_parent_communication($parent_user, $parent_post_id) {
+    if (!is_user_logged_in()) {
+        return '<p>Please log in to use this chat.</p>';
+    }
+
+    global $wpdb;
+    $edu_center_id = educational_center_parent_id();
+    if (empty($edu_center_id)) {
+        return '<div class="alert alert-danger">No Educational Center found for this parent account.</div>';
+    }
+
+    $username = $parent_user->user_login;
+
+    // Fetch teachers only as contacts
+    $contacts = get_posts([
+        'post_type' => 'teacher',
+        'posts_per_page' => -1,
+        'meta_key' => 'educational_center_id',
+        'meta_value' => $edu_center_id,
+    ]);
+
+    // Build contact map for teachers
+    $contact_map = [];
+    foreach ($contacts as $contact) {
+        $contact_id = get_post_meta($contact->ID, 'teacher_id', true);
+        $teacher_name = get_post_meta($contact->ID, 'teacher_name', true) ?: $contact->post_title;
+        if ($contact_id && $contact_id !== $username) {
+            $contact_map[$contact_id] = "$teacher_name ($contact_id - Teacher)";
+        }
+    }
+
+    // Fetch initial conversations relevant to the parent
+    $table = $wpdb->prefix . 'aspire_messages';
+    $group_types = ['all', 'teachers', 'institute_admins', 'parents'];
+    $group_names = [
+        'all' => 'Everyone in Center',
+        'teachers' => 'Teachers',
+        'institute_admins' => 'Institute Admins',
+        'parents' => 'Parents'
+    ];
+
+    $query = "
+        SELECT DISTINCT receiver_id AS conversation_with 
+        FROM $table 
+        WHERE education_center_id = %s 
+        AND sender_id = %s
+        UNION
+        SELECT DISTINCT sender_id AS conversation_with 
+        FROM $table 
+        WHERE education_center_id = %s 
+        AND receiver_id = %s 
+        AND sender_id NOT IN ('all', 'teachers', 'institute_admins', 'parents')
+        UNION
+        SELECT DISTINCT receiver_id AS conversation_with 
+        FROM $table 
+        WHERE education_center_id = %s 
+        AND receiver_id IN ('all', 'parents')
+        AND sender_id != %s
+    ";
+    $query_args = [$edu_center_id, $username, $edu_center_id, $username, $edu_center_id, $username];
+    $active_conversations = $wpdb->get_results($wpdb->prepare($query, $query_args));
+
+    ob_start();
+    ?>
+    <div class="parent-communication card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title mb-0"><i class="fas fa-comments me-2"></i>Communication</h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="chat-wrapper">
+                <div class="chat-sidebar">
+                    <div class="sidebar-header">
+                        <h4>Inbox</h4>
+                    </div>
+                    <ul id="aspire-parent-conversations" class="conversation-list">
+                        <?php
+                        $has_conversations = false;
+                        foreach ($active_conversations as $conv) {
+                            $conv_with = $conv->conversation_with;
+                            if (isset($group_names[$conv_with])) {
+                                $name = "Group: " . $group_names[$conv_with];
+                            } else {
+                                $name = $contact_map[$conv_with] ?? (get_user_by('login', $conv_with)->display_name ?? $conv_with);
+                            }
+                            echo '<li class="conversation-item" data-conversation-with="' . esc_attr($conv_with) . '">' . esc_html($name) . '</li>';
+                            $has_conversations = true;
+                        }
+                        if (!$has_conversations) {
+                            echo '<li class="conversation-item text-muted">No conversations yet.</li>';
+                        }
+                        ?>
+                    </ul>
+                </div>
+                <div class="chat-main">
+                    <div class="chat-header">
+                        <h5 id="current-conversation">Select a conversation</h5>
+                        <div>
+                            <button id="new-chat" class="btn btn-outline-primary btn-sm">New Chat</button>
+                            <button id="clear-conversation" class="btn btn-outline-secondary btn-sm" style="display:none;">Clear</button>
+                        </div>
+                    </div>
+                    <div id="aspire-parent-message-list" class="chat-messages"></div>
+                    <form id="aspire-parent-send-form" class="chat-form">
+                        <div class="input-group">
+                            <textarea id="aspire-parent-message-input" class="form-control" placeholder="Type your message..." rows="1" required></textarea>
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i></button>
+                        </div>
+                        <div id="recipient-select" class="recipient-select" style="display:none;">
+                            <select id="aspire-parent-target-value" class="form-select">
+                                <option value="">Select a recipient</option>
+                                <option value="all">All</option>
+                                <option value="teachers">All Teachers</option>
+                                <?php
+                                foreach ($contacts as $contact) {
+                                    $contact_id = get_post_meta($contact->ID, 'teacher_id', true);
+                                    $teacher_name = get_post_meta($contact->ID, 'teacher_name', true) ?: $contact->post_title;
+                                    if ($contact_id && $contact_id !== $username) {
+                                        echo '<option value="' . esc_attr($contact_id) . '">' . esc_html("$teacher_name ($contact_id - Teacher)") . '</option>';
+                                    }
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <?php wp_nonce_field('aspire_parent_nonce', 'aspire_parent_nonce_field'); ?>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    jQuery(document).ready(function($) {
+        let selectedConversation = localStorage.getItem('aspire_parent_selected_conversation') || '';
+        let currentRecipient = '';
+
+        function fetchMessages(conversationWith) {
+            $('#aspire-parent-message-list').html('<div class="chat-loading active"><div class="spinner"></div><p>Loading messages...</p></div>');
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'aspire_parent_fetch_messages',
+                    conversation_with: conversationWith,
+                    nonce: $('#aspire_parent_nonce_field').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#aspire-parent-message-list').html(response.data.html);
+                        const chatMessages = document.querySelector('#aspire-parent-message-list');
+                        if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+                        updateTimestamps();
+                    } else {
+                        $('#aspire-parent-message-list').html('<p>Error loading messages.</p>');
+                        console.error('Fetch messages failed:', response.data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#aspire-parent-message-list').html('<p>Network error occurred.</p>');
+                    console.error('AJAX error:', status, error);
+                }
+            });
+        }
+
+        function updateTimestamps() {
+            $('.chat-message .meta').each(function() {
+                const timestamp = $(this).data('timestamp');
+                $(this).text(`${$(this).text().split(' - ')[0]} - ${moment(timestamp).fromNow()}`);
+            });
+        }
+
+        $(document).on('click', '#aspire-parent-conversations li', function() {
+            $('#aspire-parent-conversations li').removeClass('active');
+            $(this).addClass('active');
+            selectedConversation = $(this).data('conversation-with');
+            currentRecipient = selectedConversation;
+            localStorage.setItem('aspire_parent_selected_conversation', selectedConversation);
+            $('#current-conversation').text($(this).text());
+            $('#clear-conversation').show();
+            $('#new-chat').show();
+            $('#recipient-select').hide();
+            fetchMessages(selectedConversation);
+        });
+
+        $('#clear-conversation').click(function() {
+            selectedConversation = '';
+            currentRecipient = '';
+            localStorage.removeItem('aspire_parent_selected_conversation');
+            $('#current-conversation').text('Select a conversation');
+            $('#clear-conversation').hide();
+            $('#new-chat').show();
+            $('#recipient-select').hide();
+            $('#aspire-parent-message-list').empty();
+            $('#aspire-parent-conversations li').removeClass('active');
+        });
+
+        $('#new-chat').click(function() {
+            selectedConversation = '';
+            currentRecipient = '';
+            localStorage.removeItem('aspire_parent_selected_conversation');
+            $('#current-conversation').text('New Conversation');
+            $('#clear-conversation').show();
+            $('#new-chat').hide();
+            $('#recipient-select').show();
+            $('#aspire-parent-message-list').empty();
+            $('#aspire-parent-conversations li').removeClass('active');
+            $('#aspire-parent-target-value').val('');
+        });
+
+        $('#aspire-parent-send-form').submit(function(e) {
+            e.preventDefault();
+            const message = $('#aspire-parent-message-input').val().trim();
+            if (!message) return;
+
+            let targetValue = $('#recipient-select').is(':visible') ? $('#aspire-parent-target-value').val() : currentRecipient;
+            if (!targetValue) {
+                alert('Please select a recipient.');
+                return;
+            }
+
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'aspire_parent_send_message',
+                    message: message,
+                    target_value: targetValue,
+                    nonce: $('#aspire_parent_nonce_field').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#aspire-parent-message-input').val('');
+                        if ($('#recipient-select').is(':visible')) {
+                            currentRecipient = targetValue;
+                            $('#current-conversation').text($(`#aspire-parent-target-value option[value="${targetValue}"]`).text());
+                            $('#clear-conversation').show();
+                            $('#new-chat').hide();
+                            $('#recipient-select').hide();
+                        }
+                        fetchMessages(currentRecipient);
+                        setTimeout(() => location.reload(), 500);
+                    } else {
+                        alert('Failed to send message: ' + (response.data?.error || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', status, error);
+                    alert('Network error occurred. Please try again.');
+                }
+            });
+        });
+
+        if (selectedConversation) {
+            $(`#aspire-parent-conversations li[data-conversation-with="${selectedConversation}"]`).addClass('active');
+            $('#current-conversation').text($(`#aspire-parent-conversations li[data-conversation-with="${selectedConversation}"]`).text());
+            $('#clear-conversation').show();
+            $('#new-chat').show();
+            $('#recipient-select').hide();
+            fetchMessages(selectedConversation);
+        }
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// AJAX Handlers
+add_action('wp_ajax_aspire_parent_send_message', 'aspire_parent_ajax_send_message');
+function aspire_parent_ajax_send_message() {
+    check_ajax_referer('aspire_parent_nonce', 'nonce');
+
+    $edu_center_id = educational_center_parent_id();
+    $user = wp_get_current_user();
+    $sender_id = $user->user_login;
+    $message = sanitize_text_field($_POST['message'] ?? '');
+    $target_value = sanitize_text_field($_POST['target_value'] ?? '');
+
+    if (!$edu_center_id || !$sender_id || !$message || !$target_value) {
+        error_log("Missing fields: edu_center_id=$edu_center_id, sender_id=$sender_id, message=$message, target_value=$target_value");
+        wp_send_json_error(['error' => 'Missing required fields']);
+        return;
+    }
+
+    $success = aspire_parent_send_message($sender_id, $target_value, $message, $edu_center_id);
+
+    if ($success) {
+        wp_send_json_success(['success' => 'Message sent!']);
+    } else {
+        wp_send_json_error(['error' => 'Failed to send message']);
+    }
+}
+
+function aspire_parent_send_message($sender_id, $receiver_id, $message, $education_center_id) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_messages';
+
+    $result = $wpdb->insert(
+        $table,
+        [
+            'sender_id' => $sender_id,
+            'receiver_id' => $receiver_id,
+            'message' => $message,
+            'education_center_id' => $education_center_id,
+            'status' => 'sent',
+            'timestamp' => current_time('mysql'),
+        ],
+        ['%s', '%s', '%s', '%s', '%s', '%s']
+    );
+
+    if ($result === false) {
+        error_log("Insert failed: " . $wpdb->last_error);
+    }
+    return $result !== false;
+}
+
+add_action('wp_ajax_aspire_parent_fetch_messages', 'aspire_parent_ajax_fetch_messages');
+function aspire_parent_ajax_fetch_messages() {
+    ob_start();
+    check_ajax_referer('aspire_parent_nonce', 'nonce');
+
+    $user = wp_get_current_user();
+    $username = $user->user_login;
+    $conversation_with = sanitize_text_field($_POST['conversation_with'] ?? '');
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_messages';
+    $edu_center_id = educational_center_parent_id();
+
+    $group_types = ['all', 'teachers', 'institute_admins', 'parents'];
+    $group_names = [
+        'all' => 'Everyone in Center',
+        'teachers' => 'Teachers',
+        'institute_admins' => 'Institute Admins',
+        'parents' => 'Parents'
+    ];
+
+    $query = "SELECT * FROM $table WHERE education_center_id = %s";
+    $query_args = [$edu_center_id];
+
+    if ($conversation_with) {
+        if (in_array($conversation_with, $group_types)) {
+            $query .= " AND (receiver_id = %s OR (sender_id = %s AND receiver_id = %s)) LIMIT 50";
+            $query_args[] = $conversation_with;
+            $query_args[] = $username;
+            $query_args[] = $conversation_with;
+        } else {
+            $query .= " AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s)) LIMIT 50";
+            $query_args[] = $username;
+            $query_args[] = $conversation_with;
+            $query_args[] = $conversation_with;
+            $query_args[] = $username;
+        }
+    }
+
+    $messages = $wpdb->get_results($wpdb->prepare($query, $query_args));
+
+    $contacts = get_posts([
+        'post_type' => 'teacher',
+        'posts_per_page' => -1,
+        'meta_key' => 'educational_center_id',
+        'meta_value' => $edu_center_id,
+    ]);
+
+    $contact_map = [];
+    foreach ($contacts as $contact) {
+        $contact_id = get_post_meta($contact->ID, 'teacher_id', true);
+        $teacher_name = get_post_meta($contact->ID, 'teacher_name', true) ?: $contact->post_title;
+        if ($contact_id) {
+            $contact_map[$contact_id] = "$teacher_name ($contact_id - Teacher)";
+        }
+    }
+
+    $output = '';
+    foreach ($messages as $msg) {
+        if (in_array($msg->receiver_id, $group_types)) {
+            $sender_name = ($msg->sender_id === $username) ? 'You' : ($contact_map[$msg->sender_id] ?? (get_user_by('login', $msg->sender_id)->display_name ?? $msg->sender_id));
+            $receiver_display = "Group: " . ($group_names[$msg->receiver_id] ?? $msg->receiver_id);
+        } else {
+            $sender_name = ($msg->sender_id === $username) ? 'You' : ($contact_map[$msg->sender_id] ?? (get_user_by('login', $msg->sender_id)->display_name ?? $msg->sender_id));
+            $receiver_display = $contact_map[$msg->receiver_id] ?? (get_user_by('login', $msg->receiver_id)->display_name ?? $msg->receiver_id);
+        }
+
+        $initials = strtoupper(substr($sender_name === 'You' ? $user->display_name : $sender_name, 0, 2));
+        $output .= '<div class="chat-message ' . ($msg->sender_id === $username ? 'sent' : 'received') . '">';
+        $output .= '<div class="bubble">';
+        $output .= '<span class="avatar">' . esc_html($initials) . '</span>';
+        $output .= '<p>' . esc_html($msg->message) . '</p>';
+        $output .= '</div>';
+        $timestamp = $msg->timestamp ?? 'N/A';
+        $output .= '<div class="meta" data-timestamp="' . esc_attr($timestamp) . '">' . 
+                  esc_html($sender_name) . ' to ' . esc_html($receiver_display) . ' - ' . esc_html($timestamp) . 
+                  '</div>';
+        $output .= '</div>';
+    }
+
+    ob_end_clean();
+    wp_send_json_success(['html' => $output]);
+}
+
+//fees
+function render_parent_fees($parent_user, $parent_post_id) {
+    global $wpdb;
+
+    $educational_center_id = educational_center_parent_id();
+    if (empty($educational_center_id)) {
+        return '<div class="alert alert-danger">No Educational Center found for this parent account.</div>';
+    }
+
+    $student_ids = get_post_meta($parent_post_id, 'parent_student_ids', true);
+    if (empty($student_ids)) {
+        return '<div class="alert alert-warning">No children linked to your account. Please contact administration.</div>';
+    }
+
+    $student_ids_array = array_filter(explode(',', $student_ids));
+    $children = [];
+
+    foreach ($student_ids_array as $student_id) {
+        $student = get_posts([
+            'post_type' => 'students',
+            'post_status' => 'publish',
+            'posts_per_page' => 1,
+            'meta_query' => [
+                'relation' => 'AND',
+                ['key' => 'student_id', 'value' => trim($student_id), 'compare' => '='],
+                ['key' => 'educational_center_id', 'value' => $educational_center_id, 'compare' => '=']
+            ]
+        ]);
+
+        if (!empty($student)) {
+            $student_post = $student[0];
+            $children[$student_id] = (object)[
+                'student_id' => trim($student_id),
+                'name' => get_post_meta($student_post->ID, 'student_name', true) ?: get_the_title($student_post->ID),
+                'class' => get_post_meta($student_post->ID, 'class', true) ?: 'N/A',
+                'section' => get_post_meta($student_post->ID, 'section', true) ?: 'N/A',
+                'post_id' => $student_post->ID
+            ];
+        }
+    }
+
+    if (empty($children)) {
+        return '<div class="alert alert-warning">No valid student records found for your children.</div>';
+    }
+
+    $nonce = wp_create_nonce('parent_fees_nonce');
+    $default_student_id = array_key_first($children);
+
+    ob_start();
+    ?>
+    <div class="parent-fees card shadow-sm border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="card-title m-0"><i class="fas fa-wallet me-2"></i>Fees Overview</h3>
+            <span><?php echo esc_html(date('l, F j, Y')); ?></span>
+        </div>
+        <div class="card-body">
+            <div class="child-selector mb-4">
+                <label for="child_select" class="me-2">Select Child:</label>
+                <select id="child_select" data-nonce="<?php echo esc_attr($nonce); ?>">
+                    <?php foreach ($children as $child): ?>
+                        <option value="<?php echo esc_attr($child->student_id); ?>">
+                            <?php echo esc_html($child->name . ' (' . $child->student_id . ')'); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div id="fees-content" class="fees-content">
+                <p class="loading text-muted">Loading fees for <?php echo esc_html($children[$default_student_id]->name); ?>...</p>
+            </div>
+        </div>
+
+        <!-- External Libraries -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const select = document.getElementById('child_select');
+            const content = document.getElementById('fees-content');
+            const nonce = select.dataset.nonce;
+
+            function getFeesData() {
+                const rows = document.querySelectorAll('#fees-table tbody tr:not(.total-row)');
+                return Array.from(rows).map(row => {
+                    const cells = row.querySelectorAll('td');
+                    return {
+                        month: cells[0].textContent,
+                        type: cells[1].textContent,
+                        amount: cells[2].textContent,
+                        status: cells[3].textContent,
+                        method: cells[4].textContent,
+                        date: cells[5].textContent
+                    };
+                });
+            }
+
+            function generatePDF(studentId, instituteName) {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+                const pageWidth = doc.internal.pageSize.width;
+                const margin = 10;
+                const borderColor = [70, 130, 180];
+
+                doc.setDrawColor(...borderColor);
+                doc.setLineWidth(0.5);
+                doc.rect(margin, margin, pageWidth - 2 * margin, doc.internal.pageSize.height - 2 * margin);
+
+                doc.setFontSize(16);
+                doc.setTextColor(...borderColor);
+                doc.text(instituteName.toUpperCase(), pageWidth / 2, 20, { align: 'center' });
+                doc.setFontSize(10);
+                doc.setTextColor(51);
+                doc.text('Fees Report', pageWidth / 2, 28, { align: 'center' });
+                doc.line(margin + 5, 32, pageWidth - margin - 5, 32);
+
+                const data = getFeesData();
+                doc.autoTable({
+                    startY: 40,
+                    head: [['Month', 'Fee Type', 'Amount', 'Status', 'Payment Method', 'Paid Date']],
+                    body: data.map(d => [d.month, d.type, d.amount, d.status, d.method, d.date]),
+                    theme: 'striped',
+                    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
+                    headStyles: { fillColor: borderColor, textColor: [255, 255, 255] },
+                });
+
+                doc.setFontSize(8);
+                doc.setTextColor(102);
+                doc.text(`Generated on <?php echo date('Y-m-d'); ?>`, pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+                doc.save(`fees_${studentId}_${new Date().toISOString().slice(0,10)}.pdf`);
+            }
+
+            function exportToCSV(studentId) {
+                const data = getFeesData();
+                const csvContent = [
+                    '"Month","Fee Type","Amount","Status","Payment Method","Paid Date"',
+                    ...data.map(d => `"${d.month}","${d.type}","${d.amount}","${d.status}","${d.method}","${d.date}"`)
+                ].join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `fees_${studentId}_${new Date().toISOString().slice(0,10)}.csv`;
+                link.click();
+            }
+
+            function exportToExcel(studentId) {
+                if (!window.XLSX) return;
+                const data = getFeesData();
+                const ws = XLSX.utils.json_to_sheet(data, { header: ['month', 'type', 'amount', 'status', 'method', 'date'] });
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Fees');
+                XLSX.writeFile(wb, `fees_${studentId}_${new Date().toISOString().slice(0,10)}.xlsx`);
+            }
+
+            function copyToClipboard() {
+                const data = getFeesData();
+                const text = data.map(d => `${d.month}: ${d.type}, ${d.amount}, ${d.status}, ${d.method}, ${d.date}`).join('\n');
+                navigator.clipboard.writeText(text).then(() => alert('Fees data copied to clipboard!'));
+            }
+
+            function loadFees(studentId) {
+                content.innerHTML = '<p class="loading text-muted"><span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading fees...</p>';
+                fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `action=get_parent_fees_data&student_id=${encodeURIComponent(studentId)}&nonce=${nonce}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        content.innerHTML = data.data.html;
+                        setupExportButtons(studentId);
+                    } else {
+                        content.innerHTML = `<p class="text-danger">${data.data.message || 'Failed to load fees'}</p>`;
+                    }
+                })
+                .catch(error => {
+                    content.innerHTML = `<p class="text-danger">Error: ${error.message}</p>`;
+                });
+            }
+
+            function setupExportButtons(studentId) {
+                const exportCsvBtn = content.querySelector('.export-csv');
+                const exportPdfBtn = content.querySelector('.export-pdf');
+                const exportExcelBtn = content.querySelector('.export-excel');
+                const copyBtn = content.querySelector('.export-copy');
+                const printBtn = content.querySelector('.export-print');
+
+                if (exportCsvBtn) exportCsvBtn.addEventListener('click', () => exportToCSV(studentId));
+                if (exportPdfBtn) exportPdfBtn.addEventListener('click', () => generatePDF(studentId, '<?php echo esc_js(get_educational_center_data_student($educational_center_id)['name'] ?? 'INSTITUTE'); ?>'));
+                if (exportExcelBtn) exportExcelBtn.addEventListener('click', () => exportToExcel(studentId));
+                if (copyBtn) copyBtn.addEventListener('click', copyToClipboard);
+                if (printBtn) printBtn.addEventListener('click', () => window.print());
+            }
+
+            loadFees(select.value);
+            select.addEventListener('change', () => loadFees(select.value));
+        });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// AJAX Handler for Fees Data
+add_action('wp_ajax_get_parent_fees_data', 'get_parent_fees_data_callback');
+function get_parent_fees_data_callback() {
+    global $wpdb;
+
+    if (!check_ajax_referer('parent_fees_nonce', 'nonce', false)) {
+        wp_send_json_error(['message' => 'Invalid nonce']);
+        exit;
+    }
+
+    $student_id = sanitize_text_field($_POST['student_id']);
+    $educational_center_id = educational_center_parent_id();
+
+    $student_post = get_posts([
+        'post_type' => 'students',
+        'meta_query' => [
+            ['key' => 'student_id', 'value' => $student_id],
+            ['key' => 'educational_center_id', 'value' => $educational_center_id]
+        ]
+    ])[0] ?? null;
+
+    if (!$student_post) {
+        wp_send_json_error(['message' => 'Student not found']);
+        exit;
+    }
+
+    $table_name = $wpdb->prefix . 'student_fees';
+    $template_table = $wpdb->prefix . 'fee_templates';
+    $fees = $wpdb->get_results($wpdb->prepare(
+        "SELECT sf.*, ft.name AS template_name 
+         FROM $table_name sf 
+         LEFT JOIN $template_table ft ON sf.template_id = ft.id 
+         WHERE sf.education_center_id = %s AND sf.student_id = %s 
+         ORDER BY sf.month_year DESC",
+        $educational_center_id,
+        $student_id
+    ));
+
+    ob_start();
+    ?>
+    <div class="fees-overview">
+        <div class="export-tools mb-3">
+            <button class="export-btn export-csv" aria-label="Export to CSV"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
+            <button class="export-btn export-pdf" aria-label="Export to PDF"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
+            <button class="export-btn export-excel" aria-label="Export to Excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
+            <button class="export-btn export-copy" aria-label="Copy to Clipboard"><i class="fas fa-copy"></i><span class="tooltip">Copy to Clipboard</span></button>
+            <button class="export-btn export-print" aria-label="Print"><i class="fas fa-print"></i><span class="tooltip">Print</span></button>
+        </div>
+        <table id="fees-table" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Fee Type</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Payment Method</th>
+                    <th>Paid Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                $total_amount = 0;
+                $total_paid = 0;
+                foreach ($fees as $fee) {
+                    $total_amount += floatval($fee->amount);
+                    if ($fee->status === 'paid') $total_paid += floatval($fee->amount);
+                    ?>
+                    <tr>
+                        <td><?php echo esc_html(date('F Y', strtotime($fee->month_year))); ?></td>
+                        <td><?php echo esc_html($fee->template_name ?: 'N/A'); ?></td>
+                        <td><?php echo esc_html(number_format($fee->amount, 2)); ?></td>
+                        <td><span class="status-badge <?php echo $fee->status === 'paid' ? 'status-paid' : 'status-overdue'; ?>">
+                            <?php echo esc_html(ucfirst($fee->status)); ?>
+                        </span></td>
+                        <td><?php echo esc_html($fee->payment_method ?: 'N/A'); ?></td>
+                        <td><?php echo esc_html($fee->paid_date ?: 'N/A'); ?></td>
+                    </tr>
+                <?php } ?>
+                <tr class="total-row">
+                    <td colspan="2"><strong>Total Amount:</strong></td>
+                    <td><?php echo esc_html(number_format($total_amount, 2)); ?></td>
+                    <td colspan="2"><strong>Total Paid:</strong></td>
+                    <td><?php echo esc_html(number_format($total_paid, 2)); ?></td>
+                </tr>
+            </tbody>
+        </table>
+        <?php if (empty($fees)) echo '<p class="text-muted">No fee records found.</p>'; ?>
+    </div>
+    <?php
+    $html = ob_get_clean();
+    wp_send_json_success(['html' => $html]);
+    exit;
+}
+
+//transport
+function render_parent_transport_fees($parent_user, $parent_post_id) {
+    global $wpdb;
+
+    $educational_center_id = educational_center_parent_id();
+    if (empty($educational_center_id)) {
+        return '<div class="alert alert-danger">No Educational Center found for this parent account.</div>';
+    }
+
+    $student_ids = get_post_meta($parent_post_id, 'parent_student_ids', true);
+    if (empty($student_ids)) {
+        return '<div class="alert alert-warning">No children linked to your account. Please contact administration.</div>';
+    }
+
+    $student_ids_array = array_filter(explode(',', $student_ids));
+    $children = [];
+
+    foreach ($student_ids_array as $student_id) {
+        $student = get_posts([
+            'post_type' => 'students',
+            'post_status' => 'publish',
+            'posts_per_page' => 1,
+            'meta_query' => [
+                'relation' => 'AND',
+                ['key' => 'student_id', 'value' => trim($student_id), 'compare' => '='],
+                ['key' => 'educational_center_id', 'value' => $educational_center_id, 'compare' => '=']
+            ]
+        ]);
+
+        if (!empty($student)) {
+            $student_post = $student[0];
+            $children[$student_id] = (object)[
+                'student_id' => trim($student_id),
+                'name' => get_post_meta($student_post->ID, 'student_name', true) ?: get_the_title($student_post->ID),
+                'class' => get_post_meta($student_post->ID, 'class', true) ?: 'N/A',
+                'section' => get_post_meta($student_post->ID, 'section', true) ?: 'N/A',
+                'post_id' => $student_post->ID
+            ];
+        }
+    }
+
+    if (empty($children)) {
+        return '<div class="alert alert-warning">No valid student records found for your children.</div>';
+    }
+
+    $nonce = wp_create_nonce('parent_transport_fees_nonce');
+    $default_student_id = array_key_first($children);
+
+    ob_start();
+    ?>
+    <div class="parent-transport-fees card shadow-sm border-0">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h3 class="card-title m-0"><i class="fas fa-bus me-2"></i>Transport Fees Overview</h3>
+            <span><?php echo esc_html(date('l, F j, Y')); ?></span>
+        </div>
+        <div class="card-body">
+            <div class="child-selector mb-4">
+                <label for="child_select" class="me-2">Select Child:</label>
+                <select id="child_select" data-nonce="<?php echo esc_attr($nonce); ?>">
+                    <?php foreach ($children as $child): ?>
+                        <option value="<?php echo esc_attr($child->student_id); ?>">
+                            <?php echo esc_html($child->name . ' (' . $child->student_id . ')'); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div id="transport-fees-content" class="transport-fees-content">
+                <p class="loading text-muted">Loading transport fees for <?php echo esc_html($children[$default_student_id]->name); ?>...</p>
+            </div>
+        </div>
+
+        <!-- External Libraries -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const select = document.getElementById('child_select');
+            const content = document.getElementById('transport-fees-content');
+            const nonce = select.dataset.nonce;
+
+            function getTransportFeesData() {
+                const rows = document.querySelectorAll('#transport-fees-table tbody tr:not(.total-row)');
+                return Array.from(rows).map(row => {
+                    const cells = row.querySelectorAll('td');
+                    return {
+                        month: cells[0].textContent,
+                        type: cells[1].textContent,
+                        amount: cells[2].textContent,
+                        status: cells[3].textContent,
+                        method: cells[4].textContent,
+                        date: cells[5].textContent
+                    };
+                });
+            }
+
+            function generatePDF(studentId, instituteName) {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+                const pageWidth = doc.internal.pageSize.width;
+                const margin = 10;
+                const borderColor = [70, 130, 180];
+
+                doc.setDrawColor(...borderColor);
+                doc.setLineWidth(0.5);
+                doc.rect(margin, margin, pageWidth - 2 * margin, doc.internal.pageSize.height - 2 * margin);
+
+                doc.setFontSize(16);
+                doc.setTextColor(...borderColor);
+                doc.text(instituteName.toUpperCase(), pageWidth / 2, 20, { align: 'center' });
+                doc.setFontSize(10);
+                doc.setTextColor(51);
+                doc.text('Transport Fees Report', pageWidth / 2, 28, { align: 'center' });
+                doc.line(margin + 5, 32, pageWidth - margin - 5, 32);
+
+                const data = getTransportFeesData();
+                doc.autoTable({
+                    startY: 40,
+                    head: [['Month', 'Fee Type', 'Amount', 'Status', 'Payment Method', 'Paid Date']],
+                    body: data.map(d => [d.month, d.type, d.amount, d.status, d.method, d.date]),
+                    theme: 'striped',
+                    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
+                    headStyles: { fillColor: borderColor, textColor: [255, 255, 255] },
+                });
+
+                doc.setFontSize(8);
+                doc.setTextColor(102);
+                doc.text(`Generated on <?php echo date('Y-m-d'); ?>`, pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+                doc.save(`transport_fees_${studentId}_${new Date().toISOString().slice(0,10)}.pdf`);
+            }
+
+            function exportToCSV(studentId) {
+                const data = getTransportFeesData();
+                const csvContent = [
+                    '"Month","Fee Type","Amount","Status","Payment Method","Paid Date"',
+                    ...data.map(d => `"${d.month}","${d.type}","${d.amount}","${d.status}","${d.method}","${d.date}"`)
+                ].join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `transport_fees_${studentId}_${new Date().toISOString().slice(0,10)}.csv`;
+                link.click();
+            }
+
+            function exportToExcel(studentId) {
+                if (!window.XLSX) return;
+                const data = getTransportFeesData();
+                const ws = XLSX.utils.json_to_sheet(data, { header: ['month', 'type', 'amount', 'status', 'method', 'date'] });
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Transport Fees');
+                XLSX.writeFile(wb, `transport_fees_${studentId}_${new Date().toISOString().slice(0,10)}.xlsx`);
+            }
+
+            function copyToClipboard() {
+                const data = getTransportFeesData();
+                const text = data.map(d => `${d.month}: ${d.type}, ${d.amount}, ${d.status}, ${d.method}, ${d.date}`).join('\n');
+                navigator.clipboard.writeText(text).then(() => alert('Transport fees data copied to clipboard!'));
+            }
+
+            function loadTransportFees(studentId) {
+                content.innerHTML = '<p class="loading text-muted"><span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading transport fees...</p>';
+                fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `action=get_parent_transport_fees_data&student_id=${encodeURIComponent(studentId)}&nonce=${nonce}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        content.innerHTML = data.data.html;
+                        setupExportButtons(studentId);
+                    } else {
+                        content.innerHTML = `<p class="text-danger">${data.data.message || 'Failed to load transport fees'}</p>`;
+                    }
+                })
+                .catch(error => {
+                    content.innerHTML = `<p class="text-danger">Error: ${error.message}</p>`;
+                });
+            }
+
+            function setupExportButtons(studentId) {
+                const exportCsvBtn = content.querySelector('.export-csv');
+                const exportPdfBtn = content.querySelector('.export-pdf');
+                const exportExcelBtn = content.querySelector('.export-excel');
+                const copyBtn = content.querySelector('.export-copy');
+                const printBtn = content.querySelector('.export-print');
+
+                if (exportCsvBtn) exportCsvBtn.addEventListener('click', () => exportToCSV(studentId));
+                if (exportPdfBtn) exportPdfBtn.addEventListener('click', () => generatePDF(studentId, '<?php echo esc_js(get_educational_center_data_student($educational_center_id)['name'] ?? 'INSTITUTE'); ?>'));
+                if (exportExcelBtn) exportExcelBtn.addEventListener('click', () => exportToExcel(studentId));
+                if (copyBtn) copyBtn.addEventListener('click', copyToClipboard);
+                if (printBtn) printBtn.addEventListener('click', () => window.print());
+            }
+
+            loadTransportFees(select.value);
+            select.addEventListener('change', () => loadTransportFees(select.value));
+        });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// AJAX Handler for Transport Fees Data
+add_action('wp_ajax_get_parent_transport_fees_data', 'get_parent_transport_fees_data_callback');
+function get_parent_transport_fees_data_callback() {
+    global $wpdb;
+
+    if (!check_ajax_referer('parent_transport_fees_nonce', 'nonce', false)) {
+        wp_send_json_error(['message' => 'Invalid nonce']);
+        exit;
+    }
+
+    $student_id = sanitize_text_field($_POST['student_id']);
+    $educational_center_id = educational_center_parent_id();
+
+    $student_post = get_posts([
+        'post_type' => 'students',
+        'meta_query' => [
+            ['key' => 'student_id', 'value' => $student_id],
+            ['key' => 'educational_center_id', 'value' => $educational_center_id]
+        ]
+    ])[0] ?? null;
+
+    if (!$student_post) {
+        wp_send_json_error(['message' => 'Student not found']);
+        exit;
+    }
+
+    $table_name = $wpdb->prefix . 'transport_fees';
+    $template_table = $wpdb->prefix . 'fee_templates';
+    $fees = $wpdb->get_results($wpdb->prepare(
+        "SELECT tf.*, ft.name AS template_name 
+         FROM $table_name tf 
+         LEFT JOIN $template_table ft ON tf.template_id = ft.id 
+         WHERE tf.education_center_id = %s AND tf.student_id = %s 
+         ORDER BY tf.month_year DESC",
+        $educational_center_id,
+        $student_id
+    ));
+
+    ob_start();
+    ?>
+    <div class="transport-fees-overview">
+        <div class="export-tools mb-3">
+            <button class="export-btn export-csv" aria-label="Export to CSV"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
+            <button class="export-btn export-pdf" aria-label="Export to PDF"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
+            <button class="export-btn export-excel" aria-label="Export to Excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
+            <button class="export-btn export-copy" aria-label="Copy to Clipboard"><i class="fas fa-copy"></i><span class="tooltip">Copy to Clipboard</span></button>
+            <button class="export-btn export-print" aria-label="Print"><i class="fas fa-print"></i><span class="tooltip">Print</span></button>
+        </div>
+        <table id="transport-fees-table" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Fee Type</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Payment Method</th>
+                    <th>Paid Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                $total_amount = 0;
+                $total_paid = 0;
+                foreach ($fees as $fee) {
+                    $total_amount += floatval($fee->amount);
+                    if ($fee->status === 'paid') $total_paid += floatval($fee->amount);
+                    ?>
+                    <tr>
+                        <td><?php echo esc_html(date('F Y', strtotime($fee->month_year))); ?></td>
+                        <td><?php echo esc_html($fee->template_name ?: 'N/A'); ?></td>
+                        <td><?php echo esc_html(number_format($fee->amount, 2)); ?></td>
+                        <td><span class="status-badge <?php echo $fee->status === 'paid' ? 'status-paid' : 'status-overdue'; ?>">
+                            <?php echo esc_html(ucfirst($fee->status)); ?>
+                        </span></td>
+                        <td><?php echo esc_html($fee->payment_method ?: 'N/A'); ?></td>
+                        <td><?php echo esc_html($fee->paid_date ?: 'N/A'); ?></td>
+                    </tr>
+                <?php } ?>
+                <tr class="total-row">
+                    <td colspan="2"><strong>Total Amount:</strong></td>
+                    <td><?php echo esc_html(number_format($total_amount, 2)); ?></td>
+                    <td colspan="2"><strong>Total Paid:</strong></td>
+                    <td><?php echo esc_html(number_format($total_paid, 2)); ?></td>
+                </tr>
+            </tbody>
+        </table>
+        <?php if (empty($fees)) echo '<p class="text-muted">No transport fee records found.</p>'; ?>
+    </div>
+    <?php
+    $html = ob_get_clean();
+    wp_send_json_success(['html' => $html]);
+    exit;
+}
+
+
+//calender
+function render_parent_calendar($parent_user, $parent_post_id) {
+    global $wpdb;
+
+    $educational_center_id = educational_center_parent_id();
+    if (empty($educational_center_id)) {
+        return '<div class="alert alert-danger">No Educational Center found for this parent account.</div>';
+    }
+
+    $student_ids = get_post_meta($parent_post_id, 'parent_student_ids', true);
+    if (empty($student_ids)) {
+        return '<div class="alert alert-warning">No children linked to your account. Please contact administration.</div>';
+    }
+
+    $student_ids_array = array_filter(explode(',', $student_ids));
+    $children = [];
+
+    foreach ($student_ids_array as $student_id) {
+        $student = get_posts([
+            'post_type' => 'students',
+            'post_status' => 'publish',
+            'posts_per_page' => 1,
+            'meta_query' => [
+                'relation' => 'AND',
+                ['key' => 'student_id', 'value' => trim($student_id), 'compare' => '='],
+                ['key' => 'educational_center_id', 'value' => $educational_center_id, 'compare' => '=']
+            ]
+        ]);
+
+        if (!empty($student)) {
+            $student_post = $student[0];
+            $children[$student_id] = (object)[
+                'student_id' => trim($student_id),
+                'name' => get_post_meta($student_post->ID, 'student_name', true) ?: get_the_title($student_post->ID),
+                'class' => get_post_meta($student_post->ID, 'class', true) ?: 'N/A',
+                'section' => get_post_meta($student_post->ID, 'section', true) ?: 'N/A',
+                'post_id' => $student_post->ID
+            ];
+        }
+    }
+
+    if (empty($children)) {
+        return '<div class="alert alert-warning">No valid student records found for your children.</div>';
+    }
+
+    // Fetch educational center details for PDF
+    $center_data = get_educational_center_data_teachers($educational_center_id); // Assuming this exists
+    $institute_name = $center_data['name'] ?? 'Unknown Institute';
+    $institute_logo = $center_data['logo_url'] ?? '';
+
+    // Fetch calendar events server-side
+    $events_by_student = [];
+    $all_events = [];
+
+    foreach ($children as $student_id => $child) {
+        $class_id = $child->class;
+        $events = [];
+
+        // Fetch Exams
+        $exams_table = $wpdb->prefix . 'exams';
+        $exams = $wpdb->get_results($wpdb->prepare(
+            "SELECT name, exam_date, class_id 
+             FROM $exams_table 
+             WHERE education_center_id = %s 
+             AND class_id = %s",
+            $educational_center_id,
+            $class_id
+        ));
+        foreach ($exams as $exam) {
+            $events[] = [
+                'title' => $exam->name,
+                'start' => $exam->exam_date,
+                'type' => 'exam',
+                'student_id' => $student_id
+            ];
+            $all_events[] = $events[count($events) - 1];
+        }
+
+        // Fetch Fees
+        $fees_table = $wpdb->prefix . 'student_fees';
+        $template_table = $wpdb->prefix . 'fee_templates';
+        $fees = $wpdb->get_results($wpdb->prepare(
+            "SELECT sf.month_year, sf.template_id 
+             FROM $fees_table sf 
+             WHERE sf.education_center_id = %s 
+             AND sf.student_id = %s",
+            $educational_center_id,
+            $student_id
+        ));
+        foreach ($fees as $fee) {
+            $template_name = $wpdb->get_var($wpdb->prepare(
+                "SELECT name FROM $template_table WHERE id = %d",
+                $fee->template_id
+            ));
+            $events[] = [
+                'title' => "Fee Due: " . ($template_name ?: 'N/A'),
+                'start' => date('Y-m-01', strtotime($fee->month_year)),
+                'type' => 'fee',
+                'student_id' => $student_id
+            ];
+            $all_events[] = $events[count($events) - 1];
+        }
+
+        // Fetch Transport Fees
+        $transport_table = $wpdb->prefix . 'transport_fees';
+        $transport_fees = $wpdb->get_results($wpdb->prepare(
+            "SELECT tf.month_year, tf.template_id 
+             FROM $transport_table tf 
+             WHERE tf.education_center_id = %s 
+             AND tf.student_id = %s",
+            $educational_center_id,
+            $student_id
+        ));
+        foreach ($transport_fees as $fee) {
+            $template_name = $wpdb->get_var($wpdb->prepare(
+                "SELECT name FROM $template_table WHERE id = %d",
+                $fee->template_id
+            ));
+            $events[] = [
+                'title' => "Transport Fee Due: " . ($template_name ?: 'N/A'),
+                'start' => date('Y-m-01', strtotime($fee->month_year)),
+                'type' => 'transport_fee',
+                'student_id' => $student_id
+            ];
+            $all_events[] = $events[count($events) - 1];
+        }
+
+        $events_by_student[$student_id] = $events;
+    }
+
+    // Fetch Notices (applicable to all students)
+    $notice_table = $wpdb->prefix . 'aspire_announcements';
+    $notices = $wpdb->get_results($wpdb->prepare(
+        "SELECT message, timestamp 
+         FROM $notice_table 
+         WHERE education_center_id = %s 
+         AND receiver_id IN ('all', 'students', 'parents')",
+        $educational_center_id
+    ));
+    foreach ($notices as $notice) {
+        $notice_event = [
+            'title' => "Notice: " . substr($notice->message, 0, 30) . "...",
+            'start' => date('Y-m-d', strtotime($notice->timestamp)),
+            'type' => 'notice',
+            'student_id' => 'all'
+        ];
+        $all_events[] = $notice_event;
+        foreach ($children as $student_id => $child) {
+            $events_by_student[$student_id][] = $notice_event;
+        }
+    }
+
+    // Encode events for JavaScript
+    $events_json = json_encode([
+        'all' => $all_events,
+        'by_student' => $events_by_student
+    ]);
+
+    ob_start();
+    ?>
+    <div class="parent-calendar card shadow-sm border-0">
+        <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
+            <h3 class="card-title m-0"><i class="fas fa-calendar-alt me-2"></i>Calendar</h3>
+            <span><?php echo esc_html(date('l, F j, Y')); ?></span>
+        </div>
+        <div class="card-body">
+            <div class="calendar-controls mb-4 d-flex gap-3 flex-wrap">
+                <div class="child-selector">
+                    <label for="child_select" class="me-2">Select Child:</label>
+                    <select id="child_select" class="form-select w-auto">
+                        <option value="all">All Children</option>
+                        <?php foreach ($children as $child): ?>
+                            <option value="<?php echo esc_attr($child->student_id); ?>" data-name="<?php echo esc_attr($child->name); ?>">
+                                <?php echo esc_html($child->name . ' (' . $child->student_id . ')'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="export-tools">
+                    <button class="export-btn export-pdf" aria-label="Export to PDF"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
+                    <button class="export-btn export-csv" aria-label="Export to CSV"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
+                    <button class="export-btn export-excel" aria-label="Export to Excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
+                    <button class="export-btn export-copy" aria-label="Copy to Clipboard"><i class="fas fa-copy"></i><span class="tooltip">Copy to Clipboard</span></button>
+                    <button class="export-btn export-print" aria-label="Print"><i class="fas fa-print"></i><span class="tooltip">Print</span></button>
+                </div>
+            </div>
+            <div id="calendar" class="calendar-container"></div>
+        </div>
+    </div>
+
+    <!-- External Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar');
+            const childSelect = document.getElementById('child_select');
+            const eventsData = <?php echo $events_json; ?>;
+            let calendar;
+
+            function initializeCalendar(events) {
+                if (calendar) calendar.destroy();
+                calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    events: events,
+                    eventClick: function(info) {
+                        alert(`${info.event.title}\n${info.event.start.toLocaleString()}`);
+                    },
+                    eventBackgroundColor: function(arg) {
+                        switch (arg.event.extendedProps.type) {
+                            case 'exam': return '#dc3545'; // Red
+                            case 'fee': return '#007bff'; // Blue
+                            case 'transport_fee': return '#28a745'; // Green
+                            case 'notice': return '#17a2b8'; // Cyan
+                            default: return '#6c757d'; // Gray
+                        }
+                    },
+                    height: 'auto',
+                    contentHeight: 'auto'
+                });
+                calendar.render();
+            }
+
+            function getCalendarEvents() {
+                return calendar.getEvents().map(event => ({
+                    title: event.title,
+                    start: event.start.toISOString().slice(0, 10),
+                    type: event.extendedProps.type
+                }));
+            }
+
+            function generatePDF(studentId) {
+                const data = getCalendarEvents();
+                const studentName = childSelect.value === 'all' ? 'All Children' : (childSelect.selectedOptions[0]?.dataset.name || 'Unknown');
+                generate_reusable_pdf({
+                    student_id: studentId,
+                    student_name: studentName,
+                    title: 'Calendar Events',
+                    table_data: data.map(e => [e.title, e.start, e.type.replace('_', ' ').toUpperCase()]),
+                    details: [
+                        ['Generated', new Date().toLocaleDateString()]
+                    ],
+                    filename_prefix: 'calendar',
+                    orientation: 'portrait',
+                    institute_name: '<?php echo esc_js($institute_name); ?>',
+                    institute_logo: '<?php echo esc_js($institute_logo); ?>'
+                });
+            }
+
+            function exportToCSV() {
+                const events = getCalendarEvents();
+                const csvContent = [
+                    '"Title","Date","Type"',
+                    ...events.map(e => `"${e.title}","${e.start}","${e.type.replace('_', ' ').toUpperCase()}"`)
+                ].join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const studentId = childSelect.value === 'all' ? 'all' : childSelect.value;
+                link.href = URL.createObjectURL(blob);
+                link.download = `calendar_${studentId}_${new Date().toISOString().slice(0,10)}.csv`;
+                link.click();
+            }
+
+            function exportToExcel() {
+                if (!window.XLSX) return;
+                const events = getCalendarEvents();
+                const ws = XLSX.utils.json_to_sheet(events, { header: ['title', 'start', 'type'] });
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Calendar');
+                const studentId = childSelect.value === 'all' ? 'all' : childSelect.value;
+                XLSX.writeFile(wb, `calendar_${studentId}_${new Date().toISOString().slice(0,10)}.xlsx`);
+            }
+
+            function copyToClipboard() {
+                const events = getCalendarEvents();
+                const text = events.map(e => `${e.title}: ${e.start} (${e.type})`).join('\n');
+                navigator.clipboard.writeText(text).then(() => alert('Calendar events copied to clipboard!'));
+            }
+
+            function loadCalendar(studentId) {
+                const events = studentId === 'all' ? eventsData.all : (eventsData.by_student[studentId] || []);
+                initializeCalendar(events);
+            }
+
+            // Setup export buttons
+            document.querySelector('.export-pdf').addEventListener('click', () => generatePDF(childSelect.value));
+            document.querySelector('.export-csv').addEventListener('click', exportToCSV);
+            document.querySelector('.export-excel').addEventListener('click', exportToExcel);
+            document.querySelector('.export-copy').addEventListener('click', copyToClipboard);
+            document.querySelector('.export-print').addEventListener('click', () => window.print());
+
+            // Load initial calendar
+            loadCalendar('all');
+            childSelect.addEventListener('change', () => loadCalendar(childSelect.value));
+        });
+    </script>
+
+    <style>
+        .fc-event { cursor: pointer; }
+        .fc-daygrid-event { padding: 2px 5px; font-size: 0.9em; }
+        .export-tools button { margin-right: 5px; }
+    </style>
+    <?php
+    return ob_get_clean();
+}
+
 add_action('wp_enqueue_scripts', function() {
     wp_enqueue_style('parent-dashboard', plugin_dir_url(__FILE__) . 'style.css', [], '1.0.0');
 });
@@ -3296,6 +5314,11 @@ add_action('wp_enqueue_scripts', function() {
     // Enqueue jsPDF and its autotable plugin
     wp_enqueue_script('jspdf', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', [], '2.5.1', true);
     wp_enqueue_script('jspdf-autotable', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js', ['jspdf'], '3.8.2', true);
+    wp_enqueue_script('moment', 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js', [], '2.29.4', true);
     // Enqueue custom pdf-helper.js
+    wp_enqueue_style('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css');
+    // wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
+    wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', [], '6.5.1');
+
     wp_enqueue_script('pdf-helper', plugin_dir_url(__FILE__) . 'js/pdf-helper.js', ['jspdf', 'jspdf-autotable'], '1.0', true);
 });

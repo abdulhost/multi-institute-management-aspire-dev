@@ -30,21 +30,21 @@ if ($parents->have_posts()) {
     $title = 'Parent';
 }
 $avatar = wp_get_attachment_url(get_post_meta($post_id, 'parent_profile_photo', true)) ?: 'https://via.placeholder.com/150';
-if (!empty($_FILES['parent_profile_photo']['name'])) {
-  $upload = wp_handle_upload($_FILES['parent_profile_photo'], ['test_form' => false]);
-  if (isset($upload['file'])) {
-      $attachment_id = wp_insert_attachment([
-          'guid' => $upload['url'],
-          'post_mime_type' => $upload['type'],
-          'post_title' => basename($upload['file']),
-          'post_content' => '',
-          'post_status' => 'inherit'
-      ], $upload['file']);
-      wp_update_attachment_metadata($attachment_id, wp_generate_attachment_metadata($attachment_id, $upload['file']));
-      update_post_meta($student->ID, 'student_profile_photo', $attachment_id);
-      $avatar = $upload['url'];
-  }
-}
+// if (!empty($_FILES['parent_profile_photo']['name'])) {
+//   $upload = wp_handle_upload($_FILES['parent_profile_photo'], ['test_form' => false]);
+//   if (isset($upload['file'])) {
+//       $attachment_id = wp_insert_attachment([
+//           'guid' => $upload['url'],
+//           'post_mime_type' => $upload['type'],
+//           'post_title' => basename($upload['file']),
+//           'post_content' => '',
+//           'post_status' => 'inherit'
+//       ], $upload['file']);
+//       wp_update_attachment_metadata($attachment_id, wp_generate_attachment_metadata($attachment_id, $upload['file']));
+//       update_post_meta($student->ID, 'parent_profile_photo', $attachment_id);
+//       $avatar = $upload['url'];
+//   }
+// }
 $active_section = isset($active_section) ? $active_section : 'overview';
 ?>
 
@@ -96,6 +96,12 @@ $active_section = isset($active_section) ? $active_section : 'overview';
                 <span>Timetable</span>
             </a>
         </li>
+        <li class="<?php echo $active_section == 'parent_calendar' ? 'active' : ''; ?>">
+            <a href="/parent-dashboard?section=parent_calendar">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-80q0-33 23.5-56.5T240-320h480q33 0 56.5 23.5T800-240v80H160Zm80-160h480q0-17-11.5-28.5T680-360H280q-17 0-28.5 11.5T240-320Zm240-240q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg>
+                <span>Parent Calendar</span>
+            </a>
+        </li>
         <li class="<?php echo $active_section == 'exams' ? 'active' : ''; ?>">
             <a href="/parent-dashboard?section=exams">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-80q0-33 23.5-56.5T240-320h480q33 0 56.5 23.5T800-240v80H160Zm80-160h480q0-17-11.5-28.5T680-360H280q-17 0-28.5 11.5T240-320Zm240-240q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg>
@@ -108,12 +114,44 @@ $active_section = isset($active_section) ? $active_section : 'overview';
                 <span>Results</span>
             </a>
         </li>
+        <li class="<?php echo $active_section == 'fees' ? 'active' : ''; ?>">
+            <a href="/parent-dashboard?section=fees">
+                <!-- <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-80q0-33 23.5-56.5T240-320h480q33 0 56.5 23.5T800-240v80H160Zm80-160h480q0-17-11.5-28.5T680-360H280q-17 0-28.5 11.5T240-320Zm240-240q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg> -->
+                <i class="fas fa-bell"></i>
+                <span>Fees</span>
+            </a>
+        </li>
+        <li class="<?php echo $active_section == 'transport_fees' ? 'active' : ''; ?>">
+            <a href="/parent-dashboard?section=transport_fees">
+                <!-- <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-80q0-33 23.5-56.5T240-320h480q33 0 56.5 23.5T800-240v80H160Zm80-160h480q0-17-11.5-28.5T680-360H280q-17 0-28.5 11.5T240-320Zm240-240q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg> -->
+                <i class="fas fa-bell"></i>
+                <span>Transport Fees</span>
+            </a>
+        </li>
+        <li class="<?php echo $active_section == 'notice_board' ? 'active' : ''; ?>">
+            <a href="/parent-dashboard?section=notice_board">
+                <!-- <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-80q0-33 23.5-56.5T240-320h480q33 0 56.5 23.5T800-240v80H160Zm80-160h480q0-17-11.5-28.5T680-360H280q-17 0-28.5 11.5T240-320Zm240-240q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg> -->
+                <i class="fas fa-bell"></i>
+                <span>Notice Board</span>
+            </a>
+        </li>
+        <li class="<?php echo $active_section == 'communication' ? 'active' : ''; ?>">
+            <a href="/parent-dashboard?section=communication">
+            <i class="fas fa-comments"></i>
+                <span>Communication</span>
+            </a>
+        </li>
 
-
-        <li>
-<?php
+        <li class="<?php echo $active_section == '' ? 'active' : ''; ?>">
+        <?php
 // Usage in template
-echo '<a href="' . get_secure_logout_url_by_role() . '">Log Out</a>';
-?></li>    </ul>
+echo '<a href="' . get_secure_logout_url_by_role() . '">' ?>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-80q0-33 23.5-56.5T240-320h480q33 0 56.5 23.5T800-240v80H160Zm80-160h480q0-17-11.5-28.5T680-360H280q-17 0-28.5 11.5T240-320Zm240-240q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg>
+                <span>Log Out</span>
+            </a>
+        </li>
+       
+
+</ul>
 
 </nav>
