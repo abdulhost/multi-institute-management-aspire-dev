@@ -21,7 +21,7 @@ body {
 }
 
 /* General Card Styling */
-.parent-dashboard, .parent-profile, .child-selection, .child-attendance, .child-timetable, .child-exams, .child-results, .parent-notice-board,.parent-communication ,.parent-fees ,.parent-transport-fees{
+.parent-dashboard, .parent-profile, .child-selection, .child-attendance, .child-timetable, .child-exams, .child-results, .parent-notice-board,.parent-communication ,.parent-fees ,.parent-transport-fees,.parent-calendar,.change-password,.parent-homework,.parent-library{
     max-width: 1200px;
     margin: auto;
     background: var(--secondary-color);

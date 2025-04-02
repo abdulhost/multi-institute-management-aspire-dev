@@ -120,6 +120,16 @@ function aspire_parent_dashboard_shortcode() {
                                         case 'communication':
                                             echo render_parent_communication($current_user, $parent_post->ID);
                                             break;
+                                        case 'change_password':
+                                            echo render_change_password($current_user,  $parent_post->ID);
+                                                                                        break;
+                                        
+                                        case 'homework':
+                                            echo render_parent_homework($current_user,  $parent_post->ID);
+                                                                                        break;
+                                        case 'library':
+                                            echo render_parent_library($current_user,  $parent_post->ID);
+                                                                                        break;
                                         
                     default:
                         echo render_parent_overview($current_user, $parent_post->ID);
@@ -161,7 +171,7 @@ function render_parent_header($parent_user) {
     $dashboard_link = esc_url(home_url('/parent-dashboard'));
     $communication_link = esc_url(home_url('/parent-dashboard?section=communication'));
     $notifications_link = esc_url(home_url('/parent-dashboard?section=notice_board'));
-    $settings_link = esc_url(home_url('/parent-dashboard?section=settings'));
+    $settings_link = esc_url(home_url('/parent-dashboard?section=change_password'));
     $edu_center_id = educational_center_parent_id();
     $seven_days_ago = date('Y-m-d H:i:s', strtotime('-7 days'));
 
@@ -357,6 +367,7 @@ function render_parent_header($parent_user) {
                             </div>
                             <ul class="dropdown-list">
                                 <li><a href="<?php echo $profile_link; ?>" class="profile-link">Profile</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/parent-dashboard?section=change_password')); ?>" class="profile-link">Change Password</a></li>
                                 <li><a href="<?php echo $logout_link; ?>" class="profile-link logout">Logout</a></li>
                             </ul>
                         </div>
@@ -5181,13 +5192,13 @@ function render_parent_calendar($parent_user, $parent_post_id) {
     </div>
 
     <!-- External Libraries -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script> -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -5303,6 +5314,892 @@ function render_parent_calendar($parent_user, $parent_post_id) {
         .fc-daygrid-event { padding: 2px 5px; font-size: 0.9em; }
         .export-tools button { margin-right: 5px; }
     </style>
+    <?php
+    return ob_get_clean();
+}
+
+//homework
+function render_parent_homework($parent_user, $parent_post_id) {
+    global $wpdb;
+
+    $educational_center_id = educational_center_parent_id();
+    if (empty($educational_center_id)) {
+        return '<div class="alert alert-danger">No Educational Center found for this parent account.</div>';
+    }
+
+    $student_ids = get_post_meta($parent_post_id, 'parent_student_ids', true);
+    if (empty($student_ids)) {
+        return '<div class="alert alert-warning">No children linked to your account. Please contact administration.</div>';
+    }
+
+    $student_ids_array = array_filter(explode(',', $student_ids));
+    $children = [];
+
+    foreach ($student_ids_array as $student_id) {
+        $student = get_posts([
+            'post_type' => 'students',
+            'post_status' => 'publish',
+            'posts_per_page' => 1,
+            'meta_query' => [
+                'relation' => 'AND',
+                ['key' => 'student_id', 'value' => trim($student_id), 'compare' => '='],
+                ['key' => 'educational_center_id', 'value' => $educational_center_id, 'compare' => '=']
+            ]
+        ]);
+
+        if (!empty($student)) {
+            $student_post = $student[0];
+            $children[$student_id] = (object)[
+                'student_id' => trim($student_id),
+                'name' => get_post_meta($student_post->ID, 'student_name', true) ?: get_the_title($student_post->ID),
+                'class' => get_post_meta($student_post->ID, 'class', true) ?: 'N/A',
+                'section' => get_post_meta($student_post->ID, 'section', true) ?: 'N/A',
+                'post_id' => $student_post->ID
+            ];
+        }
+    }
+
+    if (empty($children)) {
+        return '<div class="alert alert-warning">No valid student records found for your children.</div>';
+    }
+
+    // Fetch homework for all children
+    $homework_table = $wpdb->prefix . 'homework';
+    $subjects_table = $wpdb->prefix . 'subjects';
+    $homeworks_by_student = [];
+    $all_homeworks = [];
+
+    foreach ($children as $student_id => $child) {
+        $class_name = $child->class;
+        $section = $child->section;
+        $homeworks = $wpdb->get_results($wpdb->prepare(
+            "SELECT h.*, s.subject_name 
+             FROM $homework_table h 
+             LEFT JOIN $subjects_table s ON h.subject_id = s.subject_id 
+             WHERE h.education_center_id = %s 
+             AND h.class_name = %s 
+             AND h.section = %s",
+            $educational_center_id,
+            $class_name,
+            $section
+        ));
+
+        foreach ($homeworks as $homework) {
+            $homework->student_id = $student_id;
+            $homeworks_by_student[$student_id][] = $homework;
+            $all_homeworks[] = $homework;
+        }
+    }
+
+    $homeworks_json = json_encode([
+        'all' => $all_homeworks,
+        'by_student' => $homeworks_by_student
+    ]);
+
+    $center_data = get_educational_center_data_teachers($educational_center_id);
+    $institute_name = $center_data['name'] ?? 'Unknown Institute';
+    $institute_logo = $center_data['logo_url'] ?? '';
+
+    ob_start();
+    ?>
+    <div class="parent-homework card shadow-lg">
+        <div class="card-header bg-primary text-white" style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="card-title m-0"><i class="fas fa-book me-2"></i>Homework/Assignments</h3>
+            <span><?php echo esc_html(date('l, F j, Y')); ?></span>
+        </div>
+        <div class="card-body p-4">
+            <div class="child-selector mb-4">
+                <label for="child_select" class="me-2">Select Child:</label>
+                <select id="child_select" class="form-select">
+                    <option value="all" selected>All Children</option>
+                    <?php foreach ($children as $child): ?>
+                        <option value="<?php echo esc_attr($child->student_id); ?>" data-name="<?php echo esc_attr($child->name); ?>">
+                            <?php echo esc_html($child->name . ' (' . $child->student_id . ')'); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="export-tools mb-4">
+                <button class="export-btn export-pdf" aria-label="Export to PDF"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
+                <button class="export-btn export-csv" aria-label="Export to CSV"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
+                <button class="export-btn export-excel" aria-label="Export to Excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
+                <button class="export-btn export-copy" aria-label="Copy to Clipboard"><i class="fas fa-copy"></i><span class="tooltip">Copy to Clipboard</span></button>
+                <button class="export-btn export-print" aria-label="Print"><i class="fas fa-print"></i><span class="tooltip">Print</span></button>
+            </div>
+            <div id="homework-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Subject</th>
+                            <th>Class</th>
+                            <th>Section</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Child</th>
+                        </tr>
+                    </thead>
+                    <tbody id="homework-table-body">
+                        <?php if (empty($all_homeworks)): ?>
+                            <tr><td colspan="7" class="text-muted">No homework assigned yet for your children.</td></tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const childSelect = document.getElementById('child_select');
+            const tableBody = document.getElementById('homework-table-body');
+            const homeworkData = <?php echo $homeworks_json; ?>;
+            const childrenNames = <?php echo json_encode(array_column($children, 'name', 'student_id')); ?>;
+
+            function updateTable(studentId) {
+                if (!tableBody) {
+                    console.error('Table body not found');
+                    return;
+                }
+                tableBody.innerHTML = ''; // Clear existing rows
+                const homeworks = studentId === 'all' ? homeworkData.all : (homeworkData.by_student[studentId] || []);
+                if (!homeworks || homeworks.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="7" class="text-muted">No homework assigned for this selection.</td></tr>';
+                    return;
+                }
+                homeworks.forEach(homework => {
+                    const now = new Date();
+                    const dueDate = new Date(homework.due_date);
+                    const status = homework.status === 'completed' ? 'Completed' : (dueDate < now ? 'Overdue' : 'Pending');
+                    const row = document.createElement('tr');
+                    row.setAttribute('data-student-id', homework.student_id);
+                    row.innerHTML = `
+                        <td>${escapeHtml(homework.title)}</td>
+                        <td>${escapeHtml(homework.subject_name || 'N/A')}</td>
+                        <td>${escapeHtml(homework.class_name)}</td>
+                        <td>${escapeHtml(homework.section)}</td>
+                        <td>${escapeHtml(homework.due_date)}</td>
+                        <td class="status-${status.toLowerCase()}">${escapeHtml(status)}</td>
+                        <td>${escapeHtml(childrenNames[homework.student_id])}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            function escapeHtml(text) {
+                const map = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'};
+                return text.replace(/[&<>"']/g, m => map[m]);
+            }
+
+            function getTableData() {
+                return Array.from(tableBody.querySelectorAll('tr:not(.text-muted)')).map(row => ({
+                    title: row.cells[0].textContent,
+                    subject: row.cells[1].textContent,
+                    class: row.cells[2].textContent,
+                    section: row.cells[3].textContent,
+                    due_date: row.cells[4].textContent,
+                    status: row.cells[5].textContent,
+                    child: row.cells[6].textContent
+                }));
+            }
+
+            function generatePDF(studentId) {
+    const data = getTableData();
+    if (data.length === 0) {
+        alert('No homework data to export.');
+        return;
+    }
+    const studentName = childSelect.value === 'all' ? 'All Children' : (childSelect.selectedOptions[0]?.dataset.name || 'Unknown');
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 10;
+    const borderColor = [26, 43, 95]; // #1a2b5f
+
+    // Draw border
+    doc.setDrawColor(...borderColor);
+    doc.setLineWidth(1);
+    doc.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin);
+
+    // Add institute logo (if available)
+    const instituteLogo = '<?php echo esc_js($institute_logo); ?>';
+    if (instituteLogo) {
+        try {
+            doc.addImage(instituteLogo, 'PNG', (pageWidth - 24) / 2, 15, 24, 24);
+        } catch (e) {
+            console.log('Logo loading failed:', e);
+            doc.setFontSize(10);
+            doc.text('No logo available', pageWidth / 2, 20, { align: 'center' });
+        }
+    }
+
+    // Institute name and title
+    const instituteName = '<?php echo esc_js($institute_name); ?>';
+    doc.setFontSize(18);
+    doc.setTextColor(...borderColor);
+    doc.text(instituteName.toUpperCase(), pageWidth / 2, 45, { align: 'center' });
+    doc.setFontSize(12);
+    doc.setTextColor(102);
+    doc.text('Homework/Assignments', pageWidth / 2, 55, { align: 'center' });
+    doc.setDrawColor(...borderColor);
+    doc.line(margin + 5, 60, pageWidth - margin - 5, 60);
+
+    // Details section
+    let y = 70;
+    const details = [
+        ['Student Name', studentName],
+        ['Student ID', studentId],
+        ['Date', new Date().toLocaleDateString()],
+        ['Generated', new Date().toLocaleDateString()]
+    ];
+    details.forEach(([label, value]) => {
+        doc.setFillColor(245, 245, 245); // Light gray background
+        doc.rect(margin + 5, y, 50, 6, 'F');
+        doc.setTextColor(...borderColor);
+        doc.setFont('helvetica', 'bold');
+        doc.text(label, margin + 7, y + 4);
+        doc.setTextColor(51);
+        doc.setFont('helvetica', 'normal');
+        doc.text(value, margin + 60, y + 4);
+        y += 6;
+    });
+
+    // Table generation
+    if (typeof doc.autoTable === 'function') {
+        const headers = ['Title', 'Subject', 'Class', 'Section', 'Due Date', 'Status', 'Child'];
+        const body = data.map(row => [
+            row.title,
+            row.subject,
+            row.class,
+            row.section,
+            row.due_date,
+            row.status,
+            row.child
+        ]);
+
+        doc.autoTable({
+            startY: y + 10,
+            head: [headers],
+            body: body,
+            theme: 'striped',
+            styles: {
+                fontSize: 11,
+                cellPadding: 2,
+                overflow: 'linebreak',
+                halign: 'center',
+                textColor: [51, 51, 51]
+            },
+            headStyles: {
+                fillColor: borderColor,
+                textColor: [255, 255, 255],
+                fontStyle: 'bold'
+            },
+            alternateRowStyles: { fillColor: [249, 249, 249] },
+            tableLineColor: [204, 204, 204],
+            tableLineWidth: 0.1
+        });
+
+        // Footer
+        const finalY = doc.lastAutoTable.finalY || y + 10;
+        doc.setFontSize(9);
+        doc.setTextColor(102);
+        doc.text(`This is an Online Generated Homework/Assignments issued by ${instituteName}`, pageWidth / 2, finalY + 20, { align: 'center' });
+        doc.text(`Generated on ${new Date().toISOString().slice(0, 10)}`, pageWidth / 2, finalY + 25, { align: 'center' });
+        doc.text('___________________________', pageWidth / 2, finalY + 35, { align: 'center' });
+        doc.text('Registrar / Authorized Signatory', pageWidth / 2, finalY + 40, { align: 'center' });
+        doc.text('Managed by Instituto Educational Center Management System', pageWidth / 2, finalY + 45, { align: 'center' });
+    } else {
+        console.error('jsPDF autoTable plugin not loaded');
+        alert('PDF generation failed: autoTable plugin missing');
+        return;
+    }
+
+    // Save the PDF
+    doc.save(`homework_${studentId}_${new Date().toISOString().slice(0,10)}.pdf`);
+    }
+
+            function exportToCSV() {
+                const data = getTableData();
+                if (data.length === 0) {
+                    alert('No homework data to export.');
+                    return;
+                }
+                const csvContent = [
+                    '"Title","Subject","Class","Section","Due Date","Status","Child"',
+                    ...data.map(h => `"${h.title.replace(/"/g, '""')}","${h.subject.replace(/"/g, '""')}","${h.class.replace(/"/g, '""')}","${h.section.replace(/"/g, '""')}","${h.due_date.replace(/"/g, '""')}","${h.status.replace(/"/g, '""')}","${h.child.replace(/"/g, '""')}"`)
+                ].join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const studentId = childSelect.value === 'all' ? 'all' : childSelect.value;
+                link.href = URL.createObjectURL(blob);
+                link.download = `homework_${studentId}_${new Date().toISOString().slice(0,10)}.csv`;
+                link.click();
+            }
+
+            function exportToExcel() {
+                if (!window.XLSX) return;
+                const data = getTableData();
+                if (data.length === 0) {
+                    alert('No homework data to export.');
+                    return;
+                }
+                const ws = XLSX.utils.json_to_sheet(data, { header: ['title', 'subject', 'class', 'section', 'due_date', 'status', 'child'] });
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Homework');
+                const studentId = childSelect.value === 'all' ? 'all' : childSelect.value;
+                XLSX.writeFile(wb, `homework_${studentId}_${new Date().toISOString().slice(0,10)}.xlsx`);
+            }
+
+            function copyToClipboard() {
+                const data = getTableData();
+                if (data.length === 0) {
+                    alert('No homework data to copy.');
+                    return;
+                }
+                const text = data.map(h => `${h.title}: ${h.due_date} (${h.status}) - ${h.child}`).join('\n');
+                navigator.clipboard.writeText(text).then(() => alert('Homework copied to clipboard!'));
+            }
+            function printHomework(studentId) {
+                const data = getTableData();
+                if (data.length === 0) {
+                    alert('No homework data to print.');
+                    return;
+                }
+                const studentName = childSelect.value === 'all' ? 'All Children' : (childSelect.selectedOptions[0]?.dataset.name || 'Unknown');
+                const instituteName = '<?php echo esc_js($institute_name); ?>';
+                const logoUrl = '<?php echo esc_js($institute_logo); ?>';
+
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Homework - ${studentId}</title>
+                        <style>
+                            @media print {
+                                body { font-family: Helvetica, sans-serif; margin: 10mm; }
+                                .page { border: 4px solid #007bff; padding: 5mm; }
+                                .header { text-align: center; border-bottom: 2px solid #007bff; margin-bottom: 10mm; }
+                                .header img { width: 60px; height: 60px; margin-bottom: 5mm; }
+                                .header h1 { font-size: 18pt; color: #007bff; margin: 0; text-transform: uppercase; }
+                                .header .subtitle { font-size: 12pt; color: #666; margin: 0; }
+                                .details p { margin: 5px 0; }
+                                .details strong { color: #007bff; }
+                                table { width: 100%; border-collapse: collapse; margin: 10mm 0; }
+                                th, td { border: 1px solid #e5e5e5; padding: 8px; text-align: center; }
+                                th { background: #007bff; color: white; font-weight: bold; }
+                                tr:nth-child(even) { background: #f9f9f9; }
+                                .status-completed { color: #2e7d32; font-weight: bold; }
+                                .status-pending { color: #f1c40f; }
+                                .status-overdue { color: #c62828; font-weight: bold; }
+                                .footer { text-align: center; font-size: 9pt; color: #666; margin-top: 10mm; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="page">
+                            <div class="header">
+                                ${logoUrl ? `<img src="${logoUrl}" alt="Logo" onerror="this.style.display='none';this.nextSibling.style.display='block';"><p style="display:none;">No logo available</p>` : '<p>No logo available</p>'}
+                                <h1><?php echo esc_html(strtoupper($institute_name)); ?></h1>
+                                <p class="subtitle">Homework/Assignments</p>
+                            </div>
+                            <div class="details">
+                                <p><strong>Student Name:</strong> ${escapeHtml(studentName)}</p>
+                                <p><strong>Student ID:</strong> ${escapeHtml(studentId)}</p>
+                                <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Subject</th>
+                                        <th>Class</th>
+                                        <th>Section</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+                                        <th>Child</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.map(row => `
+                                        <tr>
+                                            <td>${escapeHtml(row.title)}</td>
+                                            <td>${escapeHtml(row.subject)}</td>
+                                            <td>${escapeHtml(row.class)}</td>
+                                            <td>${escapeHtml(row.section)}</td>
+                                            <td>${escapeHtml(row.due_date)}</td>
+                                            <td class="status-${row.status.toLowerCase()}">${escapeHtml(row.status)}</td>
+                                            <td>${escapeHtml(row.child)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                            <div class="footer">
+                                <p>This is an Online Generated Homework/Assignments issued by ${instituteName}</p>
+                                <p>Generated on ${new Date().toISOString().slice(0, 10)}</p>
+                                <p>___________________________</p>
+                                <p>Registrar / Authorized Signatory</p>
+                                <p>Managed by Instituto Educational Center Management System</p>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.focus();
+                printWindow.print();
+                // Optional: Uncomment to auto-close the window after printing
+                // printWindow.close();
+            }
+
+            childSelect.addEventListener('change', () => updateTable(childSelect.value));
+            document.querySelector('.export-pdf')?.addEventListener('click', () => generatePDF(childSelect.value));
+            document.querySelector('.export-csv')?.addEventListener('click', () => exportToCSV);
+            document.querySelector('.export-excel')?.addEventListener('click', () => exportToExcel);
+            document.querySelector('.export-copy')?.addEventListener('click', () => copyToClipboard);
+            document.querySelector('.export-print')?.addEventListener('click', () => printHomework(childSelect.value));
+
+            updateTable('all');
+        });
+    </script>
+
+
+    <?php
+    return ob_get_clean();
+}
+
+//library
+function render_parent_library($parent_user, $parent_post_id) {
+    global $wpdb;
+
+    $educational_center_id = educational_center_parent_id();
+    if (empty($educational_center_id)) {
+        return '<div class="alert alert-danger">No Educational Center found for this parent account.</div>';
+    }
+
+    $student_ids = get_post_meta($parent_post_id, 'parent_student_ids', true);
+    if (empty($student_ids)) {
+        return '<div class="alert alert-warning">No children linked to your account. Please contact administration.</div>';
+    }
+
+    $student_ids_array = array_filter(explode(',', $student_ids));
+    $children = [];
+
+    foreach ($student_ids_array as $student_id) {
+        $student = get_posts([
+            'post_type' => 'students',
+            'post_status' => 'publish',
+            'posts_per_page' => 1,
+            'meta_query' => [
+                'relation' => 'AND',
+                ['key' => 'student_id', 'value' => trim($student_id), 'compare' => '='],
+                ['key' => 'educational_center_id', 'value' => $educational_center_id, 'compare' => '=']
+            ]
+        ]);
+
+        if (!empty($student)) {
+            $student_post = $student[0];
+            $children[$student_id] = (object)[
+                'student_id' => trim($student_id),
+                'name' => get_post_meta($student_post->ID, 'student_name', true) ?: get_the_title($student_post->ID),
+                'post_id' => $student_post->ID
+            ];
+        }
+    }
+
+    if (empty($children)) {
+        return '<div class="alert alert-warning">No valid student records found for your children.</div>';
+    }
+
+    $trans_table = $wpdb->prefix . 'library_transactions';
+    $library_table = $wpdb->prefix . 'library';
+    $transactions_by_student = [];
+    $all_transactions = [];
+
+    foreach ($children as $student_id => $child) {
+        $transactions = $wpdb->get_results($wpdb->prepare(
+            "SELECT t.*, l.title, l.isbn 
+             FROM $trans_table t 
+             JOIN $library_table l ON t.book_id = l.book_id 
+             WHERE t.user_id = %s AND t.user_type = 'Student' AND l.education_center_id = %s",
+            $student_id, $educational_center_id
+        ));
+
+        foreach ($transactions as $transaction) {
+            $transaction->student_id = $student_id;
+            $transactions_by_student[$student_id][] = $transaction;
+            $all_transactions[] = $transaction;
+        }
+    }
+
+    $transactions_json = json_encode([
+        'all' => $all_transactions,
+        'by_student' => $transactions_by_student
+    ]);
+
+    $center_data = get_educational_center_data_teachers($educational_center_id);
+    $institute_name = $center_data['name'] ?? 'Unknown Institute';
+    $institute_logo = $center_data['logo_url'] ?? '';
+
+    ob_start();
+    ?>
+    <div class="parent-library card shadow-lg" style="border-radius: 15px; background: #fff; border: 3px solid #007bff;">
+        <div class="card-header bg-primary text-white" style="display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0; padding: 1.5rem;">
+            <h3 class="card-title m-0"><i class="fas fa-book-reader me-2"></i>Library Transactions</h3>
+            <span><?php echo esc_html(date('l, F j, Y')); ?></span>
+        </div>
+        <div class="card-body p-4">
+            <div class="child-selector mb-4">
+                <label for="child_select" class="me-2 fw-bold">Select Child:</label>
+                <select id="child_select" class="form-select" style="border-radius: 20px;">
+                    <option value="all" selected>All Children</option>
+                    <?php foreach ($children as $child): ?>
+                        <option value="<?php echo esc_attr($child->student_id); ?>" data-name="<?php echo esc_attr($child->name); ?>">
+                            <?php echo esc_html($child->name . ' (' . $child->student_id . ')'); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="export-tools mb-4">
+                <button class="export-btn export-pdf" aria-label="Export to PDF"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
+                <button class="export-btn export-csv" aria-label="Export to CSV"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
+                <button class="export-btn export-excel" aria-label="Export to Excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
+                <button class="export-btn export-copy" aria-label="Copy to Clipboard"><i class="fas fa-copy"></i><span class="tooltip">Copy to Clipboard</span></button>
+                <button class="export-btn export-print" aria-label="Print"><i class="fas fa-print"></i><span class="tooltip">Print</span></button>
+            </div>
+            <div id="library-table-container">
+                <table class="data-table table table-hover" id="libraryTable">
+                    <thead style="background: #e6f3ff;">
+                        <tr>
+                            <th>Book ID</th>
+                            <th>ISBN</th>
+                            <th>Title</th>
+                            <th>Issue Date</th>
+                            <th>Due Date</th>
+                            <th>Return Date</th>
+                            <th>Status</th>
+                            <th>Fine</th>
+                            <th>Child</th>
+                        </tr>
+                    </thead>
+                    <tbody id="library-table-body">
+                        <?php if (empty($all_transactions)): ?>
+                            <tr><td colspan="9" class="text-muted text-center py-4">No library transactions recorded for your children.</td></tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script> -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const childSelect = document.getElementById('child_select');
+            const tableBody = document.getElementById('library-table-body');
+            const transactionsData = <?php echo $transactions_json; ?>;
+            const childrenNames = <?php echo json_encode(array_column($children, 'name', 'student_id')); ?>;
+
+            function updateTable(studentId) {
+                if (!tableBody) {
+                    console.error('Table body not found');
+                    return;
+                }
+                tableBody.innerHTML = '';
+                const transactions = studentId === 'all' ? transactionsData.all : (transactionsData.by_student[studentId] || []);
+                if (!transactions || transactions.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="9" class="text-muted text-center py-4">No library transactions for this selection.</td></tr>';
+                    return;
+                }
+                transactions.forEach(trans => {
+                    const now = new Date();
+                    const dueDate = new Date(trans.due_date);
+                    const returnDate = trans.return_date ? new Date(trans.return_date) : null;
+                    let status = returnDate ? 'Returned' : (dueDate < now ? 'Overdue' : 'Borrowed');
+                    const daysOverdue = !returnDate && dueDate < now ? Math.max(0, Math.floor((now - dueDate) / (1000 * 60 * 60 * 24))) : 0;
+                    const fine = trans.fine > 0 ? trans.fine : (daysOverdue * 0.50).toFixed(2);
+
+                    const row = document.createElement('tr');
+                    row.setAttribute('data-student-id', trans.student_id);
+                    row.innerHTML = `
+                        <td>${escapeHtml(trans.book_id)}</td>
+                        <td>${escapeHtml(trans.isbn || 'N/A')}</td>
+                        <td>${escapeHtml(trans.title)}</td>
+                        <td>${escapeHtml(trans.issue_date)}</td>
+                        <td>${escapeHtml(trans.due_date)}</td>
+                        <td>${returnDate ? escapeHtml(trans.return_date) : '<span class="badge bg-warning">Pending</span>'}</td>
+                        <td class="status-${status.toLowerCase()}">${escapeHtml(status)}</td>
+                        <td>${fine} ${!returnDate && daysOverdue > 0 ? '(Pending)' : ''}</td>
+                        <td>${escapeHtml(childrenNames[trans.student_id])}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            function escapeHtml(text) {
+                const map = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'};
+                return text.toString().replace(/[&<>"']/g, m => map[m]);
+            }
+
+            function getTableData() {
+                return Array.from(tableBody.querySelectorAll('tr:not(.text-muted)')).map(row => ({
+                    book_id: row.cells[0].textContent,
+                    isbn: row.cells[1].textContent,
+                    title: row.cells[2].textContent,
+                    issue_date: row.cells[3].textContent,
+                    due_date: row.cells[4].textContent,
+                    return_date: row.cells[5].textContent.includes('Pending') ? 'Pending' : row.cells[5].textContent,
+                    status: row.cells[6].textContent,
+                    fine: row.cells[7].textContent,
+                    child: row.cells[8].textContent
+                }));
+            }
+
+            function generatePDF(studentId) {
+                const data = getTableData();
+                if (data.length === 0) {
+                    alert('No library data to export.');
+                    return;
+                }
+                const studentName = childSelect.value === 'all' ? 'All Children' : (childSelect.selectedOptions[0]?.dataset.name || 'Unknown');
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
+                const pageWidth = doc.internal.pageSize.width;
+                const pageHeight = doc.internal.pageSize.height;
+                const margin = 10;
+                const borderColor = [0, 123, 255];
+
+                doc.setDrawColor(...borderColor);
+                doc.setLineWidth(1);
+                doc.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin);
+
+                const instituteLogo = '<?php echo esc_js($institute_logo); ?>';
+                if (instituteLogo) {
+                    try {
+                        doc.addImage(instituteLogo, 'PNG', (pageWidth - 24) / 2, 15, 24, 24);
+                    } catch (e) {
+                        console.log('Logo loading failed:', e);
+                        doc.setFontSize(10);
+                        doc.text('No logo available', pageWidth / 2, 20, { align: 'center' });
+                    }
+                }
+
+                const instituteName = '<?php echo esc_js($institute_name); ?>';
+                doc.setFontSize(18);
+                doc.setTextColor(...borderColor);
+                doc.text(instituteName.toUpperCase(), pageWidth / 2, 45, { align: 'center' });
+                doc.setFontSize(12);
+                doc.setTextColor(102);
+                doc.text('Library Transactions', pageWidth / 2, 55, { align: 'center' });
+                doc.setDrawColor(...borderColor);
+                doc.line(margin + 5, 60, pageWidth - margin - 5, 60);
+
+                let y = 70;
+                const details = [
+                    ['Student Name', studentName],
+                    ['Student ID', studentId],
+                    ['Date', new Date().toLocaleDateString()]
+                ];
+                details.forEach(([label, value]) => {
+                    doc.setFillColor(245, 245, 245);
+                    doc.rect(margin + 5, y, 50, 6, 'F');
+                    doc.setTextColor(...borderColor);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(label, margin + 7, y + 4);
+                    doc.setTextColor(51);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(value, margin + 60, y + 4);
+                    y += 6;
+                });
+
+                if (typeof doc.autoTable === 'function') {
+                    const headers = ['Book ID', 'ISBN', 'Title', 'Issue Date', 'Due Date', 'Return Date', 'Status', 'Fine', 'Child'];
+                    const body = data.map(row => [row.book_id, row.isbn, row.title, row.issue_date, row.due_date, row.return_date, row.status, row.fine, row.child]);
+
+                    doc.autoTable({
+                        startY: y + 10,
+                        head: [headers],
+                        body: body,
+                        theme: 'striped',
+                        styles: { fontSize: 10, cellPadding: 2, overflow: 'linebreak', halign: 'center', textColor: [51, 51, 51] },
+                        headStyles: { fillColor: borderColor, textColor: [255, 255, 255], fontStyle: 'bold' },
+                        alternateRowStyles: { fillColor: [249, 249, 249] },
+                        tableLineColor: [204, 204, 204],
+                        tableLineWidth: 0.1
+                    });
+
+                    const finalY = doc.lastAutoTable.finalY || y + 10;
+                    doc.setFontSize(9);
+                    doc.setTextColor(102);
+                    doc.text(`This is an Online Generated Library Transactions Report issued by ${instituteName}`, pageWidth / 2, finalY + 20, { align: 'center' });
+                    doc.text(`Generated on ${new Date().toISOString().slice(0, 10)}`, pageWidth / 2, finalY + 25, { align: 'center' });
+                    doc.text('___________________________', pageWidth / 2, finalY + 35, { align: 'center' });
+                    doc.text('Registrar / Authorized Signatory', pageWidth / 2, finalY + 40, { align: 'center' });
+                    doc.text('Managed by Instituto Educational Center Management System', pageWidth / 2, finalY + 45, { align: 'center' });
+                } else {
+                    console.error('jsPDF autoTable plugin not loaded');
+                    alert('PDF generation failed: autoTable plugin missing');
+                    return;
+                }
+
+                doc.save(`library_transactions_${studentId}_${new Date().toISOString().slice(0,10)}.pdf`);
+            }
+
+            function exportToCSV() {
+                const data = getTableData();
+                if (data.length === 0) {
+                    alert('No library data to export.');
+                    return;
+                }
+                const csvContent = [
+                    '"Book ID","ISBN","Title","Issue Date","Due Date","Return Date","Status","Fine","Child"',
+                    ...data.map(t => `"${t.book_id.replace(/"/g, '""')}","${t.isbn.replace(/"/g, '""')}","${t.title.replace(/"/g, '""')}","${t.issue_date.replace(/"/g, '""')}","${t.due_date.replace(/"/g, '""')}","${t.return_date.replace(/"/g, '""')}","${t.status.replace(/"/g, '""')}","${t.fine.replace(/"/g, '""')}","${t.child.replace(/"/g, '""')}"`)
+                ].join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const studentId = childSelect.value === 'all' ? 'all' : childSelect.value;
+                link.href = URL.createObjectURL(blob);
+                link.download = `library_transactions_${studentId}_${new Date().toISOString().slice(0,10)}.csv`;
+                link.click();
+            }
+
+            function exportToExcel() {
+                if (!window.XLSX) return;
+                const data = getTableData();
+                if (data.length === 0) {
+                    alert('No library data to export.');
+                    return;
+                }
+                const ws = XLSX.utils.json_to_sheet(data, { header: ['book_id', 'isbn', 'title', 'issue_date', 'due_date', 'return_date', 'status', 'fine', 'child'] });
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Library Transactions');
+                const studentId = childSelect.value === 'all' ? 'all' : childSelect.value;
+                XLSX.writeFile(wb, `library_transactions_${studentId}_${new Date().toISOString().slice(0,10)}.xlsx`);
+            }
+
+            function copyToClipboard() {
+                const data = getTableData();
+                if (data.length === 0) {
+                    alert('No library data to copy.');
+                    return;
+                }
+                const text = data.map(t => `${t.title}: Issued ${t.issue_date}, Due ${t.due_date}, ${t.status} - ${t.child}`).join('\n');
+                navigator.clipboard.writeText(text).then(() => alert('Library transactions copied to clipboard!'));
+            }
+
+            function printLibrary(studentId) {
+                const data = getTableData();
+                if (data.length === 0) {
+                    alert('No library data to print.');
+                    return;
+                }
+                const studentName = childSelect.value === 'all' ? 'All Children' : (childSelect.selectedOptions[0]?.dataset.name || 'Unknown');
+                const instituteName = '<?php echo esc_js($institute_name); ?>';
+                const logoUrl = '<?php echo esc_js($institute_logo); ?>';
+
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Library Transactions - ${studentId}</title>
+                        <style>
+                            @media print {
+                                body { font-family: Helvetica, sans-serif; margin: 10mm; }
+                                .page { border: 4px solid #007bff; padding: 5mm; }
+                                .header { text-align: center; border-bottom: 2px solid #007bff; margin-bottom: 10mm; }
+                                .header img { width: 60px; height: 60px; margin-bottom: 5mm; }
+                                .header h1 { font-size: 18pt; color: #007bff; margin: 0; text-transform: uppercase; }
+                                .header .subtitle { font-size: 12pt; color: #666; margin: 0; }
+                                .details p { margin: 5px 0; }
+                                .details strong { color: #007bff; }
+                                table { width: 100%; border-collapse: collapse; margin: 10mm 0; }
+                                th, td { border: 1px solid #e5e5e5; padding: 8px; text-align: center; }
+                                th { background: #007bff; color: white; font-weight: bold; }
+                                tr:nth-child(even) { background: #f9f9f9; }
+                                .status-returned { color: #2e7d32; font-weight: bold; }
+                                .status-borrowed { color: #f1c40f; }
+                                .status-overdue { color: #c62828; font-weight: bold; }
+                                .footer { text-align: center; font-size: 9pt; color: #666; margin-top: 10mm; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="page">
+                            <div class="header">
+                                ${logoUrl ? `<img src="${logoUrl}" alt="Logo" onerror="this.style.display='none';this.nextSibling.style.display='block';"><p style="display:none;">No logo available</p>` : '<p>No logo available</p>'}
+                                <h1><?php echo esc_html(strtoupper($institute_name)); ?></h1>
+                                <p class="subtitle">Library Transactions</p>
+                            </div>
+                            <div class="details">
+                                <p><strong>Student Name:</strong> ${escapeHtml(studentName)}</p>
+                                <p><strong>Student ID:</strong> ${escapeHtml(studentId)}</p>
+                                <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Book ID</th>
+                                        <th>ISBN</th>
+                                        <th>Title</th>
+                                        <th>Issue Date</th>
+                                        <th>Due Date</th>
+                                        <th>Return Date</th>
+                                        <th>Status</th>
+                                        <th>Fine</th>
+                                        <th>Child</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.map(row => `
+                                        <tr>
+                                            <td>${escapeHtml(row.book_id)}</td>
+                                            <td>${escapeHtml(row.isbn)}</td>
+                                            <td>${escapeHtml(row.title)}</td>
+                                            <td>${escapeHtml(row.issue_date)}</td>
+                                            <td>${escapeHtml(row.due_date)}</td>
+                                            <td>${row.return_date === 'Pending' ? '<span class="badge bg-warning">Pending</span>' : escapeHtml(row.return_date)}</td>
+                                            <td class="status-${row.status.toLowerCase()}">${escapeHtml(row.status)}</td>
+                                            <td>${escapeHtml(row.fine)}</td>
+                                            <td>${escapeHtml(row.child)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                            <div class="footer">
+                                <p>This is an Online Generated Library Transactions Report issued by ${instituteName}</p>
+                                <p>Generated on ${new Date().toISOString().slice(0, 10)}</p>
+                                <p>___________________________</p>
+                                <p>Registrar / Authorized Signatory</p>
+                                <p>Managed by Instituto Educational Center Management System</p>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.focus();
+                printWindow.print();
+            }
+
+            childSelect.addEventListener('change', () => updateTable(childSelect.value));
+            document.querySelector('.export-pdf')?.addEventListener('click', () => generatePDF(childSelect.value));
+            document.querySelector('.export-csv')?.addEventListener('click', exportToCSV);
+            document.querySelector('.export-excel')?.addEventListener('click', exportToExcel);
+            document.querySelector('.export-copy')?.addEventListener('click', copyToClipboard);
+            document.querySelector('.export-print')?.addEventListener('click', () => printLibrary(childSelect.value));
+
+            updateTable('all');
+        });
+    </script>
     <?php
     return ob_get_clean();
 }

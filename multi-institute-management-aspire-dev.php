@@ -1558,18 +1558,339 @@ add_action('wp_enqueue_scripts', 'enqueue_font_awesome');
 
 
 //common functions
-
-
-
 function aspire_get_admins($edu_center_id) {
     global $wpdb;
     $table = $wpdb->prefix . 'institute_admins';
     return $wpdb->get_results($wpdb->prepare("SELECT id, name FROM $table WHERE educational_center_id = %s", $edu_center_id), ARRAY_A);
 }
 
+//change
+function render_change_password($current_user, $post_id = null) {
+    global $wpdb;
 
+    // Ensure user is logged in
+    if (!is_user_logged_in() || !$current_user instanceof WP_User) {
+        return '<div class="alert alert-danger">You must be logged in to change your password.</div>';
+    }
 
+    $user_id = $current_user->ID;
+    $user_type = $current_user->roles[0] ?? 'unknown';
+    $nonce = wp_create_nonce('change_password_nonce_' . $user_id);
+    $message = ''; // Unified message for both forms
 
+    // Handle Change Password Submission
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password_submit'])) {
+        if (!wp_verify_nonce($_POST['change_password_nonce'], 'change_password_nonce_' . $user_id)) {
+            $message = '<div class="alert alert-danger">Security check failed. Please try again.</div>';
+        } else {
+            $current_password = sanitize_text_field($_POST['current_password'] ?? '');
+            $new_password = sanitize_text_field($_POST['new_password'] ?? '');
+            $confirm_password = sanitize_text_field($_POST['confirm_new_password'] ?? '');
+
+            if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
+                $message = '<div class="alert alert-danger">All fields are required.</div>';
+            } elseif (!wp_check_password($current_password, $current_user->user_pass, $user_id)) {
+                $message = '<div class="alert alert-danger">Current password is incorrect.</div>';
+            } elseif ($new_password !== $confirm_password) {
+                $message = '<div class="alert alert-danger">New passwords do not match.</div>';
+            } elseif (strlen($new_password) < 8) {
+                $message = '<div class="alert alert-danger">New password must be at least 8 characters long.</div>';
+            } else {
+                wp_set_password($new_password, $user_id);
+                wp_clear_auth_cookie();
+                wp_set_current_user($user_id);
+                wp_set_auth_cookie($user_id);
+                $message = '<div class="alert alert-success">Password changed successfully!</div>';
+            }
+        }
+    }
+
+    // Handle Forgot Password Submission
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['forgot_password_submit'])) {
+        $email = sanitize_email($_POST['forgot_email'] ?? '');
+        if (empty($email)) {
+            $message = '<div class="alert alert-danger">Please enter your email address.</div>';
+        } elseif (!is_email($email) || !email_exists($email)) {
+            $message = '<div class="alert alert-danger">Invalid email address or no account found.</div>';
+        } else {
+            $user = get_user_by('email', $email);
+            $reset_key = get_password_reset_key($user);
+            if (is_wp_error($reset_key)) {
+                $message = '<div class="alert alert-danger">Error generating reset link. Please try again.</div>';
+            } else {
+                $reset_link = network_site_url("wp-login.php?action=rp&key=$reset_key&login=" . rawurlencode($user->user_login), 'login');
+                $subject = 'Password Reset Request';
+                $email_message = "Someone requested a password reset for your account. Click the link below to reset your password:\n\n";
+                $email_message .= "$reset_link\n\n";
+                $email_message .= "If you did not request this, please ignore this email.";
+                $sent = wp_mail($email, $subject, $email_message);
+
+                if ($sent) {
+                    $message = '<div class="alert alert-success">A password reset link has been sent to your email.</div>';
+                } else {
+                    $message = '<div class="alert alert-danger">Failed to send reset email. Please try again later.</div>';
+                }
+            }
+        }
+    }
+
+    ob_start();
+    ?>
+    <div class="change-password card shadow-lg">
+        <div class="card-header bg-dark text-white" style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="card-title m-0"><i class="fas fa-lock me-2"></i>Change Password</h3>
+            <span><?php echo esc_html(date('l, F j, Y')); ?></span>
+        </div>
+        <div class="card-body p-4">
+            <?php if ($message): ?>
+                <?php echo $message; ?>
+            <?php endif; ?>
+
+            <!-- Change Password Form -->
+            <form id="change-password-form" method="post" action="" <?php echo ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['forgot_password_submit'])) ? 'style="display: none;"' : ''; ?>>
+                <input type="hidden" name="change_password_nonce" value="<?php echo esc_attr($nonce); ?>">
+                <div class="form-group">
+                    <label for="current_password">Current Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-key"></i></span>
+                        <input type="password" id="current_password" name="current_password" required>
+                        <button type="button" class="toggle-password" data-target="current_password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="new_password">New Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                        <input type="password" id="new_password" name="new_password" required>
+                        <button type="button" class="toggle-password" data-target="new_password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <span class="form-hint">Minimum 8 characters.</span>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_new_password">Confirm New Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                        <input type="password" id="confirm_new_password" name="confirm_new_password" required>
+                        <button type="button" class="toggle-password" data-target="confirm_new_password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" name="change_password_submit" class="submit-btn">
+                    <i class="fas fa-save me-2"></i>Change Password
+                </button>
+                <p class="forgot-link"><a href="#" id="show-forgot-form">Forgot Password?</a></p>
+            </form>
+
+            <!-- Forgot Password Form -->
+            <form id="forgot-password-form" method="post" action="" <?php echo ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['forgot_password_submit'])) ? '' : 'style="display: none;"'; ?>>
+                <div class="form-group">
+                    <label for="forgot_email">Email Address</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                        <input type="email" id="forgot_email" name="forgot_email" required>
+                    </div>
+                </div>
+                <button type="submit" name="forgot_password_submit" class="submit-btn">
+                    <i class="fas fa-paper-plane me-2"></i>Send Reset Link
+                </button>
+                <p class="forgot-link"><a href="#" id="show-change-form">Back to Change Password</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- External Libraries (Font Awesome Only) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle password visibility
+            document.querySelectorAll('.toggle-password').forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const input = document.getElementById(targetId);
+                    const icon = this.querySelector('i');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                });
+            });
+
+            // Form validation (client-side)
+            const changeForm = document.getElementById('change-password-form');
+            changeForm.addEventListener('submit', function(e) {
+                const currentPassword = document.getElementById('current_password').value;
+                const newPassword = document.getElementById('new_password').value;
+                const confirmPassword = document.getElementById('confirm_new_password').value;
+
+                if (newPassword.length < 8) {
+                    e.preventDefault();
+                    alert('New password must be at least 8 characters long.');
+                    return;
+                }
+                if (newPassword !== confirmPassword) {
+                    e.preventDefault();
+                    alert('New passwords do not match.');
+                    return;
+                }
+            });
+
+            // Toggle between forms
+            const changeFormDiv = document.getElementById('change-password-form');
+            const forgotFormDiv = document.getElementById('forgot-password-form');
+            document.getElementById('show-forgot-form').addEventListener('click', function(e) {
+                e.preventDefault();
+                changeFormDiv.style.display = 'none';
+                forgotFormDiv.style.display = 'block';
+            });
+            document.getElementById('show-change-form').addEventListener('click', function(e) {
+                e.preventDefault();
+                forgotFormDiv.style.display = 'none';
+                changeFormDiv.style.display = 'block';
+            });
+        });
+    </script>
+
+    <style>
+        /* Reusing existing classes and aligning with your color scheme */
+        .card {
+            background: #fff;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .shadow-lg {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .card-header {
+            padding: 10px 15px;
+            font-weight: bold;
+        }
+        .bg-dark {
+            background: #343a40; /* Consistent with your dark headers */
+        }
+        .text-white {
+            color: #fff;
+        }
+        .card-title {
+            font-size: 1.25em;
+        }
+        .m-0 {
+            margin: 0;
+        }
+        .me-2 {
+            margin-right: 8px;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .p-4 {
+            padding: 20px !important;
+        }
+        .alert {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        .alert-success {
+            background: #d4edda; /* Light green from your success alerts */
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-danger {
+            background: #f8d7da; /* Light red from your danger alerts */
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Custom form styling with your color scheme */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333; /* Dark gray from your text */
+        }
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc; /* Light gray border */
+            border-radius: 4px;
+            background: #fff;
+        }
+        .input-icon {
+            padding: 8px;
+            background: #f5f5f5; /* Light gray background from your inputs */
+            border-right: 1px solid #ccc;
+            color: #666; /* Medium gray */
+        }
+        .input-wrapper input {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            color: #333;
+        }
+        .input-wrapper input:focus {
+            box-shadow: 0 0 5px rgba(220, 53, 69, 0.5); /* Red shadow from your danger theme */
+        }
+        .toggle-password {
+            padding: 8px 12px;
+            border: none;
+            background: #f5f5f5;
+            cursor: pointer;
+            color: #666;
+        }
+        .toggle-password:hover {
+            background: #e5e5e5; /* Slightly darker gray */
+        }
+        .form-hint {
+            display: block;
+            font-size: 0.85em;
+            color: #666; /* Muted gray from your hints */
+            margin-top: 5px;
+        }
+        .submit-btn {
+            padding: 10px 15px;
+            background: #007bff; /* Blue from your primary buttons */
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .submit-btn:hover {
+            background: #0056b3; /* Darker blue on hover */
+        }
+        .forgot-link {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .forgot-link a {
+            color: #dc3545; /* Red from your danger theme for links */
+            text-decoration: none;
+        }
+        .forgot-link a:hover {
+            color: #a71d2a; /* Darker red on hover */
+            text-decoration: underline;
+        }
+    </style>
+    <?php
+    return ob_get_clean();
+}
 
 
 // function restrict_edit_class_section_access() {
