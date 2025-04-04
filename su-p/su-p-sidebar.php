@@ -64,30 +64,103 @@ $active_section = isset($active_section) ? $active_section : 'overview';
                 <span>Teacher</span>
             </a>
         </li>
+        <li class="<?php echo $active_section === 'students' ? 'active' : ''; ?>">
+            <a href="<?php echo esc_url(home_url('su_p-dashboard?section=students')); ?>">
+                <i class="fas fa-user-friends" style="color: #e8eaed;"></i>
+                <span>Students</span>
+            </a>
+        </li>
+        <li class="<?php echo $active_section === 'staff' ? 'active' : ''; ?>">
+            <a href="<?php echo esc_url(home_url('su_p-dashboard?section=staff')); ?>">
+                <i class="fas fa-user-friends" style="color: #e8eaed;"></i>
+                <span>Staff</span>
+            </a>
+        </li>
         <li class="<?php echo $active_section === 'roles' ? 'active' : ''; ?>">
             <a href="<?php echo esc_url(home_url('su_p-dashboard?section=roles')); ?>">
                 <i class="fas fa-user-shield" style="color: #e8eaed;"></i>
                 <span>Roles & Permissions</span>
             </a>
         </li>
-        <li class="<?php echo $active_section === 'classes' ? 'active' : ''; ?>">
-            <a href="<?php echo esc_url(home_url('su_p-dashboard?section=classes')); ?>">
-                <i class="fas fa-chalkboard-teacher" style="color: #e8eaed;"></i>
-                <span>Classes & Subjects</span>
-            </a>
-        </li>
-        <li class="<?php echo $active_section === 'exams' ? 'active' : ''; ?>">
-            <a href="<?php echo esc_url(home_url('su_p-dashboard?section=exams')); ?>">
-                <i class="fas fa-book" style="color: #e8eaed;"></i>
-                <span>Exams</span>
-            </a>
-        </li>
-        <li class="<?php echo $active_section === 'attendance' ? 'active' : ''; ?>">
-            <a href="<?php echo esc_url(home_url('su_p-dashboard?section=attendance')); ?>">
-                <i class="fas fa-check-square" style="color: #e8eaed;"></i>
-                <span>Attendance</span>
-            </a>
-        </li>
+       
+        <li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'classes' ? 'rotate' : ''; ?>">
+  <i class="fas fa-chalkboard-teacher" style="color: #e8eaed;"></i>    
+    <span>Classes & Sections</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'classes' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'classes' && empty($active_action) ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=classes'); ?>">Classes & Sections</a></li>
+      <li class="<?php echo $active_action == 'add-class' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=classes&action=add-class'); ?>">Add Class</a></li>
+      <li class="<?php echo $active_action == 'edit-class' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=classes&action=edit-class'); ?>">Edit Class</a></li>
+      <li class="<?php echo $active_action == 'delete-class' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=classes&action=delete-class'); ?>">Delete Class</a></li>
+      <li class="<?php echo $active_action == 'student-count' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=classes&action=student-count'); ?>">Student Count</a></li>
+    </div>
+  </ul>
+</li>
+        <li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'exams' ? 'rotate' : ''; ?>">
+  <i class="fas fa-chalkboard-teacher" style="color: #e8eaed;"></i>    
+    <span>Exams</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'exams' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'exams' && empty($active_action) ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=exams'); ?>">Classes & Sections</a></li>
+      <li class="<?php echo $active_action == 'add-exams' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=exams&action=add-exams'); ?>">Add Class</a></li>
+      <li class="<?php echo $active_action == 'edit-exams' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=exams&action=edit-exams'); ?>">Edit Class</a></li>
+      <li class="<?php echo $active_action == 'delete-exams' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=exams&action=delete-exams'); ?>">Delete Class</a></li>
+    </div>
+  </ul>
+</li>
+        <li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'results' ? 'rotate' : ''; ?>">
+  <i class="fas fa-chalkboard-teacher" style="color: #e8eaed;"></i>    
+    <span>Results</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'results' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'results' && empty($active_action) ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=results'); ?>">Results</a></li>
+      <li class="<?php echo $active_action == 'add-exams' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=exams&action=add-exams'); ?>">Add Class</a></li>
+      <li class="<?php echo $active_action == 'edit-exams' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=exams&action=edit-exams'); ?>">Edit Class</a></li>
+      <li class="<?php echo $active_action == 'delete-exams' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=exams&action=delete-exams'); ?>">Delete Class</a></li>
+    </div>
+  </ul>
+</li>
+        <li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'library' ? 'rotate' : ''; ?>">
+  <i class="fas fa-chalkboard-teacher" style="color: #e8eaed;"></i>    
+    <span>Library</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'library' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'library' && empty($active_action) ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=library'); ?>">Library</a></li>
+      <li class="<?php echo $active_action == 'add-library' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=exams&action=add-exams'); ?>">Add Class</a></li>
+      <li class="<?php echo $active_action == 'edit-exams' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=exams&action=edit-exams'); ?>">Edit Class</a></li>
+      <li class="<?php echo $active_action == 'delete-exams' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=exams&action=delete-exams'); ?>">Delete Class</a></li>
+    </div>
+  </ul>
+</li>
+
+      
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'attendance' ? 'rotate' : ''; ?>">
+  <i class="fas fa-check-square" style="color: #e8eaed;"></i>
+      <span>Attendance</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'attendance' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'attendance' && empty($active_action) ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=attendance'); ?>">Students Attendance</a></li>
+      <li class="<?php echo $active_action == 'teachers-attendance' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=attendance&action=teachers-attendance'); ?>">Teachers Attendance</a></li>
+      <li class="<?php echo $active_action == 'staff-attendance' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=attendance&action=staff-attendance'); ?>">Staff Attendance</a></li>
+    </div>
+  </ul>
+</li>
+
+
         <li class="<?php echo $active_section === 'timetable' ? 'active' : ''; ?>">
             <a href="<?php echo esc_url(home_url('su_p-dashboard?section=timetable')); ?>">
                 <i class="fas fa-calendar-alt" style="color: #e8eaed;"></i>

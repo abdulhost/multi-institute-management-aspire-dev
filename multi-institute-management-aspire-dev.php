@@ -804,6 +804,33 @@ function get_unique_id_for_role($role_type, $center_id = '') {
     );
 }
 
+function generate_unique_staff_id($wpdb, $table_name, $education_center_id) {
+    $max_attempts = 5;
+    $prefix = 'STF-';
+    $id_length = 12;
+
+    for ($attempt = 1; $attempt <= $max_attempts; $attempt++) {
+        $time_part = substr(str_replace('.', '', microtime(true)), -10);
+        $random_part = strtoupper(substr(bin2hex(random_bytes(1)), 0, 2));
+        $staff_id = $prefix . $time_part . $random_part;
+
+        if (strlen($staff_id) > 20) {
+            $staff_id = substr($staff_id, 0, 20);
+        }
+
+        $exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM $table_name WHERE staff_id = %s AND education_center_id = %s",
+            $staff_id, $education_center_id
+        ));
+
+        if ($exists == 0) {
+            return $staff_id;
+        }
+        usleep(10000);
+    }
+    return new WP_Error('staff_id_generation_failed', 'Unable to generate a unique Staff ID after multiple attempts.');
+}
+
 // Handle student addition
 function handle_add_student_submission() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_student'])) {
