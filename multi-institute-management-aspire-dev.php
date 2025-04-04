@@ -277,6 +277,12 @@ function custom_login_processing($user_type_configs = []) {
             'post_type' => 'parent',
             'meta_key' => 'parent_id',
         ],
+        'su_p' => [
+            'prefix' => 'su_p-',
+            'role' => 'su_p',
+            'redirect' => '/su_p-dashboard/',
+            'validate_edu_center' => false,
+        ],
     ];
 
     // Validate and merge configurations
@@ -416,7 +422,11 @@ function get_secure_logout_url_by_role() {
         $redirect = home_url('/teacher-login/');
     } elseif (in_array('institute_admin', (array) $user->roles)) {
         $redirect = home_url('/institute-login/');
-    } else {
+    }
+    // elseif (in_array('parent', (array) $user->roles)) {
+    //     $redirect = home_url('/login/');
+    // }
+     else {
         $redirect = home_url('/login/');
     }
 
@@ -766,6 +776,12 @@ function get_unique_id_for_role($role_type, $center_id = '') {
             'entity_name' => $wpdb->prefix . 'books',
             'prefix'      => 'BOOK-',
             'field_name'  => 'book_id',
+        ],
+        'institute_admins' => [
+            'type'        => 'table',
+            'entity_name' => $wpdb->prefix . 'institute_admins',
+            'prefix'      => 'admin-',
+            'field_name'  => 'institute_admin_id',
         ],
     ];
 
@@ -1450,6 +1466,7 @@ include_files_from_directory('assets/asset');
 include_files_from_directory('teacher-dashboard');
 include_files_from_directory('student-dashboard');
 include_files_from_directory('parent-dashboard');
+include_files_from_directory('su-p');
 
 // Include all other necessary files
 include plugin_dir_path(__FILE__) . 'assets/edit-classes.php';
@@ -1522,6 +1539,15 @@ function create_custom_user_roles() {
             'manage_options' => true, // Grant access to manage admin options
         ));
     }
+    if ( !get_role( 'su_p' ) ) {
+        add_role( 'su_p', 'Su_P', array(
+            'read' => true,
+            'edit_posts' => true,
+            'publish_posts' => true,
+            'edit_pages' => true,
+            'manage_options' => true, // Grant access to manage admin options
+        ));
+    }
 }
 add_action( 'init', 'create_custom_user_roles' );
 
@@ -1543,6 +1569,7 @@ wp_enqueue_script('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0
     // wp_enqueue_style('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css');
     // wp_enqueue_script('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', ['jquery'], '4.0.13', true);
     // wp_enqueue_style('bootstrap-css', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css', [], '5.3.0');
+
 }
 add_action('wp_enqueue_scripts', 'institute_dashboard_scripts');
 function enqueue_font_awesome() {

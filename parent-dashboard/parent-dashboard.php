@@ -167,7 +167,7 @@ function render_parent_header($parent_user) {
     $avatar_url = $parent_post_id ? wp_get_attachment_url(get_post_meta($parent_post_id, 'parent_profile_photo', true)) : 'https://via.placeholder.com/150';
 
     $profile_link = esc_url(home_url('/parent-dashboard?section=profile'));
-    $logout_link = wp_logout_url(home_url());
+    $logout_link = get_secure_logout_url_by_role() ;
     $dashboard_link = esc_url(home_url('/parent-dashboard'));
     $communication_link = esc_url(home_url('/parent-dashboard?section=communication'));
     $notifications_link = esc_url(home_url('/parent-dashboard?section=notice_board'));
