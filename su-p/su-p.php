@@ -101,20 +101,26 @@ function su_p_dashboard_shortcode() {
                         break;
                     case 'library':
                         if ($action === 'add-library') {
-                            echo render_su_p_teacher_attendance();
-                        } elseif ($action === 'staff-attendance') {
-                            echo 
-                            render_su_p_staff_attendance();
+                            echo render_su_p_library_add_form();
                         } 
-                        // elseif ($action === 'bulk-import') {
-                        //     echo bulk_import_attendance_shortcode($user_id);
-                        // }
+                        elseif ($action === 'edit-library') {
+                            echo render_su_p_library_edit_form();
+                        } 
+                        elseif ($action === 'delete-library') {
+                            echo render_su_p_library_delete_form();
+                        } 
+                        elseif ($action === 'transaction-library') {
+                            echo render_su_p_library_transaction_form();
+                        } 
+                        elseif ($action === 'overdue-library') {
+                            echo su_p_library_overdue_shortcode();
+                        } 
                          else {
                             echo su_p_library_management_dashboard_shortcode();
                         }
                         break;
                 case 'timetable':
-                    echo render_su_p_timetable();
+                    echo render_su_p_timetable_management();
                     break;
                 case 'reports':
                     echo su_p_reports_dashboard_shortcode();
@@ -11250,199 +11256,469 @@ function su_p_view_report_details() {
 add_shortcode('su_p_reports_dashboard', 'su_p_reports_dashboard_shortcode');
 
 //Library
-// Super Admin Library Management Shortcode
+// Main Dashboard Shortcode
 function su_p_library_management_dashboard_shortcode() {
-    // Check if user is logged in and is a super admin
-    // if (!is_user_logged_in() || !is_super_admin()) {
+    // if (!is_user_logged_in() || !is_super_admin()) { // Fixed typo: is_super_admin
     //     return '<p>You must be logged in as a Super Administrator to view this dashboard.</p>';
     // }
 
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'library';
+
+    // Fetch educational centers
+    $centers = get_posts([
+        'post_type' => 'educational-center',
+        'posts_per_page' => -1,
+        'post_status' => 'publish'
+    ]);
+
+    // Pre-generate book IDs for each center
+    $book_ids = [];
+    if (!empty($centers)) {
+        foreach ($centers as $center) {
+            $center_id = get_field('educational_center_id', $center->ID) ?: $center->ID;
+            $book_ids[$center_id] = get_unique_id_for_role('book', $center_id);
+            if (is_wp_error($book_ids[$center_id])) {
+                $book_ids[$center_id] = 'ERROR-' . uniqid();
+            }
+        }
+    }
+
+    // Handle Add Book submission
+    $add_message = '';
+    if (isset($_POST['su_p_add_library_book']) && check_admin_referer('su_p_library_add', 'nonce')) {
+        $education_center_id = sanitize_text_field($_POST['education_center_id']);
+        $isbn = sanitize_text_field($_POST['isbn']);
+        $title = sanitize_text_field($_POST['title']);
+        $author = sanitize_text_field($_POST['author']);
+        $quantity = intval($_POST['quantity']);
+        $book_id = get_unique_id_for_role('book', $education_center_id);
+
+        if (empty($education_center_id) || empty($title) || empty($author) || $quantity < 0) {
+            $add_message = '<div class="alert alert-danger">Invalid input data</div>';
+        } elseif (is_wp_error($book_id)) {
+            $add_message = '<div class="alert alert-danger">Error generating book ID: ' . esc_html($book_id->get_error_message()) . '</div>';
+        } else {
+            $exists = $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM $table_name WHERE book_id = %s AND education_center_id = %s",
+                $book_id,
+                $education_center_id
+            ));
+
+            if ($exists === null) {
+                $add_message = '<div class="alert alert-danger">Database error: ' . esc_html($wpdb->last_error) . '</div>';
+            } elseif ($exists > 0) {
+                $add_message = '<div class="alert alert-danger">Book ID already exists for this center</div>';
+            } else {
+                $wpdb->insert(
+                    $table_name,
+                    [
+                        'book_id' => $book_id,
+                        'isbn' => $isbn,
+                        'title' => $title,
+                        'author' => $author,
+                        'quantity' => $quantity,
+                        'available' => $quantity,
+                        'education_center_id' => $education_center_id
+                    ],
+                    ['%s', '%s', '%s', '%s', '%d', '%d', '%s']
+                );
+
+                if ($wpdb->last_error) {
+                    $add_message = '<div class="alert alert-danger">Failed to add book: ' . esc_html($wpdb->last_error) . '</div>';
+                } else {
+                    // Redirect to clear POST data
+                    wp_redirect('?section=library');
+                                        exit;
+                }
+            }
+        }
+    }
+
+    // Handle Edit Book submission
+    $edit_message = '';
+    if (isset($_POST['su_p_edit_library_book']) && check_admin_referer('su_p_library_edit', 'nonce')) {
+        $book_id = sanitize_text_field($_POST['book_id']);
+        $isbn = sanitize_text_field($_POST['isbn']);
+        $title = sanitize_text_field($_POST['title']);
+        $author = sanitize_text_field($_POST['author']);
+        $quantity = intval($_POST['quantity']);
+
+        if (empty($book_id) || empty($title) || empty($author) || $quantity < 0) {
+            $edit_message = '<div class="alert alert-danger">Invalid input data</div>';
+        } else {
+            $wpdb->update(
+                $table_name,
+                [
+                    'isbn' => $isbn,
+                    'title' => $title,
+                    'author' => $author,
+                    'quantity' => $quantity,
+                    'available' => $quantity
+                ],
+                ['book_id' => $book_id],
+                ['%s', '%s', '%s', '%d', '%d'],
+                ['%s']
+            );
+
+            if ($wpdb->last_error) {
+                $edit_message = '<div class="alert alert-danger">Failed to update book: ' . esc_html($wpdb->last_error) . '</div>';
+            } else {
+                wp_redirect('?section=wp_library');    
+                            exit;
+            }
+        }
+    }
+
+    // Handle Delete Book submission
+    $delete_message = '';
+    if (isset($_POST['su_p_delete_library_book']) && check_admin_referer('su_p_library_delete', 'nonce')) {
+        $book_id = sanitize_text_field($_POST['book_id']);
+
+        if (empty($book_id)) {
+            $delete_message = '<div class="alert alert-danger">Invalid book ID</div>';
+        } else {
+            $wpdb->delete($table_name, ['book_id' => $book_id], ['%s']);
+            if ($wpdb->last_error) {
+                $delete_message = '<div class="alert alert-danger">Failed to delete book: ' . esc_html($wpdb->last_error) . '</div>';
+            } else {
+                wp_redirect('?section=wp_library');      
+                          exit;
+            }
+        }
+    }
+
     ob_start();
     ?>
-    <div class="container-fluid" style="background: linear-gradient(135deg, #e6f7ff, #cce5ff); min-height: 100vh;">
-        <div class="row">
-            <div class="col-md-3 col-lg-2 p-4" style="background: #f8f9fa;">
-                <h4 class="mb-4"><i class="bi bi-book me-2"></i>Super Admin Dashboard</h4>
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a href="#" class="nav-link active filter-link" data-filter="library-list">Library List</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link filter-link" data-filter="library-add">Add Book</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link filter-link" data-filter="library-transactions">Transactions</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link filter-link" data-filter="library-overdue">Overdue Books</a>
-                    </li>
-                </ul>
+    <div class="container-fluid" style="background: linear-gradient(135deg, #e6f7ff, #cce5ff); min-height: 100vh; padding: 20px;">
+        <div class="card shadow-lg" style="border-radius: 15px; background: #fff; border: 3px solid #007bff;">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center" style="border-radius: 12px 12px 0 0; padding: 1.5rem;">
+                <h3 class="card-title mb-0"><i class="bi bi-book me-2"></i>Library Management Dashboard</h3>
+                <div class="d-flex">
+                    <select id="su-p-edu-center-filter" class="form-select me-2" style="width: 200px;">
+                        <option value="">All Educational Centers</option>
+                        <?php
+                        if (empty($centers)) {
+                            echo '<option value="">No centers found</option>';
+                        } else {
+                            foreach ($centers as $center) {
+                                $center_id = get_field('educational_center_id', $center->ID) ?: $center->ID;
+                                echo '<option value="' . esc_attr($center_id) . '">' . esc_html($center->post_title) . '</option>';
+                            }
+                        }
+                        ?>
+                    </select>
+                    <input type="text" id="su-p-search-filter" class="form-control" placeholder="Search..." style="border-radius: 20px;">
+                    <button id="su-p-add-book-btn" class="btn btn-success btn-sm ms-2" type="button">+ New Book</button>
+                </div>
             </div>
-            <div class="col-md-9 col-lg-10 p-4">
-                <div class="card shadow-lg" style="border-radius: 15px; background: #fff; border: 3px solid #007bff;">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center" style="border-radius: 12px 12px 0 0; padding: 1.5rem;">
-                        <h3 class="card-title mb-0"><i class="bi bi-book me-2"></i>Library Management Dashboard</h3>
-                        <div class="d-flex">
-                            <select id="su-p-edu-center-filter" class="form-select me-2" style="width: 200px;">
-                                <option value="">All Educational Centers</option>
-                                <?php
-                                $centers = get_educational_centers(); // Placeholder function
-                                foreach ($centers as $center) {
-                                    echo '<option value="' . esc_attr($center->id) . '">' . esc_html($center->name) . '</option>';
-                                }
-                                ?>
-                            </select>
-                            <input type="text" id="su-p-search-filter" class="form-control" placeholder="Search..." style="border-radius: 20px;">
-                        </div>
-                    </div>
-                    <div class="card-body p-4">
-                        <div id="su-p-dashboard-content">
-                            <?php echo su_p_library_list_content(); ?>
-                        </div>
-                        <div id="edu-loader" class="edu-loader" style="display: none;">
-                            <div class="edu-loader-container">
-                                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
-                            </div>
-                        </div>
+            <div class="card-body p-4">
+                <div id="su-p-dashboard-content">
+                    <?php
+                    $books = $wpdb->get_results("SELECT * FROM $table_name");
+                    if ($wpdb->last_error) {
+                        echo '<div class="alert alert-danger">Error loading books: ' . esc_html($wpdb->last_error) . '</div>';
+                    } elseif (empty($books)) {
+                        echo '<p>No books found.</p>';
+                    } else {
+                        echo '<table class="table table-hover"><thead><tr><th>ID</th><th>Title</th><th>Author</th><th>Center ID</th><th>Actions</th></tr></thead><tbody>';
+                        foreach ($books as $book) {
+                            echo '<tr>';
+                            echo '<td>' . esc_html($book->book_id) . '</td>';
+                            echo '<td>' . esc_html($book->title) . '</td>';
+                            echo '<td>' . esc_html($book->author) . '</td>';
+                            echo '<td>' . esc_html($book->education_center_id) . '</td>';
+                            echo '<td>';
+                            echo '<button class="btn btn-warning btn-sm edit-book-btn" data-book-id="' . esc_attr($book->book_id) . '">Edit</button> ';
+                            echo '<button class="btn btn-danger btn-sm delete-book-btn" data-book-id="' . esc_attr($book->book_id) . '">Delete</button>';
+                            echo '</td>';
+                            echo '</tr>';
+                        }
+                        echo '</tbody></table>';
+                    }
+                    ?>
+                </div>
+                <div id="edu-loader" class="edu-loader" style="display: none;">
+                    <div class="edu-loader-container">
+                        <img src="<?php echo plugin_dir_url(__FILE__) . 'custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Add Book Modal -->
+    <div class="modal" id="addBookModal">
+        <div class="modal-content">
+            <span class="modal-close">×</span>
+            <h5 class="bg-success text-white p-3 mb-3" style="border-radius: 8px 8px 0 0;">Add New Book</h5>
+            <div id="add-book-form-container">
+                <?php if ($add_message) echo $add_message; ?>
+                <form id="add-library-form" method="post" class="needs-validation" novalidate>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label for="book_id" class="form-label fw-bold">Book ID</label>
+                            <input type="text" name="book_id" id="book_id" class="form-control" value="" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edu_center_id" class="form-label fw-bold">Educational Center</label>
+                            <select name="education_center_id" id="edu_center_id" class="form-control" required>
+                                <option value="">Select Center</option>
+                                <?php
+                                if (empty($centers)) {
+                                    echo '<option value="">No centers available</option>';
+                                } else {
+                                    foreach ($centers as $center) {
+                                        $center_id = get_field('educational_center_id', $center->ID) ?: $center->ID;
+                                        echo '<option value="' . esc_attr($center_id) . '">' . esc_html($center->post_title) . '</option>';
+                                    }
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="isbn" class="form-label fw-bold">ISBN</label>
+                            <input type="text" name="isbn" id="isbn" class="form-control" placeholder="Enter ISBN">
+                        </div>
+                        <div class="col-md-12">
+                            <label for="title" class="form-label fw-bold">Title</label>
+                            <input type="text" name="title" id="title" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="author" class="form-label fw-bold">Author</label>
+                            <input type="text" name="author" id="author" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="quantity" class="form-label fw-bold">Quantity</label>
+                            <input type="number" name="quantity" id="quantity" class="form-control" min="0" required>
+                        </div>
+                    </div>
+                    <?php wp_nonce_field('su_p_library_add', 'nonce'); ?>
+                    <input type="hidden" name="su_p_add_library_book" value="1">
+                </form>
+            </div>
+            <div class="mt-3 text-end">
+                <button type="button" class="btn btn-secondary modal-close-btn me-2">Close</button>
+                <button type="submit" form="add-library-form" class="btn btn-success add-book-btn" id="add-book-submit">Add Book</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Book Modal -->
+    <div class="modal" id="editBookModal">
+        <div class="modal-content">
+            <span class="modal-close">×</span>
+            <h5 class="bg-warning text-dark p-3 mb-3" style="border-radius: 8px 8px 0 0;">Edit Library Book</h5>
+            <div id="edit-book-form-container">
+                <?php if ($edit_message) echo $edit_message; ?>
+                <form id="edit-library-form" method="post" class="needs-validation" novalidate>
+                    <div class="row g-4" id="edit-form-fields"></div>
+                    <?php wp_nonce_field('su_p_library_edit', 'nonce'); ?>
+                    <input type="hidden" name="su_p_edit_library_book" value="1">
+                </form>
+            </div>
+            <div class="mt-3 text-end">
+                <button type="button" class="btn btn-secondary modal-close-btn me-2">Close</button>
+                <button type="submit" form="edit-library-form" class="btn btn-warning update-book-btn">Update Book</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Book Modal -->
+    <div class="modal" id="deleteBookModal">
+        <div class="modal-content">
+            <span class="modal-close">×</span>
+            <h5 class="bg-danger text-white p-3 mb-3" style="border-radius: 8px 8px 0 0;">Confirm Deletion</h5>
+            <div id="delete-book-container">
+                <?php if ($delete_message) echo $delete_message; ?>
+                <p>Are you sure you want to delete this book?</p>
+                <form id="delete-library-form" method="post">
+                    <input type="hidden" name="book_id" id="delete-book-id">
+                    <?php wp_nonce_field('su_p_library_delete', 'nonce'); ?>
+                    <input type="hidden" name="su_p_delete_library_book" value="1">
+                </form>
+            </div>
+            <div class="mt-3 text-end">
+                <button type="button" class="btn btn-secondary modal-close-btn me-2">Cancel</button>
+                <button type="submit" form="delete-library-form" class="btn btn-danger confirm-delete-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <style>
-        .edu-loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .edu-loader-container {
-            text-align: center;
-        }
-        .edu-loader-png {
-            width: 100px;
-            height: auto;
-        }
-        .modal-content {
-            background: #fff;
-            margin: 15% auto;
-            padding: 20px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-        }
-        .modal-close {
-            float: right;
-            font-size: 24px;
-            cursor: pointer;
-        }
+        .edu-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .edu-loader-container { text-align: center; }
+        .edu-loader-png { width: 100px; height: auto; }
+        .modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background: rgba(0,0,0,0.5); }
+        .modal-content { background: #fff; margin: 10% auto; padding: 20px; border-radius: 10px; width: 90%; max-width: 600px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-close { float: right; font-size: 24px; cursor: pointer; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; }
+        .alert-success { background-color: #d4edda; color: #155724; }
     </style>
 
-    <script>
-    jQuery(document).ready(function($) {
-        var currentFilter = 'library-list';
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const $loader = document.getElementById('edu-loader');
+    const addModal = document.getElementById('addBookModal');
+    const editModal = document.getElementById('editBookModal');
+    const deleteModal = document.getElementById('deleteBookModal');
+    const addButton = document.getElementById('su-p-add-book-btn');
+    const bookIds = <?php echo json_encode($book_ids); ?>;
+    const $content = document.getElementById('su-p-dashboard-content');
+    const centerFilter = document.getElementById('su-p-edu-center-filter');
+    const searchFilter = document.getElementById('su-p-search-filter');
+    const ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
 
-        function loadDashboardContent(filter, eduCenterId, searchQuery) {
-            var $container = $('#su-p-dashboard-content');
-            var $loader = $('#edu-loader');
+    function showLoader() { $loader.style.display = 'flex'; }
+    function hideLoader() { $loader.style.display = 'none'; }
+    function showModal(modal) { modal.style.display = 'block'; }
+    function hideModal(modal) { modal.style.display = 'none'; }
 
-            $loader.show();
-            $container.hide();
+    // Modal close handlers
+    [addModal, editModal, deleteModal].forEach(modal => {
+        document.querySelectorAll(`#${modal.id} .modal-close, #${modal.id} .modal-close-btn`).forEach(btn => {
+            btn.addEventListener('click', () => hideModal(modal));
+        });
+        window.addEventListener('click', function(e) { if (e.target === modal) hideModal(modal); });
+    });
 
-            $.ajax({
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                type: 'POST',
-                data: {
-                    action: 'su_p_library_filter',
-                    filter: filter,
-                    edu_center_id: eduCenterId,
-                    search_query: searchQuery,
-                    nonce: '<?php echo wp_create_nonce('su_p_library_filter'); ?>'
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $container.html(response.data).show();
-                    } else {
-                        $container.html('<div class="alert alert-danger">' + response.data + '</div>').show();
-                    }
-                    $loader.hide();
-                },
-                error: function() {
-                    $container.html('<div class="alert alert-danger">Error loading content.</div>').show();
-                    $loader.hide();
+    // Function to load dashboard content via AJAX
+    function loadDashboard() {
+        showLoader();
+        const data = new FormData();
+        data.append('action', 'su_p_library_list');
+        data.append('nonce', '<?php echo wp_create_nonce('su_p_library_list'); ?>');
+        data.append('edu_center_id', centerFilter.value);
+        data.append('search_query', searchFilter.value);
+
+        fetch(ajaxUrl, { method: 'POST', body: data })
+            .then(response => response.json())
+            .then(data => {
+                hideLoader();
+                if (data.success) {
+                    $content.innerHTML = data.data;
+                } else {
+                    $content.innerHTML = '<div class="alert alert-danger">' + (data.data.message || 'Error loading books') + '</div>';
                 }
+            })
+            .catch(error => {
+                hideLoader();
+                $content.innerHTML = '<div class="alert alert-danger">Error: ' + error.message + '</div>';
             });
-        }
+    }
 
-        // Sidebar filter links
-        $('.filter-link').on('click', function(e) {
-            e.preventDefault();
-            $('.filter-link').removeClass('active');
-            $(this).addClass('active');
-            currentFilter = $(this).data('filter');
-            var eduCenterId = $('#su-p-edu-center-filter').val();
-            var searchQuery = $('#su-p-search-filter').val();
-            loadDashboardContent(currentFilter, eduCenterId, searchQuery);
-        });
+    // Add Book Modal
+    addButton.addEventListener('click', function() {
+        document.getElementById('book_id').value = '';
+        showModal(addModal);
+    });
 
-        // Educational center filter
-        $('#su-p-edu-center-filter').on('change', function() {
-            var eduCenterId = $(this).val();
-            var searchQuery = $('#su-p-search-filter').val();
-            loadDashboardContent(currentFilter, eduCenterId, searchQuery);
-        });
+    document.getElementById('edu_center_id').addEventListener('change', function() {
+        const centerId = this.value;
+        document.getElementById('book_id').value = centerId ? bookIds[centerId] : '';
+    });
 
-        // Search filter
-        $('#su-p-search-filter').on('input', function() {
-            var eduCenterId = $('#su-p-edu-center-filter').val();
-            var searchQuery = $(this).val();
-            loadDashboardContent(currentFilter, eduCenterId, searchQuery);
-        });
+    const addForm = document.getElementById('add-library-form');
+    const addSubmitBtn = document.getElementById('add-book-submit');
+    addForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        showLoader();
+        addSubmitBtn.disabled = true;
+        this.submit();
+    });
 
-        // Event delegation for dynamic actions
-        $(document).on('click', '.edit-book-btn', function() {
-            var bookId = $(this).data('book-id');
-            var nonce = $(this).data('nonce');
-            loadDashboardContent('library-edit', '', '', { book_id: bookId, nonce: nonce });
-        });
+    // Event listener for center filter
+    centerFilter.addEventListener('change', function() {
+        loadDashboard();
+    });
 
-        $(document).on('click', '.delete-book-btn', function() {
-            var bookId = $(this).data('book-id');
-            var nonce = $(this).data('nonce');
-            loadDashboardContent('library-delete', '', '', { book_id: bookId, nonce: nonce });
-        });
+    // Event listener for search filter (optional, for completeness)
+    searchFilter.addEventListener('input', function() {
+        loadDashboard();
+    });
 
-        $(document).on('click', '.transact-book-btn', function() {
-            var bookId = $(this).data('book-id');
-            var nonce = $(this).data('nonce');
-            loadDashboardContent('library-transaction', '', '', { book_id: bookId, nonce: nonce });
-        });
+    // Initial load (optional, if you want the table to load dynamically on page load)
+    loadDashboard();
 
-        $(document).on('click', '.return-book-btn', function() {
-            var transactionId = $(this).data('transaction-id');
-            var bookId = $(this).data('book-id');
-            var userId = $(this).data('user-id');
-            var nonce = $(this).data('nonce');
-            loadDashboardContent('library-return', '', '', { transaction_id: transactionId, book_id: bookId, user_id: userId, nonce: nonce });
+    // Edit Book Modal
+    document.querySelectorAll('.edit-book-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const bookId = this.getAttribute('data-book-id');
+            const book = <?php echo json_encode(array_column($books, null, 'book_id')); ?>[bookId];
+            if (book) {
+                document.getElementById('edit-form-fields').innerHTML = `
+                    <div class="col-md-6">
+                        <label for="edit_book_id" class="form-label fw-bold">Book ID</label>
+                        <input type="text" name="book_id" id="edit_book_id" class="form-control" value="${book.book_id}" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="edit_isbn" class="form-label fw-bold">ISBN</label>
+                        <input type="text" name="isbn" id="edit_isbn" class="form-control" value="${book.isbn}">
+                    </div>
+                    <div class="col-md-12">
+                        <label for="edit_title" class="form-label fw-bold">Title</label>
+                        <input type="text" name="title" id="edit_title" class="form-control" value="${book.title}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="edit_author" class="form-label fw-bold">Author</label>
+                        <input type="text" name="author" id="edit_author" class="form-control" value="${book.author}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="edit_quantity" class="form-label fw-bold">Quantity</label>
+                        <input type="number" name="quantity" id="edit_quantity" class="form-control" value="${book.quantity}" min="0" required>
+                    </div>
+                `;
+                showModal(editModal);
+            }
         });
     });
-    </script>
+
+    const editForm = document.getElementById('edit-library-form');
+    editForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        showLoader();
+        this.submit();
+    });
+
+    // Delete Book Modal
+    document.querySelectorAll('.delete-book-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const bookId = this.getAttribute('data-book-id');
+            document.getElementById('delete-book-id').value = bookId;
+            document.getElementById('delete-book-container').innerHTML = `<p>Are you sure you want to delete book "${bookId}"?</p>` + document.getElementById('delete-library-form').outerHTML;
+            showModal(deleteModal);
+        });
+    });
+
+    const deleteForm = document.getElementById('delete-library-form');
+    deleteForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        showLoader();
+        this.submit();
+    });
+    });
+</script>
     <?php
     return ob_get_clean();
 }
 add_shortcode('su_p_library_management_dashboard', 'su_p_library_management_dashboard_shortcode');
 
-// Library List Content
-function su_p_library_list_content($edu_center_id = '', $search_query = '') {
+// Library List AJAX Handler
+add_action('wp_ajax_su_p_library_list', 'su_p_library_list');
+function su_p_library_list() {
+    // if (!is_user_logged_in() || !is_super_admin()) {
+    //     wp_send_json_error(['message' => 'Access denied']);
+    // }
+    check_ajax_referer('su_p_library_list', 'nonce');
+
     global $wpdb;
     $table_name = $wpdb->prefix . 'library';
+    $edu_center_id = sanitize_text_field($_POST['edu_center_id'] ?? '');
+    $search_query = sanitize_text_field($_POST['search_query'] ?? '');
+
     $query = "SELECT * FROM $table_name";
     $args = [];
     if ($edu_center_id) {
@@ -11456,7 +11732,7 @@ function su_p_library_list_content($edu_center_id = '', $search_query = '') {
         $args[] = '%' . $wpdb->esc_like($search_query) . '%';
         $args[] = '%' . $wpdb->esc_like($search_query) . '%';
     }
-    $books = $wpdb->get_results($wpdb->prepare($query, $args));
+    $books = $args ? $wpdb->get_results($wpdb->prepare($query, $args)) : $wpdb->get_results($query);
 
     ob_start();
     ?>
@@ -11503,356 +11779,283 @@ function su_p_library_list_content($edu_center_id = '', $search_query = '') {
         </table>
     </div>
     <?php
-    return ob_get_clean();
+    wp_send_json_success(ob_get_clean());
 }
-
-// AJAX Handler for Filters
-add_action('wp_ajax_su_p_library_filter', 'su_p_library_filter');
-function su_p_library_filter() {
-    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'su_p_library_filter')) {
-        wp_send_json_error('Security check failed.');
+// Library Add Form AJAX Handler
+add_action('wp_ajax_su_p_library_add_form', 'su_p_library_add_form');
+function su_p_library_add_form() {
+    // Clear any previous output to prevent JSON corruption
+    if (ob_get_length()) {
+        ob_end_clean();
     }
 
-    $filter = sanitize_text_field($_POST['filter']);
-    $edu_center_id = sanitize_text_field($_POST['edu_center_id']);
-    $search_query = sanitize_text_field($_POST['search_query']);
-    $extra_data = isset($_POST['extra']) ? $_POST['extra'] : [];
+    // if (!is_user_logged_in() || !is_super_admin()) {
+    //     wp_send_json_error(['message' => 'Access denied']);
+    //     return;
+    // }
 
-    switch ($filter) {
-        case 'library-list':
-            $html = su_p_library_list_content($edu_center_id, $search_query);
-            break;
-        case 'library-add':
-            $html = su_p_library_add_content($edu_center_id);
-            break;
-        case 'library-edit':
-            $book_id = sanitize_text_field($extra_data['book_id']);
-            $nonce = sanitize_text_field($extra_data['nonce']);
-            $html = su_p_library_edit_content($book_id, $nonce);
-            break;
-        case 'library-delete':
-            $book_id = sanitize_text_field($extra_data['book_id']);
-            $nonce = sanitize_text_field($extra_data['nonce']);
-            $html = su_p_library_delete_content($book_id, $nonce);
-            break;
-        case 'library-transaction':
-            $book_id = sanitize_text_field($extra_data['book_id']);
-            $nonce = sanitize_text_field($extra_data['nonce']);
-            $html = su_p_library_transaction_content($book_id, $nonce);
-            break;
-        case 'library-return':
-            $transaction_id = sanitize_text_field($extra_data['transaction_id']);
-            $book_id = sanitize_text_field($extra_data['book_id']);
-            $user_id = sanitize_text_field($extra_data['user_id']);
-            $nonce = sanitize_text_field($extra_data['nonce']);
-            $html = su_p_library_return_content($transaction_id, $book_id, $user_id, $nonce);
-            break;
-        case 'library-transactions':
-            $html = su_p_library_transactions_content($edu_center_id, $search_query);
-            break;
-        case 'library-overdue':
-            $html = su_p_library_overdue_content($edu_center_id);
-            break;
-        default:
-            $html = su_p_library_list_content($edu_center_id, $search_query);
+    if (!check_ajax_referer('su_p_library_add', 'nonce', false)) {
+        wp_send_json_error(['message' => 'Invalid nonce']);
+        return;
     }
 
-    wp_send_json_success($html);
-}
-
-// Library Add Content
-function su_p_library_add_content($edu_center_id) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'library';
-    $new_book_id = generate_unique_id($wpdb, $table_name, 'BOOK-', $edu_center_id); // Assuming this generates a unique ID
-    $message = is_wp_error($new_book_id) ? '<div class="alert alert-danger">' . esc_html($new_book_id->get_error_message()) . '</div>' : '';
+
+    if (!function_exists('generate_unique_id')) {
+        wp_send_json_error(['message' => 'generate_unique_id function missing']);
+        return;
+    }
+    $new_book_id = generate_unique_id($wpdb, $table_name, 'BOOK-');
 
     ob_start();
     ?>
-    <div class="card shadow-lg" style="max-width: 800px; margin: 0 auto; border: 3px solid #28a745; background: #f8fff8;">
-        <div class="card-header bg-success text-white text-center" style="border-radius: 10px 10px 0 0;">
-            <h3 class="card-title mb-0"><i class="bi bi-book-fill me-2"></i>Add New Book</h3>
-        </div>
-        <div class="card-body p-4">
-            <?php echo $message; ?>
-            <form id="su-p-add-library-form" class="needs-validation" novalidate>
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <label for="book_id" class="form-label fw-bold">Book ID</label>
-                        <input type="text" name="book_id" id="book_id" class="form-control" value="<?php echo esc_attr($new_book_id); ?>" readonly>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="edu_center_id" class="form-label fw-bold">Educational Center</label>
-                        <select name="education_center_id" id="edu_center_id" class="form-control" required>
-                            <option value="">Select Center</option>
-                            <?php
-                            $centers = get_educational_centers();
-                            foreach ($centers as $center) {
-                                echo '<option value="' . esc_attr($center->id) . '">' . esc_html($center->name) . '</option>';
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="isbn" class="form-label fw-bold">ISBN</label>
-                        <input type="text" name="isbn" id="isbn" class="form-control" placeholder="Enter ISBN">
-                    </div>
-                    <div class="col-md-12">
-                        <label for="title" class="form-label fw-bold">Title</label>
-                        <input type="text" name="title" id="title" class="form-control" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="author" class="form-label fw-bold">Author</label>
-                        <input type="text" name="author" id="author" class="form-control" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="quantity" class="form-label fw-bold">Quantity</label>
-                        <input type="number" name="quantity" id="quantity" class="form-control" min="0" required>
-                    </div>
-                </div>
-                <?php wp_nonce_field('library_nonce', 'nonce'); ?>
-                <div class="mt-4 text-center">
-                    <button type="submit" class="btn btn-success btn-lg">Add Book</button>
-                    <button type="button" class="btn btn-outline-secondary btn-lg ms-2 back-to-list">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <script>
-    jQuery(document).ready(function($) {
-        $('#su-p-add-library-form').on('submit', function(e) {
-            e.preventDefault();
-            var $form = $(this);
-            var $loader = $('#edu-loader');
-            var formData = new FormData(this);
-            formData.append('action', 'su_p_add_library_book');
-
-            $loader.show();
-            $.ajax({
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if (response.success) {
-                        $form.before('<div class="alert alert-success">Book added successfully!</div>');
-                        setTimeout(function() {
-                            loadDashboardContent('library-list', $('#su-p-edu-center-filter').val(), $('#su-p-search-filter').val());
-                        }, 1500);
-                    } else {
-                        $form.before('<div class="alert alert-danger">' + (response.data.message || 'Error adding book') + '</div>');
-                    }
-                    $loader.hide();
-                },
-                error: function() {
-                    $form.before('<div class="alert alert-danger">An error occurred.</div>');
-                    $loader.hide();
-                }
-            });
-        });
-
-        $('.back-to-list').on('click', function() {
-            loadDashboardContent('library-list', $('#su-p-edu-center-filter').val(), $('#su-p-search-filter').val());
-        });
-    });
-    </script>
-    <?php
-    return ob_get_clean();
-}
-
-// Library Edit Content
-function su_p_library_edit_content($book_id, $nonce) {
-    global $wpdb;
-    if (!wp_verify_nonce($nonce, 'edit_book_' . $book_id)) {
-        return '<div class="alert alert-danger">Invalid security token.</div>';
-    }
-
-    $book = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}library WHERE book_id = %s", $book_id));
-    if (!$book) {
-        return '<div class="alert alert-danger">Book not found.</div>';
-    }
-
-    ob_start();
-    ?>
-    <div class="modal-content">
-        <span class="modal-close back-to-list">×</span>
-        <h5 class="bg-warning text-dark p-3 mb-3" style="border-radius: 8px 8px 0 0;">Edit Library Book</h5>
-        <form id="su-p-edit-library-form" class="needs-validation" novalidate>
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <label for="isbn" class="form-label fw-bold">ISBN</label>
-                    <input type="text" name="isbn" id="isbn" class="form-control" value="<?php echo esc_attr($book->isbn); ?>">
-                </div>
-                <div class="col-md-6">
-                    <label for="title" class="form-label fw-bold">Title</label>
-                    <input type="text" name="title" id="title" class="form-control" value="<?php echo esc_attr($book->title); ?>" required>
-                </div>
-                <div class="col-md-6">
-                    <label for="author" class="form-label fw-bold">Author</label>
-                    <input type="text" name="author" id="author" class="form-control" value="<?php echo esc_attr($book->author); ?>" required>
-                </div>
-                <div class="col-md-6">
-                    <label for="quantity" class="form-label fw-bold">Quantity</label>
-                    <input type="number" name="quantity" id="quantity" class="form-control" value="<?php echo esc_attr($book->quantity); ?>" min="0" required>
-                </div>
-                <div class="col-md-6">
-                    <label for="available" class="form-label fw-bold">Available</label>
-                    <input type="number" name="available" id="available" class="form-control" value="<?php echo esc_attr($book->available); ?>" min="0" max="<?php echo esc_attr($book->quantity); ?>" required>
-                </div>
+    <form id="add-library-form" class="needs-validation" novalidate>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label for="book_id" class="form-label fw-bold">Book ID</label>
+                <input type="text" name="book_id" id="book_id" class="form-control" value="<?php echo esc_attr($new_book_id); ?>" readonly>
             </div>
-            <input type="hidden" name="book_id" value="<?php echo esc_attr($book_id); ?>">
-            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('library_edit_nonce'); ?>">
-            <div class="mt-3 text-end">
-                <button type="button" class="btn btn-secondary back-to-list me-2">Close</button>
-                <button type="submit" class="btn btn-warning">Update Book</button>
-            </div>
-        </form>
-    </div>
-    <script>
-    jQuery(document).ready(function($) {
-        $('#su-p-edit-library-form').on('submit', function(e) {
-            e.preventDefault();
-            var $form = $(this);
-            var $loader = $('#edu-loader');
-            var formData = new FormData(this);
-            formData.append('action', 'su_p_edit_library_book');
-
-            $loader.show();
-            $.ajax({
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if (response.success) {
-                        $form.before('<div class="alert alert-success">Book updated successfully!</div>');
-                        setTimeout(function() {
-                            loadDashboardContent('library-list', $('#su-p-edu-center-filter').val(), $('#su-p-search-filter').val());
-                        }, 1500);
+            <div class="col-md-6">
+                <label for="edu_center_id" class="form-label fw-bold">Educational Center</label>
+                <select name="education_center_id" id="edu_center_id" class="form-control" required>
+                    <option value="">Select Center</option>
+                    <?php
+                    $centers = $wpdb->get_results("SELECT center_id AS id, center_name AS name FROM {$wpdb->prefix}educational_centers");
+                    if ($wpdb->last_error) {
+                        echo '<option value="">Error: ' . esc_html($wpdb->last_error) . '</option>';
+                    } elseif (empty($centers)) {
+                        echo '<option value="">No centers available</option>';
                     } else {
-                        $form.before('<div class="alert alert-danger">' + (response.data.message || 'Error updating book') + '</div>');
+                        foreach ($centers as $center) {
+                            echo '<option value="' . esc_attr($center->id) . '">' . esc_html($center->name) . '</option>';
+                        }
                     }
-                    $loader.hide();
-                },
-                error: function() {
-                    $form.before('<div class="alert alert-danger">An error occurred.</div>');
-                    $loader.hide();
-                }
-            });
-        });
-
-        $('.back-to-list').on('click', function() {
-            loadDashboardContent('library-list', $('#su-p-edu-center-filter').val(), $('#su-p-search-filter').val());
-        });
-    });
-    </script>
+                    ?>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="isbn" class="form-label fw-bold">ISBN</label>
+                <input type="text" name="isbn" id="isbn" class="form-control" placeholder="Enter ISBN">
+            </div>
+            <div class="col-md-12">
+                <label for="title" class="form-label fw-bold">Title</label>
+                <input type="text" name="title" id="title" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="author" class="form-label fw-bold">Author</label>
+                <input type="text" name="author" id="author" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="quantity" class="form-label fw-bold">Quantity</label>
+                <input type="number" name="quantity" id="quantity" class="form-control" min="0" required>
+            </div>
+        </div>
+        <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('library_nonce'); ?>">
+    </form>
     <?php
-    return ob_get_clean();
-}
+    $form_html = ob_get_clean();
 
-// Library Delete Content
-function su_p_library_delete_content($book_id, $nonce) {
+    wp_send_json_success(['form_html' => $form_html]);
+}
+// Library Add AJAX Handler
+add_action('wp_ajax_su_p_add_library_book', 'su_p_add_library_book');
+function su_p_add_library_book() {
     global $wpdb;
-    if (!wp_verify_nonce($nonce, 'delete_book_' . $book_id)) {
-        return '<div class="alert alert-danger">Invalid security token.</div>';
+    check_ajax_referer('library_nonce', 'nonce');
+
+    $table_name = $wpdb->prefix . 'library';
+    $book_id = sanitize_text_field($_POST['book_id']);
+    $education_center_id = sanitize_text_field($_POST['education_center_id']);
+    $isbn = sanitize_text_field($_POST['isbn']);
+    $title = sanitize_text_field($_POST['title']);
+    $author = sanitize_text_field($_POST['author']);
+    $quantity = intval($_POST['quantity']);
+
+    if (empty($book_id) || empty($education_center_id) || empty($title) || empty($author) || $quantity < 0) {
+        wp_send_json_error(['message' => 'Invalid input data']);
     }
 
+    $exists = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM $table_name WHERE book_id = %s AND education_center_id = %s",
+        $book_id, $education_center_id
+    ));
+
+    if ($exists > 0) {
+        wp_send_json_error(['message' => 'Book ID already exists for this center']);
+    }
+
+    $wpdb->insert(
+        $table_name,
+        [
+            'book_id' => $book_id,
+            'isbn' => $isbn,
+            'title' => $title,
+            'author' => $author,
+            'quantity' => $quantity,
+            'available' => $quantity,
+            'education_center_id' => $education_center_id
+        ],
+        ['%s', '%s', '%s', '%s', '%d', '%d', '%s']
+    );
+
+    if ($wpdb->last_error) {
+        wp_send_json_error(['message' => 'Failed to add book: ' . $wpdb->last_error]);
+    }
+
+    wp_send_json_success(['message' => 'Book added successfully']);
+}
+
+// Library Edit Form AJAX Handler
+add_action('wp_ajax_su_p_library_edit_form', 'su_p_library_edit_form');
+function su_p_library_edit_form() {
+    // if (!is_user_logged_in() || !is_super_admin()) {
+    //     wp_send_json_error(['message' => 'Access denied']);
+    // }
+    check_ajax_referer('edit_book_' . sanitize_text_field($_POST['book_id']), 'nonce');
+
+    global $wpdb;
+    $book_id = sanitize_text_field($_POST['book_id']);
     $book = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}library WHERE book_id = %s", $book_id));
+
     if (!$book) {
-        return '<div class="alert alert-danger">Book not found.</div>';
+        wp_send_json_error(['message' => 'Book not found']);
     }
 
     ob_start();
     ?>
-    <div class="modal-content">
-        <span class="modal-close back-to-list">×</span>
-        <h5 class="bg-danger text-white p-3 mb-3" style="border-radius: 8px 8px 0 0;">Confirm Deletion</h5>
-        <div>
-            <p>Are you sure you want to delete the following book?</p>
-            <ul>
-                <li><strong>ID:</strong> <?php echo esc_html($book->book_id); ?></li>
-                <li><strong>ISBN:</strong> <?php echo esc_html($book->isbn); ?></li>
-                <li><strong>Title:</strong> <?php echo esc_html($book->title); ?></li>
-                <li><strong>Author:</strong> <?php echo esc_html($book->author); ?></li>
-                <li><strong>Quantity:</strong> <?php echo esc_html($book->quantity); ?></li>
-                <li><strong>Available:</strong> <?php echo esc_html($book->available); ?></li>
-            </ul>
+    <form id="edit-library-form" class="needs-validation" novalidate>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label for="isbn" class="form-label fw-bold">ISBN</label>
+                <input type="text" name="isbn" id="isbn" class="form-control" value="<?php echo esc_attr($book->isbn); ?>">
+            </div>
+            <div class="col-md-6">
+                <label for="title" class="form-label fw-bold">Title</label>
+                <input type="text" name="title" id="title" class="form-control" value="<?php echo esc_attr($book->title); ?>" required>
+            </div>
+            <div class="col-md-6">
+                <label for="author" class="form-label fw-bold">Author</label>
+                <input type="text" name="author" id="author" class="form-control" value="<?php echo esc_attr($book->author); ?>" required>
+            </div>
+            <div class="col-md-6">
+                <label for="quantity" class="form-label fw-bold">Quantity</label>
+                <input type="number" name="quantity" id="quantity" class="form-control" value="<?php echo esc_attr($book->quantity); ?>" min="0" required>
+            </div>
+            <div class="col-md-6">
+                <label for="available" class="form-label fw-bold">Available</label>
+                <input type="number" name="available" id="available" class="form-control" value="<?php echo esc_attr($book->available); ?>" min="0" max="<?php echo esc_attr($book->quantity); ?>" required>
+            </div>
         </div>
-        <div class="mt-3 text-end">
-            <button type="button" class="btn btn-secondary back-to-list me-2">Cancel</button>
-            <button type="button" class="btn btn-danger confirm-delete-btn" data-book-id="<?php echo esc_attr($book_id); ?>" data-nonce="<?php echo esc_attr($nonce); ?>">Delete</button>
-        </div>
-    </div>
-    <script>
-    jQuery(document).ready(function($) {
-        $('.confirm-delete-btn').on('click', function() {
-            var $button = $(this);
-            var bookId = $button.data('book-id');
-            var nonce = $button.data('nonce');
-            var $loader = $('#edu-loader');
-
-            $button.prop('disabled', true).text('Deleting...');
-            $loader.show();
-
-            $.ajax({
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                type: 'POST',
-                data: {
-                    action: 'su_p_delete_library_book',
-                    book_id: bookId,
-                    nonce: nonce
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $button.parent().before('<div class="alert alert-success">Book deleted successfully!</div>');
-                        setTimeout(function() {
-                            loadDashboardContent('library-list', $('#su-p-edu-center-filter').val(), $('#su-p-search-filter').val());
-                        }, 1500);
-                    } else {
-                        $button.parent().before('<div class="alert alert-danger">' + (response.data.message || 'Error deleting book') + '</div>');
-                        $button.prop('disabled', false).text('Delete');
-                    }
-                    $loader.hide();
-                },
-                error: function() {
-                    $button.parent().before('<div class="alert alert-danger">An error occurred.</div>');
-                    $button.prop('disabled', false).text('Delete');
-                    $loader.hide();
-                }
-            });
-        });
-
-        $('.back-to-list').on('click', function() {
-            loadDashboardContent('library-list', $('#su-p-edu-center-filter').val(), $('#su-p-search-filter').val());
-        });
-    });
-    </script>
+        <input type="hidden" name="book_id" value="<?php echo esc_attr($book_id); ?>">
+        <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('library_edit_nonce'); ?>">
+    </form>
     <?php
-    return ob_get_clean();
+    wp_send_json_success(['form_html' => ob_get_clean()]);
 }
 
-// Library Transaction Content
-function su_p_library_transaction_content($book_id, $nonce) {
+// Library Edit AJAX Handler
+add_action('wp_ajax_su_p_edit_library_book', 'su_p_edit_library_book');
+function su_p_edit_library_book() {
     global $wpdb;
-    if (!wp_verify_nonce($nonce, 'transact_book_' . $book_id)) {
-        return '<div class="alert alert-danger">Invalid security token.</div>';
+    check_ajax_referer('library_edit_nonce', 'nonce');
+
+    $table_name = $wpdb->prefix . 'library';
+    $book_id = sanitize_text_field($_POST['book_id']);
+    $isbn = sanitize_text_field($_POST['isbn']);
+    $title = sanitize_text_field($_POST['title']);
+    $author = sanitize_text_field($_POST['author']);
+    $quantity = intval($_POST['quantity']);
+    $available = intval($_POST['available']);
+
+    $updated = $wpdb->update(
+        $table_name,
+        [
+            'isbn' => $isbn,
+            'title' => $title,
+            'author' => $author,
+            'quantity' => $quantity,
+            'available' => $available
+        ],
+        ['book_id' => $book_id],
+        ['%s', '%s', '%s', '%d', '%d'],
+        ['%s']
+    );
+
+    if ($updated === false) {
+        wp_send_json_error(['message' => 'Failed to update book: ' . $wpdb->last_error]);
     }
 
+    wp_send_json_success(['message' => 'Book updated successfully']);
+}
+
+// Library Delete Form AJAX Handler
+add_action('wp_ajax_su_p_library_delete_form', 'su_p_library_delete_form');
+function su_p_library_delete_form() {
+    // if (!is_user_logged_in() || !is_super_admin()) {
+    //     wp_send_json_error(['message' => 'Access denied']);
+    // }
+    check_ajax_referer('delete_book_' . sanitize_text_field($_POST['book_id']), 'nonce');
+
+    global $wpdb;
+    $book_id = sanitize_text_field($_POST['book_id']);
     $book = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}library WHERE book_id = %s", $book_id));
+
     if (!$book) {
-        return '<div class="alert alert-danger">Book not found.</div>';
+        wp_send_json_error(['message' => 'Book not found']);
+    }
+
+    ob_start();
+    ?>
+    <p>Are you sure you want to delete the following book?</p>
+    <ul>
+        <li><strong>ID:</strong> <?php echo esc_html($book->book_id); ?></li>
+        <li><strong>ISBN:</strong> <?php echo esc_html($book->isbn); ?></li>
+        <li><strong>Title:</strong> <?php echo esc_html($book->title); ?></li>
+        <li><strong>Author:</strong> <?php echo esc_html($book->author); ?></li>
+        <li><strong>Quantity:</strong> <?php echo esc_html($book->quantity); ?></li>
+        <li><strong>Available:</strong> <?php echo esc_html($book->available); ?></li>
+    </ul>
+    <?php
+    wp_send_json_success(['confirm_html' => ob_get_clean()]);
+}
+// Library Delete AJAX Handler
+add_action('wp_ajax_su_p_delete_library_book', 'su_p_delete_library_book');
+function su_p_delete_library_book() {
+    global $wpdb;
+    check_ajax_referer('delete_book_' . sanitize_text_field($_POST['book_id']), 'nonce');
+
+    $book_id = sanitize_text_field($_POST['book_id']);
+    $deleted = $wpdb->delete($wpdb->prefix . 'library', ['book_id' => $book_id], ['%s']);
+
+    if ($deleted === false || $deleted === 0) {
+        wp_send_json_error(['message' => 'Failed to delete book']);
+    }
+
+    wp_send_json_success(['message' => 'Book deleted successfully']);
+}
+
+// Library Transaction Form AJAX Handler
+add_action('wp_ajax_su_p_library_transaction_form', 'su_p_library_transaction_form');
+function su_p_library_transaction_form() {
+    // if (!is_user_logged_in() || !is_super_admin()) {
+    //     wp_send_json_error(['message' => 'Access denied']);
+    // }
+    check_ajax_referer('transact_book_' . sanitize_text_field($_POST['book_id']), 'nonce');
+
+    global $wpdb;
+    $book_id = sanitize_text_field($_POST['book_id']);
+    $book = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}library WHERE book_id = %s", $book_id));
+
+    if (!$book) {
+        wp_send_json_error(['message' => 'Book not found']);
     }
 
     $students = get_posts([
         'post_type' => 'students',
         'posts_per_page' => -1,
-        'meta_query' => [
-            ['key' => 'educational_center_id', 'value' => $book->education_center_id, 'compare' => '=']
-        ]
+        'meta_query' => [['key' => 'educational_center_id', 'value' => $book->education_center_id, 'compare' => '=']]
     ]);
-
     $staff = $wpdb->get_results($wpdb->prepare(
         "SELECT staff_id, name FROM {$wpdb->prefix}staff WHERE education_center_id = %s",
         $book->education_center_id
@@ -11860,62 +12063,56 @@ function su_p_library_transaction_content($book_id, $nonce) {
 
     ob_start();
     ?>
-    <div class="modal-content">
-        <span class="modal-close back-to-list">×</span>
-        <h5 class="bg-info text-white p-3 mb-3" style="border-radius: 8px 8px 0 0;">Process Transaction</h5>
-        <form id="su-p-library-transaction-form" class="needs-validation" novalidate>
-            <div class="mb-3">
-                <label for="user_select" class="form-label fw-bold">Select User (Optional)</label>
-                <select name="user_select" id="user_select" class="form-select select2-transact" style="width: 100%;">
-                    <option value="" selected>Select a student or staff member</option>
-                    <optgroup label="Students">
-                        <?php foreach ($students as $student) {
-                            $student_id = get_field('student_id', $student->ID);
-                            if ($student_id) {
-                                echo '<option value="' . esc_attr($student_id) . '" data-type="Student">' . esc_html($student_id . ' - ' . $student->post_title) . '</option>';
-                            }
-                        } ?>
-                    </optgroup>
-                    <optgroup label="Staff">
-                        <?php foreach ($staff as $staff_member) {
-                            echo '<option value="' . esc_attr($staff_member->staff_id) . '" data-type="Staff">' . esc_html($staff_member->staff_id . ' - ' . $staff_member->name) . '</option>';
-                        } ?>
-                    </optgroup>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="user_id" class="form-label fw-bold">User ID</label>
-                <input type="text" name="user_id" id="user_id" class="form-control" placeholder="Enter User ID or select from above" required>
-            </div>
-            <div class="mb-3">
-                <label for="user_type" class="form-label fw-bold">User Type</label>
-                <select name="user_type" id="user_type" class="form-control" required>
-                    <option value="" disabled selected>Select user type</option>
-                    <option value="Student">Student</option>
-                    <option value="Staff">Staff</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="due_date" class="form-label fw-bold">Due Date</label>
-                <input type="datetime-local" name="due_date" id="due_date" class="form-control" min="<?php echo date('Y-m-d\TH:i', current_time('timestamp')); ?>" required>
-            </div>
-            <input type="hidden" name="book_id" value="<?php echo esc_attr($book_id); ?>">
-            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('library_transaction_nonce'); ?>">
-            <div class="mt-3 text-end">
-                <button type="button" class="btn btn-secondary back-to-list me-2">Close</button>
-                <button type="submit" class="btn btn-info">Process</button>
-            </div>
-        </form>
-    </div>
+    <form id="library-transaction-form" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label for="user_select_<?php echo esc_attr($book_id); ?>" class="form-label fw-bold">Select User (Optional)</label>
+            <select name="user_select" id="user_select_<?php echo esc_attr($book_id); ?>" class="form-select select2-transact" style="width: 100%;">
+                <option value="" selected>Select a student or staff member</option>
+                <optgroup label="Students">
+                    <?php foreach ($students as $student) {
+                        $student_id = get_field('student_id', $student->ID);
+                        if ($student_id) {
+                            echo '<option value="' . esc_attr($student_id) . '" data-type="Student">' . esc_html($student_id . ' - ' . $student->post_title) . '</option>';
+                        }
+                    } ?>
+                </optgroup>
+                <optgroup label="Staff">
+                    <?php foreach ($staff as $staff_member) {
+                        echo '<option value="' . esc_attr($staff_member->staff_id) . '" data-type="Staff">' . esc_html($staff_member->staff_id . ' - ' . $staff_member->name) . '</option>';
+                    } ?>
+                </optgroup>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="user_id" class="form-label fw-bold">User ID</label>
+            <input type="text" name="user_id" id="user_id" class="form-control" placeholder="Enter User ID or select from above" required>
+        </div>
+        <div class="mb-3">
+            <label for="user_type" class="form-label fw-bold">User Type</label>
+            <select name="user_type" id="user_type" class="form-control" required>
+                <option value="" disabled selected>Select user type</option>
+                <option value="Student">Student</option>
+                <option value="Staff">Staff</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="due_date" class="form-label fw-bold">Due Date</label>
+            <input type="datetime-local" name="due_date" id="due_date" class="form-control" min="<?php echo date('Y-m-d\TH:i', current_time('timestamp')); ?>" required>
+        </div>
+        <input type="hidden" name="book_id" value="<?php echo esc_attr($book_id); ?>">
+        <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('library_transaction_nonce'); ?>">
+    </form>
     <script>
     jQuery(document).ready(function($) {
-        $('#user_select').select2({
+        var $select = $('#user_select_<?php echo esc_js($book_id); ?>');
+        if ($select.hasClass('select2-hidden-accessible')) { $select.select2('destroy'); }
+        $select.select2({
             placeholder: 'Search for a student or staff member...',
             allowClear: true,
-            width: '100%'
+            width: '100%',
+            dropdownParent: $('#transactBookModal')
         });
-
-        $('#user_select').on('change', function() {
+        $select.on('change', function() {
             var userId = $(this).val();
             if (userId) {
                 var $selectedOption = $(this).find(':selected');
@@ -11927,172 +12124,135 @@ function su_p_library_transaction_content($book_id, $nonce) {
                 $('#user_type').val('');
             }
         });
-
-        $('#user_id').on('input', function() {
-            $('#user_select').val(null).trigger('change');
-        });
-
-        $('#su-p-library-transaction-form').on('submit', function(e) {
-            e.preventDefault();
-            var $form = $(this);
-            var $loader = $('#edu-loader');
-            var formData = new FormData(this);
-            formData.append('action', 'su_p_process_library_transaction');
-
-            $loader.show();
-            $.ajax({
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if (response.success) {
-                        $form.before('<div class="alert alert-success">Transaction processed successfully!</div>');
-                        setTimeout(function() {
-                            loadDashboardContent('library-list', $('#su-p-edu-center-filter').val(), $('#su-p-search-filter').val());
-                        }, 1500);
-                    } else {
-                        $form.before('<div class="alert alert-danger">' + (response.data.message || 'Error processing transaction') + '</div>');
-                    }
-                    $loader.hide();
-                },
-                error: function() {
-                    $form.before('<div class="alert alert-danger">An error occurred.</div>');
-                    $loader.hide();
-                }
-            });
-        });
-
-        $('.back-to-list').on('click', function() {
-            loadDashboardContent('library-list', $('#su-p-edu-center-filter').val(), $('#su-p-search-filter').val());
-        });
+        $('#user_id').on('input', function() { $select.val(null).trigger('change'); });
     });
     </script>
     <?php
-    return ob_get_clean();
+    wp_send_json_success(['form_html' => ob_get_clean()]);
 }
 
-// Library Return Content
-function su_p_library_return_content($transaction_id, $book_id, $user_id, $nonce) {
+// Library Transaction AJAX Handler
+add_action('wp_ajax_su_p_process_library_transaction', 'su_p_process_library_transaction');
+function su_p_process_library_transaction() {
     global $wpdb;
-    if (!wp_verify_nonce($nonce, 'return_book_' . $transaction_id)) {
-        return '<div class="alert alert-danger">Invalid security token.</div>';
-    }
+    check_ajax_referer('library_transaction_nonce', 'nonce');
 
-    $trans_table = $wpdb->prefix . 'library_transactions';
     $library_table = $wpdb->prefix . 'library';
-    $transaction = $wpdb->get_row($wpdb->prepare(
-        "SELECT t.*, l.title 
-         FROM $trans_table t 
-         JOIN $library_table l ON t.book_id = l.book_id 
-         WHERE t.transaction_id = %d AND t.book_id = %s AND t.user_id = %s AND t.return_date IS NULL",
-        $transaction_id, $book_id, $user_id
-    ));
+    $trans_table = $wpdb->prefix . 'library_transactions';
 
-    if (!$transaction) {
-        return '<div class="alert alert-danger">Transaction not found or already returned.</div>';
+    $book_id = sanitize_text_field($_POST['book_id']);
+    $user_id = sanitize_text_field($_POST['user_id']);
+    $user_type = sanitize_text_field($_POST['user_type']);
+    $due_date = sanitize_text_field($_POST['due_date']);
+
+    if (empty($book_id) || empty($user_id) || empty($user_type) || empty($due_date)) {
+        wp_send_json_error(['message' => 'Missing required fields']);
     }
+
+    if (!in_array($user_type, ['Student', 'Staff'])) {
+        wp_send_json_error(['message' => 'Invalid user type']);
+    }
+
+    $due_timestamp = strtotime($due_date);
+    $current_timestamp = current_time('timestamp');
+    if ($due_timestamp <= $current_timestamp) {
+        wp_send_json_error(['message' => 'Due date must be in the future']);
+    }
+    $due_date_mysql = date('Y-m-d H:i:s', $due_timestamp);
+
+    $book = $wpdb->get_row($wpdb->prepare("SELECT * FROM $library_table WHERE book_id = %s", $book_id));
+    if (!$book || $book->available <= 0) {
+        wp_send_json_error(['message' => 'No copies available to borrow']);
+    }
+
+    $wpdb->insert(
+        $trans_table,
+        [
+            'book_id' => $book_id,
+            'user_id' => $user_id,
+            'user_type' => $user_type,
+            'issue_date' => current_time('mysql'),
+            'due_date' => $due_date_mysql,
+            'return_date' => null,
+            'fine' => 0.00
+        ],
+        ['%s', '%s', '%s', '%s', '%s', '%s', '%f']
+    );
+
+    $new_available = $book->available - 1;
+    $wpdb->update($library_table, ['available' => $new_available], ['book_id' => $book_id], ['%d'], ['%s']);
+
+    if ($wpdb->last_error) {
+        wp_send_json_error(['message' => 'Failed to process transaction: ' . $wpdb->last_error]);
+    }
+
+    wp_send_json_success(['message' => 'Transaction processed successfully']);
+}
+
+// Library Transactions Shortcode
+function su_p_library_transactions_shortcode() {
+    // if (!is_user_logged_in() || !is_super_admin()) {
+    //     return '<p>Access denied.</p>';
+    // }
 
     ob_start();
     ?>
-    <div class="modal-content">
-        <span class="modal-close back-to-list">×</span>
-        <h5 class="bg-primary text-white p-3 mb-3" style="border-radius: 8px 8px 0 0;">Confirm Return</h5>
-        <div>
-            <p>Are you sure you want to return the following book?</p>
-            <ul>
-                <li><strong>Book ID:</strong> <?php echo esc_html($transaction->book_id); ?></li>
-                <li><strong>Title:</strong> <?php echo esc_html($transaction->title); ?></li>
-                <li><strong>User ID:</strong> <?php echo esc_html($transaction->user_id); ?></li>
-                <li><strong>User Type:</strong> <?php echo esc_html($transaction->user_type); ?></li>
-                <li><strong>Issue Date:</strong> <?php echo esc_html($transaction->issue_date); ?></li>
-                <li><strong>Due Date:</strong> <?php echo esc_html($transaction->due_date); ?></li>
-            </ul>
+    <div class="card shadow-lg" style="margin: 20px auto; border: 3px solid #007bff; background: #fff;">
+        <div class="card-header bg-primary text-white text-center" style="border-radius: 10px 10px 0 0;">
+            <h3 class="card-title mb-0"><i class="bi bi-list-ul me-2"></i>Library Transactions</h3>
         </div>
-        <div class="mt-3 text-end">
-            <button type="button" class="btn btn-secondary back-to-list me-2">Cancel</button>
-            <button type="button" class="btn btn-primary confirm-return-btn" 
-                    data-transaction-id="<?php echo esc_attr($transaction_id); ?>" 
-                    data-book-id="<?php echo esc_attr($book_id); ?>" 
-                    data-user-id="<?php echo esc_attr($user_id); ?>" 
-                    data-nonce="<?php echo esc_attr($nonce); ?>">Return Book</button>
+        <div class="card-body p-4">
+            <div id="su-p-transactions-content"></div>
         </div>
     </div>
     <script>
-    jQuery(document).ready(function($) {
-        $('.confirm-return-btn').on('click', function() {
-            var $button = $(this);
-            var transactionId = $button.data('transaction-id');
-            var bookId = $button.data('book-id');
-            var userId = $button.data('user-id');
-            var nonce = $button.data('nonce');
-            var $loader = $('#edu-loader');
+    document.addEventListener('DOMContentLoaded', function() {
+        const $content = document.getElementById('su-p-transactions-content');
+        const ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
 
-            $button.prop('disabled', true).text('Returning...');
-            $loader.show();
+        function loadTransactions() {
+            $content.innerHTML = '<p>Loading...</p>';
+            const data = new FormData();
+            data.append('action', 'su_p_library_transactions');
+            data.append('nonce', '<?php echo wp_create_nonce('su_p_library_transactions'); ?>');
 
-            $.ajax({
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                type: 'POST',
-                data: {
-                    action: 'su_p_process_book_return',
-                    transaction_id: transactionId,
-                    book_id: bookId,
-                    user_id: userId,
-                    nonce: nonce
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $button.parent().before('<div class="alert alert-success">Book returned successfully!</div>');
-                        setTimeout(function() {
-                            loadDashboardContent('library-transactions', $('#su-p-edu-center-filter').val(), $('#su-p-search-filter').val());
-                        }, 1500);
+            fetch(ajaxUrl, { method: 'POST', body: data })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        $content.innerHTML = data.data;
+                        attachTransactionHandlers();
                     } else {
-                        $button.parent().before('<div class="alert alert-danger">' + (response.data.message || 'Error returning book') + '</div>');
-                        $button.prop('disabled', false).text('Return Book');
+                        $content.innerHTML = '<div class="alert alert-danger">' + (data.data.message || 'Error loading transactions') + '</div>';
                     }
-                    $loader.hide();
-                },
-                error: function() {
-                    $button.parent().before('<div class="alert alert-danger">An error occurred.</div>');
-                    $button.prop('disabled', false).text('Return Book');
-                    $loader.hide();
-                }
-            });
-        });
+                })
+                .catch(error => {
+                    $content.innerHTML = '<div class="alert alert-danger">Error: ' + error.message + '</div>';
+                });
+        }
 
-        $('.back-to-list').on('click', function() {
-            loadDashboardContent('library-transactions', $('#su-p-edu-center-filter').val(), $('#su-p-search-filter').val());
-        });
+        loadTransactions();
     });
     </script>
     <?php
     return ob_get_clean();
 }
+add_shortcode('su_p_library_transactions', 'su_p_library_transactions_shortcode');
+// Library Transactions AJAX Handler
+add_action('wp_ajax_su_p_library_transactions', 'su_p_library_transactions');
+function su_p_library_transactions() {
+    // if (!is_user_logged_in() || !is_super_admin()) {
+    //     wp_send_json_error(['message' => 'Access denied']);
+    // }
+    check_ajax_referer('su_p_library_transactions', 'nonce');
 
-// Library Transactions Content
-function su_p_library_transactions_content($edu_center_id, $search_query = '') {
     global $wpdb;
     $trans_table = $wpdb->prefix . 'library_transactions';
     $library_table = $wpdb->prefix . 'library';
-    $query = "SELECT t.*, l.title 
-              FROM $trans_table t 
-              JOIN $library_table l ON t.book_id = l.book_id";
-    $args = [];
-    if ($edu_center_id) {
-        $query .= " WHERE l.education_center_id = %s";
-        $args[] = $edu_center_id;
-    }
-    if ($search_query) {
-        $query .= $edu_center_id ? " AND" : " WHERE";
-        $query .= " (t.book_id LIKE %s OR t.user_id LIKE %s OR l.title LIKE %s)";
-        $args[] = '%' . $wpdb->esc_like($search_query) . '%';
-        $args[] = '%' . $wpdb->esc_like($search_query) . '%';
-        $args[] = '%' . $wpdb->esc_like($search_query) . '%';
-    }
-    $query .= " ORDER BY t.issue_date DESC";
-    $transactions = $wpdb->get_results($wpdb->prepare($query, $args));
+    $transactions = $wpdb->get_results("SELECT t.*, l.title, l.education_center_id 
+        FROM $trans_table t 
+        JOIN $library_table l ON t.book_id = l.book_id 
+        ORDER BY t.issue_date DESC");
 
     ob_start();
     ?>
@@ -12149,255 +12309,47 @@ function su_p_library_transactions_content($edu_center_id, $search_query = '') {
         </table>
     </div>
     <?php
-    return ob_get_clean();
+    wp_send_json_success(ob_get_clean());
 }
 
-// Library Overdue Content
-function su_p_library_overdue_content($edu_center_id) {
+// Library Return Form AJAX Handler
+add_action('wp_ajax_su_p_library_return_form', 'su_p_library_return_form');
+function su_p_library_return_form() {
+    // if (!is_user_logged_in() || !is_super_admin()) {
+    //     wp_send_json_error(['message' => 'Access denied']);
+    // }
+    check_ajax_referer('return_book_' . sanitize_text_field($_POST['transaction_id']), 'nonce');
+
     global $wpdb;
-    $trans_table = $wpdb->prefix . 'library_transactions';
-    $library_table = $wpdb->prefix . 'library';
-    $query = "SELECT t.*, l.title 
-              FROM $trans_table t 
-              JOIN $library_table l ON t.book_id = l.book_id 
-              WHERE t.return_date IS NULL AND t.due_date < %s";
-    $args = [current_time('mysql')];
-    if ($edu_center_id) {
-        $query .= " AND l.education_center_id = %s";
-        $args[] = $edu_center_id;
+    $transaction_id = sanitize_text_field($_POST['transaction_id']);
+    $book_id = sanitize_text_field($_POST['book_id']);
+    $user_id = sanitize_text_field($_POST['user_id']);
+    $trans = $wpdb->get_row($wpdb->prepare(
+        "SELECT t.*, l.title FROM {$wpdb->prefix}library_transactions t 
+         JOIN {$wpdb->prefix}library l ON t Lists.t.book_id = l.book_id 
+         WHERE t.transaction_id = %d AND t.book_id = %s AND t.user_id = %s AND t.return_date IS NULL",
+        $transaction_id, $book_id, $user_id
+    ));
+
+    if (!$trans) {
+        wp_send_json_error(['message' => 'Transaction not found or already returned']);
     }
-    $overdue = $wpdb->get_results($wpdb->prepare($query, $args));
 
     ob_start();
     ?>
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead style="background: #ffe6e6;">
-                <tr>
-                    <th>Book ID</th>
-                    <th>Title</th>
-                    <th>User ID</th>
-                    <th>User Type</th>
-                    <th>Issue Date</th>
-                    <th>Due Date</th>
-                    <th>Days Overdue</th>
-                    <th>Fine</th>
-                    <th>Center ID</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if (empty($overdue)) {
-                    echo '<tr><td colspan="9" class="text-center py-4">No overdue books.</td></tr>';
-                } else {
-                    foreach ($overdue as $item) {
-                        $days_overdue = max(0, (strtotime(current_time('mysql')) - strtotime($item->due_date)) / (60 * 60 * 24));
-                        $fine = $days_overdue * 0.50;
-                        echo '<tr>';
-                        echo '<td>' . esc_html($item->book_id) . '</td>';
-                        echo '<td>' . esc_html($item->title) . '</td>';
-                        echo '<td>' . esc_html($item->user_id) . '</td>';
-                        echo '<td>' . esc_html($item->user_type) . '</td>';
-                        echo '<td>' . esc_html($item->issue_date) . '</td>';
-                        echo '<td>' . esc_html($item->due_date) . '</td>';
-                        echo '<td>' . esc_html($days_overdue) . '</td>';
-                        echo '<td>' . number_format($fine, 2) . '</td>';
-                        echo '<td>' . esc_html($item->education_center_id) . '</td>';
-                        echo '</tr>';
-                    }
-                }
-                ?>
-            </tbody>
-        </table>
-    </div>
-    <button class="btn btn-outline-danger mt-3 back-to-list">Back to Library</button>
-    <script>
-    jQuery(document).ready(function($) {
-        $('.back-to-list').on('click', function() {
-            loadDashboardContent('library-list', $('#su-p-edu-center-filter').val(), $('#su-p-search-filter').val());
-        });
-    });
-    </script>
+    <p>Are you sure you want to return the following book?</p>
+    <ul>
+        <li><strong>Book ID:</strong> <?php echo esc_html($trans->book_id); ?></li>
+        <li><strong>Title:</strong> <?php echo esc_html($trans->title); ?></li>
+        <li><strong>User ID:</strong> <?php echo esc_html($trans->user_id); ?></li>
+        <li><strong>User Type:</strong> <?php echo esc_html($trans->user_type); ?></li>
+        <li><strong>Issue Date:</strong> <?php echo esc_html($trans->issue_date); ?></li>
+        <li><strong>Due Date:</strong> <?php echo esc_html($trans->due_date); ?></li>
+    </ul>
     <?php
-    return ob_get_clean();
+    wp_send_json_success(['confirm_html' => ob_get_clean()]);
 }
-
-// AJAX Handlers
-add_action('wp_ajax_su_p_add_library_book', 'su_p_add_library_book');
-function su_p_add_library_book() {
-    global $wpdb;
-    check_ajax_referer('library_nonce', 'nonce');
-
-    $table_name = $wpdb->prefix . 'library';
-    $book_id = sanitize_text_field($_POST['book_id']);
-    $education_center_id = sanitize_text_field($_POST['education_center_id']);
-    $isbn = sanitize_text_field($_POST['isbn']);
-    $title = sanitize_text_field($_POST['title']);
-    $author = sanitize_text_field($_POST['author']);
-    $quantity = intval($_POST['quantity']);
-
-    if (empty($book_id) || empty($education_center_id) || empty($title) || empty($author) || $quantity < 0) {
-        wp_send_json_error(['message' => 'Invalid input data']);
-    }
-
-    $exists = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(*) FROM $table_name WHERE book_id = %s AND education_center_id = %s",
-        $book_id, $education_center_id
-    ));
-
-    if ($exists > 0) {
-        wp_send_json_error(['message' => 'Book ID already exists for this center']);
-    }
-
-    $wpdb->insert(
-        $table_name,
-        [
-            'book_id' => $book_id,
-            'isbn' => $isbn,
-            'title' => $title,
-            'author' => $author,
-            'quantity' => $quantity,
-            'available' => $quantity,
-            'education_center_id' => $education_center_id
-        ],
-        ['%s', '%s', '%s', '%s', '%d', '%d', '%s']
-    );
-
-    if ($wpdb->last_error) {
-        wp_send_json_error(['message' => 'Failed to add book: ' . $wpdb->last_error]);
-    }
-
-    wp_send_json_success(['message' => 'Book added successfully']);
-}
-
-add_action('wp_ajax_su_p_edit_library_book', 'su_p_edit_library_book');
-function su_p_edit_library_book() {
-    global $wpdb;
-    check_ajax_referer('library_edit_nonce', 'nonce');
-
-    $table_name = $wpdb->prefix . 'library';
-    $book_id = sanitize_text_field($_POST['book_id']);
-    $isbn = sanitize_text_field($_POST['isbn']);
-    $title = sanitize_text_field($_POST['title']);
-    $author = sanitize_text_field($_POST['author']);
-    $quantity = intval($_POST['quantity']);
-    $available = intval($_POST['available']);
-
-    $updated = $wpdb->update(
-        $table_name,
-        [
-            'isbn' => $isbn,
-            'title' => $title,
-            'author' => $author,
-            'quantity' => $quantity,
-            'available' => $available
-        ],
-        ['book_id' => $book_id],
-        ['%s', '%s', '%s', '%d', '%d'],
-        ['%s']
-    );
-
-    if ($updated === false) {
-        wp_send_json_error(['message' => 'Failed to update book: ' . $wpdb->last_error]);
-    }
-
-    wp_send_json_success(['message' => 'Book updated successfully']);
-}
-
-add_action('wp_ajax_su_p_delete_library_book', 'su_p_delete_library_book');
-function su_p_delete_library_book() {
-    global $wpdb;
-    $book_id = sanitize_text_field($_POST['book_id']);
-    $nonce = sanitize_text_field($_POST['nonce']);
-
-    if (!wp_verify_nonce($nonce, 'delete_book_' . $book_id)) {
-        wp_send_json_error(['message' => 'Invalid security token']);
-    }
-
-    $deleted = $wpdb->delete(
-        $wpdb->prefix . 'library',
-        ['book_id' => $book_id],
-        ['%s']
-    );
-
-    if ($deleted === false || $deleted === 0) {
-        wp_send_json_error(['message' => 'Failed to delete book']);
-    }
-
-    wp_send_json_success(['message' => 'Book deleted successfully']);
-}
-
-add_action('wp_ajax_su_p_process_library_transaction', 'su_p_process_library_transaction');
-function su_p_process_library_transaction() {
-    global $wpdb;
-    check_ajax_referer('library_transaction_nonce', 'nonce');
-
-    $library_table = $wpdb->prefix . 'library';
-    $trans_table = $wpdb->prefix . 'library_transactions';
-
-    $book_id = sanitize_text_field($_POST['book_id']);
-    $user_id = sanitize_text_field($_POST['user_id']);
-    $user_type = sanitize_text_field($_POST['user_type']);
-    $due_date = sanitize_text_field($_POST['due_date']);
-
-    if (empty($book_id) || empty($user_id) || empty($user_type) || empty($due_date)) {
-        wp_send_json_error(['message' => 'Missing required fields']);
-    }
-
-    if (!in_array($user_type, ['Student', 'Staff'])) {
-        wp_send_json_error(['message' => 'Invalid user type']);
-    }
-
-    $due_timestamp = strtotime($due_date);
-    $current_timestamp = current_time('timestamp');
-    if ($due_timestamp <= $current_timestamp) {
-        wp_send_json_error(['message' => 'Due date must be in the future']);
-    }
-    $due_date_mysql = date('Y-m-d H:i:s', $due_timestamp);
-
-    $book = $wpdb->get_row($wpdb->prepare("SELECT * FROM $library_table WHERE book_id = %s", $book_id));
-    if (!$book) {
-        wp_send_json_error(['message' => 'Book not found']);
-    }
-
-    if ($book->available <= 0) {
-        wp_send_json_error(['message' => 'No copies available to borrow']);
-    }
-
-    $result = $wpdb->insert(
-        $trans_table,
-        [
-            'book_id' => $book_id,
-            'user_id' => $user_id,
-            'user_type' => $user_type,
-            'issue_date' => current_time('mysql'),
-            'due_date' => $due_date_mysql,
-            'return_date' => null,
-            'fine' => 0.00
-        ],
-        ['%s', '%s', '%s', '%s', '%s', '%s', '%f']
-    );
-
-    if ($result === false) {
-        wp_send_json_error(['message' => 'Failed to record transaction: ' . $wpdb->last_error]);
-    }
-
-    $new_available = $book->available - 1;
-    $update_result = $wpdb->update(
-        $library_table,
-        ['available' => $new_available],
-        ['book_id' => $book_id],
-        ['%d'],
-        ['%s']
-    );
-
-    if ($update_result === false) {
-        wp_send_json_error(['message' => 'Failed to update book availability: ' . $wpdb->last_error]);
-    }
-
-    wp_send_json_success(['message' => 'Book borrowed successfully']);
-}
-
+// Library Return AJAX Handler
 add_action('wp_ajax_su_p_process_book_return', 'su_p_process_book_return');
 function su_p_process_book_return() {
     global $wpdb;
@@ -12423,7 +12375,7 @@ function su_p_process_book_return() {
     $days_overdue = max(0, (strtotime($return_date) - strtotime($trans->due_date)) / (60 * 60 * 24));
     $fine = $days_overdue * 0.50;
 
-    $result = $wpdb->update(
+    $wpdb->update(
         $trans_table,
         ['return_date' => $return_date, 'fine' => $fine],
         ['transaction_id' => $transaction_id],
@@ -12431,35 +12383,2270 @@ function su_p_process_book_return() {
         ['%d']
     );
 
-    if ($result === false) {
-        wp_send_json_error(['message' => 'Failed to update transaction: ' . $wpdb->last_error]);
-    }
-
     $book = $wpdb->get_row($wpdb->prepare("SELECT available FROM $library_table WHERE book_id = %s", $book_id));
     $new_available = $book->available + 1;
+    $wpdb->update($library_table, ['available' => $new_available], ['book_id' => $book_id], ['%d'], ['%s']);
 
-    $update_result = $wpdb->update(
-        $library_table,
-        ['available' => $new_available],
-        ['book_id' => $book_id],
-        ['%d'],
-        ['%s']
-    );
-
-    if ($update_result === false) {
-        wp_send_json_error(['message' => 'Failed to update book availability: ' . $wpdb->last_error]);
+    if ($wpdb->last_error) {
+        wp_send_json_error(['message' => 'Failed to process return: ' . $wpdb->last_error]);
     }
 
     wp_send_json_success(['message' => 'Book returned successfully']);
 }
 
-// Placeholder function for educational centers
-function get_educational_centers() {
-    // Replace with actual logic to fetch educational centers
-    return [
-        (object) ['id' => 'center1', 'name' => 'Center 1'],
-        (object) ['id' => 'center2', 'name' => 'Center 2'],
-    ];
+// Library Overdue Shortcode
+function su_p_library_overdue_shortcode() {
+    ob_start();
+    ?>
+    <div class="card shadow-lg" style="margin: 20px auto; border: 3px solid #dc3545; background: #ffe6e6;">
+        <div class="card-header bg-danger text-white text-center" style="border-radius: 10px 10px 0 0;">
+            <h3 class="card-title mb-0"><i class="bi bi-book me-2"></i>Borrowed Books</h3>
+        </div>
+        <div class="card-body p-4">
+            <div id="su-p-overdue-content"></div>
+        </div>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const $content = document.getElementById('su-p-overdue-content');
+        const ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
+
+        function loadBorrowed() {
+            $content.innerHTML = '<p>Loading borrowed books...</p>';
+            const data = new FormData();
+            data.append('action', 'su_p_library_overdue');
+            data.append('nonce', '<?php echo wp_create_nonce('su_p_library_overdue'); ?>');
+
+            fetch(ajaxUrl, { method: 'POST', body: data })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        $content.innerHTML = data.data.html;
+                    } else {
+                        $content.innerHTML = '<div class="alert alert-danger">' + (data.data?.message || 'Error loading borrowed books') + '</div>';
+                    }
+                })
+                .catch(error => {
+                    $content.innerHTML = '<div class="alert alert-danger">Error: ' + error.message + '</div>';
+                    console.error('Fetch error:', error);
+                });
+        }
+
+        $content.addEventListener('click', function(e) {
+            const button = e.target.closest('.return-book-btn');
+            if (button) {
+                const transactionId = button.getAttribute('data-transaction-id');
+                if (confirm('Mark this book as returned?')) {
+                    const data = new FormData();
+                    data.append('action', 'su_p_library_return_book');
+                    data.append('transaction_id', transactionId);
+                    data.append('nonce', '<?php echo wp_create_nonce('su_p_library_return'); ?>');
+
+                    fetch(ajaxUrl, { method: 'POST', body: data })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Book marked as returned.');
+                                loadBorrowed();
+                            } else {
+                                alert('Error: ' + (data.data?.message || 'Failed to return book'));
+                            }
+                        })
+                        .catch(error => {
+                            alert('Error: ' + error.message);
+                            console.error('Return error:', error);
+                        });
+                }
+            }
+        });
+
+        loadBorrowed();
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('su_p_library_overdue', 'su_p_library_overdue_shortcode');
+add_action('wp_ajax_su_p_library_overdue', 'su_p_library_overdue');
+function su_p_library_overdue() {
+    check_ajax_referer('su_p_library_overdue', 'nonce');
+
+    global $wpdb;
+    $trans_table = $wpdb->prefix . 'library_transactions';
+    $library_table = $wpdb->prefix . 'library';
+    $current_time = current_time('mysql');
+    $borrowed = $wpdb->get_results(
+        "SELECT t.*, l.title, l.education_center_id 
+         FROM $trans_table t 
+         JOIN $library_table l ON t.book_id = l.book_id 
+         WHERE t.return_date IS NULL"
+    );
+
+    if ($wpdb->last_error) {
+        wp_send_json_error(['message' => 'Database error: ' . $wpdb->last_error]);
+    }
+
+    ob_start();
+    ?>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead style="background: #ffcccc;">
+                <tr>
+                    <th>Book ID</th>
+                    <th>Title</th>
+                    <th>User ID</th>
+                    <th>User Name</th>
+                    <th>User Type</th>
+                    <th>Issue Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Days Overdue</th>
+                    <th>Fine ($)</th>
+                    <th>Center ID</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if (empty($borrowed)) {
+                    echo '<tr><td colspan="12" class="text-center py-4">No borrowed books found.</td></tr>';
+                } else {
+                    foreach ($borrowed as $item) {
+                        $days_overdue = max(0, floor((strtotime($current_time) - strtotime($item->due_date)) / (60 * 60 * 24)));
+                        $fine = $days_overdue * 0.50;
+                        $status = $days_overdue > 0 ? 'Overdue' : 'Borrowed';
+
+                        $user_name = 'Unknown';
+                        if ($item->user_type === 'Student') {
+                            $student = get_posts([
+                                'post_type' => 'student',
+                                'meta_key' => 'student_id',
+                                'meta_value' => $item->user_id,
+                                'posts_per_page' => 1
+                            ]);
+                            if (!empty($student)) {
+                                $user_name = get_the_title($student[0]->ID);
+                            }
+                        } elseif ($item->user_type === 'Staff') {
+                            $staff_table = $wpdb->prefix . 'staff';
+                            $staff = $wpdb->get_row($wpdb->prepare(
+                                "SELECT name FROM $staff_table WHERE staff_id = %s",
+                                $item->user_id
+                            ));
+                            if ($staff) {
+                                $user_name = $staff->name;
+                            }
+                        }
+
+                        echo '<tr' . ($days_overdue > 0 ? ' class="table-danger"' : '') . '>';
+                        echo '<td>' . esc_html($item->book_id) . '</td>';
+                        echo '<td>' . esc_html($item->title) . '</td>';
+                        echo '<td>' . esc_html($item->user_id) . '</td>';
+                        echo '<td>' . esc_html($user_name) . '</td>';
+                        echo '<td>' . esc_html($item->user_type) . '</td>';
+                        echo '<td>' . esc_html($item->issue_date) . '</td>';
+                        echo '<td>' . esc_html($item->due_date) . '</td>';
+                        echo '<td>' . esc_html($status) . '</td>';
+                        echo '<td>' . esc_html($days_overdue) . '</td>';
+                        echo '<td>' . number_format($fine, 2) . '</td>';
+                        echo '<td>' . esc_html($item->education_center_id) . '</td>';
+                        echo '<td><button class="btn btn-sm btn-primary return-book-btn" data-transaction-id="' . esc_attr($item->transaction_id) . '">Return</button></td>';
+                        echo '</tr>';
+                    }
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    $output = ob_get_clean();
+    wp_send_json_success(['html' => $output]);
+}
+add_action('wp_ajax_su_p_library_return_book', 'su_p_library_return_book');
+function su_p_library_return_book() {
+    check_ajax_referer('su_p_library_return', 'nonce');
+    global $wpdb;
+
+    $transaction_id = sanitize_text_field($_POST['transaction_id'] ?? '');
+    error_log('Return attempt for transaction_id: ' . $transaction_id);
+
+    if (empty($transaction_id)) {
+        error_log('Error: Invalid transaction ID');
+        wp_send_json_error(['message' => 'Invalid transaction ID']);
+    }
+
+    $trans_table = $wpdb->prefix . 'library_transactions';
+    $library_table = $wpdb->prefix . 'library';
+
+    // Fetch book_id from transactions
+    $transaction = $wpdb->get_row($wpdb->prepare(
+        "SELECT book_id FROM $trans_table WHERE transaction_id = %d AND return_date IS NULL",
+        $transaction_id
+    ));
+
+    if (!$transaction) {
+        error_log('Error: Transaction not found or already returned for ID ' . $transaction_id);
+        wp_send_json_error(['message' => 'Transaction not found or already returned']);
+    }
+
+    // Fetch education_center_id from wp_library
+    $center_info = $wpdb->get_row($wpdb->prepare(
+        "SELECT education_center_id FROM $library_table WHERE book_id = %s",
+        $transaction->book_id
+    ));
+
+    if (!$center_info) {
+        error_log('Error: Book not found in library for book_id ' . $transaction->book_id);
+        wp_send_json_error(['message' => 'Book not found in library']);
+    }
+
+    // Update return_date
+    $result = $wpdb->update(
+        $trans_table,
+        ['return_date' => current_time('mysql')],
+        ['transaction_id' => $transaction_id],
+        ['%s'],
+        ['%d']
+    );
+
+    if ($result === false) {
+        error_log('Error: Failed to update return date - ' . $wpdb->last_error);
+        wp_send_json_error(['message' => 'Failed to update return date: ' . $wpdb->last_error]);
+    }
+
+    // Update availability in wp_library
+    $wpdb->query($wpdb->prepare(
+        "UPDATE $library_table SET available = available + 1 WHERE book_id = %s AND education_center_id = %s",
+        $transaction->book_id,
+        $center_info->education_center_id
+    ));
+
+    if ($wpdb->last_error) {
+        error_log('Error: Failed to update book availability - ' . $wpdb->last_error);
+        wp_send_json_error(['message' => 'Failed to update book availability: ' . $wpdb->last_error]);
+    }
+
+    error_log('Success: Book returned for transaction_id ' . $transaction_id);
+    wp_send_json_success(['message' => 'Book returned successfully']);
+}
+
+// JavaScript Handlers for Modals (Added to Dashboard)
+add_action('wp_footer', 'su_p_library_modal_handlers');
+function su_p_library_modal_handlers() {
+    // Note: Keeping this check as is unless you confirm it should be commented out too
+    if (!is_user_logged_in() || !is_super_admin()) return;
+    ?>
+    <script>
+    function attachEditFormHandler(bookId) {
+        const form = document.getElementById('edit-book-form-container').querySelector('#edit-library-form');
+        const updateButton = document.querySelector('.update-book-btn');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateButton.disabled = true;
+                updateButton.textContent = 'Updating...';
+
+                const formData = new FormData(this);
+                formData.append('action', 'su_p_edit_library_book');
+
+                fetch('<?php echo admin_url('admin-ajax.php'); ?>', { method: 'POST', body: formData })
+                    .then(response => response.json())
+                    .then(data => {
+                        const container = document.getElementById('edit-book-form-container');
+                        if (data.success) {
+                            container.innerHTML = '<div class="alert alert-success">Book updated successfully!</div>';
+                            setTimeout(() => {
+                                document.getElementById('editBookModal').style.display = 'none';
+                                document.getElementById('su-p-dashboard-content').innerHTML = '';
+                                loadDashboard();
+                            }, 1500);
+                        } else {
+                            container.innerHTML = '<div class="alert alert-danger">' + (data.data.message || 'Error updating book') + '</div>';
+                            updateButton.disabled = false;
+                            updateButton.textContent = 'Update Book';
+                        }
+                    })
+                    .catch(error => {
+                        document.getElementById('edit-book-form-container').innerHTML = '<div class="alert alert-danger">Error: ' + error.message + '</div>';
+                        updateButton.disabled = false;
+                        updateButton.textContent = 'Update Book';
+                    });
+            });
+            updateButton.onclick = () => form.dispatchEvent(new Event('submit'));
+        }
+    }
+
+    function attachDeleteHandler(bookId, nonce) {
+        const confirmButton = document.querySelector('.confirm-delete-btn');
+        confirmButton.onclick = function() {
+            confirmButton.disabled = true;
+            confirmButton.textContent = 'Deleting...';
+
+            const data = new FormData();
+            data.append('action', 'su_p_delete_library_book');
+            data.append('book_id', bookId);
+            data.append('nonce', nonce);
+
+            fetch('<?php echo admin_url('admin-ajax.php'); ?>', { method: 'POST', body: data })
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('delete-book-container');
+                    if (data.success) {
+                        container.innerHTML = '<div class="alert alert-success">Book deleted successfully!</div>';
+                        setTimeout(() => {
+                            document.getElementById('deleteBookModal').style.display = 'none';
+                            document.getElementById('su-p-dashboard-content').innerHTML = '';
+                            loadDashboard();
+                        }, 1500);
+                    } else {
+                        container.innerHTML = '<div class="alert alert-danger">' + (data.data.message || 'Error deleting book') + '</div>';
+                        confirmButton.disabled = false;
+                        confirmButton.textContent = 'Delete';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('delete-book-container').innerHTML = '<div class="alert alert-danger">Error: ' + error.message + '</div>';
+                    confirmButton.disabled = false;
+                    confirmButton.textContent = 'Delete';
+                });
+        };
+    }
+
+    function attachTransactionFormHandler(bookId) {
+        const form = document.getElementById('transact-book-form-container').querySelector('#library-transaction-form');
+        const processButton = document.querySelector('.process-transaction-btn');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                processButton.disabled = true;
+                processButton.textContent = 'Processing...';
+
+                const formData = new FormData(this);
+                formData.append('action', 'su_p_process_library_transaction');
+
+                fetch('<?php echo admin_url('admin-ajax.php'); ?>', { method: 'POST', body: formData })
+                    .then(response => response.json())
+                    .then(data => {
+                        const container = document.getElementById('transact-book-form-container');
+                        if (data.success) {
+                            container.innerHTML = '<div class="alert alert-success">Transaction processed successfully!</div>';
+                            setTimeout(() => {
+                                document.getElementById('transactBookModal').style.display = 'none';
+                                document.getElementById('su-p-dashboard-content').innerHTML = '';
+                                loadDashboard();
+                            }, 1500);
+                        } else {
+                            container.innerHTML = '<div class="alert alert-danger">' + (data.data.message || 'Error processing transaction') + '</div>';
+                            processButton.disabled = false;
+                            processButton.textContent = 'Process';
+                        }
+                    })
+                    .catch(error => {
+                        document.getElementById('transact-book-form-container').innerHTML = '<div class="alert alert-danger">Error: ' + error.message + '</div>';
+                        processButton.disabled = false;
+                        processButton.textContent = 'Process';
+                    });
+            });
+            processButton.onclick = () => form.dispatchEvent(new Event('submit'));
+        }
+    }
+
+    function attachTransactionHandlers() {
+        document.querySelectorAll('.return-book-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const transactionId = this.getAttribute('data-transaction-id');
+                const bookId = this.getAttribute('data-book-id');
+                const userId = this.getAttribute('data-user-id');
+                const nonce = this.getAttribute('data-nonce');
+                document.getElementById('edu-loader').style.display = 'flex';
+
+                const data = new FormData();
+                data.append('action', 'su_p_library_return_form');
+                data.append('transaction_id', transactionId);
+                data.append('book_id', bookId);
+                data.append('user_id', userId);
+                data.append('nonce', nonce);
+
+                fetch('<?php echo admin_url('admin-ajax.php'); ?>', { method: 'POST', body: data })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('return-book-container').innerHTML = data.data.confirm_html;
+                            document.getElementById('returnBookModal').style.display = 'block';
+                            attachReturnHandler(transactionId, bookId, userId, nonce);
+                        } else {
+                            alert('Error: ' + (data.data.message || 'Unable to load return form'));
+                        }
+                        document.getElementById('edu-loader').style.display = 'none';
+                    })
+                    .catch(error => {
+                        alert('Error: ' + error.message);
+                        document.getElementById('edu-loader').style.display = 'none';
+                    });
+            });
+        });
+    }
+
+    function attachReturnHandler(transactionId, bookId, userId, nonce) {
+        const confirmButton = document.querySelector('.confirm-return-btn');
+        confirmButton.onclick = function() {
+            confirmButton.disabled = true;
+            confirmButton.textContent = 'Returning...';
+
+            const data = new FormData();
+            data.append('action', 'su_p_process_book_return');
+            data.append('transaction_id', transactionId);
+            data.append('book_id', bookId);
+            data.append('user_id', userId);
+            data.append('nonce', nonce);
+
+            fetch('<?php echo admin_url('admin-ajax.php'); ?>', { method: 'POST', body: data })
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('return-book-container');
+                    if (data.success) {
+                        container.innerHTML = '<div class="alert alert-success">Book returned successfully!</div>';
+                        setTimeout(() => {
+                            document.getElementById('returnBookModal').style.display = 'none';
+                            document.getElementById('su-p-transactions-content').innerHTML = '';
+                            loadTransactions();
+                        }, 1500);
+                    } else {
+                        container.innerHTML = '<div class="alert alert-danger">' + (data.data.message || 'Error returning book') + '</div>';
+                        confirmButton.disabled = false;
+                        confirmButton.textContent = 'Return Book';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('return-book-container').innerHTML = '<div class="alert alert-danger">Error: ' + error.message + '</div>';
+                    confirmButton.disabled = false;
+                    confirmButton.textContent = 'Return Book';
+                });
+        };
+    }
+    </script>
+    <?php
+}
+function render_su_p_library_add_form() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'library';
+
+    // Fetch educational centers
+    $centers = get_posts([
+        'post_type' => 'educational-center',
+        'posts_per_page' => -1,
+        'post_status' => 'publish'
+    ]);
+
+    // Initialize variables
+    $message = '';
+    $book_id = '';
+    $existing_books = $wpdb->get_results("SELECT * FROM $table_name ORDER BY book_id DESC");
+
+    // Handle form submission (non-AJAX for adding book)
+    if (isset($_POST['su_p_add_library_book']) && check_admin_referer('su_p_library_add', 'nonce')) {
+        $education_center_id = sanitize_text_field($_POST['education_center_id'] ?? '');
+        $isbn = sanitize_text_field($_POST['isbn'] ?? '');
+        $title = sanitize_text_field($_POST['title'] ?? '');
+        $author = sanitize_text_field($_POST['author'] ?? '');
+        $quantity = intval($_POST['quantity'] ?? 0);
+        $book_id = sanitize_text_field($_POST['book_id'] ?? '');
+
+        if (empty($education_center_id) || empty($title) || empty($author) || $quantity < 0 || empty($book_id)) {
+            $message = '<div class="message alert-danger">Invalid input data. All fields except ISBN are required, and quantity must be non-negative.</div>';
+        } else {
+            // Check if book ID already exists
+            $exists = $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM $table_name WHERE book_id = %s AND education_center_id = %s",
+                $book_id,
+                $education_center_id
+            ));
+
+            if ($exists === null) {
+                $message = '<div class="message alert-danger">Database error: ' . esc_html($wpdb->last_error) . '</div>';
+            } elseif ($exists > 0) {
+                $message = '<div class="message alert-danger">Book ID already exists for this center.</div>';
+            } else {
+                // Insert the book
+                $result = $wpdb->insert(
+                    $table_name,
+                    [
+                        'book_id' => $book_id,
+                        'isbn' => $isbn,
+                        'title' => $title,
+                        'author' => $author,
+                        'quantity' => $quantity,
+                        'available' => $quantity,
+                        'education_center_id' => $education_center_id
+                    ],
+                    ['%s', '%s', '%s', '%s', '%d', '%d', '%s']
+                );
+
+                if ($result === false) {
+                    $message = '<div class="message alert-danger">Failed to add book: ' . esc_html($wpdb->last_error) . '</div>';
+                } else {
+                    $message = '<div class="message alert-success">Book added successfully!</div>';
+                    // Redirect to clear POST data and prevent duplicates
+                    wp_redirect('su_p-dashboard?section=library&action=add-library');
+                    exit;
+                }
+            }
+        }
+    }
+
+    // Check if redirected after success
+    if (isset($_GET['added']) && $_GET['added'] === '1') {
+        $message = '<div class="message alert-success">Book added successfully!</div>';
+    }
+
+    ob_start();
+    ?>
+    <div class="wrap" style="padding: 20px;">
+        <h2>Add New Book</h2>
+        <div id="add-book-message" style="padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+            <?php echo $message; ?>
+        </div>
+        <form id="standalone-add-book-form" method="post" class="needs-validation" novalidate>
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><label for="book_id">Book ID</label></th>
+                    <td><input type="text" name="book_id" id="book_id" class="regular-text" value="<?php echo esc_attr($book_id); ?>" readonly placeholder="Select a center to generate"></td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="edu_center_id">Educational Center</label></th>
+                    <td>
+                        <select name="education_center_id" id="edu_center_id" class="regular-text" required>
+                            <option value="">Select Center</option>
+                            <?php
+                            if (empty($centers)) {
+                                echo '<option value="">No centers available</option>';
+                            } else {
+                                foreach ($centers as $center) {
+                                    $center_id = get_field('educational_center_id', $center->ID) ?: $center->ID;
+                                    $selected = (isset($_POST['education_center_id']) && $_POST['education_center_id'] === $center_id) ? 'selected' : '';
+                                    echo '<option value="' . esc_attr($center_id) . '" ' . $selected . '>' . esc_html($center->post_title) . '</option>';
+                                }
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="isbn">ISBN</label></th>
+                    <td><input type="text" name="isbn" id="isbn" class="regular-text" value="<?php echo esc_attr($_POST['isbn'] ?? ''); ?>" placeholder="Enter ISBN"></td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="title">Title</label></th>
+                    <td><input type="text" name="title" id="title" class="regular-text" value="<?php echo esc_attr($_POST['title'] ?? ''); ?>" required></td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="author">Author</label></th>
+                    <td><input type="text" name="author" id="author" class="regular-text" value="<?php echo esc_attr($_POST['author'] ?? ''); ?>" required></td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="quantity">Quantity</label></th>
+                    <td><input type="number" name="quantity" id="quantity" class="regular-text" value="<?php echo esc_attr($_POST['quantity'] ?? ''); ?>" min="0" required></td>
+                </tr>
+            </table>
+            <?php wp_nonce_field('su_p_library_add', 'nonce'); ?>
+            <input type="hidden" name="su_p_add_library_book" value="1">
+            <p class="submit"><button type="submit" id="save-book" class="button-primary" disabled>Add Book</button></p>
+        </form>
+        <h3>Existing Books</h3>
+        <table class="wp-list-table widefat fixed striped" id="add-book-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>ISBN</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Total</th>
+                    <th>Available</th>
+                    <th>Center ID</th>
+                </tr>
+            </thead>
+            <tbody id="add-book-table-body">
+                <?php
+                if ($wpdb->last_error) {
+                    echo '<tr><td colspan="7">Error loading books: ' . esc_html($wpdb->last_error) . '</td></tr>';
+                } elseif (empty($existing_books)) {
+                    echo '<tr><td colspan="7">No books found.</td></tr>';
+                } else {
+                    foreach ($existing_books as $book) {
+                        echo '<tr>';
+                        echo '<td>' . esc_html($book->book_id) . '</td>';
+                        echo '<td>' . esc_html($book->isbn) . '</td>';
+                        echo '<td>' . esc_html($book->title) . '</td>';
+                        echo '<td>' . esc_html($book->author) . '</td>';
+                        echo '<td>' . esc_html($book->quantity) . '</td>';
+                        echo '<td>' . esc_html($book->available) . '</td>';
+                        echo '<td>' . esc_html($book->education_center_id) . '</td>';
+                        echo '</tr>';
+                    }
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+    <style>
+        .message.alert-danger { background-color: #f8d7da; color: #721c24; }
+        .message.alert-success { background-color: #d4edda; color: #155724; }
+    </style>
+    <script>
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const $eduCenterId = $('#edu_center_id');
+        const $bookIdField = $('#book_id');
+        const $saveButton = $('#save-book');
+        const $message = $('#add-book-message');
+
+        // Generate book ID on center selection
+        $eduCenterId.on('change', function() {
+            const centerId = $(this).val();
+            if (centerId) {
+                $.ajax({
+                    url: ajaxUrl,
+                    method: 'POST',
+                    data: {
+                        action: 'su_p_generate_book_id',
+                        education_center_id: centerId,
+                        nonce: '<?php echo wp_create_nonce('su_p_generate_book_id'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $bookIdField.val(response.data.book_id);
+                            $saveButton.prop('disabled', false);
+                        } else {
+                            $bookIdField.val('');
+                            $saveButton.prop('disabled', true);
+                            $message
+                                .addClass('alert-danger')
+                                .text('Error generating book ID: ' + (response.data?.message || 'Unknown error'));
+                            setTimeout(() => $message.text(''), 4000);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $bookIdField.val('');
+                        $saveButton.prop('disabled', true);
+                        $message
+                            .addClass('alert-danger')
+                            .text('AJAX error: ' + error);
+                        setTimeout(() => $message.text(''), 4000);
+                    }
+                });
+            } else {
+                $bookIdField.val('');
+                $saveButton.prop('disabled', true);
+            }
+        });
+
+        // Client-side form validation
+        $('#standalone-add-book-form').on('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                this.reportValidity();
+                $message
+                    .addClass('alert-danger')
+                    .text('Please fill out all required fields correctly.');
+                setTimeout(() => $message.text(''), 4000);
+            }
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('su_p_library_add_form', 'render_su_p_library_add_form');
+
+// AJAX handler to generate book ID (your provided code)
+add_action('wp_ajax_su_p_generate_book_id', 'su_p_generate_book_id');
+function su_p_generate_book_id() {
+    check_ajax_referer('su_p_generate_book_id', 'nonce');
+    $education_center_id = sanitize_text_field($_POST['education_center_id'] ?? '');
+
+    if (empty($education_center_id)) {
+        wp_send_json_error(['message' => 'No educational center selected']);
+    }
+
+    $book_id = get_unique_id_for_role('book', $education_center_id); // Assumes this function exists
+    if (is_wp_error($book_id)) {
+        wp_send_json_error(['message' => $book_id->get_error_message()]);
+    }
+
+    wp_send_json_success(['book_id' => $book_id]);
+}
+
+function render_su_p_library_edit_form() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'library';
+
+    // Fetch educational centers
+    $centers = get_posts([
+        'post_type' => 'educational-center',
+        'posts_per_page' => -1,
+        'post_status' => 'publish'
+    ]);
+
+    // Fetch books
+    $books = $wpdb->get_results("SELECT * FROM $table_name ORDER BY book_id DESC");
+
+    // Handle form submission
+    $message = '';
+    if (isset($_POST['su_p_edit_library_book']) && check_admin_referer('su_p_library_edit', 'nonce')) {
+        $book_id = sanitize_text_field($_POST['book_id'] ?? '');
+        $education_center_id = sanitize_text_field($_POST['education_center_id'] ?? '');
+        $isbn = sanitize_text_field($_POST['isbn'] ?? '');
+        $title = sanitize_text_field($_POST['title'] ?? '');
+        $author = sanitize_text_field($_POST['author'] ?? '');
+        $quantity = intval($_POST['quantity'] ?? 0);
+        $available = intval($_POST['available'] ?? 0);
+
+        if (empty($book_id) || empty($education_center_id) || empty($title) || empty($author) || $quantity < 0 || $available < 0 || $available > $quantity) {
+            $message = '<div class="message alert-danger">Invalid input data. All fields except ISBN are required, and quantities must be valid.</div>';
+        } else {
+            $result = $wpdb->update(
+                $table_name,
+                [
+                    'education_center_id' => $education_center_id,
+                    'isbn' => $isbn,
+                    'title' => $title,
+                    'author' => $author,
+                    'quantity' => $quantity,
+                    'available' => $available
+                ],
+                ['book_id' => $book_id],
+                ['%s', '%s', '%s', '%s', '%d', '%d'],
+                ['%s']
+            );
+
+            if ($result === false) {
+                $message = '<div class="message alert-danger">Failed to update book: ' . esc_html($wpdb->last_error) . '</div>';
+            } else {
+                $message = '<div class="message alert-success">Book updated successfully!</div>';
+                wp_redirect($_SERVER['REQUEST_URI']);
+                exit;
+            }
+        }
+    }
+
+    ob_start();
+    ?>
+    <div class="wrap" style="padding: 20px;">
+        <h2>Edit Books</h2>
+        <div id="edit-book-message" style="padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+            <?php echo $message; ?>
+        </div>
+        <table class="wp-list-table widefat fixed striped" id="edit-book-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>ISBN</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Total</th>
+                    <th>Available</th>
+                    <th>Center ID</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody id="edit-book-table-body">
+                <?php
+                if ($wpdb->last_error) {
+                    echo '<tr><td colspan="8">Error loading books: ' . esc_html($wpdb->last_error) . '</td></tr>';
+                } elseif (empty($books)) {
+                    echo '<tr><td colspan="8">No books found.</td></tr>';
+                } else {
+                    foreach ($books as $book) {
+                        echo '<tr>';
+                        echo '<td>' . esc_html($book->book_id) . '</td>';
+                        echo '<td>' . esc_html($book->isbn) . '</td>';
+                        echo '<td>' . esc_html($book->title) . '</td>';
+                        echo '<td>' . esc_html($book->author) . '</td>';
+                        echo '<td>' . esc_html($book->quantity) . '</td>';
+                        echo '<td>' . esc_html($book->available) . '</td>';
+                        echo '<td>' . esc_html($book->education_center_id) . '</td>';
+                        echo '<td><button class="edit-book button" data-book-id="' . esc_attr($book->book_id) . '">Edit</button></td>';
+                        echo '</tr>';
+                    }
+                }
+                ?>
+            </tbody>
+        </table>
+
+        <!-- Edit Book Modal -->
+        <div class="modal" id="editBookModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background: rgba(0,0,0,0.5);">
+            <div class="modal-content" style="background: #fff; margin: 15% auto; padding: 20px; border-radius: 10px; width: 90%; max-width: 600px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+                <span class="modal-close" style="float: right; font-size: 24px; cursor: pointer;">×</span>
+                <h3>Edit Book</h3>
+                <form id="standalone-edit-book-form" method="post" class="needs-validation" novalidate>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="edit-book-id">Book ID</label></th>
+                            <td><input type="text" name="book_id" id="edit-book-id" class="regular-text" readonly></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="edit-edu-center-id">Educational Center</label></th>
+                            <td>
+                                <select name="education_center_id" id="edit-edu-center-id" class="regular-text" required>
+                                    <option value="">Select Center</option>
+                                    <?php
+                                    if (empty($centers)) {
+                                        echo '<option value="">No centers available</option>';
+                                    } else {
+                                        foreach ($centers as $center) {
+                                            $center_id = get_field('educational_center_id', $center->ID) ?: $center->ID;
+                                            echo '<option value="' . esc_attr($center_id) . '">' . esc_html($center->post_title) . '</option>';
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="edit-isbn">ISBN</label></th>
+                            <td><input type="text" name="isbn" id="edit-isbn" class="regular-text" value="<?php echo esc_attr($_POST['isbn'] ?? ''); ?>"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="edit-title">Title</label></th>
+                            <td><input type="text" name="title" id="edit-title" class="regular-text" value="<?php echo esc_attr($_POST['title'] ?? ''); ?>" required></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="edit-author">Author</label></th>
+                            <td><input type="text" name="author" id="edit-author" class="regular-text" value="<?php echo esc_attr($_POST['author'] ?? ''); ?>" required></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="edit-quantity">Quantity</label></th>
+                            <td><input type="number" name="quantity" id="edit-quantity" class="regular-text" min="0" value="<?php echo esc_attr($_POST['quantity'] ?? ''); ?>" required></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="edit-available">Available</label></th>
+                            <td><input type="number" name="available" id="edit-available" class="regular-text" min="0" value="<?php echo esc_attr($_POST['available'] ?? ''); ?>" required></td>
+                        </tr>
+                    </table>
+                    <?php wp_nonce_field('su_p_library_edit', 'nonce'); ?>
+                    <input type="hidden" name="su_p_edit_library_book" value="1">
+                    <p class="submit">
+                        <button type="submit" id="update-book" class="button-primary">Update Book</button>
+                        <button type="button" class="button modal-close-btn">Cancel</button>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+    <style>
+        .message.alert-danger { background-color: #f8d7da; color: #721c24; }
+        .message.alert-success { background-color: #d4edda; color: #155724; }
+    </style>
+    <script>
+    jQuery(document).ready(function($) {
+        const $modal = $('#editBookModal');
+        const $message = $('#edit-book-message');
+
+        // Open modal and populate form
+        $('#edit-book-table-body').on('click', '.edit-book', function() {
+            const $row = $(this).closest('tr');
+            $('#edit-book-id').val($row.find('td:eq(0)').text());
+            $('#edit-isbn').val($row.find('td:eq(1)').text());
+            $('#edit-title').val($row.find('td:eq(2)').text());
+            $('#edit-author').val($row.find('td:eq(3)').text());
+            $('#edit-quantity').val($row.find('td:eq(4)').text());
+            $('#edit-available').val($row.find('td:eq(5)').text());
+            $('#edit-edu-center-id').val($row.find('td:eq(6)').text());
+            $modal.show();
+        });
+
+        // Close modal
+        $('.modal-close, .modal-close-btn').on('click', function() {
+            $modal.hide();
+        });
+
+        // Close modal on outside click
+        $(window).on('click', function(e) {
+            if (e.target === $modal[0]) {
+                $modal.hide();
+            }
+        });
+
+        // Form validation
+        $('#standalone-edit-book-form').on('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                this.reportValidity();
+                $message
+                    .addClass('alert-danger')
+                    .text('Please fill out all required fields correctly.');
+                setTimeout(() => $message.text(''), 4000);
+            }
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('su_p_library_edit_form', 'render_su_p_library_edit_form');
+function render_su_p_library_delete_form() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'library';
+
+    // Fetch books
+    $books = $wpdb->get_results("SELECT * FROM $table_name ORDER BY book_id DESC");
+
+    // Handle deletion submission
+    $message = '';
+    if (isset($_POST['su_p_delete_library_book']) && check_admin_referer('su_p_library_delete', 'nonce')) {
+        $book_id = sanitize_text_field($_POST['book_id'] ?? '');
+
+        if (empty($book_id)) {
+            $message = '<div class="message alert-danger">Invalid book ID.</div>';
+        } else {
+            $result = $wpdb->delete(
+                $table_name,
+                ['book_id' => $book_id],
+                ['%s']
+            );
+
+            if ($result === false) {
+                $message = '<div class="message alert-danger">Failed to delete book: ' . esc_html($wpdb->last_error) . '</div>';
+            } else {
+                // Store success message in transient to display after redirect
+                set_transient('su_p_delete_success', 'Book deleted successfully!', 10);
+                wp_redirect($_SERVER['REQUEST_URI']);
+                exit;
+            }
+        }
+    }
+
+    // Check for success message after redirect
+    if ($success_message = get_transient('su_p_delete_success')) {
+        $message = '<div class="message alert-success">' . esc_html($success_message) . '</div>';
+        delete_transient('su_p_delete_success');
+    }
+
+    ob_start();
+    ?>
+    <div class="wrap" style="padding: 20px;">
+        <h2>Delete Books</h2>
+        <div id="delete-book-message" style="padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+            <?php echo $message; ?>
+        </div>
+        <table class="wp-list-table widefat fixed striped" id="delete-book-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>ISBN</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Total</th>
+                    <th>Available</th>
+                    <th>Center ID</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="delete-book-table-body">
+                <?php
+                if ($wpdb->last_error) {
+                    echo '<tr><td colspan="8">Error loading books: ' . esc_html($wpdb->last_error) . '</td></tr>';
+                } elseif (empty($books)) {
+                    echo '<tr><td colspan="8">No books found.</td></tr>';
+                } else {
+                    foreach ($books as $book) {
+                        echo '<tr>';
+                        echo '<td>' . esc_html($book->book_id) . '</td>';
+                        echo '<td>' . esc_html($book->isbn) . '</td>';
+                        echo '<td>' . esc_html($book->title) . '</td>';
+                        echo '<td>' . esc_html($book->author) . '</td>';
+                        echo '<td>' . esc_html($book->quantity) . '</td>';
+                        echo '<td>' . esc_html($book->available) . '</td>';
+                        echo '<td>' . esc_html($book->education_center_id) . '</td>';
+                        echo '<td><button class="delete-book button" data-book-id="' . esc_attr($book->book_id) . '">Delete</button></td>';
+                        echo '</tr>';
+                    }
+                }
+                ?>
+            </tbody>
+        </table>
+
+        <!-- Delete Book Modal -->
+        <div class="modal" id="deleteBookModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background: rgba(0,0,0,0.5);">
+            <div class="modal-content" style="background: #fff; margin: 15% auto; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+                <span class="modal-close" style="float: right; font-size: 24px; cursor: pointer;">×</span>
+                <h3>Confirm Deletion</h3>
+                <p id="delete-book-text">Are you sure you want to delete this book?</p>
+                <form id="standalone-delete-book-form" method="post">
+                    <input type="hidden" name="book_id" id="delete-book-id">
+                    <?php wp_nonce_field('su_p_library_delete', 'nonce'); ?>
+                    <input type="hidden" name="su_p_delete_library_book" value="1">
+                    <p class="submit" style="text-align: right;">
+                        <button type="button" class="button modal-close-btn">Cancel</button>
+                        <button type="submit" class="button-primary delete-confirm">Delete</button>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+    <style>
+        .message.alert-danger { background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; }
+        .message.alert-success { background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; }
+    </style>
+    <script>
+    jQuery(document).ready(function($) {
+        const $modal = $('#deleteBookModal');
+        const $message = $('#delete-book-message');
+
+        // Open modal and set book ID
+        $('#delete-book-table-body').on('click', '.delete-book', function() {
+            const bookId = $(this).data('book-id');
+            $('#delete-book-id').val(bookId);
+            $('#delete-book-text').text(`Are you sure you want to delete book "${bookId}"?`);
+            $modal.show();
+        });
+
+        // Close modal
+        $('.modal-close, .modal-close-btn').on('click', function() {
+            $modal.hide();
+        });
+
+        // Close modal on outside click
+        $(window).on('click', function(e) {
+            if (e.target === $modal[0]) {
+                $modal.hide();
+            }
+        });
+
+        // Form submission validation
+        $('#standalone-delete-book-form').on('submit', function(e) {
+            if (!$(this).find('#delete-book-id').val()) {
+                e.preventDefault();
+                $message
+                    .addClass('alert-danger')
+                    .text('No book selected for deletion.');
+                setTimeout(() => $message.removeClass('alert-danger').text(''), 4000);
+            }
+        });
+    });
+    </script>
+    <?php
+    $output = ob_get_clean();
+    return $output;
+}
+add_shortcode('su_p_library_delete_form', 'render_su_p_library_delete_form');
+
+function render_su_p_library_transaction_form() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'library_transactions';
+
+    $centers = get_posts([
+        'post_type' => 'educational-center',
+        'posts_per_page' => -1,
+        'post_status' => 'publish'
+    ]);
+
+    $message = '';
+    if (isset($_POST['su_p_process_library_transaction']) && check_admin_referer('su_p_library_transaction', 'nonce')) {
+        $education_center_id = sanitize_text_field($_POST['education_center_id'] ?? '');
+        $book_id = sanitize_text_field($_POST['book_id'] ?? '');
+        $user_id = sanitize_text_field($_POST['user_id'] ?? '');
+        $user_type = sanitize_text_field($_POST['user_type'] ?? '');
+        $due_date = sanitize_text_field($_POST['due_date'] ?? '');
+        $return_date = !empty($_POST['return_date']) ? sanitize_text_field($_POST['return_date']) : null;
+
+        if (empty($education_center_id) || empty($book_id) || empty($user_id) || empty($user_type) || empty($due_date)) {
+            $message = '<div class="message alert-danger">All fields except return date are required.</div>';
+        } else {
+            $available = $wpdb->get_var($wpdb->prepare(
+                "SELECT available FROM {$wpdb->prefix}library WHERE book_id = %s AND education_center_id = %s",
+                $book_id,
+                $education_center_id
+            ));
+
+            if ($available === null) {
+                $message = '<div class="message alert-danger">Book not found.</div>';
+            } elseif ($available <= 0) {
+                $message = '<div class="message alert-danger">Book is not available for borrowing.</div>';
+            } else {
+                $data = [
+                    'book_id' => $book_id,
+                    'user_id' => $user_id, // Now uses student_id or staff_id
+                    'user_type' => $user_type,
+                    'issue_date' => current_time('mysql'),
+                    'due_date' => $due_date
+                  
+                ];
+                $formats = ['%s', '%s', '%s', '%s', '%s', '%s'];
+
+                if ($return_date) {
+                    $data['return_date'] = $return_date;
+                    $formats[] = '%s';
+                }
+
+                $result = $wpdb->insert($table_name, $data, $formats);
+
+                if ($result === false) {
+                    $message = '<div class="message alert-danger">Failed to process transaction: ' . esc_html($wpdb->last_error) . '</div>';
+                } else {
+                    $update_result = $wpdb->update(
+                        $wpdb->prefix . 'library',
+                        ['available' => $available - 1],
+                        ['book_id' => $book_id, 'education_center_id' => $education_center_id],
+                        ['%d'],
+                        ['%s', '%s']
+                    );
+
+                    if ($update_result === false) {
+                        $message = '<div class="message alert-danger">Failed to update book availability: ' . esc_html($wpdb->last_error) . '</div>';
+                        $wpdb->delete($table_name, ['book_id' => $book_id, 'user_id' => $user_id, 'issue_date' => current_time('mysql')], ['%s', '%s', '%s']);
+                    } else {
+                        set_transient('su_p_transaction_success', 'Book borrowed successfully!', 10);
+                        wp_redirect($_SERVER['REQUEST_URI']);
+                        exit;
+                    }
+                }
+            }
+        }
+    }
+
+    if ($success_message = get_transient('su_p_transaction_success')) {
+        $message = '<div class="message alert-success">' . esc_html($success_message) . '</div>';
+        delete_transient('su_p_transaction_success');
+    }
+
+    ob_start();
+    ?>
+    <div class="wrap" style="padding: 20px;">
+        <h2>Borrow a Book</h2>
+        <div id="transaction-message" style="padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+            <?php echo $message; ?>
+        </div>
+        <form id="standalone-transaction-form" method="post" class="needs-validation" novalidate>
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><label for="trans-center-id">Educational Center</label></th>
+                    <td>
+                        <select name="education_center_id" id="trans-center-id" class="regular-text" required>
+                            <option value="">Select Center</option>
+                            <?php
+                            if (empty($centers)) {
+                                echo '<option value="">No centers available</option>';
+                            } else {
+                                foreach ($centers as $center) {
+                                    $center_id = get_field('educational_center_id', $center->ID) ?: $center->ID;
+                                    $selected = (isset($_POST['education_center_id']) && $_POST['education_center_id'] === $center_id) ? 'selected' : '';
+                                    echo '<option value="' . esc_attr($center_id) . '" ' . $selected . '>' . esc_html($center->post_title) . '</option>';
+                                }
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="trans-book-id">Book</label></th>
+                    <td>
+                        <select name="book_id" id="trans-book-id" class="regular-text" required>
+                            <option value="">Select Book</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="trans-user-id">User</label></th>
+                    <td>
+                        <select name="user_id" id="trans-user-id" class="regular-text" required>
+                            <option value="">Select User</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="trans-user-type">User Type</label></th>
+                    <td>
+                        <select name="user_type" id="trans-user-type" class="regular-text" required>
+                            <option value="">Select Type</option>
+                            <option value="Student" <?php echo (isset($_POST['user_type']) && $_POST['user_type'] === 'Student') ? 'selected' : ''; ?>>Student</option>
+                            <option value="Staff" <?php echo (isset($_POST['user_type']) && $_POST['user_type'] === 'Staff') ? 'selected' : ''; ?>>Staff</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="trans-due-date">Due Date</label></th>
+                    <td><input type="datetime-local" name="due_date" id="trans-due-date" class="regular-text" min="<?php echo esc_attr(date('Y-m-d\TH:i', current_time('timestamp'))); ?>" value="<?php echo esc_attr($_POST['due_date'] ?? ''); ?>" required></td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="trans-return-date">Return Date (Optional)</label></th>
+                    <td><input type="datetime-local" name="return_date" id="trans-return-date" class="regular-text" min="<?php echo esc_attr(date('Y-m-d\TH:i', current_time('timestamp'))); ?>" value="<?php echo esc_attr($_POST['return_date'] ?? ''); ?>"></td>
+                </tr>
+            </table>
+            <?php wp_nonce_field('su_p_library_transaction', 'nonce'); ?>
+            <input type="hidden" name="su_p_process_library_transaction" value="1">
+            <p class="submit"><button type="submit" id="process-transaction" class="button-primary">Borrow Book</button></p>
+        </form>
+
+        <div id="edu-loader" class="edu-loader" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999;">
+            <div class="edu-loader-container" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                <img src="<?php echo esc_url(plugin_dir_url(__FILE__) . '../custom-loader.png'); ?>" alt="Loading..." class="edu-loader-png" style="max-width: 100px;">
+            </div>
+        </div>
+    </div>
+    <style>
+        .message.alert-danger { background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; }
+        .message.alert-success { background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; }
+    </style>
+    <script>
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const $centerSelect = $('#trans-center-id');
+        const $bookSelect = $('#trans-book-id');
+        const $userSelect = $('#trans-user-id');
+        const $message = $('#transaction-message');
+        const $loader = $('#edu-loader');
+
+        function showLoader() { $loader.show(); }
+        function hideLoader() { $loader.hide(); }
+
+        $centerSelect.on('change', function() {
+            const centerId = $(this).val();
+            if (centerId) {
+                showLoader();
+
+                $.ajax({
+                    url: ajaxUrl,
+                    method: 'POST',
+                    data: {
+                        action: 'su_p_library_list',
+                        edu_center_id: centerId,
+                        nonce: '<?php echo esc_js(wp_create_nonce('su_p_library_list')); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            const $books = $(response.data).find('tbody tr');
+                            let options = '<option value="">Select Book</option>';
+                            $books.each(function() {
+                                const bookId = $(this).find('td:eq(0)').text();
+                                const title = $(this).find('td:eq(2)').text();
+                                options += `<option value="${bookId}">${title} (${bookId})</option>`;
+                            });
+                            $bookSelect.html(options);
+                        } else {
+                            $bookSelect.html('<option value="">No books available</option>');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $message
+                            .addClass('alert-danger')
+                            .text('Error loading books: ' + error);
+                        setTimeout(() => $message.removeClass('alert-danger').text(''), 4000);
+                    },
+                    complete: function() {
+                        hideLoader();
+                    }
+                });
+
+                $.ajax({
+                    url: ajaxUrl,
+                    method: 'POST',
+                    data: {
+                        action: 'su_p_library_users_by_center',
+                        education_center_id: centerId,
+                        nonce: '<?php echo esc_js(wp_create_nonce('su_p_library_users')); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            let options = '<option value="">Select User</option>';
+                            if (response.data && response.data.users) {
+                                response.data.users.forEach(function(user) {
+                                    options += `<option value="${user.id}">${user.name}</option>`;
+                                });
+                                $userSelect.html(options);
+                            } else {
+                                $userSelect.html('<option value="">No users available</option>');
+                            }
+                            if (response.data.debug) {
+                                console.log('User fetch debug: ' + response.data.debug);
+                            }
+                        } else {
+                            $userSelect.html('<option value="">No users available</option>');
+                            $message
+                                .addClass('alert-danger')
+                                .text('Error: ' + (response.data?.message || 'No users found'));
+                            setTimeout(() => $message.removeClass('alert-danger').text(''), 4000);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $userSelect.html('<option value="">No users available</option>');
+                        $message
+                            .addClass('alert-danger')
+                            .text('Error loading users: ' + error);
+                        setTimeout(() => $message.removeClass('alert-danger').text(''), 4000);
+                    },
+                    complete: function() {
+                        hideLoader();
+                    }
+                });
+            } else {
+                $bookSelect.html('<option value="">Select Book</option>');
+                $userSelect.html('<option value="">Select User</option>');
+            }
+        });
+
+        $('#standalone-transaction-form').on('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                this.reportValidity();
+                $message
+                    .addClass('alert-danger')
+                    .text('Please fill out all required fields correctly.');
+                setTimeout(() => $message.removeClass('alert-danger').text(''), 4000);
+            }
+        });
+    });
+    </script>
+    <?php
+    $output = ob_get_clean();
+    return $output;
+}
+add_shortcode('su_p_library_transaction_form', 'render_su_p_library_transaction_form');
+// Updated AJAX handler for users by center
+function su_p_library_users_by_center() {
+    global $wpdb;
+    check_ajax_referer('su_p_library_users', 'nonce');
+    $education_center_id = sanitize_text_field($_POST['education_center_id'] ?? '');
+
+    if (empty($education_center_id)) {
+        wp_send_json_error(['message' => 'No educational center selected']);
+    }
+
+    $users = [];
+
+    // Fetch students as posts
+    $students = get_posts([
+        'post_type' => 'students',
+        'posts_per_page' => -1,
+        'post_status' => 'any',
+        'meta_query' => [
+            [
+                'key' => 'educational_center_id',
+                'value' => $education_center_id,
+                'compare' => '='
+            ]
+        ]
+    ]);
+
+    error_log('Students found: ' . count($students));
+    if (!empty($students)) {
+        foreach ($students as $student) {
+            $student_id = get_post_meta($student->ID, 'student_id', true); // Fetch student_id meta
+            $student_name = get_the_title($student->ID);
+            if (empty($student_id)) {
+                $student_id = 'STU-' . $student->ID; // Fallback if no student_id meta
+                error_log('No student_id meta for student ' . $student->ID . ', using fallback: ' . $student_id);
+            }
+            $users[] = [
+                'id' => $student_id, // Use student_id instead of post ID
+                'name' => $student_name
+            ];
+        }
+    }
+
+    // Fetch staff from custom table
+    $staff_table = $wpdb->prefix . 'staff';
+    if ($wpdb->get_var("SHOW TABLES LIKE '$staff_table'") == $staff_table) {
+        $staff = $wpdb->get_results($wpdb->prepare(
+            "SELECT staff_id AS id, name AS name FROM $staff_table WHERE education_center_id = %s",
+            $education_center_id
+        ));
+        if (!empty($staff)) {
+            foreach ($staff as $member) {
+                $users[] = ['id' => $member->id, 'name' => $member->name];
+            }
+        }
+    }
+
+    if (empty($users)) {
+        wp_send_json_success(['users' => [], 'debug' => 'No users found for center ' . $education_center_id]);
+    } else {
+        wp_send_json_success(['users' => $users, 'debug' => count($users) . ' users found']);
+    }
+}
+add_action('wp_ajax_su_p_library_users_by_center', 'su_p_library_users_by_center');
+// Enqueue Scripts
+// function su_p_enqueue_library_scripts() {
+//     wp_enqueue_style('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css');
+//     wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js', ['jquery'], null, true);
+//     wp_enqueue_style('select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', [], '4.1.0');
+//     wp_enqueue_script('select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', ['jquery'], '4.1.0', true);
+//     wp_enqueue_style('bootstrap-icons', 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css');
+//     wp_enqueue_script('jquery');
+// }
+// add_action('wp_enqueue_scripts', 'su_p_enqueue_library_scripts');
+
+//timetable
+// Main Render Function
+function render_su_p_timetable_management() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    
+    // Pagination and filter variables
+    $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+    $per_page = isset($_GET['per_page']) ? intval($_GET['per_page']) : 10;
+    $class_name_search = isset($_GET['class_name_search']) ? sanitize_text_field($_GET['class_name_search']) : '';
+    $center_filter = isset($_GET['center_filter']) ? sanitize_text_field($_GET['center_filter']) : '';
+    $class_filter = isset($_GET['class_filter']) ? intval($_GET['class_filter']) : '';
+    $section_filter = isset($_GET['section_filter']) ? sanitize_text_field($_GET['section_filter']) : '';
+
+    // Fetch ALL timetable data initially
+    $table_name = $wpdb->prefix . 'timetables';
+    $class_table = $wpdb->prefix . 'class_sections';
+    $subject_table = $wpdb->prefix . 'subjects';
+
+    $query = "SELECT t.*, c.class_name, s.subject_name 
+              FROM $table_name t 
+              JOIN $class_table c ON t.class_id = c.id 
+              LEFT JOIN $subject_table s ON t.subject_id = s.subject_id 
+              WHERE 1=1";
+    
+    $args = [];
+    if ($class_name_search) {
+        $query .= " AND c.class_name LIKE %s";
+        $args[] = '%' . $wpdb->esc_like($class_name_search) . '%';
+    }
+    if ($center_filter) {
+        $query .= " AND t.education_center_id = %s";
+        $args[] = $center_filter;
+    }
+    if ($class_filter) {
+        $query .= " AND t.class_id = %d";
+        $args[] = $class_filter;
+    }
+    if ($section_filter) {
+        $query .= " AND t.section = %s";
+        $args[] = $section_filter;
+    }
+    
+    $query .= " ORDER BY t.day, t.start_time";
+    $timetable_slots = !empty($args) ? $wpdb->get_results($wpdb->prepare($query, $args)) : $wpdb->get_results($query);
+    $total = count($timetable_slots);
+
+    // Fetch classes and subjects
+    $classes_query = $center_filter 
+        ? $wpdb->prepare("SELECT id, class_name, sections, education_center_id FROM $class_table WHERE education_center_id = %s", $center_filter) 
+        : "SELECT id, class_name, sections, education_center_id FROM $class_table";
+    $all_classes = $wpdb->get_results($classes_query);
+    $sections_data = [];
+    foreach ($all_classes as $class) {
+        $sections_data[$class->id] = array_filter(explode(',', $class->sections));
+    }
+
+    $subjects_query = $center_filter 
+        ? $wpdb->prepare("SELECT subject_id, subject_name FROM $subject_table WHERE education_center_id = %s OR education_center_id IS NULL", $center_filter) 
+        : "SELECT subject_id, subject_name FROM $subject_table";
+    $subjects = $wpdb->get_results($subjects_query);
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Timetable Management</h2>
+                <div class="search-filters">
+                    <input type="text" id="class-name-search" placeholder="Search by Class Name..." value="<?php echo esc_attr($class_name_search); ?>">
+                    <select id="center-filter">
+                        <option value="">All Educational Centers</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='$center_id' " . selected($center_filter, $center_id, false) . ">" . esc_html($center->post_title) . " ($center_id)</option>";
+                        }
+                        ?>
+                    </select>
+                    <select id="class-filter">
+                        <option value="">All Classes</option>
+                        <?php
+                        foreach ($all_classes as $class) {
+                            echo "<option value='" . esc_attr($class->id) . "' " . selected($class_filter, $class->id, false) . ">" . esc_html($class->class_name) . "</option>";
+                        }
+                        ?>
+                    </select>
+                    <select id="section-filter">
+                        <option value="">All Sections</option>
+                        <?php
+                        $unique_sections = [];
+                        foreach ($sections_data as $sections) {
+                            foreach ($sections as $sec) {
+                                if (!in_array($sec, $unique_sections)) {
+                                    $unique_sections[] = $sec;
+                                    echo "<option value='$sec' " . selected($section_filter, $sec, false) . ">" . esc_html($sec) . "</option>";
+                                }
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="actions">
+                    <button id="add-timetable-btn">Add Timetable Slot</button>
+                    <select id="slots-per-page" name="per_page">
+                        <option value="10" <?php selected($per_page, 10); ?>>10</option>
+                        <option value="20" <?php selected($per_page, 20); ?>>20</option>
+                        <option value="50" <?php selected($per_page, 50); ?>>50</option>
+                    </select>
+                    <button id="prev-page" class="button" <?php echo $page <= 1 ? 'disabled' : ''; ?>>Previous</button>
+                    <span id="page-info">Page <?php echo $page; ?> of <?php echo ceil($total / $per_page); ?> (Total Records: <?php echo $total; ?>)</span>
+                    <button id="next-page" class="button" <?php echo $page >= ceil($total / $per_page) ? 'disabled' : ''; ?>>Next</button>
+                    <button id="refresh-table" class="button">Refresh</button>
+                </div>
+                <div class="management-table-wrapper">
+                    <div class="actions" id="export-tools">
+                        <button class="export-btn export-csv" aria-label="Export to CSV"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
+                        <button class="export-btn export-pdf" aria-label="Export to PDF"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
+                        <button class="export-btn export-excel" aria-label="Export to Excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
+                    </div>
+                    <table id="timetable-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Day</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Class Name</th>
+                                <th>Section</th>
+                                <th>Subject</th>
+                                <th>Education Center ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $start = ($page - 1) * $per_page;
+                            $end = min($start + $per_page, $total);
+                            for ($i = $start; $i < $end && $i < count($timetable_slots); $i++) {
+                                $slot = $timetable_slots[$i];
+                                echo "<tr>
+                                    <td>" . esc_html($slot->timetable_id) . "</td>
+                                    <td>" . esc_html($slot->day) . "</td>
+                                    <td>" . esc_html($slot->start_time) . "</td>
+                                    <td>" . esc_html($slot->end_time) . "</td>
+                                    <td>" . esc_html($slot->class_name) . "</td>
+                                    <td>" . esc_html($slot->section) . "</td>
+                                    <td>" . esc_html($slot->subject_name ?: 'N/A') . "</td>
+                                    <td>" . esc_html($slot->education_center_id) . "</td>
+                                    <td>
+                                        <button class='edit-timetable' data-timetable-id='" . esc_attr($slot->timetable_id) . "'>Edit</button>
+                                        <button class='delete-timetable' data-timetable-id='" . esc_attr($slot->timetable_id) . "'>Delete</button>
+                                    </td>
+                                </tr>";
+                            }
+                            if (empty($timetable_slots)) {
+                                echo '<tr><td colspan="9">No timetable slots found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Timetable Modal -->
+    <div class="edu-modal" id="edit-timetable-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="edit-timetable-modal">×</span>
+            <h3>Edit Timetable Slot</h3>
+            <form id="edit-timetable-form" method="POST">
+                <input type="hidden" id="edit-timetable-id" name="timetable_id">
+                <div class="search-filters">
+                    <label for="edit-center-id">Education Center</label>
+                    <select id="edit-center-id" name="education_center_id" required onchange="updateEditClasses()">
+                        <option value="">Select Center</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title . " ($center_id)") . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-class-id">Class</label>
+                    <select id="edit-class-id" name="class_id" required onchange="updateEditSections()">
+                        <option value="">Select Class</option>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-section">Section</label>
+                    <select id="edit-section" name="section" required>
+                        <option value="">Select Section</option>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-subject-id">Subject</label>
+                    <select id="edit-subject-id" name="subject_id">
+                        <option value="">None</option>
+                        <?php
+                        foreach ($subjects as $subject) {
+                            echo "<option value='" . esc_attr($subject->subject_id) . "'>" . esc_html($subject->subject_name) . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-day">Day</label>
+                    <select id="edit-day" name="day" required>
+                        <option value="">Select Day</option>
+                        <?php foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day) : ?>
+                            <option value="<?php echo $day; ?>"><?php echo $day; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-start-time">Start Time</label>
+                    <input type="time" id="edit-start-time" name="start_time" required>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-end-time">End Time</label>
+                    <input type="time" id="edit-end-time" name="end_time" required>
+                </div>
+                <input type="hidden" name="action" value="edit_timetable">
+                <button type="submit" id="update-timetable">Update Slot</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        const allSlots = <?php echo json_encode(array_map(function($slot) {
+            return [
+                'id' => $slot->timetable_id,
+                'day' => $slot->day,
+                'start_time' => $slot->start_time,
+                'end_time' => $slot->end_time,
+                'class_name' => $slot->class_name,
+                'class_id' => $slot->class_id,
+                'section' => $slot->section,
+                'subject_name' => $slot->subject_name ?: 'N/A',
+                'subject_id' => $slot->subject_id,
+                'education_center_id' => $slot->education_center_id
+            ];
+        }, $timetable_slots)); ?>;
+
+        const allClasses = <?php echo json_encode(array_map(function($class) {
+            return [
+                'id' => $class->id,
+                'class_name' => $class->class_name,
+                'education_center_id' => $class->education_center_id,
+                'sections' => array_filter(explode(',', $class->sections))
+            ];
+        }, $all_classes)); ?>;
+
+        let currentPage = <?php echo $page; ?>;
+        let perPage = <?php echo $per_page; ?>;
+        let totalRecords = <?php echo $total; ?>;
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+        function openModal(modalId) { $(modalId).css('display', 'flex'); }
+        function closeModal(modalId) { $(modalId).css('display', 'none'); }
+
+        function filterAndRender() {
+            showLoader();
+            const classNameSearch = $('#class-name-search').val().toLowerCase();
+            const centerFilter = $('#center-filter').val();
+            const classFilter = $('#class-filter').val();
+            const sectionFilter = $('#section-filter').val();
+
+            let filteredSlots = allSlots.filter(slot => {
+                return (!classNameSearch || slot.class_name.toLowerCase().includes(classNameSearch)) &&
+                       (!centerFilter || slot.education_center_id === centerFilter) &&
+                       (!classFilter || slot.class_id == classFilter) &&
+                       (!sectionFilter || slot.section === sectionFilter);
+            });
+
+            totalRecords = filteredSlots.length;
+            const totalPages = Math.ceil(totalRecords / perPage);
+            currentPage = Math.min(currentPage, Math.max(1, totalPages));
+
+            const start = (currentPage - 1) * perPage;
+            const end = Math.min(start + perPage, filteredSlots.length);
+            const paginatedSlots = filteredSlots.slice(start, end);
+
+            let html = '';
+            if (paginatedSlots.length > 0) {
+                paginatedSlots.forEach(slot => {
+                    html += `<tr>
+                        <td>${slot.id}</td>
+                        <td>${slot.day}</td>
+                        <td>${slot.start_time}</td>
+                        <td>${slot.end_time}</td>
+                        <td>${slot.class_name}</td>
+                        <td>${slot.section}</td>
+                        <td>${slot.subject_name}</td>
+                        <td>${slot.education_center_id}</td>
+                        <td>
+                            <button class="edit-timetable" data-timetable-id="${slot.id}">Edit</button>
+                            <button class="delete-timetable" data-timetable-id="${slot.id}">Delete</button>
+                        </td>
+                    </tr>`;
+                });
+            } else {
+                html = '<tr><td colspan="9">No timetable slots found.</td></tr>';
+            }
+            $('#timetable-table tbody').html(html);
+
+            $('#page-info').text(`Page ${currentPage} of ${totalPages} (Total Records: ${totalRecords})`);
+            $('#prev-page').prop('disabled', currentPage <= 1);
+            $('#next-page').prop('disabled', currentPage >= totalPages);
+
+            hideLoader();
+        }
+
+        // Event handlers
+        $('#class-name-search').on('keyup', debounce(filterAndRender, 300));
+        $('#center-filter, #class-filter, #section-filter').on('change', filterAndRender);
+        $('#slots-per-page').on('change', function() {
+            perPage = parseInt($(this).val());
+            currentPage = 1;
+            filterAndRender();
+        });
+        $('#prev-page').on('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                filterAndRender();
+            }
+        });
+        $('#next-page').on('click', function() {
+            if (currentPage < Math.ceil(totalRecords / perPage)) {
+                currentPage++;
+                filterAndRender();
+            }
+        });
+        $('#refresh-table').on('click', function() {
+            $('#class-name-search').val('');
+            $('#center-filter').val('');
+            $('#class-filter').val('');
+            $('#section-filter').val('');
+            currentPage = 1;
+            filterAndRender();
+        });
+
+        // Edit Functionality
+        $(document).on('click', '.edit-timetable', function() {
+            const timetableId = $(this).data('timetable-id').toString();
+            const slot = allSlots.find(s => s.id.toString() === timetableId);
+
+            if (slot) {
+                $('#edit-timetable-id').val(slot.id);
+                $('#edit-center-id').val(slot.education_center_id);
+
+                $('#edit-class-id').empty().append('<option value="">Select Class</option>');
+                allClasses.forEach(cls => {
+                    if (cls.education_center_id === slot.education_center_id) {
+                        $('#edit-class-id').append(`<option value="${cls.id}" data-center-id="${cls.education_center_id}">${cls.class_name}</option>`);
+                    }
+                });
+                $('#edit-class-id').val(slot.class_id);
+
+                const classData = allClasses.find(c => c.id.toString() === slot.class_id.toString());
+                $('#edit-section').empty().append('<option value="">Select Section</option>');
+                if (classData && classData.sections) {
+                    classData.sections.forEach(section => {
+                        $('#edit-section').append(`<option value="${section}">${section}</option>`);
+                    });
+                }
+                $('#edit-section').val(slot.section);
+
+                $('#edit-subject-id').val(slot.subject_id || '');
+                $('#edit-day').val(slot.day);
+                $('#edit-start-time').val(slot.start_time);
+                $('#edit-end-time').val(slot.end_time);
+
+                openModal('#edit-timetable-modal');
+            } else {
+                console.error('Timetable slot not found for ID:', timetableId);
+                alert('Timetable slot not found.');
+            }
+        });
+
+        // Delete Functionality
+        $(document).on('click', '.delete-timetable', function() {
+            if (confirm('Are you sure you want to delete this timetable slot?')) {
+                showLoader();
+                const timetableId = $(this).data('timetable-id').toString();
+
+                // Use the current page URL as the endpoint
+                fetch('<?php echo esc_url(admin_url('admin-ajax.php')); ?>', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        'action': 'delete_timetable_slot', // Custom action for WordPress AJAX
+                        'timetable_id': timetableId,
+                        'nonce': '<?php echo wp_create_nonce('delete_timetable_nonce'); ?>'
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    if (result.success) {
+                        // Reload the page to reflect the updated data
+                        window.location.reload();
+                    } else {
+                        alert('Failed to delete timetable slot: ' + (result.data.message || 'Unknown error'));
+                        hideLoader();
+                    }
+                })
+                .catch(error => {
+                    console.error('Delete error:', error);
+                    alert('An error occurred while deleting the timetable slot: ' + error.message);
+                    hideLoader();
+                });
+            }
+        });
+
+        $('.edu-modal-close').on('click', function() {
+            closeModal('#' + $(this).data('modal'));
+        });
+
+        $(document).on('click', '.edu-modal', function(event) {
+            if ($(event.target).hasClass('edu-modal')) {
+                closeModal('#' + event.target.id);
+            }
+        });
+
+        // Export functionality (unchanged)
+        $('.export-csv').on('click', function() {
+            const headers = ['ID', 'Day', 'Start Time', 'End Time', 'Class Name', 'Section', 'Subject', 'Education Center ID'];
+            const csvRows = [headers.join(',')];
+            const filteredSlots = getFilteredSlots();
+            filteredSlots.forEach(row => {
+                const values = [row.id, row.day, row.start_time, row.end_time, row.class_name, row.section, row.subject_name, row.education_center_id].map(value => `"${value}"`);
+                csvRows.push(values.join(','));
+            });
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'timetable_slots.csv';
+            link.click();
+        });
+
+        $('.export-pdf').on('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(16);
+            doc.text('Timetable Slots Report', 10, 10);
+            doc.setFontSize(12);
+            const filteredSlots = getFilteredSlots();
+            const tableData = filteredSlots.map(row => [row.id, row.day, row.start_time, row.end_time, row.class_name, row.section, row.subject_name, row.education_center_id]);
+            doc.autoTable({
+                head: [['ID', 'Day', 'Start Time', 'End Time', 'Class Name', 'Section', 'Subject', 'Education Center ID']],
+                body: tableData,
+                startY: 20,
+                styles: { fontSize: 10, cellPadding: 2 },
+                headStyles: { fillColor: [44, 109, 251] }
+            });
+            doc.save('timetable_slots.pdf');
+        });
+
+        $('.export-excel').on('click', function() {
+            const filteredSlots = getFilteredSlots();
+            const worksheetData = filteredSlots.map(row => ({
+                'ID': row.id,
+                'Day': row.day,
+                'Start Time': row.start_time,
+                'End Time': row.end_time,
+                'Class Name': row.class_name,
+                'Section': row.section,
+                'Subject': row.subject_name,
+                'Education Center ID': row.education_center_id
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Timetable');
+            XLSX.writeFile(workbook, 'timetable_slots.xlsx');
+        });
+
+        function getFilteredSlots() {
+            const classNameSearch = $('#class-name-search').val().toLowerCase();
+            const centerFilter = $('#center-filter').val();
+            const classFilter = $('#class-filter').val();
+            const sectionFilter = $('#section-filter').val();
+            return allSlots.filter(slot => {
+                return (!classNameSearch || slot.class_name.toLowerCase().includes(classNameSearch)) &&
+                       (!centerFilter || slot.education_center_id === centerFilter) &&
+                       (!classFilter || slot.class_id == classFilter) &&
+                       (!sectionFilter || slot.section === sectionFilter);
+            });
+        }
+
+        function updateEditClasses() {
+            const centerId = $('#edit-center-id').val();
+            $('#edit-class-id').empty().append('<option value="">Select Class</option>');
+            allClasses.forEach(cls => {
+                if (cls.education_center_id === centerId) {
+                    $('#edit-class-id').append(`<option value="${cls.id}" data-center-id="${cls.education_center_id}">${cls.class_name}</option>`);
+                }
+            });
+            updateEditSections();
+        }
+
+        function updateEditSections() {
+            const classId = $('#edit-class-id').val();
+            const classData = allClasses.find(c => c.id.toString() === classId.toString());
+            $('#edit-section').empty().append('<option value="">Select Section</option>');
+            if (classData && classData.sections) {
+                classData.sections.forEach(section => {
+                    $('#edit-section').append(`<option value="${section}">${section}</option>`);
+                });
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    });
+    </script>
+    <?php
+    // Handle POST for edit
+    if (isset($_POST['action']) && $_POST['action'] === 'edit_timetable') {
+        $timetable_id = intval($_POST['timetable_id']);
+        $education_center_id = sanitize_text_field($_POST['education_center_id']);
+        $class_id = intval($_POST['class_id']);
+        $section = sanitize_text_field($_POST['section']);
+        $subject_id = !empty($_POST['subject_id']) ? intval($_POST['subject_id']) : null;
+        $day = sanitize_text_field($_POST['day']);
+        $start_time = sanitize_text_field($_POST['start_time']);
+        $end_time = sanitize_text_field($_POST['end_time']);
+
+        $wpdb->update(
+            $table_name,
+            [
+                'education_center_id' => $education_center_id,
+                'class_id' => $class_id,
+                'section' => $section,
+                'subject_id' => $subject_id,
+                'day' => $day,
+                'start_time' => $start_time,
+                'end_time' => $end_time
+            ],
+            ['timetable_id' => $timetable_id],
+            ['%s', '%d', '%s', '%d', '%s', '%s', '%s'],
+            ['%d']
+        );
+        wp_redirect($_SERVER['REQUEST_URI']);
+        exit;
+    }
+
+    return ob_get_clean();
+}
+
+// Register AJAX handler for delete (outside the render function)
+add_action('wp_ajax_delete_timetable_slot', 'handle_delete_timetable_slot');
+function handle_delete_timetable_slot() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'timetables';
+
+    // Check nonce for security
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'delete_timetable_nonce')) {
+        wp_send_json_error(['message' => 'Invalid security token']);
+        wp_die();
+    }
+
+    $timetable_id = intval($_POST['timetable_id'] ?? 0);
+    if (empty($timetable_id)) {
+        wp_send_json_error(['message' => 'Invalid timetable ID']);
+        wp_die();
+    }
+
+    $result = $wpdb->delete($table_name, ['timetable_id' => $timetable_id], ['%d']);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Database error: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success(['message' => 'Timetable slot deleted successfully']);
+    }
+    wp_die();
+}
+// AJAX Handlers
+add_action('wp_ajax_su_p_fetch_timetable', 'su_p_fetch_timetable');
+function su_p_fetch_timetable() {
+    check_ajax_referer('su_p_timetable_nonce', 'nonce');
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'timetables';
+    $class_table = $wpdb->prefix . 'class_sections';
+    $subject_table = $wpdb->prefix . 'subjects';
+
+    $page = max(1, intval($_POST['page'] ?? 1));
+    $per_page = intval($_POST['per_page'] ?? 10);
+    $class_name = sanitize_text_field($_POST['search_class_name'] ?? '');
+    $center = sanitize_text_field($_POST['center_filter'] ?? '');
+    $section = sanitize_text_field($_POST['section_filter'] ?? '');
+
+    $query = "SELECT t.*, c.class_name, s.subject_name 
+              FROM $table_name t 
+              JOIN $class_table c ON t.class_id = c.id 
+              LEFT JOIN $subject_table s ON t.subject_id = s.subject_id 
+              WHERE 1=1";
+    $args = [];
+
+    if ($class_name) {
+        $query .= " AND c.class_name LIKE %s";
+        $args[] = '%' . $wpdb->esc_like($class_name) . '%';
+    }
+    if ($center) {
+        $query .= " AND t.education_center_id = %s";
+        $args[] = $center;
+    }
+    if ($section) {
+        $query .= " AND t.section = %s";
+        $args[] = $section;
+    }
+
+    $total = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name t JOIN $class_table c ON t.class_id = c.id WHERE 1=1" . strstr($query, ' AND'), $args));
+    if ($wpdb->last_error) wp_send_json_error(['message' => 'Database error (total): ' . $wpdb->last_error]);
+
+    $offset = ($page - 1) * $per_page;
+    $query .= " ORDER BY t.day, t.start_time LIMIT %d OFFSET %d";
+    $args[] = $per_page;
+    $args[] = $offset;
+
+    $results = $wpdb->get_results($wpdb->prepare($query, $args));
+    if ($wpdb->last_error) wp_send_json_error(['message' => 'Database error (results): ' . $wpdb->last_error]);
+
+    $table_head = '<tr><th>ID</th><th>Day</th><th>Start Time</th><th>End Time</th><th>Class Name</th><th>Section</th><th>Subject</th><th>Education Center ID</th><th>Actions</th></tr>';
+    $slots = '';
+    $slot_data = [];
+    $sections_data = [];
+
+    $classes = $wpdb->get_results($center ? $wpdb->prepare("SELECT id, sections FROM $class_table WHERE education_center_id = %s", $center) : "SELECT id, sections FROM $class_table");
+    foreach ($classes as $class) {
+        $sections_data[$class->id] = array_filter(explode(',', $class->sections));
+    }
+
+    if ($results) {
+        foreach ($results as $row) {
+            $slots .= "<tr>
+                <td>" . esc_html($row->timetable_id) . "</td>
+                <td>" . esc_html($row->day) . "</td>
+                <td>" . esc_html($row->start_time) . "</td>
+                <td>" . esc_html($row->end_time) . "</td>
+                <td>" . esc_html($row->class_name) . "</td>
+                <td>" . esc_html($row->section) . "</td>
+                <td>" . esc_html($row->subject_name ?: 'N/A') . "</td>
+                <td>" . esc_html($row->education_center_id) . "</td>
+                <td>
+                    <button class='edit-timetable' data-timetable-id='" . esc_attr($row->timetable_id) . "'>Edit</button>
+                    <button class='delete-timetable' data-timetable-id='" . esc_attr($row->timetable_id) . "'>Delete</button>
+                </td>
+            </tr>";
+            $slot_data[] = [
+                'id' => $row->timetable_id,
+                'day' => $row->day,
+                'start_time' => $row->start_time,
+                'end_time' => $row->end_time,
+                'class_name' => $row->class_name,
+                'section' => $row->section,
+                'subject_name' => $row->subject_name,
+                'education_center_id' => $row->education_center_id
+            ];
+        }
+    } else {
+        $slots = '<tr><td colspan="9">No timetable slots found.</td></tr>';
+    }
+
+    wp_send_json_success([
+        'table_head' => $table_head,
+        'slots' => $slots,
+        'slot_data' => $slot_data,
+        'sections_data' => $sections_data,
+        'total' => $total ?: 0
+    ]);
+}
+
+add_action('wp_ajax_su_p_fetch_timetable_slot', 'su_p_fetch_timetable_slot');
+function su_p_fetch_timetable_slot() {
+    check_ajax_referer('su_p_timetable_nonce', 'nonce');
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'timetables';
+    $timetable_id = intval($_POST['timetable_id'] ?? 0);
+
+    $slot = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE timetable_id = %d", $timetable_id));
+    if ($slot) {
+        wp_send_json_success([
+            'id' => $slot->timetable_id,
+            'education_center_id' => $slot->education_center_id,
+            'class_id' => $slot->class_id,
+            'section' => $slot->section,
+            'subject_id' => $slot->subject_id,
+            'day' => $slot->day,
+            'start_time' => $slot->start_time,
+            'end_time' => $slot->end_time
+        ]);
+    } else {
+        wp_send_json_error(['message' => 'Timetable slot not found']);
+    }
+}
+
+add_action('wp_ajax_su_p_fetch_subjects', 'su_p_fetch_subjects');
+function su_p_fetch_subjects() {
+    check_ajax_referer('su_p_timetable_nonce', 'nonce');
+    global $wpdb;
+    $center = sanitize_text_field($_POST['center_filter'] ?? '');
+    $query = "SELECT * FROM {$wpdb->prefix}subjects WHERE education_center_id = %s OR education_center_id IS NULL";
+    $subjects = $wpdb->get_results($wpdb->prepare($query, $center));
+    wp_send_json_success($subjects);
+}
+
+add_action('wp_ajax_su_p_add_timetable', 'su_p_add_timetable');
+function su_p_add_timetable() {
+    check_ajax_referer('su_p_timetable_nonce', 'nonce');
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'timetables';
+
+    $center_id = sanitize_text_field($_POST['education_center_id'] ?? '');
+    $class_id = intval($_POST['class_id'] ?? 0);
+    $section = sanitize_text_field($_POST['section'] ?? '');
+    $subject_id = !empty($_POST['subject_id']) ? intval($_POST['subject_id']) : null;
+    $day = sanitize_text_field($_POST['day'] ?? '');
+    $start_time = sanitize_text_field($_POST['start_time'] ?? '');
+    $end_time = sanitize_text_field($_POST['end_time'] ?? '');
+
+    if (empty($center_id) || empty($class_id) || empty($section) || empty($day) || empty($start_time) || empty($end_time)) {
+        wp_send_json_error(['message' => 'All fields except subject are required']);
+        exit;
+    }
+
+    if ($start_time >= $end_time) {
+        wp_send_json_error(['message' => 'Start time must be before end time']);
+        exit;
+    }
+
+    $conflict = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM $table_name 
+         WHERE education_center_id = %s AND class_id = %d AND section = %s AND day = %s AND (
+            (start_time <= %s AND end_time > %s) OR 
+            (start_time < %s AND end_time >= %s)
+         )",
+        $center_id, $class_id, $section, $day, $start_time, $start_time, $end_time, $end_time
+    ));
+
+    if ($conflict > 0) {
+        wp_send_json_error(['message' => 'Time conflict detected']);
+        exit;
+    }
+
+    $result = $wpdb->insert(
+        $table_name,
+        [
+            'education_center_id' => $center_id,
+            'class_id' => $class_id,
+            'section' => $section,
+            'subject_id' => $subject_id,
+            'day' => $day,
+            'start_time' => $start_time,
+            'end_time' => $end_time
+        ],
+        ['%s', '%d', '%s', '%d', '%s', '%s', '%s']
+    );
+
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to add timetable slot: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Timetable slot added successfully');
+    }
+    exit;
+}
+
+add_action('wp_ajax_su_p_edit_timetable', 'su_p_edit_timetable');
+function su_p_edit_timetable() {
+    check_ajax_referer('su_p_timetable_nonce', 'nonce');
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'timetables';
+
+    $timetable_id = intval($_POST['timetable_id'] ?? 0);
+    $center_id = sanitize_text_field($_POST['education_center_id'] ?? '');
+    $class_id = intval($_POST['class_id'] ?? 0);
+    $section = sanitize_text_field($_POST['section'] ?? '');
+    $subject_id = !empty($_POST['subject_id']) ? intval($_POST['subject_id']) : null;
+    $day = sanitize_text_field($_POST['day'] ?? '');
+    $start_time = sanitize_text_field($_POST['start_time'] ?? '');
+    $end_time = sanitize_text_field($_POST['end_time'] ?? '');
+
+    if (empty($timetable_id) || empty($center_id) || empty($class_id) || empty($section) || empty($day) || empty($start_time) || empty($end_time)) {
+        wp_send_json_error(['message' => 'All fields except subject are required']);
+        exit;
+    }
+
+    if ($start_time >= $end_time) {
+        wp_send_json_error(['message' => 'Start time must be before end time']);
+        exit;
+    }
+
+    $conflict = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM $table_name 
+         WHERE education_center_id = %s AND class_id = %d AND section = %s AND day = %s AND (
+            (start_time <= %s AND end_time > %s) OR 
+            (start_time < %s AND end_time >= %s)
+         ) AND timetable_id != %d",
+        $center_id, $class_id, $section, $day, $start_time, $start_time, $end_time, $end_time, $timetable_id
+    ));
+
+    if ($conflict > 0) {
+        wp_send_json_error(['message' => 'Time conflict detected']);
+        exit;
+    }
+
+    $result = $wpdb->update(
+        $table_name,
+        [
+            'education_center_id' => $center_id,
+            'class_id' => $class_id,
+            'section' => $section,
+            'subject_id' => $subject_id,
+            'day' => $day,
+            'start_time' => $start_time,
+            'end_time' => $end_time
+        ],
+        ['timetable_id' => $timetable_id],
+        ['%s', '%d', '%s', '%d', '%s', '%s', '%s'],
+        ['%d']
+    );
+
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to update timetable slot: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Timetable slot updated successfully');
+    }
+    exit;
+}
+
+add_action('wp_ajax_su_p_delete_timetable', 'su_p_delete_timetable');
+function su_p_delete_timetable() {
+    check_ajax_referer('su_p_timetable_nonce', 'nonce');
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'timetables';
+    $timetable_id = intval($_POST['timetable_id'] ?? 0);
+
+    if (empty($timetable_id)) {
+        wp_send_json_error(['message' => 'Invalid timetable ID']);
+    }
+
+    $result = $wpdb->delete($table_name, ['timetable_id' => $timetable_id], ['%d']);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to delete timetable slot: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success(['message' => 'Timetable slot deleted successfully']);
+    }
+    exit;
 }
 
 
@@ -12473,20 +14660,6 @@ function render_su_p_roles() {
         <div class="card-header bg-primary text-white">Role & Permissions</div>
         <div class="card-body">
             <p>Role and permissions management to be implemented.</p>
-        </div>
-    </div>
-    <?php
-    return ob_get_clean();
-}
-
-// Timetable Management (Stub)
-function render_su_p_timetable() {
-    ob_start();
-    ?>
-    <div class="card shadow-sm" style="margin-top: 80px;">
-        <div class="card-header bg-primary text-white">Timetable Management</div>
-        <div class="card-body">
-            <p>Timetable supervision to be implemented.</p>
         </div>
     </div>
     <?php

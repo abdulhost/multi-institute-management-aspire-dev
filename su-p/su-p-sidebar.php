@@ -138,9 +138,11 @@ $active_section = isset($active_section) ? $active_section : 'overview';
   <ul class="sub-menu <?php echo $active_section == 'library' ? 'show' : ''; ?>">
     <div>
       <li class="<?php echo $active_section == 'library' && empty($active_action) ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=library'); ?>">Library</a></li>
-      <li class="<?php echo $active_action == 'add-library' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=exams&action=add-exams'); ?>">Add Class</a></li>
-      <li class="<?php echo $active_action == 'edit-exams' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=exams&action=edit-exams'); ?>">Edit Class</a></li>
-      <li class="<?php echo $active_action == 'delete-exams' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=exams&action=delete-exams'); ?>">Delete Class</a></li>
+      <li class="<?php echo $active_action == 'add-library' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=library&action=add-library'); ?>">Add Library</a></li>
+      <li class="<?php echo $active_action == 'edit-library' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=library&action=edit-library'); ?>">Edit Library</a></li>
+      <li class="<?php echo $active_action == 'delete-library' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=library&action=delete-library'); ?>">Delete Library</a></li>
+      <li class="<?php echo $active_action == 'transaction-library' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=library&action=transaction-library'); ?>">Transaction Library</a></li>
+      <li class="<?php echo $active_action == 'overdue-library' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=library&action=overdue-library'); ?>">Overdue Library</a></li>
     </div>
   </ul>
 </li>

@@ -726,7 +726,7 @@ function render_class_add($user_id, $teacher) {
         );
 
         if ($inserted) {
-            wp_redirect('?section=classes');
+            wp_redirect($_SERVER['REQUEST_URI']);
             exit;
         } else {
             echo '<div class="alert alert-danger">Error adding class: ' . $wpdb->last_error . '</div>';
@@ -789,8 +789,7 @@ function render_class_edit($user_id, $teacher, $class_id = null) {
         $updated = $wpdb->update($table_name, $data, ['id' => $class_id, 'education_center_id' => $education_center_id]);
 
         if ($updated !== false) {
-            wp_redirect('?section=classes');
-            exit;
+            wp_redirect($_SERVER['REQUEST_URI']);            exit;
         } else {
             echo '<div class="alert alert-danger">Error updating class: ' . $wpdb->last_error . '</div>';
         }

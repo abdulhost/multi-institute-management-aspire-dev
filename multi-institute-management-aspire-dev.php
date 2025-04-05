@@ -773,7 +773,7 @@ function get_unique_id_for_role($role_type, $center_id = '') {
         ],
         'book' => [
             'type'        => 'table',
-            'entity_name' => $wpdb->prefix . 'books',
+            'entity_name' => $wpdb->prefix . 'library',
             'prefix'      => 'BOOK-',
             'field_name'  => 'book_id',
         ],
