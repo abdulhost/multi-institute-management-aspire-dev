@@ -9,32 +9,6 @@ function aspire_notice_board_enqueue_scripts() {
 }
 add_action('wp_enqueue_scripts', 'aspire_notice_board_enqueue_scripts');
 
-// Shared function to get announcements
-function aspire_get_announcements($username, $role = 'teacher') {
-    global $wpdb;
-    $table = $wpdb->prefix . 'aspire_announcements';
-    $edu_center_id = ($role === 'teacher') ? educational_center_teacher_id() : get_educational_center_data();
-
-    $query = "SELECT * FROM $table WHERE education_center_id = %s";
-    $query_args = [$edu_center_id];
-
-    if ($role === 'teacher') {
-        // Teachers see announcements to 'all', 'teachers', or sent by themselves
-        $query .= " AND (receiver_id IN ('all', 'teachers') OR sender_id = %s)";
-        $query_args[] = $username;
-    } elseif ($role === 'admin') {
-        // Admins see all announcements in their center
-        // No additional filtering needed
-    }
-    
-
-    $query .= " ORDER BY timestamp DESC";
-    $prepared_query = $wpdb->prepare($query, $query_args);
-    error_log("$role announcements query: $prepared_query");
-    $results = $wpdb->get_results($prepared_query);
-    error_log("$role announcements for $username: " . print_r($results, true));
-    return $results;
-}
 
 // Shared function to send announcements
 function aspire_send_announcement($sender_id, $receiver_id, $message, $edu_center_id) {
@@ -52,16 +26,6 @@ function aspire_send_announcement($sender_id, $receiver_id, $message, $edu_cente
     return $result;
 }
 
-// Shared recipient options
-function aspire_get_recipient_options() {
-    return [
-        'all' => 'Everyone',
-        'teachers' => 'Teachers',
-        'students' => 'Students',
-        'parents' => 'Parents',
-        'institute_admins' => 'Admins'
-    ];
-}
 
 // Teacher Notice Board Shortcode
 function aspire_teacher_notice_board_shortcode() {
@@ -193,6 +157,153 @@ function aspire_teacher_notice_board_shortcode() {
 }
 add_shortcode('aspire_teacher_notice_board', 'aspire_teacher_notice_board_shortcode');
 
+// Teacher AJAX Handlers
+function aspire_teacher_fetch_announcements() {
+    check_ajax_referer('aspire_teacher_notice_nonce', 'nonce');
+    $user = wp_get_current_user();
+    $username = $user->user_login;
+    $announcements = aspire_get_announcements($username, 'teacher');
+    $recipients = aspire_get_recipient_options();
+
+    $output = '';
+    foreach ($announcements as $ann) {
+        $output .= '<div class="announcement-item">';
+        $output .= '<div class="announcement-content">';
+        $output .= '<span class="announcement-meta">' . esc_html($ann->sender_id === $username ? 'You' : $ann->sender_id) . ' to ';
+        $output .= esc_html($recipients[$ann->receiver_id] ?? ucfirst($ann->receiver_id)) . '</span>';
+        $output .= '<p class="announcement-message">' . esc_html($ann->message) . '</p>';
+        $output .= '</div>';
+        $output .= '<span class="announcement-timestamp" data-timestamp="' . esc_attr($ann->timestamp) . '">' . esc_html($ann->timestamp) . '</span>';
+        $output .= '</div>';
+    }
+    if (empty($announcements)) {
+        $output = '<div class="announcement-item"><p class="announcement-message text-muted">No announcements yet.</p></div>';
+    }
+    wp_send_json_success(['html' => $output]);
+}
+add_action('wp_ajax_aspire_teacher_fetch_announcements', 'aspire_teacher_fetch_announcements');
+
+function aspire_teacher_send_announcement() {
+    $nonce = $_POST['nonce'] ?? '';
+    if (!wp_verify_nonce($nonce, 'aspire_teacher_notice_nonce')) {
+        error_log("Teacher send failed: Invalid nonce - $nonce");
+        wp_send_json_error(['message' => 'Invalid nonce']);
+    }
+
+    $user = wp_get_current_user();
+    $username = $user->user_login;
+    $edu_center_id = educational_center_teacher_id();
+    $message = sanitize_text_field($_POST['message'] ?? '');
+    $target = sanitize_text_field($_POST['target'] ?? '');
+    $valid_targets = array_keys(aspire_get_recipient_options());
+
+    error_log("Teacher send announcement: username=$username, target=$target, message=$message, nonce=$nonce");
+
+    if (!aspire_is_teacher($user)) {
+        error_log("Teacher send failed: Not a teacher");
+        wp_send_json_error(['message' => 'Permission denied']);
+    }
+
+    if (!in_array($target, $valid_targets)) {
+        error_log("Teacher send failed: Invalid target - $target");
+        wp_send_json_error(['message' => 'Invalid target']);
+    }
+
+    if (empty($message)) {
+        error_log("Teacher send failed: Empty message");
+        wp_send_json_error(['message' => 'Message cannot be empty']);
+    }
+
+    $result = aspire_send_announcement($username, $target, $message, $edu_center_id);
+    if ($result) {
+        error_log("Teacher send success: Announcement posted");
+        wp_send_json_success();
+    } else {
+        error_log("Teacher send failed: Database insert error - " . $GLOBALS['wpdb']->last_error);
+        wp_send_json_error(['message' => 'Failed to post announcement']);
+    }
+}
+add_action('wp_ajax_aspire_teacher_send_announcement', 'aspire_teacher_send_announcement');
+
+
+
+// Existing functions (unchanged for this update)
+function aspire_get_announcements($username, $role = 'teacher') {
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_announcements';
+    $edu_center_id = ($role === 'teacher') ? educational_center_teacher_id() : get_educational_center_data();
+
+    $query = "SELECT * FROM $table WHERE education_center_id = %s";
+    $query_args = [$edu_center_id];
+
+    if ($role === 'teacher') {
+        $query .= " AND (receiver_id IN ('all', 'teachers') OR sender_id = %s)";
+        $query_args[] = $username;
+    } elseif ($role === 'admin') {
+        // No additional filtering needed for admin
+    }
+    
+    $query .= " ORDER BY timestamp DESC";
+    $prepared_query = $wpdb->prepare($query, $query_args);
+    error_log("$role announcements query: $prepared_query");
+    $results = $wpdb->get_results($prepared_query);
+    error_log("$role announcements for $username: " . print_r($results, true));
+    return $results;
+}
+
+function aspire_get_recipient_options() {
+    return [
+        'all' => 'Everyone',
+        'teachers' => 'Teachers',
+        'students' => 'Students',
+        'parents' => 'Parents',
+        'institute_admins' => 'Admins'
+    ];
+}
+
+// Admin AJAX Send Announcement (unchanged for this update)
+function aspire_admin_send_announcement() {
+    $nonce = $_POST['nonce'] ?? '';
+    if (!wp_verify_nonce($nonce, 'aspire_admin_notice_nonce')) {
+        error_log("Admin send failed: Invalid nonce - $nonce");
+        wp_send_json_error(['message' => 'Invalid nonce']);
+    }
+
+    $user = wp_get_current_user();
+    $username = $user->user_login;
+    $edu_center_id = get_educational_center_data();
+    $message = sanitize_text_field($_POST['message'] ?? '');
+    $target = sanitize_text_field($_POST['target'] ?? '');
+    $valid_targets = array_keys(aspire_get_recipient_options());
+
+    error_log("Admin send announcement: username=$username, target=$target, message=$message, nonce=$nonce");
+
+    if (!aspire_is_institute_admin($username, $edu_center_id)) {
+        error_log("Admin send failed: Not an admin");
+        wp_send_json_error(['message' => 'Permission denied']);
+    }
+
+    if (!in_array($target, $valid_targets)) {
+        error_log("Admin send failed: Invalid target - $target");
+        wp_send_json_error(['message' => 'Invalid target']);
+    }
+
+    if (empty($message)) {
+        error_log("Admin send failed: Empty message");
+        wp_send_json_error(['message' => 'Message cannot be empty']);
+    }
+
+    $result = aspire_send_announcement($username, $target, $message, $edu_center_id);
+    if ($result) {
+        error_log("Admin send success: Announcement posted");
+        wp_send_json_success();
+    } else {
+        error_log("Admin send failed: Database insert error - " . $GLOBALS['wpdb']->last_error);
+        wp_send_json_error(['message' => 'Failed to post announcement']);
+    }
+}
+add_action('wp_ajax_aspire_admin_send_announcement', 'aspire_admin_send_announcement');
+
 // Admin Notice Board Shortcode
 function aspire_admin_notice_board_shortcode() {
     if (!is_user_logged_in()) {
@@ -209,6 +320,19 @@ function aspire_admin_notice_board_shortcode() {
 
     $announcements = aspire_get_announcements($username, 'admin');
     $recipients = aspire_get_recipient_options();
+
+    // Fetch admin names for this center
+    global $wpdb;
+    $admin_table = $wpdb->prefix . 'institute_admins';
+    $admins = $wpdb->get_results($wpdb->prepare(
+        "SELECT institute_admin_id AS id, name FROM $admin_table WHERE education_center_id = %s",
+        $edu_center_id
+    ));
+    $admin_map = [];
+    foreach ($admins as $admin) {
+        $admin_map[$admin->id] = $admin->name;
+    }
+
     ob_start();
     ?>
     <div id="aspire-admin-notice-board" class="notice-board-container">
@@ -218,8 +342,12 @@ function aspire_admin_notice_board_shortcode() {
                 <div class="announcement-item">
                     <div class="announcement-content">
                         <span class="announcement-meta">
-                            <?php echo esc_html($ann->sender_id === $username ? 'You' : $ann->sender_id); ?> 
-                            to <?php echo esc_html($recipients[$ann->receiver_id] ?? ucfirst($ann->receiver_id)); ?>
+                            <?php 
+                            // Replace 'enigma_overlord' with 'Instituto' for display
+                            $sender_display = $ann->sender_id === 'enigma_overlord' ? 'Instituto' : ($ann->sender_id === $username ? 'You' : ($admin_map[$ann->sender_id] ?? $ann->sender_id));
+                            $receiver_display = isset($admin_map[$ann->receiver_id]) ? $admin_map[$ann->receiver_id] : ($recipients[$ann->receiver_id] ?? ucfirst($ann->receiver_id));
+                            echo esc_html($sender_display) . ' to ' . esc_html($receiver_display);
+                            ?>
                         </span>
                         <p class="announcement-message"><?php echo esc_html($ann->message); ?></p>
                     </div>
@@ -320,88 +448,35 @@ function aspire_admin_notice_board_shortcode() {
 }
 add_shortcode('aspire_admin_notice_board', 'aspire_admin_notice_board_shortcode');
 
-// Teacher AJAX Handlers
-function aspire_teacher_fetch_announcements() {
-    check_ajax_referer('aspire_teacher_notice_nonce', 'nonce');
-    $user = wp_get_current_user();
-    $username = $user->user_login;
-    $announcements = aspire_get_announcements($username, 'teacher');
-    $recipients = aspire_get_recipient_options();
-
-    $output = '';
-    foreach ($announcements as $ann) {
-        $output .= '<div class="announcement-item">';
-        $output .= '<div class="announcement-content">';
-        $output .= '<span class="announcement-meta">' . esc_html($ann->sender_id === $username ? 'You' : $ann->sender_id) . ' to ';
-        $output .= esc_html($recipients[$ann->receiver_id] ?? ucfirst($ann->receiver_id)) . '</span>';
-        $output .= '<p class="announcement-message">' . esc_html($ann->message) . '</p>';
-        $output .= '</div>';
-        $output .= '<span class="announcement-timestamp" data-timestamp="' . esc_attr($ann->timestamp) . '">' . esc_html($ann->timestamp) . '</span>';
-        $output .= '</div>';
-    }
-    if (empty($announcements)) {
-        $output = '<div class="announcement-item"><p class="announcement-message text-muted">No announcements yet.</p></div>';
-    }
-    wp_send_json_success(['html' => $output]);
-}
-add_action('wp_ajax_aspire_teacher_fetch_announcements', 'aspire_teacher_fetch_announcements');
-
-function aspire_teacher_send_announcement() {
-    $nonce = $_POST['nonce'] ?? '';
-    if (!wp_verify_nonce($nonce, 'aspire_teacher_notice_nonce')) {
-        error_log("Teacher send failed: Invalid nonce - $nonce");
-        wp_send_json_error(['message' => 'Invalid nonce']);
-    }
-
-    $user = wp_get_current_user();
-    $username = $user->user_login;
-    $edu_center_id = educational_center_teacher_id();
-    $message = sanitize_text_field($_POST['message'] ?? '');
-    $target = sanitize_text_field($_POST['target'] ?? '');
-    $valid_targets = array_keys(aspire_get_recipient_options());
-
-    error_log("Teacher send announcement: username=$username, target=$target, message=$message, nonce=$nonce");
-
-    if (!aspire_is_teacher($user)) {
-        error_log("Teacher send failed: Not a teacher");
-        wp_send_json_error(['message' => 'Permission denied']);
-    }
-
-    if (!in_array($target, $valid_targets)) {
-        error_log("Teacher send failed: Invalid target - $target");
-        wp_send_json_error(['message' => 'Invalid target']);
-    }
-
-    if (empty($message)) {
-        error_log("Teacher send failed: Empty message");
-        wp_send_json_error(['message' => 'Message cannot be empty']);
-    }
-
-    $result = aspire_send_announcement($username, $target, $message, $edu_center_id);
-    if ($result) {
-        error_log("Teacher send success: Announcement posted");
-        wp_send_json_success();
-    } else {
-        error_log("Teacher send failed: Database insert error - " . $GLOBALS['wpdb']->last_error);
-        wp_send_json_error(['message' => 'Failed to post announcement']);
-    }
-}
-add_action('wp_ajax_aspire_teacher_send_announcement', 'aspire_teacher_send_announcement');
-
-// Admin AJAX Handlers
+// Admin AJAX Fetch Announcements
 function aspire_admin_fetch_announcements() {
     check_ajax_referer('aspire_admin_notice_nonce', 'nonce');
     $user = wp_get_current_user();
     $username = $user->user_login;
+    $edu_center_id = get_educational_center_data();
     $announcements = aspire_get_announcements($username, 'admin');
     $recipients = aspire_get_recipient_options();
 
+    // Fetch admin names for this center
+    global $wpdb;
+    $admin_table = $wpdb->prefix . 'institute_admins';
+    $admins = $wpdb->get_results($wpdb->prepare(
+        "SELECT institute_admin_id AS id, name FROM $admin_table WHERE education_center_id = %s",
+        $edu_center_id
+    ));
+    $admin_map = [];
+    foreach ($admins as $admin) {
+        $admin_map[$admin->id] = $admin->name;
+    }
+
     $output = '';
     foreach ($announcements as $ann) {
+        // Replace 'enigma_overlord' with 'Instituto' for display
+        $sender_display = $ann->sender_id === 'enigma_overlord' ? 'Instituto' : ($ann->sender_id === $username ? 'You' : ($admin_map[$ann->sender_id] ?? $ann->sender_id));
+        $receiver_display = isset($admin_map[$ann->receiver_id]) ? $admin_map[$ann->receiver_id] : ($recipients[$ann->receiver_id] ?? ucfirst($ann->receiver_id));
         $output .= '<div class="announcement-item">';
         $output .= '<div class="announcement-content">';
-        $output .= '<span class="announcement-meta">' . esc_html($ann->sender_id === $username ? 'You' : $ann->sender_id) . ' to ';
-        $output .= esc_html($recipients[$ann->receiver_id] ?? ucfirst($ann->receiver_id)) . '</span>';
+        $output .= '<span class="announcement-meta">' . esc_html($sender_display) . ' to ' . esc_html($receiver_display) . '</span>';
         $output .= '<p class="announcement-message">' . esc_html($ann->message) . '</p>';
         $output .= '</div>';
         $output .= '<span class="announcement-timestamp" data-timestamp="' . esc_attr($ann->timestamp) . '">' . esc_html($ann->timestamp) . '</span>';
@@ -413,45 +488,3 @@ function aspire_admin_fetch_announcements() {
     wp_send_json_success(['html' => $output]);
 }
 add_action('wp_ajax_aspire_admin_fetch_announcements', 'aspire_admin_fetch_announcements');
-
-function aspire_admin_send_announcement() {
-    $nonce = $_POST['nonce'] ?? '';
-    if (!wp_verify_nonce($nonce, 'aspire_admin_notice_nonce')) {
-        error_log("Admin send failed: Invalid nonce - $nonce");
-        wp_send_json_error(['message' => 'Invalid nonce']);
-    }
-
-    $user = wp_get_current_user();
-    $username = $user->user_login;
-    $edu_center_id = get_educational_center_data();
-    $message = sanitize_text_field($_POST['message'] ?? '');
-    $target = sanitize_text_field($_POST['target'] ?? '');
-    $valid_targets = array_keys(aspire_get_recipient_options());
-
-    error_log("Admin send announcement: username=$username, target=$target, message=$message, nonce=$nonce");
-
-    if (!aspire_is_institute_admin($username, $edu_center_id)) {
-        error_log("Admin send failed: Not an admin");
-        wp_send_json_error(['message' => 'Permission denied']);
-    }
-
-    if (!in_array($target, $valid_targets)) {
-        error_log("Admin send failed: Invalid target - $target");
-        wp_send_json_error(['message' => 'Invalid target']);
-    }
-
-    if (empty($message)) {
-        error_log("Admin send failed: Empty message");
-        wp_send_json_error(['message' => 'Message cannot be empty']);
-    }
-
-    $result = aspire_send_announcement($username, $target, $message, $edu_center_id);
-    if ($result) {
-        error_log("Admin send success: Announcement posted");
-        wp_send_json_success();
-    } else {
-        error_log("Admin send failed: Database insert error - " . $GLOBALS['wpdb']->last_error);
-        wp_send_json_error(['message' => 'Failed to post announcement']);
-    }
-}
-add_action('wp_ajax_aspire_admin_send_announcement', 'aspire_admin_send_announcement');

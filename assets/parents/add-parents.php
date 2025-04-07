@@ -67,7 +67,7 @@ function add_parents_institute_dashboard_shortcode($atts) {
                             <span class="toggle-icon">▼</span>
                         </div>
                         <div class="section-content" id="personal-details" style="display: none;">
-                            <?php render_acf_select('teacher_gender', 'field_67c2c1083625b', 'Gender'); ?>
+                            <?php render_acf_select('parent_gender', 'field_67c2c1083625b', 'Gender'); ?>
                             <label for="parent_date_of_birth">Date of Birth:</label>
                             <input type="date" name="parent_date_of_birth">
                             <?php render_acf_select('parent_religion', 'field_67c2c1083d672', 'Religion'); ?>
@@ -170,7 +170,7 @@ function handle_add_parent_submission($atts = []) {
         // Use the educational_center_id from the form if provided, otherwise fallback to determined value
         $educational_center_id = isset($_POST['educational_center_id']) ? sanitize_text_field($_POST['educational_center_id']) : $educational_center_id;
 
-        $gender = isset($_POST['teacher_gender']) ? sanitize_text_field($_POST['teacher_gender']) : '';
+        $gender = isset($_POST['parent_gender']) ? sanitize_text_field($_POST['parent_gender']) : '';
         $attachment_id = null;
 
         if (isset($_FILES['parent_profile_photo']) && $_FILES['parent_profile_photo']['error'] === 0) {
@@ -241,7 +241,7 @@ function handle_add_parent_submission($atts = []) {
                 'parent_email' => $parent_email,
                 'educational_center_id' => $educational_center_id,
                 'parent_phone_number' => $parent_phone_number,
-                'teacher_gender' => $gender,
+                'parent_gender' => $gender,
                 'parent_religion' => $parent_religion,
                 'parent_blood_group' => $parent_blood_group,
                 'parent_date_of_birth' => $parent_date_of_birth,

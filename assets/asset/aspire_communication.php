@@ -226,6 +226,7 @@ function aspire_admin_ajax_send_message() {
 }
 
 // Admin: AJAX Fetch Messages
+// Admin: AJAX Fetch Messages
 add_action('wp_ajax_aspire_admin_fetch_messages', 'aspire_admin_ajax_fetch_messages');
 function aspire_admin_ajax_fetch_messages() {
     ob_start();
@@ -239,7 +240,7 @@ function aspire_admin_ajax_fetch_messages() {
     $table = $wpdb->prefix . 'aspire_messages';
     $edu_center_id = get_educational_center_data();
     
-    $group_types = ['all', 'institute_admins'];
+    $group_types = ['all', 'institute_admins']; // Removed 'enigma_overlord'
     $group_names = [
         'all' => 'Everyone in Center',
         'institute_admins' => 'Institute Admins'
@@ -254,12 +255,13 @@ function aspire_admin_ajax_fetch_messages() {
             $query .= " (receiver_id = %s)"; // Messages sent to this group
             $query .= " OR (sender_id = %s AND receiver_id = %s)"; // Messages sent by user to this group
             $query .= ")";
-            $query .= " LIMIT 50";
+            $query .= " ORDER BY timestamp ASC LIMIT 50";
             $query_args[] = $conversation_with;
             $query_args[] = $username;
             $query_args[] = $conversation_with;
         } else {
-            $query .= " AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s)) LIMIT 50";
+            $query .= " AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s))";
+            $query .= " ORDER BY timestamp ASC LIMIT 50";
             $query_args[] = $username;
             $query_args[] = $conversation_with;
             $query_args[] = $conversation_with;
@@ -270,6 +272,10 @@ function aspire_admin_ajax_fetch_messages() {
 
     $prepared_query = $wpdb->prepare($query, $query_args);
     $messages = $wpdb->get_results($prepared_query);
+
+    // Debugging: Log query and results
+    error_log("Fetch Messages Query: " . $wpdb->last_query);
+    error_log("Messages Fetched: " . print_r($messages, true));
 
     $contacts = get_posts([
         'post_type' => ['teacher', 'students', 'parent'],
@@ -300,6 +306,7 @@ function aspire_admin_ajax_fetch_messages() {
     foreach ($admins as $admin) {
         $contact_map[$admin['id']] = "{$admin['name']} (Admin)";
     }
+    $contact_map['enigma_overlord'] = 'Instituto Admin';
 
     $output = '';
     foreach ($messages as $msg) {
@@ -327,7 +334,7 @@ function aspire_admin_ajax_fetch_messages() {
     ob_end_clean();
     wp_send_json_success(['html' => $output, 'unread' => aspire_admin_get_unread_count($username)]);
 }
-
+// Admin: AJAX Fetch Conversations
 // Admin: AJAX Fetch Conversations
 add_action('wp_ajax_aspire_admin_fetch_conversations', 'aspire_admin_ajax_fetch_conversations');
 function aspire_admin_ajax_fetch_conversations() {
@@ -342,39 +349,23 @@ function aspire_admin_ajax_fetch_conversations() {
     $group_names = [
         'all' => 'Everyone in Center',
         'institute_admins' => 'Institute Admins'
+        // Removed 'enigma_overlord' from group names
     ];
 
-    $group_receivers = ['all', 'institute_admins'];
-    $placeholders = implode(',', array_fill(0, count($group_receivers), '%s'));
-
     $query = "
-        SELECT DISTINCT receiver_id AS conversation_with 
+        SELECT DISTINCT 
+            CASE 
+                WHEN sender_id = %s THEN receiver_id 
+                WHEN receiver_id = %s THEN sender_id 
+            END AS conversation_with
         FROM $table 
         WHERE education_center_id = %s 
-        AND sender_id = %s
-        UNION
-        SELECT DISTINCT sender_id AS conversation_with 
-        FROM $table 
-        WHERE education_center_id = %s 
-        AND receiver_id = %s 
-        AND sender_id NOT IN ($placeholders)
-        UNION
-        SELECT DISTINCT receiver_id AS conversation_with 
-        FROM $table 
-        WHERE education_center_id = %s 
-        AND receiver_id IN ($placeholders)
-        AND sender_id != %s
+        AND (sender_id = %s OR receiver_id = %s)
     ";
-    $query_args = array_merge(
-        [$edu_center_id, $username],
-        [$edu_center_id, $username],
-        $group_receivers,
-        [$edu_center_id],
-        $group_receivers,
-        [$username]
-    );
+    $query_args = [$username, $username, $edu_center_id, $username, $username];
     $active_conversations = $wpdb->get_results($wpdb->prepare($query, $query_args));
 
+    // Fetch contacts for mapping
     $contacts = get_posts([
         'post_type' => ['teacher', 'students', 'parent'],
         'posts_per_page' => -1,
@@ -404,11 +395,16 @@ function aspire_admin_ajax_fetch_conversations() {
     foreach ($admins as $admin) {
         $contact_map[$admin['id']] = "{$admin['name']} (Admin)";
     }
+    $contact_map['enigma_overlord'] = 'Instituto Admin'; // Treated as individual contact
 
     $output = '';
     $has_conversations = false;
+    $seen_conversations = [];
     foreach ($active_conversations as $conv) {
         $conv_with = $conv->conversation_with;
+        if (!$conv_with || isset($seen_conversations[$conv_with])) continue;
+        $seen_conversations[$conv_with] = true;
+
         if (isset($group_names[$conv_with])) {
             $name = "Group: " . $group_names[$conv_with];
         } else {
@@ -424,7 +420,6 @@ function aspire_admin_ajax_fetch_conversations() {
     ob_end_clean();
     wp_send_json_success($output);
 }
-
 // Admin: Shortcode
 function aspire_admin_prochat_shortcode() {
     if (!is_user_logged_in()) {
@@ -462,6 +457,7 @@ function aspire_admin_prochat_shortcode() {
                 <div class="chat-header">
                     <h5 id="current-conversation">Select a conversation</h5>
                     <div>
+                        <button id="refresh-chat" class="btn btn-outline-info btn-sm"><i class="bi bi-arrow-repeat"></i> Refresh</button>
                         <button id="new-chat" class="btn btn-outline-primary btn-sm">New Chat</button>
                         <button id="clear-conversation" class="btn btn-outline-secondary btn-sm" style="display:none;">Clear</button>
                     </div>
@@ -477,6 +473,7 @@ function aspire_admin_prochat_shortcode() {
                             <option value="">Select a recipient</option>
                             <option value="all">All</option>
                             <option value="institute_admins">All Admins</option>
+                            <option value="enigma_overlord">Instituto Admin</option>
                             <?php
                             $unique_contacts = [];
                             foreach ($contacts as $contact) {
@@ -514,28 +511,10 @@ function aspire_admin_prochat_shortcode() {
     </div>
 
     <style>
-        .chat-loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-        .chat-loading.active {
-            display: block;
-        }
-        .spinner {
-            width: 30px;
-            height: 30px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        .chat-loading { display: none; text-align: center; padding: 20px; color: #666; }
+        .chat-loading.active { display: block; }
+        .spinner { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
@@ -568,7 +547,7 @@ function aspire_admin_prochat_shortcode() {
                 },
                 error: function(xhr, status, error) {
                     $('#aspire-admin-message-list').html('<p>Network error occurred.</p>');
-                    console.error('AJAX error:', status, error);
+                    console.error('AJAX error fetching messages:', status, error);
                 }
             });
         }
@@ -592,7 +571,7 @@ function aspire_admin_prochat_shortcode() {
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error('AJAX error:', status, error);
+                    console.error('AJAX error fetching conversations:', status, error);
                 }
             });
         }
@@ -615,6 +594,13 @@ function aspire_admin_prochat_shortcode() {
             $('#new-chat').show();
             $('#recipient-select').hide();
             fetchMessages(selectedConversation);
+        });
+
+        $('#refresh-chat').click(function() {
+            if (selectedConversation) {
+                fetchMessages(selectedConversation); // Refresh messages for current conversation
+            }
+            updateConversations(); // Refresh conversation list
         });
 
         $('#clear-conversation').click(function() {
@@ -679,7 +665,7 @@ function aspire_admin_prochat_shortcode() {
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error('AJAX error:', status, error);
+                    console.error('AJAX error sending message:', status, error);
                     alert('Network error occurred. Please try again.');
                 }
             });

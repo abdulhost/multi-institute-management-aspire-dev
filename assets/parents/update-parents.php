@@ -85,7 +85,7 @@ function edit_parents_institute_dashboard_shortcode($atts) {
                                 $parent_phone_number = get_post_meta($parent->ID, 'parent_phone_number', true);
                                 $parent_student_ids = get_post_meta($parent->ID, 'parent_student_ids', true);
                                 $parent_name = get_post_meta($parent->ID, 'parent_name', true);
-                                $parent_gender = get_post_meta($parent->ID, 'teacher_gender', true);
+                                $parent_gender = get_post_meta($parent->ID, 'parent_gender', true);
                                 $parent_date_of_birth = get_post_meta($parent->ID, 'parent_date_of_birth', true);
                                 $parent_religion = get_post_meta($parent->ID, 'parent_religion', true);
                                 $parent_blood_group = get_post_meta($parent->ID, 'parent_blood_group', true);
@@ -173,7 +173,7 @@ function edit_parents_institute_dashboard_shortcode($atts) {
                         $gender_field = get_field_object('field_67c2c1083625b');
                         if ($gender_field) : ?>
                             <label for="edit_parent_gender">Gender:</label>
-                            <select name="teacher_gender" id="edit_parent_gender">
+                            <select name="parent_gender" id="edit_parent_gender">
                                 <option value="">Select Gender</option>
                                 <?php foreach ($gender_field['choices'] as $value => $label) : ?>
                                     <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
@@ -449,7 +449,7 @@ function handle_parent_update_submission() {
         'parent_name' => sanitize_text_field($_POST['parent_name'] ?? ''),
         'parent_email' => sanitize_email($_POST['parent_email'] ?? ''),
         'parent_phone_number' => sanitize_text_field($_POST['parent_phone_number'] ?? ''),
-        'teacher_gender' => sanitize_text_field($_POST['teacher_gender'] ?? ''),
+        'parent_gender' => sanitize_text_field($_POST['parent_gender'] ?? ''),
         'parent_religion' => sanitize_text_field($_POST['parent_religion'] ?? ''),
         'parent_blood_group' => sanitize_text_field($_POST['parent_blood_group'] ?? ''),
         'parent_date_of_birth' => sanitize_text_field($_POST['parent_date_of_birth'] ?? ''),

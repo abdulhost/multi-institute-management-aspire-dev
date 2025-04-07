@@ -32,17 +32,46 @@ function su_p_dashboard_shortcode() {
             <?php
             switch ($active_section) {
                 case 'overview':
-                    echo render_su_p_overview();
+                    echo render_instituto_dashboard();
                     break;
                 case 'centers':
                     echo render_su_p_centers();
                     break;
-                case 'teacher':
-                    echo render_su_p_teachers();
-                    break;
-                case 'students':
-                    echo render_su_p_students();
-                    break;
+                // case 'teacher':
+                //     echo render_su_p_teachers();
+
+                //     break;
+                    case 'teacher':
+                        if ($action === 'add-teacher') {
+                            echo render_su_p_add_teachers();
+                        } 
+                        elseif ($action === 'edit-teacher') {
+                            echo render_su_p_edit_teachers();
+                        } 
+                        elseif ($action === 'delete-teacher') {
+                            echo render_su_p_delete_teachers();
+                        } 
+                         else {
+                            echo render_su_p_teachers_management();
+                        }
+                        break;
+                    case 'students':
+                        if ($action === 'add-students') {
+                            echo render_su_p_add_students();
+                        } 
+                        elseif ($action === 'edit-students') {
+                            echo render_su_p_edit_students();
+                        } 
+                        elseif ($action === 'delete-students') {
+                            echo render_su_p_delete_students();
+                        } 
+                         else {
+                            echo render_su_p_students_management();
+                        }
+                        break;
+                // case 'students':
+                //     echo render_su_p_students();
+                //     break;
                 case 'staff':
                     echo render_su_p_staff();
                     break;
@@ -119,9 +148,185 @@ function su_p_dashboard_shortcode() {
                             echo su_p_library_management_dashboard_shortcode();
                         }
                         break;
-                case 'timetable':
-                    echo render_su_p_timetable_management();
-                    break;
+                    case 'timetable':
+                        if ($action === 'add-timetable') {
+                            echo render_su_p_add_timetable();
+                        } 
+                        elseif ($action === 'edit-timetable') {
+                            echo render_su_p_edit_timetable();
+                        } 
+                        elseif ($action === 'delete-timetable') {
+                            echo render_su_p_delete_timetable();
+                        } 
+                         else {
+                            echo render_su_p_timetable_management();
+                        }
+                        break;
+                    case 'subjects':
+                        if ($action === 'add-subjects') {
+                            echo render_su_p_add_subjects();
+                        } 
+                        elseif ($action === 'edit-subjects') {
+                            echo render_su_p_edit_subjects();
+                        } 
+                        elseif ($action === 'delete-subjects') {
+                            echo render_su_p_delete_subjects();
+                        } 
+                         else {
+                            echo render_su_p_subjects_management();
+                        }
+                        break;
+                    case 'homework':
+                        if ($action === 'add-homework') {
+                            echo render_su_p_add_homework();
+                        } 
+                        elseif ($action === 'edit-homework') {
+                            echo render_su_p_edit_homework();
+                        } 
+                        elseif ($action === 'delete-homework') {
+                            echo render_su_p_delete_homework();
+                        } 
+                         else {
+                            echo render_su_p_homework_management();
+                        }
+                        break;
+                    case 'department':
+                        if ($action === 'add-department') {
+                            echo render_su_p_add_department();
+                        } 
+                        elseif ($action === 'edit-department') {
+                            echo render_su_p_edit_department();
+                        } 
+                        elseif ($action === 'delete-department') {
+                            echo render_su_p_delete_department();
+                        } 
+                         else {
+                            echo render_su_p_department_management();
+                        }
+                        break;
+                    case 'parents':
+                        if ($action === 'add-parents') {
+                            echo render_su_p_add_parents();
+                        } 
+                        elseif ($action === 'edit-parents') {
+                            echo render_su_p_edit_parents();
+                        } 
+                        elseif ($action === 'delete-parents') {
+                            echo render_su_p_delete_parents();
+                        } 
+                         else {
+                            echo render_su_p_parents_management();
+                        }
+                        break;
+                        case 'inventory':
+                            if ($action === 'add-inventory') {
+                                echo render_su_p_library_add_form();
+                            } 
+                            elseif ($action === 'edit-inventory') {
+                                echo render_su_p_edit_inventory();
+                            } 
+                            elseif ($action === 'delete-inventory') {
+                                echo render_su_p_delete_inventory();
+                            } 
+                            elseif ($action === 'transaction-inventory') {
+                                echo render_su_p_transaction_management();
+                            } 
+                            elseif ($action === 'add-transaction-inventory') {
+                                echo render_su_p_add_transaction();
+                            } 
+                            elseif ($action === 'edit-transaction-inventory') {
+                                echo render_su_p_edit_transaction();
+                            } 
+                            elseif ($action === 'delete-transaction-inventory') {
+                                echo render_su_p_delete_transaction();
+                            } 
+                            elseif ($action === 'view-transaction-inventory') {
+                                echo render_su_p_view_transactions();
+                            } 
+                            
+                             else {
+                                echo render_su_p_inventory_management();
+                            }
+                            break;
+                            case 'fees':
+                               if ($action === 'add-fees') {
+                                    echo render_enigma_add_fees_form();
+                                } 
+                                elseif ($action === 'edit-fees') {
+                                    echo render_enigma_edit_fees_form();
+                                } 
+                                elseif ($action === 'delete-fees') {
+                                    echo render_enigma_delete_fees_form();
+                                } 
+                                 else {
+                                    echo render_enigma_fees_management();
+                                }
+                                break;
+                            case 'fee_templates':
+                               if ($action === 'add-fee_templates') {
+                                    echo render_enigma_add_fee_template_form();
+                                } 
+                                elseif ($action === 'edit-fee_templates') {
+                                    echo render_enigma_edit_fee_template_form();
+                                } 
+                                elseif ($action === 'delete-fee_templates') {
+                                    echo render_enigma_delete_fee_template_form();
+                                } 
+                                 else {
+                                    echo render_enigma_view_fee_templates_form();
+                                }
+                                break;
+                            case 'transport_fees':
+                               if ($action === 'add-transport_fees') {
+                                    echo render_edit_transport_fees();
+                                } 
+                                elseif ($action === 'edit-transport_fees') {
+                                    echo render_edit_transport_fees();
+                                } 
+                                elseif ($action === 'delete-transport_fees') {
+                                    echo render_delete_transport_fees();
+                                } 
+                                 else {
+                                    echo render_view_transport_fees();
+                                }
+                                break;
+                            case 'transport_enrollments':
+                               if ($action === 'add-transport_enrollments') {
+                                    echo render_add_transport_enrollments();
+                                } 
+                                elseif ($action === 'edit-transport_enrollments') {
+                                    echo render_edit_transport_enrollments();
+                                } 
+                                elseif ($action === 'delete-transport_enrollments') {
+                                    echo render_delete_transport_enrollments();
+                                } 
+                                 else {
+                                    echo render_view_transport_enrollments();
+                                }
+                                break;
+
+                            case 'message':
+                                if ($action === 'add-parents') {
+                                    echo render_su_p_add_parents();
+                                } 
+                                elseif ($action === 'edit-parents') {
+                                    echo render_su_p_edit_parents();
+                                } 
+                                elseif ($action === 'delete-parents') {
+                                    echo render_su_p_delete_parents();
+                                } 
+                                 else {
+                                    echo render_eo_chat();
+                                }
+                                break;
+                            case 'notice_board':
+                              
+                                    echo enigma_notice_board_page();
+                                
+                                break;
+                // case 'timetable':
+                //     echo render_su_p_timetable_management();
+                //     break;
                 case 'reports':
                     echo su_p_reports_dashboard_shortcode();
                     break;
@@ -592,28 +797,410 @@ function aspire_su_p_mark_messages_read() {
 }
 
 // Overview Section
-function render_su_p_overview() {
+function render_instituto_dashboard() {
     global $wpdb;
-    $centers_count = $wpdb->get_var("SELECT COUNT(*) FROM $wpdb->posts WHERE post_type = 'educational-center' AND post_status = 'publish'");
-    $teachers_count = count(get_users(['role' => 'teacher']));
-    $students_count = count(get_users(['role' => 'student']));
-    $parents_count = count(get_users(['role' => 'parent']));
+
+    // Fetch educational centers with their custom education_center_id
+    $centers = $wpdb->get_results("SELECT ID, post_title FROM {$wpdb->posts} WHERE post_type = 'educational-center' AND post_status = 'publish'");
     ob_start();
     ?>
-    <div class="card shadow-sm" style="margin-top: 80px;">
-        <div class="card-header bg-primary text-white">System Overview</div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3"><h5>Total Centers: <?php echo $centers_count; ?></h5></div>
-                <div class="col-md-3"><h5>Total Teachers: <?php echo $teachers_count; ?></h5></div>
-                <div class="col-md-3"><h5>Total Students: <?php echo $students_count; ?></h5></div>
-                <div class="col-md-3"><h5>Total Parents: <?php echo $parents_count; ?></h5></div>
+    <div class="wrap instituto-dashboard">
+        <!-- Loader -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Instituto Dashboard</h1>
+            <p class="dashboard-subtitle">Your Educational Insights</p>
+            <select id="center-selector" class="center-dropdown">
+                <option value="">All Centers</option>
+                <?php foreach ($centers as $center) : 
+                    $education_center_id = get_post_meta($center->ID, 'educational_center_id', true) ?: $center->ID; // Fallback to post ID if meta not set
+                ?>
+                    <option value="<?php echo esc_attr($education_center_id); ?>"><?php echo esc_html($center->post_title); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboard-content">
+            <!-- Quick Stats -->
+            <div class="stats-grid" id="stats-grid"></div>
+
+            <!-- Financial Overview -->
+            <div class="financial-overview">
+                <h2 class="section-title">Financial Snapshot</h2>
+                <div class="snapshot-grid" id="snapshot-grid"></div>
+            </div>
+
+            <!-- Operational Insights -->
+            <div class="operational-insights">
+                <h2 class="section-title">Operational Insights</h2>
+                <div class="insights-grid" id="insights-grid"></div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="quick-links">
+                <a href="<?php echo admin_url('admin.php?page=reports'); ?>" class="btn">Reports</a>
+                <a href="<?php echo admin_url('admin.php?page=transport_fees'); ?>" class="btn">Transport</a>
+                <a href="<?php echo admin_url('admin.php?page=exams'); ?>" class="btn">Exams</a>
             </div>
         </div>
     </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const nonce = '<?php echo wp_create_nonce('instituto_dashboard_nonce'); ?>';
+        let charts = {};
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        function destroyCharts() {
+            Object.values(charts).forEach(chart => chart.destroy());
+            charts = {};
+        }
+
+        function updateDashboard(centerId) {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'fetch_instituto_dashboard_data',
+                    center_id: centerId,
+                    nonce: nonce
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log('AJAX Response:', response);
+                    if (response.success) {
+                        $('#stats-grid').html(response.data.stats_html || '<p>No stats data</p>');
+                        $('#snapshot-grid').html(response.data.snapshot_html || '<p>No financial data</p>');
+                        $('#insights-grid').html(response.data.insights_html || '<p>No insights data</p>');
+
+                        destroyCharts();
+
+                        const chartConfigs = [
+                            { id: 'revenueChart', type: 'bar', labels: ['Fees', 'Transport'], data: [response.data.paid_fees || 0, response.data.paid_transport_fees || 0], label: 'Revenue' },
+                            { id: 'feesChart', type: 'doughnut', labels: ['Paid', 'Unpaid'], data: [response.data.paid_fees || 0, response.data.unpaid_fees || 0], label: 'Fees' },
+                            { id: 'transportChart', type: 'doughnut', labels: ['Paid', 'Unpaid'], data: [response.data.paid_transport_fees || 0, response.data.unpaid_transport_fees || 0], label: 'Transport' },
+                            { id: 'attendanceChart', type: 'bar', labels: ['Teachers', 'Students'], data: [response.data.teacher_attendance || 0, response.data.student_attendance || 0], label: 'Attendance' },
+                            { id: 'examsChart', type: 'bar', labels: ['Avg. Marks'], data: [response.data.avg_marks || 0], label: 'Exams' }
+                        ];
+
+                        chartConfigs.forEach(config => {
+                            const canvas = document.getElementById(config.id);
+                            if (canvas) {
+                                const ctx = canvas.getContext('2d');
+                                charts[config.id] = new Chart(ctx, {
+                                    type: config.type,
+                                    data: {
+                                        labels: config.labels,
+                                        datasets: [{
+                                            label: config.label,
+                                            data: config.data,
+                                            backgroundColor: config.type === 'doughnut' ? ['var(--success-bg)', 'var(--error-bg)'] : 'var(--primary-color)',
+                                            borderColor: config.type === 'doughnut' ? ['var(--success)', 'var(--error)'] : 'var(--primary-dark)',
+                                            borderWidth: 1
+                                        }]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: true,
+                                        aspectRatio: 2,
+                                        scales: config.type === 'bar' ? { y: { beginAtZero: true } } : {},
+                                        plugins: {
+                                            legend: { position: 'bottom', labels: { font: { size: 12 } } },
+                                            tooltip: { enabled: true }
+                                        }
+                                    }
+                                });
+                            } else {
+                                console.error(`Canvas #${config.id} not found`);
+                            }
+                        });
+                    } else {
+                        console.error('Response not successful:', response.data.message);
+                        alert('Error: ' + (response.data.message || 'Unknown error'));
+                    }
+                    hideLoader();
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', status, error, 'Response Text:', xhr.responseText);
+                    alert('Failed to fetch dashboard data. Check console for details.');
+                    hideLoader();
+                }
+            });
+        }
+
+        updateDashboard('');
+        $('#center-selector').on('change', function() {
+            updateDashboard($(this).val());
+        });
+    });
+    </script>
     <?php
+    wp_enqueue_style('instituto-dashboard-style', plugin_dir_url(__FILE__) . 'instituto_dashboard.css');
     return ob_get_clean();
 }
+
+// AJAX Handler
+add_action('wp_ajax_fetch_instituto_dashboard_data', 'fetch_instituto_dashboard_data');
+function fetch_instituto_dashboard_data() {
+    global $wpdb;
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    $wpdb->suppress_errors(true);
+
+    check_ajax_referer('instituto_dashboard_nonce', 'nonce');
+
+    $center_id = !empty($_POST['center_id']) ? sanitize_text_field($_POST['center_id']) : '';
+    $where_args = [];
+    if ($center_id) {
+        $where_args['education_center_id'] = $center_id;
+    }
+
+    // Helper function to build WHERE clause
+    function build_where_clause($base_query, $args) {
+        global $wpdb;
+        $where = " WHERE 1=1";
+        $params = [];
+        foreach ($args as $key => $value) {
+            $where .= " AND $key = %s";
+            $params[] = $value;
+        }
+        $query = !empty($params) ? $wpdb->prepare($base_query . $where, $params) : $base_query . $where;
+        error_log("Query: $query"); // Debug: Log each query
+        return $query;
+    }
+
+ // Counts (Modified to use post types and custom field)
+// Counts (Using get_posts with meta_query)
+if ($center_id) {
+    $centers_count = 1;
+} else {
+    $centers = get_posts([
+        'post_type' => 'educational-center',
+        'post_status' => 'publish',
+        'numberposts' => -1 // Get all posts
+    ]);
+    $centers_count = count($centers);
+}
+
+if ($center_id) {
+    $teachers = get_posts([
+        'post_type' => 'teacher',
+        'post_status' => 'publish',
+        'numberposts' => -1,
+        'meta_query' => [
+            [
+                'key' => 'educational_center_id',
+                'value' => $center_id,
+                'compare' => '='
+            ]
+        ]
+    ]);
+    $teachers_count = count($teachers);
+} else {
+    $teachers = get_posts([
+        'post_type' => 'teacher',
+        'post_status' => 'publish',
+        'numberposts' => -1
+    ]);
+    $teachers_count = count($teachers);
+}
+
+if ($center_id) {
+    $students = get_posts([
+        'post_type' => 'students',
+        'post_status' => 'publish',
+        'numberposts' => -1,
+        'meta_query' => [
+            [
+                'key' => 'educational_center_id',
+                'value' => $center_id,
+                'compare' => '='
+            ]
+        ]
+    ]);
+    $students_count = count($students);
+} else {
+    $students = get_posts([
+        'post_type' => 'students',
+        'post_status' => 'publish',
+        'numberposts' => -1
+    ]);
+    $students_count = count($students);
+}
+
+if ($center_id) {
+    $parents = get_posts([
+        'post_type' => 'parent',
+        'post_status' => 'publish',
+        'numberposts' => -1,
+        'meta_query' => [
+            [
+                'key' => 'educational_center_id',
+                'value' => $center_id,
+                'compare' => '='
+            ]
+        ]
+    ]);
+    $parents_count = count($parents);
+} else {
+    $parents = get_posts([
+        'post_type' => 'parent',
+        'post_status' => 'publish',
+        'numberposts' => -1
+    ]);
+    $parents_count = count($parents);
+}
+
+    $staff_count = $wpdb->get_var(build_where_clause("SELECT COUNT(*) FROM {$wpdb->prefix}staff", $where_args)) ?: 0;
+
+    // Fees
+    $total_fees = $wpdb->get_var(build_where_clause("SELECT SUM(amount) FROM {$wpdb->prefix}student_fees", $where_args)) ?: 0;
+    $where_args['status'] = 'paid';
+    $paid_fees = $wpdb->get_var(build_where_clause("SELECT SUM(amount) FROM {$wpdb->prefix}student_fees", $where_args)) ?: 0;
+    unset($where_args['status']);
+    $unpaid_fees = $total_fees - $paid_fees;
+
+    // Transport Fees
+    $total_transport_fees = $wpdb->get_var(build_where_clause("SELECT SUM(amount) FROM {$wpdb->prefix}transport_fees", $where_args)) ?: 0;
+    $where_args['status'] = 'paid';
+    $paid_transport_fees = $wpdb->get_var(build_where_clause("SELECT SUM(amount) FROM {$wpdb->prefix}transport_fees", $where_args)) ?: 0;
+    unset($where_args['status']);
+    $unpaid_transport_fees = $total_transport_fees - $paid_transport_fees;
+
+    $total_revenue = $paid_fees + $paid_transport_fees;
+    $total_salaries = ($wpdb->get_var(build_where_clause("SELECT SUM(salary_base) FROM {$wpdb->prefix}staff", $where_args)) ?: 0) * 12;
+
+    // Exams
+    $exams_count = $wpdb->get_var(build_where_clause("SELECT COUNT(*) FROM {$wpdb->prefix}exams", $where_args)) ?: 0;
+    $avg_marks = $wpdb->get_var(build_where_clause("SELECT AVG(marks) FROM {$wpdb->prefix}exam_results", $where_args)) ?: 0;
+
+    // Attendance
+    $teacher_where = $where_args;
+    $teacher_where['status'] = 'Present';
+    $teacher_where['date >='] = 'DATE_SUB(CURDATE(), INTERVAL 30 DAY)';
+    $teacher_attendance = $wpdb->get_var(build_where_clause("SELECT COUNT(*) FROM {$wpdb->prefix}staff_attendance", $teacher_where)) ?: 0;
+
+    $student_where = $where_args;
+    $student_where['status'] = 'Present';
+    $student_where['date >='] = 'DATE_SUB(CURDATE(), INTERVAL 30 DAY)';
+    $student_attendance = $wpdb->get_var(build_where_clause("SELECT COUNT(*) FROM {$wpdb->prefix}student_attendance", $student_where)) ?: 0;
+
+    // Resources
+    $inventory_where = $where_args;
+    $inventory_where['quantity <='] = 'low_stock_threshold';
+    $inventory_where['status'] = 'Available';
+    $low_stock_items = $wpdb->get_var(build_where_clause("SELECT COUNT(*) FROM {$wpdb->prefix}inventory", $inventory_where)) ?: 0;
+
+    if ($center_id) {
+        $overdue_books = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$wpdb->prefix}library_transactions lt
+             JOIN {$wpdb->prefix}library l ON lt.book_id = l.book_id
+             WHERE l.education_center_id = %s AND lt.return_date IS NULL AND lt.due_date < CURDATE()",
+            $center_id
+        )) ?: 0;
+    } else {
+        $overdue_books = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}library_transactions WHERE return_date IS NULL AND due_date < CURDATE()") ?: 0;
+    }
+
+    // Debug: Log all calculated values
+    error_log("Center ID: $center_id");
+    error_log("Centers: $centers_count, Teachers: $teachers_count, Students: $students_count, Parents: $parents_count, Staff: $staff_count");
+    error_log("Total Fees: $total_fees, Paid Fees: $paid_fees, Unpaid Fees: $unpaid_fees");
+    error_log("Total Transport: $total_transport_fees, Paid Transport: $paid_transport_fees, Unpaid Transport: $unpaid_transport_fees");
+    error_log("Revenue: $total_revenue, Salaries: $total_salaries");
+    error_log("Exams: $exams_count, Avg Marks: $avg_marks");
+    error_log("Teacher Attendance: $teacher_attendance, Student Attendance: $student_attendance");
+    error_log("Low Stock: $low_stock_items, Overdue Books: $overdue_books");
+
+    // HTML Output
+    ob_start();
+    ?>
+    <div class="stat-card" data-tooltip="Educational Centers"><span class="dashicons dashicons-building"></span><p><?php echo esc_html($centers_count); ?></p><h3>Centers</h3></div>
+    <div class="stat-card" data-tooltip="Total Teachers"><span class="dashicons dashicons-groups"></span><p><?php echo esc_html($teachers_count); ?></p><h3>Teachers</h3></div>
+    <div class="stat-card" data-tooltip="Total Students"><span class="dashicons dashicons-admin-users"></span><p><?php echo esc_html($students_count); ?></p><h3>Students</h3></div>
+    <div class="stat-card" data-tooltip="Total Parents"><span class="dashicons dashicons-networking"></span><p><?php echo esc_html($parents_count); ?></p><h3>Parents</h3></div>
+    <div class="stat-card" data-tooltip="Total Staff"><span class="dashicons dashicons-businessperson"></span><p><?php echo esc_html($staff_count); ?></p><h3>Staff</h3></div>
+    <?php
+    $stats_html = ob_get_clean();
+
+    ob_start();
+    ?>
+    <div class="snapshot-card">
+        <h3>Revenue</h3><p class="highlight">$<?php echo number_format($total_revenue, 2); ?></p>
+        <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+    </div>
+    <div class="snapshot-card">
+        <h3>Fees</h3><p>Total: $<?php echo number_format($total_fees, 2); ?></p><p class="success">Paid: $<?php echo number_format($paid_fees, 2); ?></p><p class="error">Unpaid: $<?php echo number_format($unpaid_fees, 2); ?></p>
+        <div class="chart-container"><canvas id="feesChart"></canvas></div>
+    </div>
+    <div class="snapshot-card">
+        <h3>Transport Fees</h3><p>Total: $<?php echo number_format($total_transport_fees, 2); ?></p><p class="success">Paid: $<?php echo number_format($paid_transport_fees, 2); ?></p><p class="error">Unpaid: $<?php echo number_format($unpaid_transport_fees, 2); ?></p>
+        <div class="chart-container"><canvas id="transportChart"></canvas></div>
+    </div>
+    <div class="snapshot-card">
+        <h3>Salaries (Annual)</h3><p class="highlight">$<?php echo number_format($total_salaries, 2); ?></p>
+    </div>
+    <?php
+    $snapshot_html = ob_get_clean();
+
+    ob_start();
+    ?>
+    <div class="insight-card">
+        <h3>Exams</h3><p>Total: <?php echo esc_html($exams_count); ?></p><p>Avg. Marks: <?php echo number_format($avg_marks, 2); ?></p>
+        <div class="chart-container"><canvas id="examsChart"></canvas></div>
+    </div>
+    <div class="insight-card">
+        <h3>Attendance (30 Days)</h3><p>Teachers: <?php echo esc_html($teacher_attendance); ?></p><p>Students: <?php echo esc_html($student_attendance); ?></p>
+        <div class="chart-container"><canvas id="attendanceChart"></canvas></div>
+    </div>
+    <div class="insight-card">
+        <h3>Resources</h3><p>Low Stock: <?php echo esc_html($low_stock_items); ?></p><p>Overdue Books: <?php echo esc_html($overdue_books); ?></p>
+    </div>
+    <?php
+    $insights_html = ob_get_clean();
+
+    $last_error = $wpdb->last_error;
+    $wpdb->suppress_errors(false);
+
+    header('Content-Type: application/json');
+    if ($last_error) {
+        wp_send_json_error(['message' => 'Database error: ' . $last_error]);
+    } else {
+        wp_send_json_success([
+            'stats_html' => $stats_html,
+            'snapshot_html' => $snapshot_html,
+            'insights_html' => $insights_html,
+            'paid_fees' => $paid_fees,
+            'paid_transport_fees' => $paid_transport_fees,
+            'unpaid_fees' => $unpaid_fees,
+            'unpaid_transport_fees' => $unpaid_transport_fees,
+            'teacher_attendance' => $teacher_attendance,
+            'student_attendance' => $student_attendance,
+            'avg_marks' => $avg_marks
+        ]);
+    }
+    exit;
+}
+
+
+
+
+
+
 
 // Educational Centers Management
 function render_su_p_centers() {
@@ -1843,7 +2430,13 @@ function su_p_add_new_admin() {
 // }
 
 // render_su_p_teachers Management (Stub)
-function render_su_p_teachers() {
+// Main Teachers Management Function (Read Only)
+// Main Teachers Management Function
+function render_su_p_teachers_management() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to view this dashboard.</p>';
+    }
+
     global $wpdb;
     ob_start();
     ?>
@@ -1911,7 +2504,7 @@ function render_su_p_teachers() {
             <form id="add-teacher-form" class="edu-form" enctype="multipart/form-data">
                 <div class="edu-form-group">
                     <label class="edu-form-label" for="teacher-id">Teacher ID</label>
-                    <input type="text" class="edu-form-input" id="teacher-id" name="teacher_id" value="TEA-<?php echo uniqid(); ?>" readonly>
+                    <input type="text" class="edu-form-input" id="teacher-id" name="teacher_id" value="" readonly>
                 </div>
                 <div class="edu-form-group">
                     <label class="edu-form-label" for="educational-center-id">Educational Center ID</label>
@@ -1941,7 +2534,7 @@ function render_su_p_teachers() {
                     <label class="edu-form-label" for="teacher-gender">Gender</label>
                     <select class="edu-form-input" id="teacher-gender" name="teacher_gender">
                         <option value="">Select Gender</option>
-                        <?php $gender_field = get_field_object('field_67baed90b66de'); foreach ($gender_field['choices'] as $value => $label) : ?>
+                        <?php $gender_field = get_field_object('field_67baed90b66de'); if ($gender_field) foreach ($gender_field['choices'] as $value => $label) : ?>
                             <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
                         <?php endforeach; ?>
                     </select>
@@ -1954,7 +2547,7 @@ function render_su_p_teachers() {
                     <label class="edu-form-label" for="teacher-religion">Religion</label>
                     <select class="edu-form-input" id="teacher-religion" name="teacher_religion">
                         <option value="">Select Religion</option>
-                        <?php $religion_field = get_field_object('field_67baed90bdebb'); foreach ($religion_field['choices'] as $value => $label) : ?>
+                        <?php $religion_field = get_field_object('field_67baed90bdebb'); if ($religion_field) foreach ($religion_field['choices'] as $value => $label) : ?>
                             <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
                         <?php endforeach; ?>
                     </select>
@@ -1967,7 +2560,7 @@ function render_su_p_teachers() {
                     <label class="edu-form-label" for="teacher-blood">Blood Group</label>
                     <select class="edu-form-input" id="teacher-blood" name="teacher_blood_group">
                         <option value="">Select Blood Group</option>
-                        <?php $blood_field = get_field_object('field_67baed90c555b'); foreach ($blood_field['choices'] as $value => $label) : ?>
+                        <?php $blood_field = get_field_object('field_67baed90c555b'); if ($blood_field) foreach ($blood_field['choices'] as $value => $label) : ?>
                             <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
                         <?php endforeach; ?>
                     </select>
@@ -2008,113 +2601,112 @@ function render_su_p_teachers() {
     </div>
 
     <!-- Edit Teacher Modal -->
- <!-- Edit Teacher Modal -->
     <div class="edu-modal" id="edit-teacher-modal">
-    <div class="edu-modal-content">
-        <span class="edu-modal-close" data-modal="edit-teacher-modal">×</span>
-        <h3>Edit Teacher</h3>
-        <form id="edit-teacher-form" class="edu-form" enctype="multipart/form-data">
-            <input type="hidden" id="edit-teacher-post-id" name="teacher_post_id">
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-id">Teacher ID</label>
-                <input type="text" class="edu-form-input" id="edit-teacher-id" name="teacher_id" readonly>
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-educational-center-id">Educational Center ID</label>
-                <input type="text" class="edu-form-input" id="edit-educational-center-id" name="educational_center_id" readonly>
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-name">Teacher Name</label>
-                <input type="text" class="edu-form-input" id="edit-teacher-name" name="teacher_name" required>
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-email">Email</label>
-                <input type="email" class="edu-form-input" id="edit-teacher-email" name="teacher_email" required>
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-phone">Phone Number</label>
-                <input type="text" class="edu-form-input" id="edit-teacher-phone" name="teacher_phone_number">
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-gender">Gender</label>
-                <select class="edu-form-input" id="edit-teacher-gender" name="teacher_gender">
-                    <option value="">Select Gender</option>
-                    <?php $gender_field = get_field_object('field_67baed90b66de'); foreach ($gender_field['choices'] as $value => $label) : ?>
-                        <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-dob">Date of Birth</label>
-                <input type="date" class="edu-form-input" id="edit-teacher-dob" name="teacher_date_of_birth">
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-religion">Religion</label>
-                <select class="edu-form-input" id="edit-teacher-religion" name="teacher_religion">
-                    <option value="">Select Religion</option>
-                    <?php $religion_field = get_field_object('field_67baed90bdebb'); foreach ($religion_field['choices'] as $value => $label) : ?>
-                        <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-photo">Profile Photo</label>
-                <input type="file" class="edu-form-input" id="edit-teacher-photo" name="teacher_profile_photo" accept="image/*">
-                <img id="edit-teacher-photo-preview" style="max-width: 200px; display: none;" />
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-blood">Blood Group</label>
-                <select class="edu-form-input" id="edit-teacher-blood" name="teacher_blood_group">
-                    <option value="">Select Blood Group</option>
-                    <?php $blood_field = get_field_object('field_67baed90c555b'); foreach ($blood_field['choices'] as $value => $label) : ?>
-                        <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-height">Height (cm)</label>
-                <input type="number" class="edu-form-input" id="edit-teacher-height" name="teacher_height">
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-weight">Weight (kg)</label>
-                <input type="number" class="edu-form-input" id="edit-teacher-weight" name="teacher_weight">
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-current-addr">Current Address</label>
-                <textarea class="edu-form-input" id="edit-teacher-current-addr" name="teacher_current_address"></textarea>
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-permanent-addr">Permanent Address</label>
-                <textarea class="edu-form-input" id="edit-teacher-permanent-addr" name="teacher_permanent_address"></textarea>
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-roll">Roll Number</label>
-                <input type="number" class="edu-form-input" id="edit-teacher-roll" name="teacher_roll_number" required>
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-admission">Admission Date</label>
-                <input type="date" class="edu-form-input" id="edit-teacher-admission" name="teacher_admission_date" required>
-            </div>
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="edit-teacher-dept">Department</label>
-                <select class="edu-form-input" id="edit-teacher-dept" name="teacher_department">
-                    <option value="">Select Department</option>
-                    <!-- Options populated via JavaScript -->
-                </select>
-            </div>
-            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_teacher_nonce'); ?>">
-            <button type="button" class="edu-button edu-button-primary" id="update-teacher">Update Teacher</button>
-        </form>
-        <div class="edu-form-message" id="edit-teacher-message"></div>
-    </div>
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="edit-teacher-modal">×</span>
+            <h3>Edit Teacher</h3>
+            <form id="edit-teacher-form" class="edu-form" enctype="multipart/form-data">
+                <input type="hidden" id="edit-teacher-post-id" name="teacher_post_id">
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-id">Teacher ID</label>
+                    <input type="text" class="edu-form-input" id="edit-teacher-id" name="teacher_id" readonly>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-educational-center-id">Educational Center ID</label>
+                    <input type="text" class="edu-form-input" id="edit-educational-center-id" name="educational_center_id" readonly>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-name">Teacher Name</label>
+                    <input type="text" class="edu-form-input" id="edit-teacher-name" name="teacher_name" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-email">Email</label>
+                    <input type="email" class="edu-form-input" id="edit-teacher-email" name="teacher_email" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-phone">Phone Number</label>
+                    <input type="text" class="edu-form-input" id="edit-teacher-phone" name="teacher_phone_number">
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-gender">Gender</label>
+                    <select class="edu-form-input" id="edit-teacher-gender" name="teacher_gender">
+                        <option value="">Select Gender</option>
+                        <?php $gender_field = get_field_object('field_67baed90b66de'); if ($gender_field) foreach ($gender_field['choices'] as $value => $label) : ?>
+                            <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-dob">Date of Birth</label>
+                    <input type="date" class="edu-form-input" id="edit-teacher-dob" name="teacher_date_of_birth">
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-religion">Religion</label>
+                    <select class="edu-form-input" id="edit-teacher-religion" name="teacher_religion">
+                        <option value="">Select Religion</option>
+                        <?php $religion_field = get_field_object('field_67baed90bdebb'); if ($religion_field) foreach ($religion_field['choices'] as $value => $label) : ?>
+                            <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-photo">Profile Photo</label>
+                    <input type="file" class="edu-form-input" id="edit-teacher-photo" name="teacher_profile_photo" accept="image/*">
+                    <img id="edit-teacher-photo-preview" style="max-width: 200px; display: none;" />
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-blood">Blood Group</label>
+                    <select class="edu-form-input" id="edit-teacher-blood" name="teacher_blood_group">
+                        <option value="">Select Blood Group</option>
+                        <?php $blood_field = get_field_object('field_67baed90c555b'); if ($blood_field) foreach ($blood_field['choices'] as $value => $label) : ?>
+                            <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-height">Height (cm)</label>
+                    <input type="number" class="edu-form-input" id="edit-teacher-height" name="teacher_height">
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-weight">Weight (kg)</label>
+                    <input type="number" class="edu-form-input" id="edit-teacher-weight" name="teacher_weight">
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-current-addr">Current Address</label>
+                    <textarea class="edu-form-input" id="edit-teacher-current-addr" name="teacher_current_address"></textarea>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-permanent-addr">Permanent Address</label>
+                    <textarea class="edu-form-input" id="edit-teacher-permanent-addr" name="teacher_permanent_address"></textarea>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-roll">Roll Number</label>
+                    <input type="number" class="edu-form-input" id="edit-teacher-roll" name="teacher_roll_number" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-admission">Admission Date</label>
+                    <input type="date" class="edu-form-input" id="edit-teacher-admission" name="teacher_admission_date" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-dept">Department</label>
+                    <select class="edu-form-input" id="edit-teacher-dept" name="teacher_department">
+                        <option value="">Select Department</option>
+                        <!-- Options populated via JavaScript -->
+                    </select>
+                </div>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_teacher_nonce'); ?>">
+                <button type="button" class="edu-button edu-button-primary" id="update-teacher">Update Teacher</button>
+            </form>
+            <div class="edu-form-message" id="edit-teacher-message"></div>
+        </div>
     </div>
 
     <!-- Dependencies -->
-    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <script>
     jQuery(document).ready(function($) {
@@ -2126,28 +2718,29 @@ function render_su_p_teachers() {
         function showLoader() { $('#edu-loader').show(); }
         function hideLoader() { $('#edu-loader').hide(); }
         function openModal(modalId) { 
-        showLoader(); 
-        $(modalId).css('display', 'block'); 
-        setTimeout(hideLoader, 100); 
-    }
-    function closeModal(modalId) { 
-        $(modalId).css('display', 'none'); 
-        $(modalId + ' .edu-form-message').removeClass('edu-success edu-error').text(''); 
-        hideLoader(); 
-    }
-
-    // Close modal when clicking the close button
-    $('.edu-modal-close').on('click', function() {
-        const modalId = '#' + $(this).data('modal');
-        closeModal(modalId);
-    });
-
-    // Close modal when clicking outside the modal content
-    $(document).on('click', function(event) {
-        if ($(event.target).hasClass('edu-modal')) {
-            closeModal('#' + event.target.id);
+            showLoader(); 
+            $(modalId).css('display', 'block'); 
+            setTimeout(hideLoader, 100); 
         }
-    });
+        function closeModal(modalId) { 
+            $(modalId).css('display', 'none'); 
+            $(modalId + ' .edu-form-message').removeClass('edu-success edu-error').text(''); 
+            hideLoader(); 
+        }
+
+        // Close modal when clicking the close button
+        $('.edu-modal-close').on('click', function() {
+            const modalId = '#' + $(this).data('modal');
+            closeModal(modalId);
+        });
+
+        // Close modal when clicking outside the modal content
+        $(document).on('click', function(event) {
+            if ($(event.target).hasClass('edu-modal')) {
+                closeModal('#' + event.target.id);
+            }
+        });
+
         function getTableData() {
             const table = $('#teachers-table')[0];
             if (!table) return [];
@@ -2428,7 +3021,20 @@ function render_su_p_teachers() {
         });
 
         // Add Teacher
-        $('#add-teacher-btn').on('click', function() { openModal('#add-teacher-modal'); });
+        $('#add-teacher-btn').on('click', function() { 
+            $('#teacher-id').val('TEA-' + Math.random().toString(36).substr(2, 9).toUpperCase()); // Generate unique ID
+            openModal('#add-teacher-modal'); 
+        });
+
+        $('#educational-center-id').on('change', function() {
+            const centerId = $(this).val();
+            if (centerId) {
+                $('#teacher-id').val('TEA-' + centerId + '-' + Math.random().toString(36).substr(2, 5).toUpperCase());
+            } else {
+                $('#teacher-id').val('');
+            }
+        });
+
         $('#save-teacher').on('click', function() {
             const formData = new FormData($('#add-teacher-form')[0]);
             formData.append('action', 'su_p_add_teacher');
@@ -2459,155 +3065,120 @@ function render_su_p_teachers() {
         });
 
         // Edit Teacher
-// Edit Teacher
-$(document).on('click', '.edit-teacher', function() {
-    const teacherId = $(this).data('teacher-id');
-    showLoader();
-    $.ajax({
-        url: '<?php echo admin_url('admin-ajax.php'); ?>',
-        method: 'POST',
-        data: {
-            action: 'su_p_get_teacher',
-            teacher_id: teacherId,
-            nonce: '<?php echo wp_create_nonce('su_p_teacher_nonce'); ?>'
-        },
-        success: function(response) {
-            hideLoader();
-            if (response.success) {
-                const teacher = response.data;
-                $('#edit-teacher-post-id').val(teacher.ID);
-                $('#edit-teacher-id').val(teacher.teacher_id);
-                $('#edit-educational-center-id').val(teacher.educational_center_id);
-                $('#edit-teacher-name').val(teacher.teacher_name);
-                $('#edit-teacher-email').val(teacher.teacher_email);
-                $('#edit-teacher-phone').val(teacher.teacher_phone_number);
-                $('#edit-teacher-gender').val(teacher.teacher_gender);
-                $('#edit-teacher-dob').val(teacher.teacher_date_of_birth);
-                $('#edit-teacher-religion').val(teacher.teacher_religion);
-                if (teacher.teacher_profile_photo_url) {
-                    $('#edit-teacher-photo-preview').attr('src', teacher.teacher_profile_photo_url).show();
-                } else {
-                    $('#edit-teacher-photo-preview').hide();
-                }
-                $('#edit-teacher-blood').val(teacher.teacher_blood_group);
-                $('#edit-teacher-height').val(teacher.teacher_height);
-                $('#edit-teacher-weight').val(teacher.teacher_weight);
-                $('#edit-teacher-current-addr').val(teacher.teacher_current_address);
-                $('#edit-teacher-permanent-addr').val(teacher.teacher_permanent_address);
-                $('#edit-teacher-roll').val(teacher.teacher_roll_number);
-                $('#edit-teacher-admission').val(teacher.teacher_admission_date);
-
-                // Load departments based on readonly educational_center_id
-                const centerId = teacher.educational_center_id;
-                $.ajax({
-                    url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                    method: 'POST',
-                    data: {
-                        action: 'su_p_get_departments',
-                        center_id: centerId,
-                        nonce: '<?php echo wp_create_nonce('su_p_teacher_nonce'); ?>'
-                    },
-                    success: function(deptResponse) {
-                        if (deptResponse.success) {
-                            const departments = deptResponse.data;
-                            let options = '<option value="">Select Department</option>';
-                            departments.forEach(dept => {
-                                options += `<option value="${dept.department_name}" ${dept.department_name === teacher.teacher_department ? 'selected' : ''}>${dept.department_name}</option>`;
-                            });
-                            $('#edit-teacher-dept').html(options);
+        $(document).on('click', '.edit-teacher', function() {
+            const teacherId = $(this).data('teacher-id');
+            showLoader();
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'su_p_get_teacher',
+                    teacher_id: teacherId,
+                    nonce: '<?php echo wp_create_nonce('su_p_teacher_nonce'); ?>'
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        const teacher = response.data;
+                        $('#edit-teacher-post-id').val(teacher.ID);
+                        $('#edit-teacher-id').val(teacher.teacher_id);
+                        $('#edit-educational-center-id').val(teacher.educational_center_id);
+                        $('#edit-teacher-name').val(teacher.teacher_name);
+                        $('#edit-teacher-email').val(teacher.teacher_email);
+                        $('#edit-teacher-phone').val(teacher.teacher_phone_number);
+                        $('#edit-teacher-gender').val(teacher.teacher_gender);
+                        $('#edit-teacher-dob').val(teacher.teacher_date_of_birth);
+                        $('#edit-teacher-religion').val(teacher.teacher_religion);
+                        if (teacher.teacher_profile_photo_url) {
+                            $('#edit-teacher-photo-preview').attr('src', teacher.teacher_profile_photo_url).show();
                         } else {
-                            $('#edit-teacher-dept').html('<option value="">No departments found</option>');
+                            $('#edit-teacher-photo-preview').hide();
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        $('#edit-teacher-dept').html('<option value="">Error loading departments</option>');
+                        $('#edit-teacher-blood').val(teacher.teacher_blood_group);
+                        $('#edit-teacher-height').val(teacher.teacher_height);
+                        $('#edit-teacher-weight').val(teacher.teacher_weight);
+                        $('#edit-teacher-current-addr').val(teacher.teacher_current_address);
+                        $('#edit-teacher-permanent-addr').val(teacher.teacher_permanent_address);
+                        $('#edit-teacher-roll').val(teacher.teacher_roll_number);
+                        $('#edit-teacher-admission').val(teacher.teacher_admission_date);
+
+                        const centerId = teacher.educational_center_id;
+                        $.ajax({
+                            url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                            method: 'POST',
+                            data: {
+                                action: 'su_p_get_departments',
+                                center_id: centerId,
+                                nonce: '<?php echo wp_create_nonce('su_p_teacher_nonce'); ?>'
+                            },
+                            success: function(deptResponse) {
+                                if (deptResponse.success) {
+                                    const departments = deptResponse.data;
+                                    let options = '<option value="">Select Department</option>';
+                                    departments.forEach(dept => {
+                                        options += `<option value="${dept.department_name}" ${dept.department_name === teacher.teacher_department ? 'selected' : ''}>${dept.department_name}</option>`;
+                                    });
+                                    $('#edit-teacher-dept').html(options);
+                                } else {
+                                    $('#edit-teacher-dept').html('<option value="">No departments found</option>');
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                $('#edit-teacher-dept').html('<option value="">Error loading departments</option>');
+                            }
+                        });
+
+                        openModal('#edit-teacher-modal');
+                    } else {
+                        alert('Error fetching teacher: ' + response.data.message);
                     }
-                });
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('Error fetching teacher: ' + error);
+                }
+            });
+        });
 
-                openModal('#edit-teacher-modal');
-            } else {
-                alert('Error fetching teacher: ' + response.data.message);
+        $('#edit-teacher-photo').on('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#edit-teacher-photo-preview').attr('src', e.target.result).show();
+                };
+                reader.readAsDataURL(file);
             }
-        },
-        error: function(xhr, status, error) {
-            hideLoader();
-            alert('Error fetching teacher: ' + error);
-        }
-    });
-});
+        });
 
-$('#edit-teacher-photo').on('change', function(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            $('#edit-teacher-photo-preview').attr('src', e.target.result).show();
-        };
-        reader.readAsDataURL(file);
-    }
-});
-
-// Update department dropdown when educational center changes
-// $('#edit-educational-center-id').on('change', function() {
-//     const centerId = $(this).val();
-//     showLoader();
-//     $.ajax({
-//         url: '<?php echo admin_url('admin-ajax.php'); ?>',
-//         method: 'POST',
-//         data: {
-//             action: 'su_p_get_departments',
-//             center_id: centerId,
-//             nonce: '<?php echo wp_create_nonce('su_p_teacher_nonce'); ?>'
-//         },
-//         success: function(response) {
-//             hideLoader();
-//             if (response.success) {
-//                 const departments = response.data;
-//                 let options = '<option value="">Select Department</option>';
-//                 departments.forEach(dept => {
-//                     options += `<option value="${dept.department_name}">${dept.department_name}</option>`;
-//                 });
-//                 $('#edit-teacher-dept').html(options);
-//             } else {
-//                 $('#edit-teacher-dept').html('<option value="">No departments found</option>');
-//             }
-//         },
-//         error: function(xhr, status, error) {
-//             hideLoader();
-//             $('#edit-teacher-dept').html('<option value="">Error loading departments</option>');
-//         }
-//     });
-// });
-
-// Update Teacher
-$('#update-teacher').on('click', function() {
-    const formData = new FormData($('#edit-teacher-form')[0]);
-    formData.append('action', 'su_p_update_teacher');
-    showLoader();
-    $.ajax({
-        url: '<?php echo admin_url('admin-ajax.php'); ?>',
-        method: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            hideLoader();
-            if (response.success) {
-                $('#edit-teacher-message').addClass('edu-success').text('Teacher updated successfully!');
-                setTimeout(() => {
-                    closeModal('#edit-teacher-modal');
-                    loadTeachers(currentPage, perPage, searchQuery, centerFilter);
-                }, 1000);
-            } else {
-                $('#edit-teacher-message').addClass('edu-error').text('Error: ' + (response.data.message || 'Unknown error'));
-            }
-        },
-        error: function(xhr, status, error) {
-            hideLoader();
-            $('#edit-teacher-message').addClass('edu-error').text('Error updating teacher: ' + error);
-        }
-    });
-});
+        $('#update-teacher').on('click', function() {
+            const formData = new FormData($('#edit-teacher-form')[0]);
+            formData.append('action', 'su_p_update_teacher');
+            showLoader();
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#edit-teacher-message').addClass('edu-success').text('Teacher updated successfully!');
+                        setTimeout(() => {
+                            closeModal('#edit-teacher-modal');
+                            loadTeachers(currentPage, perPage, searchQuery, centerFilter);
+                        }, 1000);
+                    } else {
+                        $('#edit-teacher-message').addClass('edu-error').text('Error: ' + (response.data.message || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    $('#edit-teacher-message').addClass('edu-error').text('Error updating teacher: ' + error);
+                }
+            });
+        });
 
         // Delete Teacher
         $(document).on('click', '.delete-teacher', function() {
@@ -2638,8 +3209,6 @@ $('#update-teacher').on('click', function() {
         });
     });
     </script>
-
- 
     <?php
     return ob_get_clean();
 }
@@ -2694,18 +3263,16 @@ function su_p_fetch_teachers() {
     $total = $query->found_posts;
     wp_send_json_success(['teachers' => $teachers, 'total' => $total]);
 }
+
 add_action('wp_ajax_su_p_get_departments', 'su_p_get_departments');
 function su_p_get_departments() {
     check_ajax_referer('su_p_teacher_nonce', 'nonce');
     global $wpdb;
     $center_id = sanitize_text_field($_POST['center_id']);
-    $table_name = $wpdb->prefix . 'departments'; // Ensure this matches your table name
+    $table_name = $wpdb->prefix . 'departments';
 
     $departments = $wpdb->get_results(
-        $wpdb->prepare(
-            "SELECT department_id, department_name FROM $table_name WHERE education_center_id = %s",
-            $center_id
-        ),
+        $wpdb->prepare("SELECT department_id, department_name FROM $table_name WHERE education_center_id = %s", $center_id),
         ARRAY_A
     );
 
@@ -2715,6 +3282,7 @@ function su_p_get_departments() {
         wp_send_json_error(['message' => 'No departments found for this center']);
     }
 }
+
 add_action('wp_ajax_su_p_add_teacher', 'su_p_add_teacher');
 function su_p_add_teacher() {
     check_ajax_referer('su_p_teacher_nonce', 'nonce');
@@ -2788,45 +3356,19 @@ function su_p_get_teacher() {
 add_action('wp_ajax_su_p_update_teacher', 'su_p_update_teacher');
 function su_p_update_teacher() {
     check_ajax_referer('su_p_teacher_nonce', 'nonce');
-
-    // Get post ID and key identifiers
     $post_id = intval($_POST['teacher_post_id']);
-    $teacher_id = sanitize_text_field($_POST['teacher_id']);
-    $educational_center_id = sanitize_text_field($_POST['educational_center_id']);
-
-    // Verify the post exists
     $post = get_post($post_id);
     if (!$post || $post->post_type !== 'teacher') {
         wp_send_json_error(['message' => 'Invalid teacher post ID']);
         return;
     }
 
-    // Check uniqueness of teacher_id and educational_center_id combination
-    $args = [
-        'post_type' => 'teacher',
-        'post_status' => 'publish',
-        'meta_query' => [
-            'relation' => 'AND',
-            ['key' => 'teacher_id', 'value' => $teacher_id, 'compare' => '='],
-            ['key' => 'educational_center_id', 'value' => $educational_center_id, 'compare' => '=']
-        ],
-        'posts_per_page' => 1,
-        'exclude' => [$post_id] // Exclude current post
-    ];
-    $existing = new WP_Query($args);
-    // if ($existing->have_posts()) {
-    //     wp_send_json_error(['message' => 'Teacher ID and Educational Center ID combination must be unique']);
-    //     return;
-    // }
-
-    // Update the post
     $updated = wp_update_post([
         'ID' => $post_id,
         'post_title' => sanitize_text_field($_POST['teacher_name']),
     ]);
 
     if ($updated && !is_wp_error($updated)) {
-        // Update meta fields (educational_center_id and teacher_id remain unchanged due to readonly)
         update_post_meta($post_id, 'teacher_name', sanitize_text_field($_POST['teacher_name']));
         update_post_meta($post_id, 'teacher_email', sanitize_email($_POST['teacher_email']));
         update_post_meta($post_id, 'teacher_phone_number', sanitize_text_field($_POST['teacher_phone_number']));
@@ -2838,9 +3380,6 @@ function su_p_update_teacher() {
             $attachment_id = media_handle_upload('teacher_profile_photo', $post_id);
             if (!is_wp_error($attachment_id)) {
                 update_post_meta($post_id, 'teacher_profile_photo', $attachment_id);
-            } else {
-                wp_send_json_error(['message' => 'Failed to upload profile photo: ' . $attachment_id->get_error_message()]);
-                return;
             }
         }
         update_post_meta($post_id, 'teacher_blood_group', sanitize_text_field($_POST['teacher_blood_group']));
@@ -2851,10 +3390,9 @@ function su_p_update_teacher() {
         update_post_meta($post_id, 'teacher_roll_number', sanitize_text_field($_POST['teacher_roll_number']));
         update_post_meta($post_id, 'teacher_admission_date', sanitize_text_field($_POST['teacher_admission_date']));
         update_post_meta($post_id, 'teacher_department', sanitize_text_field($_POST['teacher_department']));
-
-        wp_send_json_success(['message' => 'Teacher updated successfully']);
+        wp_send_json_success(['message' => 'Teacher updated']);
     } else {
-        wp_send_json_error(['message' => 'Failed to update teacher post']);
+        wp_send_json_error(['message' => 'Failed to update teacher']);
     }
 }
 
@@ -2869,307 +3407,864 @@ function su_p_delete_teacher() {
     }
 }
 
-// students
-function render_su_p_students() {
+// Add Teacher Function (Create)
+function render_su_p_add_teachers() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to add teachers.</p>';
+    }
+
     global $wpdb;
+    $centers = get_posts([
+        'post_type' => 'educational-center',
+        'posts_per_page' => -1,
+        'post_status' => 'publish'
+    ]);
+
+    $add_message = '';
+    if (isset($_POST['su_p_add_teacher']) && check_admin_referer('su_p_teacher_add', 'nonce')) {
+        $education_center_id = sanitize_text_field($_POST['educational_center_id']);
+        $teacher_id = 'TEA-' . $education_center_id . '-' . strtoupper(substr(uniqid(), -5)); // Fixed unique ID generation
+        $fields = [
+            'teacher_name' => sanitize_text_field($_POST['teacher_name']),
+            'teacher_email' => sanitize_email($_POST['teacher_email']),
+            'teacher_phone_number' => sanitize_text_field($_POST['teacher_phone_number']),
+            'teacher_gender' => sanitize_text_field($_POST['teacher_gender']),
+            'teacher_date_of_birth' => sanitize_text_field($_POST['teacher_date_of_birth']),
+            'teacher_religion' => sanitize_text_field($_POST['teacher_religion']),
+            'teacher_blood_group' => sanitize_text_field($_POST['teacher_blood_group']),
+            'teacher_height' => sanitize_text_field($_POST['teacher_height']),
+            'teacher_weight' => sanitize_text_field($_POST['teacher_weight']),
+            'teacher_current_address' => sanitize_textarea_field($_POST['teacher_current_address']),
+            'teacher_permanent_address' => sanitize_textarea_field($_POST['teacher_permanent_address']),
+            'teacher_roll_number' => sanitize_text_field($_POST['teacher_roll_number']),
+            'teacher_admission_date' => sanitize_text_field($_POST['teacher_admission_date']),
+            'teacher_department' => sanitize_text_field($_POST['teacher_department'])
+        ];
+
+        if (empty($education_center_id) || empty($fields['teacher_name']) || empty($fields['teacher_email'])) {
+            $add_message = '<div class="alert alert-danger">Required fields are missing.</div>';
+        } else {
+            $exists = get_posts([
+                'post_type' => 'teacher',
+                'meta_query' => [
+                    ['key' => 'teacher_id', 'value' => $teacher_id],
+                    ['key' => 'educational_center_id', 'value' => $education_center_id]
+                ]
+            ]);
+
+            if (!empty($exists)) {
+                $add_message = '<div class="alert alert-danger">Teacher ID already exists for this center.</div>';
+            } else {
+                $meta_input = array_merge(['teacher_id' => $teacher_id, 'educational_center_id' => $education_center_id], $fields);
+                if (!empty($_FILES['teacher_profile_photo']['name'])) {
+                    $upload = wp_handle_upload($_FILES['teacher_profile_photo'], ['test_form' => false]);
+                    if (isset($upload['error'])) {
+                        $add_message = '<div class="alert alert-danger">File upload error: ' . esc_html($upload['error']) . '</div>';
+                    } elseif (isset($upload['file'])) {
+                        $attachment_id = wp_insert_attachment([
+                            'post_mime_type' => $upload['type'],
+                            'post_title' => basename($upload['file']),
+                            'post_content' => '',
+                            'post_status' => 'inherit'
+                        ], $upload['file']);
+                        wp_generate_attachment_metadata($attachment_id, $upload['file']);
+                        $meta_input['teacher_profile_photo'] = $attachment_id;
+                    }
+                }
+
+                $post_id = wp_insert_post([
+                    'post_title' => $teacher_id,
+                    'post_type' => 'teacher',
+                    'post_status' => 'publish',
+                    'meta_input' => $meta_input
+                ]);
+
+                if (is_wp_error($post_id)) {
+                    $add_message = '<div class="alert alert-danger">Error adding teacher: ' . esc_html($post_id->get_error_message()) . '</div>';
+                } elseif ($post_id) {
+                    $add_message = '<div class="alert alert-success">Teacher added successfully.</div>';
+                } else {
+                    $add_message = '<div class="alert alert-danger">Failed to add teacher.</div>';
+                }
+            }
+        }        wp_redirect($_SERVER['REQUEST_URI']);
+
+    }
+
     ob_start();
     ?>
-    <div class="edu-students-container" style="margin-top: 80px;">
-        <!-- Loader SVG -->
-        <div id="edu-loader" class="edu-loader" style="display: none;">
-            <div class="edu-loader-container">
-                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Add Teacher</h2>
+                <div id="add-teacher-form-container">
+                    <?php if ($add_message) echo $add_message; ?>
+                    <form id="add-teacher-form" method="post" enctype="multipart/form-data">
+                        <div class="search-filters">
+                            <label>Teacher ID</label>
+                            <input type="text" id="add-teacher-id" name="teacher_id" readonly>
+                        </div>
+                        <div class="search-filters">
+                            <label>Education Center</label>
+                            <select id="add-center-id" name="educational_center_id" required>
+                                <option value="">Select Center</option>
+                                <?php foreach ($centers as $center) {
+                                    $center_id = get_post_meta($center->ID, 'educational_center_id', true) ?: $center->ID;
+                                    echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                                } ?>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Teacher Name</label>
+                            <input type="text" name="teacher_name" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Email</label>
+                            <input type="email" name="teacher_email" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Phone Number</label>
+                            <input type="text" name="teacher_phone_number">
+                        </div>
+                        <div class="search-filters">
+                            <label>Gender</label>
+                            <select name="teacher_gender">
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Date of Birth</label>
+                            <input type="date" name="teacher_date_of_birth">
+                        </div>
+                        <div class="search-filters">
+                            <label>Religion</label>
+                            <select name="teacher_religion">
+                                <option value="">Select Religion</option>
+                                <option value="christianity">Christianity</option>
+                                <option value="islam">Islam</option>
+                                <option value="hinduism">Hinduism</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Blood Group</label>
+                            <select name="teacher_blood_group">
+                                <option value="">Select Blood Group</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Height (cm)</label>
+                            <input type="number" name="teacher_height" step="0.1">
+                        </div>
+                        <div class="search-filters">
+                            <label>Weight (kg)</label>
+                            <input type="number" name="teacher_weight" step="0.1">
+                        </div>
+                        <div class="search-filters">
+                            <label>Current Address</label>
+                            <textarea name="teacher_current_address"></textarea>
+                        </div>
+                        <div class="search-filters">
+                            <label>Permanent Address</label>
+                            <textarea name="teacher_permanent_address"></textarea>
+                        </div>
+                        <div class="search-filters">
+                            <label>Roll Number</label>
+                            <input type="text" name="teacher_roll_number" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Admission Date</label>
+                            <input type="date" name="teacher_admission_date" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Department</label>
+                            <input type="text" name="teacher_department">
+                        </div>
+                        <div class="search-filters">
+                            <label>Profile Photo</label>
+                            <input type="file" name="teacher_profile_photo">
+                        </div>
+                        <?php wp_nonce_field('su_p_teacher_add', 'nonce'); ?>
+                        <input type="hidden" name="su_p_add_teacher" value="1">
+                        <div class="actions">
+                            <button type="submit" class="button">Add Teacher</button>
+                            <a href="<?php echo admin_url('admin.php?page=su-p-teachers-management'); ?>" class="button">Cancel</a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-        <h2 class="edu-students-title">Managing Students</h2>
-        <div class="edu-students-actions">
-            <button class="edu-button edu-button-primary" id="add-student-btn">Add New Student</button>
-            <input type="text" id="student-search" class="edu-search-input" placeholder="Search Students..." style="margin-left: 20px; padding: 8px; width: 300px;">
-            <select id="center-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
-                <option value="">All Educational Centers</option>
-                <?php
-                $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
-                foreach ($centers as $center) {
-                    $center_id = get_post_meta($center->ID, 'educational_center_id', true);
-                    echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loader = document.getElementById('edu-loader');
+        const centerSelect = document.getElementById('add-center-id');
+        const teacherIdInput = document.getElementById('add-teacher-id');
+
+        function showLoader() { loader.style.display = 'block'; }
+        function hideLoader() { loader.style.display = 'none'; }
+
+        centerSelect.addEventListener('change', function() {
+            const centerId = this.value;
+            if (centerId) {
+                // Generate a unique teacher ID based on center ID
+                teacherIdInput.value = 'TEA-' + centerId + '-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+            } else {
+                teacherIdInput.value = '';
+            }
+        });
+
+        document.getElementById('add-teacher-form').addEventListener('submit', function(e) {
+            showLoader();
+            setTimeout(() => {
+                <?php if (isset($_POST['su_p_add_teacher']) && strpos($add_message, 'success') !== false) { ?>
+                    alert('Teacher added successfully');
+                    window.location.href = '<?php echo admin_url('admin.php?page=su-p-teachers-management'); ?>';
+                <?php } else { ?>
+                    hideLoader();
+                    <?php if ($add_message) { ?>
+                        document.getElementById('add-teacher-form-container').innerHTML = '<?php echo addslashes($add_message); ?>' + document.getElementById('add-teacher-form-container').innerHTML;
+                    <?php } ?>
+                <?php } ?>
+            }, 500);
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Edit Teacher Function (Update)
+function render_su_p_edit_teachers() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to edit teachers.</p>';
+    }
+
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1, 'post_status' => 'publish']);
+    $teachers = get_posts(['post_type' => 'teacher', 'posts_per_page' => -1, 'orderby' => 'meta_value', 'meta_key' => 'teacher_name', 'order' => 'ASC']);
+
+    foreach ($teachers as $teacher) {
+        $teacher->teacher_id = get_post_meta($teacher->ID, 'teacher_id', true);
+        $teacher->educational_center_id = get_post_meta($teacher->ID, 'educational_center_id', true);
+        $teacher->teacher_name = get_post_meta($teacher->ID, 'teacher_name', true);
+        $teacher->teacher_email = get_post_meta($teacher->ID, 'teacher_email', true);
+        $teacher->teacher_phone_number = get_post_meta($teacher->ID, 'teacher_phone_number', true);
+        $teacher->teacher_gender = get_post_meta($teacher->ID, 'teacher_gender', true);
+        $teacher->teacher_date_of_birth = get_post_meta($teacher->ID, 'teacher_date_of_birth', true);
+        $teacher->teacher_religion = get_post_meta($teacher->ID, 'teacher_religion', true);
+        $teacher->teacher_blood_group = get_post_meta($teacher->ID, 'teacher_blood_group', true);
+        $teacher->teacher_height = get_post_meta($teacher->ID, 'teacher_height', true);
+        $teacher->teacher_weight = get_post_meta($teacher->ID, 'teacher_weight', true);
+        $teacher->teacher_current_address = get_post_meta($teacher->ID, 'teacher_current_address', true);
+        $teacher->teacher_permanent_address = get_post_meta($teacher->ID, 'teacher_permanent_address', true);
+        $teacher->teacher_roll_number = get_post_meta($teacher->ID, 'teacher_roll_number', true);
+        $teacher->teacher_admission_date = get_post_meta($teacher->ID, 'teacher_admission_date', true);
+        $teacher->teacher_department = get_post_meta($teacher->ID, 'teacher_department', true);
+        $teacher->teacher_profile_photo = get_post_meta($teacher->ID, 'teacher_profile_photo', true);
+        $teacher->profile_picture_url = $teacher->teacher_profile_photo ? wp_get_attachment_url($teacher->teacher_profile_photo) : '';
+    }
+
+    $edit_message = '';
+    if (isset($_POST['su_p_edit_teacher']) && check_admin_referer('su_p_teacher_edit', 'nonce')) {
+        $teacher_post_id = intval($_POST['teacher_post_id']);
+        $fields = [
+            'educational_center_id' => sanitize_text_field($_POST['educational_center_id']),
+            'teacher_name' => sanitize_text_field($_POST['teacher_name']),
+            'teacher_email' => sanitize_email($_POST['teacher_email']),
+            'teacher_phone_number' => sanitize_text_field($_POST['teacher_phone_number']),
+            'teacher_gender' => sanitize_text_field($_POST['teacher_gender']),
+            'teacher_date_of_birth' => sanitize_text_field($_POST['teacher_date_of_birth']),
+            'teacher_religion' => sanitize_text_field($_POST['teacher_religion']),
+            'teacher_blood_group' => sanitize_text_field($_POST['teacher_blood_group']),
+            'teacher_height' => sanitize_text_field($_POST['teacher_height']),
+            'teacher_weight' => sanitize_text_field($_POST['teacher_weight']),
+            'teacher_current_address' => sanitize_textarea_field($_POST['teacher_current_address']),
+            'teacher_permanent_address' => sanitize_textarea_field($_POST['teacher_permanent_address']),
+            'teacher_roll_number' => sanitize_text_field($_POST['teacher_roll_number']),
+            'teacher_admission_date' => sanitize_text_field($_POST['teacher_admission_date']),
+            'teacher_department' => sanitize_text_field($_POST['teacher_department'])
+        ];
+
+        if (empty($teacher_post_id) || empty($fields['teacher_name']) || empty($fields['teacher_email'])) {
+            $edit_message = '<div class="alert alert-danger">Required fields are missing.</div>';
+        } else {
+            $updated = wp_update_post(['ID' => $teacher_post_id, 'post_title' => get_post_meta($teacher_post_id, 'teacher_id', true)]);
+            if (is_wp_error($updated)) {
+                $edit_message = '<div class="alert alert-danger">Error updating teacher: ' . esc_html($updated->get_error_message()) . '</div>';
+            } elseif ($updated !== 0) {
+                foreach ($fields as $key => $value) {
+                    update_post_meta($teacher_post_id, $key, $value);
                 }
-                ?>
-            </select>
-        </div>
-        <div class="edu-pagination" style="margin: 20px 0;">
-            <label for="students-per-page">Show:</label>
-            <select id="students-per-page" class="edu-select" style="margin-right: 20px;">
-                <option value="10">10</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-            </select>
-            <button class="edu-button edu-button-nav" id="prev-page" disabled>Previous</button>
-            <span id="page-info" style="margin: 0 10px;"></span>
-            <button class="edu-button edu-button-nav" id="next-page">Next</button>
-        </div>
-        <div class="edu-table-wrapper">
-            <div class="export-tools" id="export-tools" style="margin-bottom: 10px;"></div>
-            <table class="edu-table" id="students-table">
-                <thead>
-                    <tr>
-                        <th>Student ID</th>
-                        <th>Edu Center ID</th>
-                        <th>Edu Center Name</th>
-                        <th>Student Name</th>
-                        <th>Class</th>
-                        <th>Section</th>
-                        <th>Roll Number</th>
-                        <th>Email</th>
-                        <th>Phone Number</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="students-table-body">
-                    <!-- Populated via AJAX -->
-                </tbody>
-            </table>
+                if (!empty($_FILES['teacher_profile_photo']['name'])) {
+                    $upload = wp_handle_upload($_FILES['teacher_profile_photo'], ['test_form' => false]);
+                    if (isset($upload['error'])) {
+                        $edit_message = '<div class="alert alert-danger">File upload error: ' . esc_html($upload['error']) . '</div>';
+                    } elseif (isset($upload['file'])) {
+                        $attachment_id = wp_insert_attachment([
+                            'post_mime_type' => $upload['type'],
+                            'post_title' => basename($upload['file']),
+                            'post_content' => '',
+                            'post_status' => 'inherit'
+                        ], $upload['file']);
+                        wp_generate_attachment_metadata($attachment_id, $upload['file']);
+                        update_post_meta($teacher_post_id, 'teacher_profile_photo', $attachment_id);
+                    }
+                }
+                $edit_message = '<div class="alert alert-success">Teacher updated successfully.</div>';
+            } else {
+                $edit_message = '<div class="alert alert-danger">Failed to update teacher.</div>';
+            }
+        }        wp_redirect($_SERVER['REQUEST_URI']);
+
+    }
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Edit Teachers</h2>
+                <div class="management-table-wrapper">
+                    <table id="teachers-table" class="management-table">
+                        <thead>
+                            <tr>
+                                <th>Teacher ID</th>
+                                <th>Edu Center ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone Number</th>
+                                <th>Roll Number</th>
+                                <th>Department</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teachers-tbody">
+                            <?php
+                            if (!empty($teachers)) {
+                                foreach ($teachers as $teacher) {
+                                    echo "<tr data-teacher-id='" . esc_attr($teacher->ID) . "'>
+                                        <td>" . esc_html($teacher->teacher_id) . "</td>
+                                        <td>" . esc_html($teacher->educational_center_id) . "</td>
+                                        <td>" . esc_html($teacher->teacher_name) . "</td>
+                                        <td>" . esc_html($teacher->teacher_email) . "</td>
+                                        <td>" . esc_html($teacher->teacher_phone_number) . "</td>
+                                        <td>" . esc_html($teacher->teacher_roll_number) . "</td>
+                                        <td>" . esc_html($teacher->teacher_department) . "</td>
+                                        <td>
+                                            <button class='button edit-teacher-modal-btn'
+                                                data-teacher-id='" . esc_attr($teacher->ID) . "'
+                                                data-name='" . esc_attr($teacher->teacher_name) . "'
+                                                data-email='" . esc_attr($teacher->teacher_email) . "'
+                                                data-phone='" . esc_attr($teacher->teacher_phone_number) . "'
+                                                data-center-id='" . esc_attr($teacher->educational_center_id) . "'
+                                                data-gender='" . esc_attr($teacher->teacher_gender) . "'
+                                                data-dob='" . esc_attr($teacher->teacher_date_of_birth) . "'
+                                                data-religion='" . esc_attr($teacher->teacher_religion) . "'
+                                                data-blood-group='" . esc_attr($teacher->teacher_blood_group) . "'
+                                                data-height='" . esc_attr($teacher->teacher_height) . "'
+                                                data-weight='" . esc_attr($teacher->teacher_weight) . "'
+                                                data-current-address='" . esc_attr($teacher->teacher_current_address) . "'
+                                                data-permanent-address='" . esc_attr($teacher->teacher_permanent_address) . "'
+                                                data-roll-number='" . esc_attr($teacher->teacher_roll_number) . "'
+                                                data-admission-date='" . esc_attr($teacher->teacher_admission_date) . "'
+                                                data-department='" . esc_attr($teacher->teacher_department) . "'
+                                                data-profile-photo='" . esc_attr($teacher->profile_picture_url) . "'>Edit</button>
+                                        </td>
+                                    </tr>";
+                                }
+                            } else {
+                                echo '<tr><td colspan="8">No teachers found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="actions">
+                    <a href="<?php echo admin_url('admin.php?page=su-p-teachers-management'); ?>" class="button">Back to Teachers</a>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Add Student Modal -->
-    <div class="edu-modal" id="add-student-modal">
+    <div class="edu-modal" id="editTeacherModal" style="display: none;">
         <div class="edu-modal-content">
-            <span class="edu-modal-close" data-modal="add-student-modal">×</span>
-            <h3>Add New Student</h3>
-            <form id="add-student-form" class="edu-form" enctype="multipart/form-data">
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="student-id">Student ID</label>
-                    <input type="text" class="edu-form-input" id="student-id" name="student_id" value="STU-<?php echo uniqid(); ?>" readonly>
+            <span class="edu-modal-close" data-modal="editTeacherModal">×</span>
+            <h3>Edit Teacher</h3>
+            <div id="edit-teacher-form-container">
+                <?php if ($edit_message) echo $edit_message; ?>
+                <form id="edit-teacher-form" method="post" enctype="multipart/form-data">
+                    <input type="hidden" id="edit-teacher-post-id" name="teacher_post_id">
+                    <div class="search-filters">
+                        <label>Teacher ID</label>
+                        <input type="text" id="edit-teacher-id" name="teacher_id" readonly>
+                    </div>
+                    <div class="search-filters">
+                        <label>Education Center</label>
+                        <select id="edit-center-id" name="educational_center_id" required>
+                            <option value="">Select Center</option>
+                            <?php foreach ($centers as $center) {
+                                $center_id = get_post_meta($center->ID, 'educational_center_id', true) ?: $center->ID;
+                                echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                            } ?>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label>Teacher Name</label>
+                        <input type="text" id="edit-name" name="teacher_name" required>
+                    </div>
+                    <div class="search-filters">
+                        <label>Email</label>
+                        <input type="email" id="edit-email" name="teacher_email" required>
+                    </div>
+                    <div class="search-filters">
+                        <label>Phone Number</label>
+                        <input type="text" id="edit-phone" name="teacher_phone_number">
+                    </div>
+                    <div class="search-filters">
+                        <label>Gender</label>
+                        <select id="edit-gender" name="teacher_gender">
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label>Date of Birth</label>
+                        <input type="date" id="edit-dob" name="teacher_date_of_birth">
+                    </div>
+                    <div class="search-filters">
+                        <label>Religion</label>
+                        <select id="edit-religion" name="teacher_religion">
+                            <option value="">Select Religion</option>
+                            <option value="christianity">Christianity</option>
+                            <option value="islam">Islam</option>
+                            <option value="hinduism">Hinduism</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label>Blood Group</label>
+                        <select id="edit-blood-group" name="teacher_blood_group">
+                            <option value="">Select Blood Group</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label>Height (cm)</label>
+                        <input type="number" id="edit-height" name="teacher_height" step="0.1">
+                    </div>
+                    <div class="search-filters">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="edit-weight" name="teacher_weight" step="0.1">
+                    </div>
+                    <div class="search-filters">
+                        <label>Current Address</label>
+                        <textarea id="edit-current-address" name="teacher_current_address"></textarea>
+                    </div>
+                    <div class="search-filters">
+                        <label>Permanent Address</label>
+                        <textarea id="edit-permanent-address" name="teacher_permanent_address"></textarea>
+                    </div>
+                    <div class="search-filters">
+                        <label>Roll Number</label>
+                        <input type="text" id="edit-roll-number" name="teacher_roll_number" required>
+                    </div>
+                    <div class="search-filters">
+                        <label>Admission Date</label>
+                        <input type="date" id="edit-admission-date" name="teacher_admission_date" required>
+                    </div>
+                    <div class="search-filters">
+                        <label>Department</label>
+                        <input type="text" id="edit-department" name="teacher_department">
+                    </div>
+                    <div class="search-filters">
+                        <label>Profile Photo</label>
+                        <img id="edit-profile-photo-preview" style="max-width: 200px; display: none;">
+                        <input type="file" id="edit-profile-photo" name="teacher_profile_photo">
+                    </div>
+                    <?php wp_nonce_field('su_p_teacher_edit', 'nonce'); ?>
+                    <input type="hidden" name="su_p_edit_teacher" value="1">
+                    <button type="submit" class="button">Update Teacher</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loader = document.getElementById('edu-loader');
+        const modal = document.getElementById('editTeacherModal');
+        const tbody = document.getElementById('teachers-tbody');
+
+        function showLoader() { loader.style.display = 'block'; }
+        function hideLoader() { loader.style.display = 'none'; }
+        function showModal() { modal.style.display = 'flex'; }
+        function hideModal() { modal.style.display = 'none'; }
+
+        tbody.addEventListener('click', function(e) {
+            if (e.target.classList.contains('edit-teacher-modal-btn')) {
+                const btn = e.target;
+                document.getElementById('edit-teacher-post-id').value = btn.dataset.teacherId;
+                document.getElementById('edit-teacher-id').value = btn.closest('tr').cells[0].textContent;
+                document.getElementById('edit-center-id').value = btn.dataset.centerId;
+                document.getElementById('edit-name').value = btn.dataset.name;
+                document.getElementById('edit-email').value = btn.dataset.email;
+                document.getElementById('edit-phone').value = btn.dataset.phone;
+                document.getElementById('edit-gender').value = btn.dataset.gender;
+                document.getElementById('edit-dob').value = btn.dataset.dob;
+                document.getElementById('edit-religion').value = btn.dataset.religion;
+                document.getElementById('edit-blood-group').value = btn.dataset.bloodGroup;
+                document.getElementById('edit-height').value = btn.dataset.height;
+                document.getElementById('edit-weight').value = btn.dataset.weight;
+                document.getElementById('edit-current-address').value = btn.dataset.currentAddress;
+                document.getElementById('edit-permanent-address').value = btn.dataset.permanentAddress;
+                document.getElementById('edit-roll-number').value = btn.dataset.rollNumber;
+                document.getElementById('edit-admission-date').value = btn.dataset.admissionDate;
+                document.getElementById('edit-department').value = btn.dataset.department;
+                const preview = document.getElementById('edit-profile-photo-preview');
+                if (btn.dataset.profilePhoto) {
+                    preview.src = btn.dataset.profilePhoto;
+                    preview.style.display = 'block';
+                } else {
+                    preview.style.display = 'none';
+                }
+                showModal();
+            }
+        });
+
+        document.querySelector('.edu-modal-close').addEventListener('click', hideModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(); });
+
+        document.getElementById('edit-profile-photo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('edit-profile-photo-preview').src = e.target.result;
+                    document.getElementById('edit-profile-photo-preview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('edit-teacher-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            this.submit();
+            setTimeout(() => {
+                <?php if (isset($_POST['su_p_edit_teacher']) && strpos($edit_message, 'success') !== false) { ?>
+                    const formData = new FormData(this);
+                    const data = Object.fromEntries(formData);
+                    const row = document.querySelector(`tr[data-teacher-id="${data.teacher_post_id}"]`);
+                    row.cells[2].textContent = data.teacher_name;
+                    row.cells[3].textContent = data.teacher_email;
+                    row.cells[4].textContent = data.teacher_phone_number;
+                    row.cells[1].textContent = data.educational_center_id;
+                    row.cells[5].textContent = data.teacher_roll_number;
+                    row.cells[6].textContent = data.teacher_department;
+                    const btn = row.querySelector('.edit-teacher-modal-btn');
+                    btn.dataset.name = data.teacher_name;
+                    btn.dataset.email = data.teacher_email;
+                    btn.dataset.phone = data.teacher_phone_number;
+                    btn.dataset.centerId = data.educational_center_id;
+                    btn.dataset.gender = data.teacher_gender;
+                    btn.dataset.dob = data.teacher_date_of_birth;
+                    btn.dataset.religion = data.teacher_religion;
+                    btn.dataset.bloodGroup = data.teacher_blood_group;
+                    btn.dataset.height = data.teacher_height;
+                    btn.dataset.weight = data.teacher_weight;
+                    btn.dataset.currentAddress = data.teacher_current_address;
+                    btn.dataset.permanentAddress = data.teacher_permanent_address;
+                    btn.dataset.rollNumber = data.teacher_roll_number;
+                    btn.dataset.admissionDate = data.teacher_admission_date;
+                    btn.dataset.department = data.teacher_department;
+                    alert('Teacher updated successfully');
+                    hideModal();
+                    hideLoader();
+                <?php } else { ?>
+                    hideLoader();
+                    <?php if ($edit_message) { ?>
+                        document.getElementById('edit-teacher-form-container').innerHTML = '<?php echo addslashes($edit_message); ?>' + document.getElementById('edit-teacher-form-container').innerHTML;
+                    <?php } ?>
+                <?php } ?>
+            }, 500);
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Delete Teacher Function (Delete)
+function render_su_p_delete_teachers() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to delete teachers.</p>';
+    }
+
+    global $wpdb;
+    $teachers = get_posts(['post_type' => 'teacher', 'posts_per_page' => -1, 'orderby' => 'meta_value', 'meta_key' => 'teacher_name', 'order' => 'ASC']);
+
+    foreach ($teachers as $teacher) {
+        $teacher->teacher_id = get_post_meta($teacher->ID, 'teacher_id', true);
+        $teacher->educational_center_id = get_post_meta($teacher->ID, 'educational_center_id', true);
+        $teacher->teacher_name = get_post_meta($teacher->ID, 'teacher_name', true);
+        $teacher->teacher_email = get_post_meta($teacher->ID, 'teacher_email', true);
+        $teacher->teacher_phone_number = get_post_meta($teacher->ID, 'teacher_phone_number', true);
+        $teacher->teacher_roll_number = get_post_meta($teacher->ID, 'teacher_roll_number', true);
+        $teacher->teacher_department = get_post_meta($teacher->ID, 'teacher_department', true);
+    }
+
+    $delete_message = '';
+    if (isset($_POST['su_p_delete_teacher']) && check_admin_referer('su_p_teacher_delete', 'nonce')) {
+        $teacher_post_id = intval($_POST['teacher_post_id']);
+        if (empty($teacher_post_id)) {
+            $delete_message = '<div class="alert alert-danger">Invalid teacher ID.</div>';
+        } else {
+            $result = wp_delete_post($teacher_post_id, true);
+            if ($result === false) {
+                error_log("Failed to delete teacher post ID: $teacher_post_id. User: " . get_current_user_id());
+                $delete_message = '<div class="alert alert-danger">Failed to delete teacher. Check debug.log.</div>';
+            } else {
+                $delete_message = '<div class="alert alert-success">Teacher deleted successfully.</div>';
+
+            }
+        }
+        wp_redirect($_SERVER['REQUEST_URI']);
+
+    }
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
                 </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="educational-center-id">Educational Center ID</label>
-                    <select class="edu-form-input" id="educational-center-id" name="educational_center_id" required>
-                        <option value="">Select Center</option>
-                        <?php
-                        foreach ($centers as $center) {
+            </div>
+            <div class="management-section">
+                <h2>Delete Teachers</h2>
+                <div class="management-table-wrapper">
+                    <table id="teachers-table" class="management-table">
+                        <thead>
+                            <tr>
+                                <th>Teacher ID</th>
+                                <th>Edu Center ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone Number</th>
+                                <th>Roll Number</th>
+                                <th>Department</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teachers-tbody">
+                            <?php
+                            if (!empty($teachers)) {
+                                foreach ($teachers as $teacher) {
+                                    echo "<tr data-teacher-id='" . esc_attr($teacher->ID) . "'>
+                                        <td>" . esc_html($teacher->teacher_id) . "</td>
+                                        <td>" . esc_html($teacher->educational_center_id) . "</td>
+                                        <td>" . esc_html($teacher->teacher_name) . "</td>
+                                        <td>" . esc_html($teacher->teacher_email) . "</td>
+                                        <td>" . esc_html($teacher->teacher_phone_number) . "</td>
+                                        <td>" . esc_html($teacher->teacher_roll_number) . "</td>
+                                        <td>" . esc_html($teacher->teacher_department) . "</td>
+                                        <td>
+                                            <button class='button delete-teacher-modal-btn' data-teacher-id='" . esc_attr($teacher->ID) . "'>Delete</button>
+                                        </td>
+                                    </tr>";
+                                }
+                            } else {
+                                echo '<tr><td colspan="8">No teachers found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="actions">
+                    <a href="<?php echo admin_url('admin.php?page=su-p-teachers-management'); ?>" class="button">Back to Teachers</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="edu-modal" id="deleteTeacherModal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="deleteTeacherModal">×</span>
+            <h3>Confirm Deletion</h3>
+            <div id="delete-teacher-container">
+                <?php if ($delete_message) echo $delete_message; ?>
+                <p id="delete-teacher-text"></p>
+                <form id="delete-teacher-form" method="post">
+                    <input type="hidden" id="delete-teacher-id" name="teacher_post_id">
+                    <?php wp_nonce_field('su_p_teacher_delete', 'nonce'); ?>
+                    <input type="hidden" name="su_p_delete_teacher" value="1">
+                    <button type="submit" class="button">Delete</button>
+                    <button type="button" class="button cancel-delete" onclick="document.getElementById('deleteTeacherModal').style.display='none'">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loader = document.getElementById('edu-loader');
+        const modal = document.getElementById('deleteTeacherModal');
+        const tbody = document.getElementById('teachers-tbody');
+
+        function showLoader() { loader.style.display = 'block'; }
+        function hideLoader() { loader.style.display = 'none'; }
+        function showModal() { modal.style.display = 'flex'; }
+        function hideModal() { modal.style.display = 'none'; }
+
+        tbody.addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-teacher-modal-btn')) {
+                const teacherId = e.target.getAttribute('data-teacher-id');
+                document.getElementById('delete-teacher-id').value = teacherId;
+                document.getElementById('delete-teacher-text').textContent = `Are you sure you want to delete teacher "${e.target.closest('tr').cells[0].textContent}"?`;
+                showModal();
+            }
+        });
+
+        document.querySelector('.edu-modal-close').addEventListener('click', hideModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(); });
+
+        document.getElementById('delete-teacher-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const teacherId = document.getElementById('delete-teacher-id').value;
+            this.submit();
+            setTimeout(() => {
+                <?php if (isset($_POST['su_p_delete_teacher']) && strpos($delete_message, 'success') !== false) { ?>
+                    const row = document.querySelector(`tr[data-teacher-id="${teacherId}"]`);
+                    if (row) {
+                        row.remove();
+                        if (tbody.children.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="8">No teachers found.</td></tr>';
+                        }
+                        alert('Teacher deleted successfully');
+                    }
+                    hideModal();
+                    hideLoader();
+                <?php } else { ?>
+                    hideLoader();
+                    <?php if ($delete_message) { ?>
+                        document.getElementById('delete-teacher-container').innerHTML = '<?php echo addslashes($delete_message); ?>' + document.getElementById('delete-teacher-container').innerHTML;
+                    <?php } ?>
+                <?php } ?>
+            }, 500);
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+//students
+// Main Students Management Function (Read)
+// Main Students Management Function (Read)
+function render_su_p_students_management() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to view this dashboard.</p>';
+    }
+
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1, 'post_status' => 'publish']);
+    $table_name = $wpdb->prefix . 'class_sections';
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Students Management</h2>
+                <div class="edu-students-actions" style="margin-bottom: 20px;">
+                    <button id="add-student-btn" class="button edu-button-primary">Add New Student</button>
+                    <input type="text" id="student-search" class="edu-search-input" placeholder="Search Students..." style="margin-left: 20px; padding: 8px; width: 300px;">
+                    <select id="center-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Educational Centers</option>
+                        <?php foreach ($centers as $center) {
                             $center_id = get_post_meta($center->ID, 'educational_center_id', true);
                             echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
-                        }
-                        ?>
+                        } ?>
                     </select>
                 </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="admission-number">Admission Number</label>
-                    <input type="text" class="edu-form-input" id="admission-number" name="admission_number" required>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="student-name">Student Name</label>
-                    <input type="text" class="edu-form-input" id="student-name" name="student_name" required>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="student-email">Email</label>
-                    <input type="email" class="edu-form-input" id="student-email" name="student_email">
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="student-phone">Phone Number</label>
-                    <input type="text" class="edu-form-input" id="student-phone" name="phone_number">
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="class-name">Class</label>
-                    <select class="edu-form-input" id="class-name" name="class_name" required>
-                        <option value="">Select Class</option>
-                        <!-- Populated via JavaScript -->
+                <div class="edu-pagination" style="margin: 20px 0;">
+                    <label for="students-per-page">Show:</label>
+                    <select id="students-per-page" class="edu-select" style="margin-right: 20px;">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
                     </select>
+                    <button class="edu-button edu-button-nav" id="prev-page" disabled>Previous</button>
+                    <span id="page-info" style="margin: 0 10px;"></span>
+                    <button class="edu-button edu-button-nav" id="next-page">Next</button>
                 </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="section">Section</label>
-                    <select class="edu-form-input" id="section" name="section" required disabled>
-                        <option value="">Select Class First</option>
-                    </select>
+                <div class="management-table-wrapper">
+                    <div class="export-tools" id="export-tools" style="margin-bottom: 10px;"></div>
+                    <table id="students-table" class="management-table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Edu Center ID</th>
+                                <th>Edu Center Name</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone Number</th>
+                                <th>Class</th>
+                                <th>Section</th>
+                                <th>Roll Number</th>
+                                <th>Admission Number</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-tbody">
+                            <!-- Populated via JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="student-gender">Gender</label>
-                    <select class="edu-form-input" id="student-gender" name="gender">
-                        <option value="">Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </select>
+                <div class="actions">
+                    <button class="button" id="refresh-table">Refresh</button>
                 </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="student-dob">Date of Birth</label>
-                    <input type="date" class="edu-form-input" id="student-dob" name="date_of_birth">
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="student-religion">Religion</label>
-                    <select class="edu-form-input" id="student-religion" name="religion">
-                        <option value="">Select Religion</option>
-                        <option value="christianity">Christianity</option>
-                        <option value="islam">Islam</option>
-                        <option value="hinduism">Hinduism</option>
-                        <option value="buddhism">Buddhism</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="student-photo">Profile Photo</label>
-                    <input type="file" class="edu-form-input" id="student-photo" name="student_profile_photo" accept="image/*">
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="student-blood">Blood Group</label>
-                    <select class="edu-form-input" id="student-blood" name="blood_group">
-                        <option value="">Select Blood Group</option>
-                        <option value="A+">A+</option>
-                        <option value="A-">A-</option>
-                        <option value="B+">B+</option>
-                        <option value="B-">B-</option>
-                        <option value="AB+">AB+</option>
-                        <option value="AB-">AB-</option>
-                        <option value="O+">O+</option>
-                        <option value="O-">O-</option>
-                    </select>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="student-height">Height (cm)</label>
-                    <input type="number" class="edu-form-input" id="student-height" name="height">
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="student-weight">Weight (kg)</label>
-                    <input type="number" class="edu-form-input" id="student-weight" name="weight">
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="student-current-addr">Current Address</label>
-                    <textarea class="edu-form-input" id="student-current-addr" name="current_address"></textarea>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="student-permanent-addr">Permanent Address</label>
-                    <textarea class="edu-form-input" id="student-permanent-addr" name="permanent_address"></textarea>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="student-roll">Roll Number</label>
-                    <input type="number" class="edu-form-input" id="student-roll" name="roll_number" required>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="student-admission">Admission Date</label>
-                    <input type="date" class="edu-form-input" id="student-admission" name="admission_date" required>
-                </div>
-                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_student_nonce'); ?>">
-                <button type="button" class="edu-button edu-button-primary" id="save-student">Save Student</button>
-            </form>
-            <div class="edu-form-message" id="add-student-message"></div>
-        </div>
-    </div>
-
-    <!-- Edit Student Modal -->
-    <div class="edu-modal" id="edit-student-modal">
-        <div class="edu-modal-content">
-            <span class="edu-modal-close" data-modal="edit-student-modal">×</span>
-            <h3>Edit Student</h3>
-            <form id="edit-student-form" class="edu-form" enctype="multipart/form-data">
-                <input type="hidden" id="edit-student-post-id" name="student_post_id">
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-student-id">Student ID</label>
-                    <input type="text" class="edu-form-input" id="edit-student-id" name="student_id" readonly>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-educational-center-id">Educational Center ID</label>
-                    <input type="text" class="edu-form-input" id="edit-educational-center-id" name="educational_center_id" readonly>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-admission-number">Admission Number</label>
-                    <input type="text" class="edu-form-input" id="edit-admission-number" name="admission_number" required>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-student-name">Student Name</label>
-                    <input type="text" class="edu-form-input" id="edit-student-name" name="student_name" required>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-student-email">Email</label>
-                    <input type="email" class="edu-form-input" id="edit-student-email" name="student_email">
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-student-phone">Phone Number</label>
-                    <input type="text" class="edu-form-input" id="edit-student-phone" name="phone_number">
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-class-name">Class</label>
-                    <select class="edu-form-input" id="edit-class-name" name="class_name" required>
-                        <option value="">Select Class</option>
-                        <!-- Populated via JavaScript -->
-                    </select>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-section">Section</label>
-                    <select class="edu-form-input" id="edit-section" name="section" required disabled>
-                        <option value="">Select Class First</option>
-                    </select>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-student-gender">Gender</label>
-                    <select class="edu-form-input" id="edit-student-gender" name="gender">
-                        <option value="">Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-student-dob">Date of Birth</label>
-                    <input type="date" class="edu-form-input" id="edit-student-dob" name="date_of_birth">
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-student-religion">Religion</label>
-                    <select class="edu-form-input" id="edit-student-religion" name="religion">
-                        <option value="">Select Religion</option>
-                        <option value="christianity">Christianity</option>
-                        <option value="islam">Islam</option>
-                        <option value="hinduism">Hinduism</option>
-                        <option value="buddhism">Buddhism</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-student-photo">Profile Photo</label>
-                    <input type="file" class="edu-form-input" id="edit-student-photo" name="student_profile_photo" accept="image/*">
-                    <img id="edit-student-photo-preview" style="max-width: 200px; display: none;" />
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-student-blood">Blood Group</label>
-                    <select class="edu-form-input" id="edit-student-blood" name="blood_group">
-                        <option value="">Select Blood Group</option>
-                        <option value="A+">A+</option>
-                        <option value="A-">A-</option>
-                        <option value="B+">B+</option>
-                        <option value="B-">B-</option>
-                        <option value="AB+">AB+</option>
-                        <option value="AB-">AB-</option>
-                        <option value="O+">O+</option>
-                        <option value="O-">O-</option>
-                    </select>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-student-height">Height (cm)</label>
-                    <input type="number" class="edu-form-input" id="edit-student-height" name="height">
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-student-weight">Weight (kg)</label>
-                    <input type="number" class="edu-form-input" id="edit-student-weight" name="weight">
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-student-current-addr">Current Address</label>
-                    <textarea class="edu-form-input" id="edit-student-current-addr" name="current_address"></textarea>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-student-permanent-addr">Permanent Address</label>
-                    <textarea class="edu-form-input" id="edit-student-permanent-addr" name="permanent_address"></textarea>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-student-roll">Roll Number</label>
-                    <input type="number" class="edu-form-input" id="edit-student-roll" name="roll_number" required>
-                </div>
-                <div class="edu-form-group">
-                    <label class="edu-form-label" for="edit-student-admission">Admission Date</label>
-                    <input type="date" class="edu-form-input" id="edit-student-admission" name="admission_date" required>
-                </div>
-                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_student_nonce'); ?>">
-                <button type="button" class="edu-button edu-button-primary" id="update-student">Update Student</button>
-            </form>
-            <div class="edu-form-message" id="edit-student-message"></div>
+            </div>
+            <div id="modal-container" class="edu-modal" style="display: none;"></div>
         </div>
     </div>
 
@@ -3182,34 +4277,74 @@ function render_su_p_students() {
 
         function showLoader() { $('#edu-loader').show(); }
         function hideLoader() { $('#edu-loader').hide(); }
-        function openModal(modalId) { 
-            showLoader(); 
-            $(modalId).css('display', 'block'); 
-            setTimeout(hideLoader, 100); 
-        }
-        function closeModal(modalId) { 
-            $(modalId).css('display', 'none'); 
-            $(modalId + ' .edu-form-message').removeClass('edu-success edu-error').text(''); 
-            hideLoader(); 
-        }
+        function showModal(content) { $('#modal-container').html(content).show(); }
+        function hideModal() { $('#modal-container').hide().html(''); }
 
-        $('.edu-modal-close').on('click', function() {
-            const modalId = '#' + $(this).data('modal');
-            closeModal(modalId);
-        });
+        function loadStudents(page, limit, query, center) {
+            showLoader();
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'su_p_fetch_students',
+                    page: page,
+                    per_page: limit,
+                    search: query,
+                    center_filter: center,
+                    nonce: '<?php echo wp_create_nonce('su_p_student_nonce'); ?>'
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        const students = response.data.students || [];
+                        const total = response.data.total || 0;
+                        let html = '';
+                        students.forEach(student => {
+                            html += `
+                                <tr data-student-id="${student.ID}">
+                                    <td>${student.student_id || 'N/A'}</td>
+                                    <td>${student.educational_center_id || 'N/A'}</td>
+                                    <td>${student.center_name || 'N/A'}</td>
+                                    <td>${student.student_name || 'N/A'}</td>
+                                    <td>${student.student_email || 'N/A'}</td>
+                                    <td>${student.phone_number || 'N/A'}</td>
+                                    <td>${student.class_name || 'N/A'}</td>
+                                    <td>${student.section || 'N/A'}</td>
+                                    <td>${student.roll_number || 'N/A'}</td>
+                                    <td>${student.admission_number || 'N/A'}</td>
+                                    <td>
+                                        <button class="edu-button edu-button-edit" data-id="${student.ID}">Edit</button>
+                                        <button class="edu-button edu-button-delete" data-id="${student.ID}">Delete</button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        $('#students-tbody').html(html || '<tr><td colspan="11">No students found.</td></tr>');
+                        setupExportButtons();
 
-        $(document).on('click', function(event) {
-            if ($(event.target).hasClass('edu-modal')) {
-                closeModal('#' + event.target.id);
-            }
-        });
+                        const totalPages = Math.ceil(total / limit);
+                        $('#page-info').text(`Page ${page} of ${totalPages}`);
+                        $('#prev-page').prop('disabled', page === 1);
+                        $('#next-page').prop('disabled', page === totalPages || total === 0);
+                    } else {
+                        const message = response.data && response.data.message ? response.data.message : 'Failed to load students.';
+                        $('#students-tbody').html(`<tr><td colspan="11">${message}</td></tr>`);
+                        $('#export-tools').html('');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    $('#students-tbody').html('<tr><td colspan="11">Error loading students: ' + error + '</td></tr>');
+                }
+            });
+        }
 
         function getTableData() {
             const table = $('#students-table')[0];
             if (!table) return [];
-            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim()).slice(0, -1); // Exclude Actions
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim()).slice(0, -1);
             const rows = Array.from(table.querySelectorAll('tbody tr')).map(row => {
-                const cells = Array.from(row.querySelectorAll('td')).slice(0, -1); // Exclude Actions
+                const cells = Array.from(row.querySelectorAll('td')).slice(0, -1);
                 return cells.map(td => td.textContent.trim());
             });
             return [headers, ...rows];
@@ -3248,13 +4383,8 @@ function render_su_p_students() {
             doc.setDrawColor(...borderColor);
             doc.setLineWidth(1);
             doc.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin);
-
             if (instituteLogo) {
-                try {
-                    doc.addImage(instituteLogo, 'JPEG', (pageWidth - 24) / 2, 15, 24, 24);
-                } catch (e) {
-                    console.log('Logo loading failed:', e);
-                }
+                try { doc.addImage(instituteLogo, 'JPEG', (pageWidth - 24) / 2, 15, 24, 24); } catch (e) {}
             }
             doc.setFontSize(18);
             doc.setTextColor(...borderColor);
@@ -3265,10 +4395,7 @@ function render_su_p_students() {
             doc.setDrawColor(...borderColor);
             doc.line(margin + 5, 60, pageWidth - margin - 5, 60);
 
-            const details = [
-                ['Date', new Date().toLocaleDateString()],
-                ['Total Students', String(data.length - 1)]
-            ];
+            const details = [['Date', new Date().toLocaleDateString()], ['Total Students', String(data.length - 1)]];
             let y = 70;
             details.forEach(([label, value]) => {
                 doc.setFillColor(245, 245, 245);
@@ -3292,20 +4419,11 @@ function render_su_p_students() {
                     headStyles: { fillColor: borderColor, textColor: [255, 255, 255], fontStyle: 'bold' },
                     alternateRowStyles: { fillColor: [249, 249, 249] }
                 });
-
                 const finalY = doc.lastAutoTable.finalY || y + 10;
                 doc.setFontSize(9);
                 doc.setTextColor(102);
-                doc.text(`This is an Online Generated Students List issued by ${instituteName}`, pageWidth / 2, finalY + 20, { align: 'center' });
-                doc.text(`Generated on ${new Date().toISOString().slice(0,10)}`, pageWidth / 2, finalY + 25, { align: 'center' });
-                doc.text('___________________________', pageWidth / 2, finalY + 35, { align: 'center' });
-                doc.text('Registrar / Authorized Signatory', pageWidth / 2, finalY + 40, { align: 'center' });
-                doc.text('Managed by Instituto Educational Center Management System', pageWidth / 2, finalY + 45, { align: 'center' });
-
+                doc.text(`Generated by Instituto on ${new Date().toISOString().slice(0,10)}`, pageWidth / 2, finalY + 20, { align: 'center' });
                 doc.save(`students_${new Date().toISOString().slice(0,10)}.pdf`);
-            } else {
-                console.error('jsPDF autoTable plugin not loaded or no data');
-                alert('PDF generation failed');
             }
         }
 
@@ -3320,28 +4438,25 @@ function render_su_p_students() {
             const data = getTableData();
             const instituteName = 'Istituto';
             const instituteLogo = '<?php echo esc_js(plugin_dir_url(__DIR__) . 'logo-instituto.jpg'); ?>';
-
             printWindow.document.write(`
                 <html>
-                <head>
-                    <title>Students List</title>
-                    <style>
-                        @media print {
-                            body { font-family: Helvetica, sans-serif; margin: 10mm; width: 190mm; }
-                            .page { border: 4px solid #4683b4; padding: 5mm; box-sizing: border-box; width: 100%; max-width: 190mm; }
-                            .header { text-align: center; border-bottom: 2px solid #4683b4; margin-bottom: 10mm; }
-                            .header img { width: 60px; height: 60px; margin-bottom: 5mm; }
-                            .header h1 { font-size: 18pt; color: #4683b4; margin: 0; text-transform: uppercase; }
-                            .header .subtitle { font-size: 12pt; color: #666; margin: 0; }
-                            table { width: 100%; max-width: 100%; border-collapse: collapse; margin: 10mm 0; table-layout: fixed; }
-                            th, td { border: 1px solid #e5e5e5; padding: 8px; text-align: center; word-wrap: break-word; font-size: 10pt; }
-                            th { background: #4683b4; color: white; font-weight: bold; }
-                            tr:nth-child(even) { background: #f9f9f9; }
-                            .footer { text-align: center; font-size: 9pt; color: #666; margin-top: 10mm; }
-                            @page { size: A4; margin: 10mm; }
-                        }
-                    </style>
-                </head>
+                <head><title>Students List</title>
+                <style>
+                    @media print {
+                        body { font-family: Helvetica, sans-serif; margin: 10mm; width: 190mm; }
+                        .page { border: 4px solid #4683b4; padding: 5mm; box-sizing: border-box; width: 100%; max-width: 190mm; }
+                        .header { text-align: center; border-bottom: 2px solid #4683b4; margin-bottom: 10mm; }
+                        .header img { width: 60px; height: 60px; margin-bottom: 5mm; }
+                        .header h1 { font-size: 18pt; color: #4683b4; margin: 0; text-transform: uppercase; }
+                        .header .subtitle { font-size: 12pt; color: #666; margin: 0; }
+                        table { width: 100%; border-collapse: collapse; margin: 10mm 0; table-layout: fixed; }
+                        th, td { border: 1px solid #e5e5e5; padding: 8px; text-align: center; word-wrap: break-word; font-size: 10pt; }
+                        th { background: #4683b4; color: white; font-weight: bold; }
+                        tr:nth-child(even) { background: #f9f9f9; }
+                        .footer { text-align: center; font-size: 9pt; color: #666; margin-top: 10mm; }
+                        @page { size: A4; margin: 10mm; }
+                    }
+                </style></head>
                 <body>
                     <div class="page">
                         <div class="header">
@@ -3352,23 +4467,14 @@ function render_su_p_students() {
                         <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
                         <p><strong>Total Students:</strong> ${data.length - 1}</p>
                         <table>
-                            <thead>
-                                <tr>${data[0].map(header => `<th>${header}</th>`).join('')}</tr>
-                            </thead>
-                            <tbody>
-                                ${data.slice(1).map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}
-                            </tbody>
+                            <thead><tr>${data[0].map(header => `<th>${header}</th>`).join('')}</tr></thead>
+                            <tbody>${data.slice(1).map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>
                         </table>
                         <div class="footer">
-                            <p>This is an Online Generated Students List issued by ${instituteName}</p>
-                            <p>Generated on ${new Date().toISOString().slice(0,10)}</p>
-                            <p>___________________________</p>
-                            <p>Registrar / Authorized Signatory</p>
-                            <p>Managed by Instituto Educational Center Management System</p>
+                            <p>Generated by Instituto on ${new Date().toISOString().slice(0,10)}</p>
                         </div>
                     </div>
-                </body>
-                </html>
+                </body></html>
             `);
             printWindow.document.close();
             printWindow.focus();
@@ -3391,319 +4497,952 @@ function render_su_p_students() {
             tools.find('.export-print').on('click', printStudents);
         }
 
-        function loadStudents(page, limit, query, center) {
+        $('#add-student-btn').on('click', function() {
             showLoader();
             $.ajax({
                 url: '<?php echo admin_url('admin-ajax.php'); ?>',
                 method: 'POST',
                 data: {
-                    action: 'su_p_fetch_students',
-                    page: page,
-                    per_page: limit,
-                    search: query,
-                    center_filter: center,
+                    action: 'su_p_get_add_form',
                     nonce: '<?php echo wp_create_nonce('su_p_student_nonce'); ?>'
                 },
                 success: function(response) {
                     hideLoader();
                     if (response.success) {
-                        const students = response.data.students;
-                        const total = response.data.total;
-                        let html = '';
-                        students.forEach(student => {
-                            html += `
-                                <tr data-student-id="${student.ID}">
-                                    <td>${student.student_id || 'N/A'}</td>
-                                    <td>${student.educational_center_id || 'N/A'}</td>
-                                    <td>${student.center_name || 'N/A'}</td>
-                                    <td>${student.student_name || 'N/A'}</td>
-                                    <td>${student.class_name || 'N/A'}</td>
-                                    <td>${student.section || 'N/A'}</td>
-                                    <td>${student.roll_number || 'N/A'}</td>
-                                    <td>${student.student_email || 'N/A'}</td>
-                                    <td>${student.phone_number || 'N/A'}</td>
-                                    <td>
-                                        <button class="edu-button edu-button-edit edit-student" data-student-id="${student.ID}">Edit</button>
-                                        <button class="edu-button edu-button-delete delete-student" data-student-id="${student.ID}">Delete</button>
-                                    </td>
-                                </tr>
-                            `;
-                        });
-                        $('#students-table-body').html(html);
-                        setupExportButtons();
-
-                        const totalPages = Math.ceil(total / limit);
-                        $('#page-info').text(`Page ${page} of ${totalPages}`);
-                        $('#prev-page').prop('disabled', page === 1);
-                        $('#next-page').prop('disabled', page === totalPages);
+                        showModal(response.data.html);
                     } else {
-                        $('#students-table-body').html('<tr><td colspan="10">No students found.</td></tr>');
-                        $('#export-tools').html('');
+                        const message = response.data && response.data.message ? response.data.message : 'Error loading add form';
+                        alert(message);
                     }
                 },
                 error: function(xhr, status, error) {
                     hideLoader();
-                    $('#students-table-body').html('<tr><td colspan="10">Error loading students: ' + error + '</td></tr>');
-                    $('#export-tools').html('');
+                    alert('AJAX error loading add form: ' + error);
                 }
             });
-        }
+        });
 
-        // Initial load
+        $('#students-tbody').on('click', '.edu-button-edit', function() {
+            const studentId = $(this).data('id');
+            showLoader();
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'su_p_get_edit_form',
+                    student_id: studentId,
+                    nonce: '<?php echo wp_create_nonce('su_p_student_nonce'); ?>'
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        showModal(response.data.html);
+                    } else {
+                        const message = response.data && response.data.message ? response.data.message : 'Error loading edit form';
+                        alert(message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('AJAX error loading edit form: ' + error);
+                }
+            });
+        });
+
+        $('#students-tbody').on('click', '.edu-button-delete', function() {
+            const studentId = $(this).data('id');
+            showLoader();
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'su_p_get_delete_form',
+                    student_id: studentId,
+                    nonce: '<?php echo wp_create_nonce('su_p_student_nonce'); ?>'
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        showModal(response.data.html);
+                    } else {
+                        const message = response.data && response.data.message ? response.data.message : 'Error loading delete form';
+                        alert(message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('AJAX error loading delete form: ' + error);
+                }
+            });
+        });
+
         loadStudents(currentPage, perPage, searchQuery, centerFilter);
-
-        // Search and Filter
         $('#student-search').on('input', function() {
             searchQuery = $(this).val();
             currentPage = 1;
             loadStudents(currentPage, perPage, searchQuery, centerFilter);
         });
-
         $('#center-filter').on('change', function() {
             centerFilter = $(this).val();
             currentPage = 1;
             loadStudents(currentPage, perPage, searchQuery, centerFilter);
         });
-
-        // Pagination
         $('#students-per-page').on('change', function() {
             perPage = parseInt($(this).val());
             currentPage = 1;
             loadStudents(currentPage, perPage, searchQuery, centerFilter);
         });
-
         $('#next-page').on('click', function() {
             currentPage++;
             loadStudents(currentPage, perPage, searchQuery, centerFilter);
         });
-
         $('#prev-page').on('click', function() {
             currentPage--;
             loadStudents(currentPage, perPage, searchQuery, centerFilter);
         });
-
-        // Add Student
-        $('#add-student-btn').on('click', function() { openModal('#add-student-modal'); });
-
-        function populateClassesAndSections(centerId, classSelectId, sectionSelectId, selectedClass, selectedSection) {
-            if (!centerId) return;
-            showLoader();
-            $.ajax({
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                method: 'POST',
-                data: {
-                    action: 'su_p_get_class_sections',
-                    center_id: centerId,
-                    nonce: '<?php echo wp_create_nonce('su_p_student_nonce'); ?>'
-                },
-                success: function(response) {
-                    hideLoader();
-                    if (response.success) {
-                        const classes = response.data;
-                        let classOptions = '<option value="">Select Class</option>';
-                        classes.forEach(cls => {
-                            classOptions += `<option value="${cls.class_name}" ${cls.class_name === selectedClass ? 'selected' : ''}>${cls.class_name}</option>`;
-                        });
-                        $(classSelectId).html(classOptions);
-
-                        $(classSelectId).off('change').on('change', function() {
-                            const selectedClass = $(this).val();
-                            const sectionSelect = $(sectionSelectId);
-                            if (selectedClass) {
-                                const selectedClassData = classes.find(cls => cls.class_name === selectedClass);
-                                let sectionOptions = '<option value="">Select Section</option>';
-                                if (selectedClassData && selectedClassData.sections) {
-                                    const sections = selectedClassData.sections.split(',');
-                                    sections.forEach(section => {
-                                        sectionOptions += `<option value="${section}" ${section === selectedSection ? 'selected' : ''}>${section}</option>`;
-                                    });
-                                }
-                                sectionSelect.html(sectionOptions).prop('disabled', false);
-                            } else {
-                                sectionSelect.html('<option value="">Select Class First</option>').prop('disabled', true);
-                            }
-                        });
-                        $(classSelectId).trigger('change');
-                    } else {
-                        $(classSelectId).html('<option value="">No classes found</option>');
-                        $(sectionSelectId).html('<option value="">Select Class First</option>').prop('disabled', true);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    hideLoader();
-                    $(classSelectId).html('<option value="">Error loading classes</option>');
-                    $(sectionSelectId).html('<option value="">Error</option>').prop('disabled', true);
-                }
-            });
-        }
-
-        $('#educational-center-id').on('change', function() {
-            const centerId = $(this).val();
-            populateClassesAndSections(centerId, '#class-name', '#section');
+        $('#refresh-table').on('click', function() {
+            currentPage = 1;
+            loadStudents(currentPage, perPage, searchQuery, centerFilter);
         });
 
-        $('#save-student').on('click', function() {
-            const formData = new FormData($('#add-student-form')[0]);
-            formData.append('action', 'su_p_add_student');
-            showLoader();
-            $.ajax({
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    hideLoader();
-                    if (response.success) {
-                        $('#add-student-message').addClass('edu-success').text('Student added successfully!');
-                        setTimeout(() => {
-                            closeModal('#add-student-modal');
-                            loadStudents(currentPage, perPage, searchQuery, centerFilter);
-                        }, 1000);
-                    } else {
-                        $('#add-student-message').addClass('edu-error').text('Error: ' + (response.data.message || 'Unknown error'));
-                    }
-                },
-                error: function(xhr, status, error) {
-                    hideLoader();
-                    $('#add-student-message').addClass('edu-error').text('Error adding student: ' + error);
-                }
-            });
-        });
-
-        // Edit Student
-        $(document).on('click', '.edit-student', function() {
-            const studentId = $(this).data('student-id');
-            showLoader();
-            $.ajax({
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                method: 'POST',
-                data: {
-                    action: 'su_p_get_student',
-                    student_id: studentId,
-                    nonce: '<?php echo wp_create_nonce('su_p_student_nonce'); ?>'
-                },
-                success: function(response) {
-                    hideLoader();
-                    if (response.success) {
-                        const student = response.data;
-                        $('#edit-student-post-id').val(student.ID);
-                        $('#edit-student-id').val(student.student_id);
-                        $('#edit-educational-center-id').val(student.educational_center_id);
-                        $('#edit-admission-number').val(student.admission_number);
-                        $('#edit-student-name').val(student.student_name);
-                        $('#edit-student-email').val(student.student_email);
-                        $('#edit-student-phone').val(student.phone_number);
-                        $('#edit-student-gender').val(student.gender);
-                        $('#edit-student-dob').val(student.date_of_birth);
-                        $('#edit-student-religion').val(student.religion);
-                        if (student.student_profile_photo_url) {
-                            $('#edit-student-photo-preview').attr('src', student.student_profile_photo_url).show();
-                        } else {
-                            $('#edit-student-photo-preview').hide();
-                        }
-                        $('#edit-student-blood').val(student.blood_group);
-                        $('#edit-student-height').val(student.height);
-                        $('#edit-student-weight').val(student.weight);
-                        $('#edit-student-current-addr').val(student.current_address);
-                        $('#edit-student-permanent-addr').val(student.permanent_address);
-                        $('#edit-student-roll').val(student.roll_number);
-                        $('#edit-student-admission').val(student.admission_date);
-
-                        populateClassesAndSections(student.educational_center_id, '#edit-class-name', '#edit-section', student.class_name, student.section);
-                        openModal('#edit-student-modal');
-                    } else {
-                        alert('Error fetching student: ' + response.data.message);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    hideLoader();
-                    alert('Error fetching student: ' + error);
-                }
-            });
-        });
-
-        $('#edit-student-photo').on('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    $('#edit-student-photo-preview').attr('src', e.target.result).show();
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        $('#update-student').on('click', function() {
-            const formData = new FormData($('#edit-student-form')[0]);
-            formData.append('action', 'su_p_update_student');
-            showLoader();
-            $.ajax({
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    hideLoader();
-                    if (response.success) {
-                        $('#edit-student-message').addClass('edu-success').text('Student updated successfully!');
-                        setTimeout(() => {
-                            closeModal('#edit-student-modal');
-                            loadStudents(currentPage, perPage, searchQuery, centerFilter);
-                        }, 1000);
-                    } else {
-                        $('#edit-student-message').addClass('edu-error').text('Error: ' + (response.data.message || 'Unknown error'));
-                    }
-                },
-                error: function(xhr, status, error) {
-                    hideLoader();
-                    $('#edit-student-message').addClass('edu-error').text('Error updating student: ' + error);
-                }
-            });
-        });
-
-        // Delete Student
-        $(document).on('click', '.delete-student', function() {
-            if (!confirm('Are you sure you want to delete this student?')) return;
-            const studentId = $(this).data('student-id');
-            showLoader();
-            $.ajax({
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                method: 'POST',
-                data: {
-                    action: 'su_p_delete_student',
-                    student_id: studentId,
-                    nonce: '<?php echo wp_create_nonce('su_p_student_nonce'); ?>'
-                },
-                success: function(response) {
-                    hideLoader();
-                    if (response.success) {
-                        loadStudents(currentPage, perPage, searchQuery, centerFilter);
-                    } else {
-                        alert('Error: ' + response.data.message);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    hideLoader();
-                    alert('Error deleting student: ' + error);
-                }
-            });
-        });
+        window.refreshStudentsTable = function() {
+            loadStudents(currentPage, perPage, searchQuery, centerFilter);
+        };
     });
     </script>
     <?php
     return ob_get_clean();
 }
-// Fetch Students
+
+// Add Student Function (Create)
+function render_su_p_add_students($ajax_mode = false) {
+    if (!current_user_can('manage_options')) {
+        return $ajax_mode ? '<p>You must be a Super Administrator to add students.</p>' : '<p>You must be a Super Administrator to add students.</p>';
+    }
+
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1, 'post_status' => 'publish']);
+    $add_message = '';
+    $initial_student_id = '';
+
+    if (isset($_POST['su_p_add_student']) && check_admin_referer('su_p_student_add', 'nonce')) {
+        $education_center_id = sanitize_text_field($_POST['educational_center_id']);
+        $student_id = sanitize_text_field($_POST['student_id']);
+        $fields = [
+            'student_name' => sanitize_text_field($_POST['student_name']),
+            'student_email' => sanitize_email($_POST['student_email']),
+            'phone_number' => sanitize_text_field($_POST['phone_number']),
+            'class' => sanitize_text_field($_POST['class_name']),
+            'section' => sanitize_text_field($_POST['section']),
+            'roll_number' => sanitize_text_field($_POST['roll_number']),
+            'admission_number' => sanitize_text_field($_POST['admission_number']),
+            'admission_date' => sanitize_text_field($_POST['admission_date']),
+            'gender' => sanitize_text_field($_POST['gender']),
+            'date_of_birth' => sanitize_text_field($_POST['date_of_birth']),
+            'religion' => sanitize_text_field($_POST['religion']),
+            'blood_group' => sanitize_text_field($_POST['blood_group']),
+            'height' => sanitize_text_field($_POST['height']),
+            'weight' => sanitize_text_field($_POST['weight']),
+            'current_address' => sanitize_textarea_field($_POST['current_address']),
+            'permanent_address' => sanitize_textarea_field($_POST['permanent_address'])
+        ];
+
+        if (empty($education_center_id) || empty($student_id) || empty($fields['student_name']) || empty($fields['admission_number'])) {
+            $add_message = '<div class="alert alert-danger">Required fields are missing.</div>';
+        } else {
+            $exists = get_posts([
+                'post_type' => 'students',
+                'meta_query' => [
+                    ['key' => 'student_id', 'value' => $student_id],
+                    ['key' => 'educational_center_id', 'value' => $education_center_id]
+                ]
+            ]);
+
+            if (!empty($exists)) {
+                $add_message = '<div class="alert alert-danger">Student ID already exists for this center.</div>';
+            } else {
+                $meta_input = array_merge(['student_id' => $student_id, 'educational_center_id' => $education_center_id], $fields);
+                if (!empty($_FILES['student_profile_photo']['name'])) {
+                    $upload = wp_handle_upload($_FILES['student_profile_photo'], ['test_form' => false]);
+                    if (isset($upload['error'])) {
+                        $add_message = '<div class="alert alert-danger">File upload error: ' . esc_html($upload['error']) . '</div>';
+                    } elseif (isset($upload['file'])) {
+                        $attachment_id = wp_insert_attachment([
+                            'post_mime_type' => $upload['type'],
+                            'post_title' => basename($upload['file']),
+                            'post_content' => '',
+                            'post_status' => 'inherit'
+                        ], $upload['file']);
+                        wp_generate_attachment_metadata($attachment_id, $upload['file']);
+                        $meta_input['student_profile_photo'] = $attachment_id;
+                    }
+                }
+
+                $post_id = wp_insert_post([
+                    'post_title' => $student_id,
+                    'post_type' => 'students',
+                    'post_status' => 'publish',
+                    'meta_input' => $meta_input
+                ]);
+
+                if (is_wp_error($post_id)) {
+                    $add_message = '<div class="alert alert-danger">Error adding student: ' . esc_html($post_id->get_error_message()) . '</div>';
+                } elseif ($post_id) {
+                    $add_message = '<div class="alert alert-success">Student added successfully.</div>';
+                } else {
+                    $add_message = '<div class="alert alert-danger">Failed to add student.</div>';
+                }
+            }
+        }
+        if ($ajax_mode) {
+            echo json_encode(['success' => strpos($add_message, 'success') !== false, 'message' => $add_message]);
+            exit;
+        }
+    }
+
+    $gender_field = get_field_object('field_67ab1ab5978fc');
+    $religion_field = get_field_object('field_67ab1b6d978fe');
+    $blood_group_field = get_field_object('field_67ab1c0197900');
+
+    ob_start();
+    if ($ajax_mode) {
+        ?>
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" onclick="jQuery('#modal-container').hide().html('');">×</span>
+            <h3>Add Student</h3>
+            <div id="add-student-form-container">
+                <?php if ($add_message) echo $add_message; ?>
+                <form id="add-student-form" method="post" enctype="multipart/form-data">
+        <?php } else { ?>
+        <div class="management-main-wrapper">
+            <div class="management-content-wrapper">
+                <div id="edu-loader" class="edu-loader" style="display: none;">
+                    <div class="edu-loader-container">
+                        <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                    </div>
+                </div>
+                <div class="management-section">
+                    <h2>Add Student</h2>
+                    <div id="add-student-form-container">
+                        <?php if ($add_message) echo $add_message; ?>
+                        <form id="add-student-form" method="post" enctype="multipart/form-data">
+        <?php } ?>
+                        <div class="search-filters">
+                            <label>Student ID</label>
+                            <input type="text" id="add-student-id" name="student_id" value="<?php echo esc_attr($initial_student_id); ?>" readonly required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Education Center</label>
+                            <select id="add-center-id" name="educational_center_id" required>
+                                <option value="">Select Center</option>
+                                <?php foreach ($centers as $center) {
+                                    $center_id = get_post_meta($center->ID, 'educational_center_id', true) ?: $center->ID;
+                                    echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                                } ?>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Class</label>
+                            <select id="add-class-name" name="class_name" required>
+                                <option value="">Select Class</option>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Section</label>
+                            <select id="add-section" name="section" disabled required>
+                                <option value="">Select Class First</option>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Student Name</label>
+                            <input type="text" name="student_name" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Email</label>
+                            <input type="email" name="student_email">
+                        </div>
+                        <div class="search-filters">
+                            <label>Phone Number</label>
+                            <input type="text" name="phone_number">
+                        </div>
+                        <div class="search-filters">
+                            <label>Roll Number</label>
+                            <input type="text" name="roll_number" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Admission Number</label>
+                            <input type="text" name="admission_number" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Admission Date</label>
+                            <input type="date" name="admission_date" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Gender</label>
+                            <select name="gender">
+                                <option value="">Select Gender</option>
+                                <?php if ($gender_field) : foreach ($gender_field['choices'] as $value => $label) : ?>
+                                    <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+                                <?php endforeach; endif; ?>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Date of Birth</label>
+                            <input type="date" name="date_of_birth">
+                        </div>
+                        <div class="search-filters">
+                            <label>Religion</label>
+                            <select name="religion">
+                                <option value="">Select Religion</option>
+                                <?php if ($religion_field) : foreach ($religion_field['choices'] as $value => $label) : ?>
+                                    <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+                                <?php endforeach; endif; ?>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Blood Group</label>
+                            <select name="blood_group">
+                                <option value="">Select Blood Group</option>
+                                <?php if ($blood_group_field) : foreach ($blood_group_field['choices'] as $value => $label) : ?>
+                                    <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+                                <?php endforeach; endif; ?>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Height (cm)</label>
+                            <input type="number" name="height" step="0.1">
+                        </div>
+                        <div class="search-filters">
+                            <label>Weight (kg)</label>
+                            <input type="number" name="weight" step="0.1">
+                        </div>
+                        <div class="search-filters">
+                            <label>Current Address</label>
+                            <textarea name="current_address"></textarea>
+                        </div>
+                        <div class="search-filters">
+                            <label>Permanent Address</label>
+                            <textarea name="permanent_address"></textarea>
+                        </div>
+                        <div class="search-filters">
+                            <label>Profile Photo</label>
+                            <input type="file" name="student_profile_photo" accept="image/*">
+                        </div>
+                        <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_student_add'); ?>">
+                        <input type="hidden" name="su_p_add_student" value="1">
+                        <button type="submit" class="button edu-button-primary">Add Student</button>
+                        <?php if (!$ajax_mode) { ?>
+                            <a href="<?php echo admin_url('admin.php?page=su-p-students-management'); ?>" class="button">Cancel</a>
+                        <?php } ?>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <?php if ($ajax_mode) { ?>
+        </div>
+        <?php } ?>
+
+        <script>
+        jQuery(document).ready(function($) {
+            const loader = $('#edu-loader');
+            function showLoader() { loader.show(); }
+            function hideLoader() { loader.hide(); }
+
+            $('#add-center-id').on('change', function() {
+                const centerId = $(this).val();
+                if (centerId) {
+                    showLoader();
+                    $.ajax({
+                        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                        method: 'POST',
+                        data: {
+                            action: 'su_p_generate_student_id',
+                            center_id: centerId,
+                            nonce: '<?php echo wp_create_nonce('su_p_student_nonce'); ?>'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                $('#add-student-id').val(response.data.student_id);
+                            }
+                            $.ajax({
+                                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                                method: 'POST',
+                                data: {
+                                    action: 'su_p_get_class_sections',
+                                    center_id: centerId,
+                                    nonce: '<?php echo wp_create_nonce('su_p_student_nonce'); ?>'
+                                },
+                                success: function(response) {
+                                    hideLoader();
+                                    if (response.success) {
+                                        const classes = response.data;
+                                        let classOptions = '<option value="">Select Class</option>';
+                                        classes.forEach(cls => {
+                                            classOptions += `<option value="${cls.class_name}">${cls.class_name}</option>`;
+                                        });
+                                        $('#add-class-name').html(classOptions);
+                                        $('#add-section').html('<option value="">Select Class First</option>').prop('disabled', true);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    $('#add-student-id').val('');
+                    $('#add-class-name').html('<option value="">Select Class</option>');
+                    $('#add-section').html('<option value="">Select Class First</option>').prop('disabled', true);
+                }
+            });
+
+            $('#add-class-name').on('change', function() {
+                const centerId = $('#add-center-id').val();
+                const selectedClass = $(this).val();
+                if (selectedClass && centerId) {
+                    showLoader();
+                    $.ajax({
+                        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                        method: 'POST',
+                        data: {
+                            action: 'su_p_get_class_sections',
+                            center_id: centerId,
+                            nonce: '<?php echo wp_create_nonce('su_p_student_nonce'); ?>'
+                        },
+                        success: function(response) {
+                            hideLoader();
+                            if (response.success) {
+                                const classes = response.data;
+                                const selectedClassData = classes.find(cls => cls.class_name === selectedClass);
+                                let sectionOptions = '<option value="">Select Section</option>';
+                                if (selectedClassData && selectedClassData.sections) {
+                                    const sections = selectedClassData.sections.split(',');
+                                    sections.forEach(section => {
+                                        sectionOptions += `<option value="${section}">${section}</option>`;
+                                    });
+                                }
+                                $('#add-section').html(sectionOptions).prop('disabled', false);
+                            }
+                        }
+                    });
+                }
+            });
+
+            $('#add-student-form').on('submit', function(e) {
+                e.preventDefault();
+                showLoader();
+                const formData = new FormData(this);
+                formData.append('action', 'su_p_add_student');
+                $.ajax({
+                    url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        hideLoader();
+                        if (response.success) {
+                            alert('Student added successfully');
+                            <?php if ($ajax_mode) { ?>
+                                $('#modal-container').hide().html('');
+                                window.refreshStudentsTable();
+                            <?php } else { ?>
+                                window.location.href = '<?php echo admin_url('admin.php?page=su-p-students-management'); ?>';
+                            <?php } ?>
+                        } else {
+                            $('#add-student-form-container').prepend(response.data.message);
+                        }
+                    }
+                });
+            });
+        });
+        </script>
+        <?php
+    return ob_get_clean();
+}
+
+
+// Edit Student Function (Update)
+// Edit Student Function (Update)
+function render_su_p_edit_students($ajax_mode = false, $student_id = 0) {
+    if (!current_user_can('manage_options')) {
+        return $ajax_mode ? '<p>You must be a Super Administrator to edit students.</p>' : '<p>You must be a Super Administrator to edit students.</p>';
+    }
+
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1, 'post_status' => 'publish']);
+    $edit_message = '';
+    $selected_student = $student_id ? get_post($student_id) : null;
+    if ($selected_student && $selected_student->post_type === 'students') {
+        $selected_student->meta = array_map('maybe_unserialize', get_post_meta($student_id));
+    }
+
+    if (isset($_POST['su_p_edit_student']) && check_admin_referer('su_p_student_edit', 'nonce')) {
+        $student_post_id = intval($_POST['student_post_id']);
+        $fields = [
+            'educational_center_id' => sanitize_text_field($_POST['educational_center_id']),
+            'student_name' => sanitize_text_field($_POST['student_name']),
+            'student_email' => sanitize_email($_POST['student_email']),
+            'phone_number' => sanitize_text_field($_POST['phone_number']),
+            'class' => sanitize_text_field($_POST['class_name']),
+            'section' => sanitize_text_field($_POST['section']),
+            'roll_number' => sanitize_text_field($_POST['roll_number']),
+            'admission_number' => sanitize_text_field($_POST['admission_number']),
+            'admission_date' => sanitize_text_field($_POST['admission_date']),
+            'gender' => sanitize_text_field($_POST['gender']),
+            'date_of_birth' => sanitize_text_field($_POST['date_of_birth']),
+            'religion' => sanitize_text_field($_POST['religion']),
+            'blood_group' => sanitize_text_field($_POST['blood_group']),
+            'height' => sanitize_text_field($_POST['height']),
+            'weight' => sanitize_text_field($_POST['weight']),
+            'current_address' => sanitize_textarea_field($_POST['current_address']),
+            'permanent_address' => sanitize_textarea_field($_POST['permanent_address'])
+        ];
+
+        if (empty($student_post_id) || empty($fields['student_name']) || empty($fields['admission_number'])) {
+            $edit_message = '<div class="alert alert-danger">Required fields are missing.</div>';
+        } else {
+            $updated = wp_update_post(['ID' => $student_post_id, 'post_title' => get_post_meta($student_post_id, 'student_id', true)]);
+            if (is_wp_error($updated)) {
+                $edit_message = '<div class="alert alert-danger">Error updating student: ' . esc_html($updated->get_error_message()) . '</div>';
+            } elseif ($updated !== 0) {
+                foreach ($fields as $key => $value) {
+                    update_post_meta($student_post_id, $key, $value);
+                }
+                if (!empty($_FILES['student_profile_photo']['name'])) {
+                    $upload = wp_handle_upload($_FILES['student_profile_photo'], ['test_form' => false]);
+                    if (isset($upload['error'])) {
+                        $edit_message = '<div class="alert alert-danger">File upload error: ' . esc_html($upload['error']) . '</div>';
+                    } elseif (isset($upload['file'])) {
+                        $attachment_id = wp_insert_attachment([
+                            'post_mime_type' => $upload['type'],
+                            'post_title' => basename($upload['file']),
+                            'post_content' => '',
+                            'post_status' => 'inherit'
+                        ], $upload['file']);
+                        wp_generate_attachment_metadata($attachment_id, $upload['file']);
+                        update_post_meta($student_post_id, 'student_profile_photo', $attachment_id);
+                    }
+                }
+                $edit_message = '<div class="alert alert-success">Student updated successfully.</div>';
+            } else {
+                $edit_message = '<div class="alert alert-danger">Failed to update student.</div>';
+            }
+        }
+        if ($ajax_mode) {
+            wp_send_json([
+                'success' => strpos($edit_message, 'success') !== false,
+                'data' => ['message' => $edit_message]
+            ]);
+            exit; // Ensure no further output
+        }
+    }
+
+    // Rest of the function remains unchanged for rendering the form
+    $gender_field = get_field_object('field_67ab1ab5978fc');
+    $religion_field = get_field_object('field_67ab1b6d978fe');
+    $blood_group_field = get_field_object('field_67ab1c0197900');
+
+    ob_start();
+    if ($ajax_mode) {
+        ?>
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" onclick="jQuery('#modal-container').hide().html('');">×</span>
+            <h3>Edit Student</h3>
+            <div id="edit-student-form-container">
+                <?php if ($edit_message) echo $edit_message; ?>
+                <?php if ($selected_student) { ?>
+                    <form id="edit-student-form" method="post" enctype="multipart/form-data">
+                <?php } ?>
+        <?php
+    } else {
+        ?>
+        <div class="management-main-wrapper">
+            <div class="management-content-wrapper">
+                <div id="edu-loader" class="edu-loader" style="display: none;">
+                    <div class="edu-loader-container">
+                        <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                    </div>
+                </div>
+                <?php echo render_su_p_students_management(); // Include the table ?>
+                <div class="management-section">
+                    <h2>Edit Student</h2>
+                    <div id="edit-student-form-container">
+                        <?php if ($edit_message) echo $edit_message; ?>
+                        <?php if ($selected_student) { ?>
+                            <form id="edit-student-form" method="post" enctype="multipart/form-data">
+                        <?php } ?>
+        <?php
+    }
+    if ($selected_student) {
+        ?>
+                        <input type="hidden" name="student_post_id" value="<?php echo esc_attr($selected_student->ID); ?>">
+                        <div class="search-filters">
+                            <label>Student ID</label>
+                            <input type="text" name="student_id" value="<?php echo esc_attr($selected_student->meta['student_id'][0] ?? ''); ?>" readonly>
+                        </div>
+                        <div class="search-filters">
+                            <label>Education Center</label>
+                            <select id="edit-center-id" name="educational_center_id" required>
+                                <option value="">Select Center</option>
+                                <?php foreach ($centers as $center) {
+                                    $center_id = get_post_meta($center->ID, 'educational_center_id', true) ?: $center->ID;
+                                    $selected = $center_id === ($selected_student->meta['educational_center_id'][0] ?? '') ? 'selected' : '';
+                                    echo "<option value='" . esc_attr($center_id) . "' $selected>" . esc_html($center->post_title) . " ($center_id)</option>";
+                                } ?>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Class</label>
+                            <select id="edit-class-name" name="class_name" required>
+                                <option value="">Select Class</option>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Section</label>
+                            <select id="edit-section" name="section" disabled required>
+                                <option value="">Select Class First</option>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Student Name</label>
+                            <input type="text" name="student_name" value="<?php echo esc_attr($selected_student->meta['student_name'][0] ?? ''); ?>" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Email</label>
+                            <input type="email" name="student_email" value="<?php echo esc_attr($selected_student->meta['student_email'][0] ?? ''); ?>">
+                        </div>
+                        <div class="search-filters">
+                            <label>Phone Number</label>
+                            <input type="text" name="phone_number" value="<?php echo esc_attr($selected_student->meta['phone_number'][0] ?? ''); ?>">
+                        </div>
+                        <div class="search-filters">
+                            <label>Roll Number</label>
+                            <input type="text" name="roll_number" value="<?php echo esc_attr($selected_student->meta['roll_number'][0] ?? ''); ?>" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Admission Number</label>
+                            <input type="text" name="admission_number" value="<?php echo esc_attr($selected_student->meta['admission_number'][0] ?? ''); ?>" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Admission Date</label>
+                            <input type="date" name="admission_date" value="<?php echo esc_attr($selected_student->meta['admission_date'][0] ?? ''); ?>" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Gender</label>
+                            <select name="gender">
+                                <option value="">Select Gender</option>
+                                <?php if ($gender_field) { foreach ($gender_field['choices'] as $value => $label) { ?>
+                                    <option value="<?php echo esc_attr($value); ?>" <?php echo ($selected_student->meta['gender'][0] ?? '') === $value ? 'selected' : ''; ?>><?php echo esc_html($label); ?></option>
+                                <?php } } ?>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Date of Birth</label>
+                            <input type="date" name="date_of_birth" value="<?php echo esc_attr($selected_student->meta['date_of_birth'][0] ?? ''); ?>">
+                        </div>
+                        <div class="search-filters">
+                            <label>Religion</label>
+                            <select name="religion">
+                                <option value="">Select Religion</option>
+                                <?php if ($religion_field) { foreach ($religion_field['choices'] as $value => $label) { ?>
+                                    <option value="<?php echo esc_attr($value); ?>" <?php echo ($selected_student->meta['religion'][0] ?? '') === $value ? 'selected' : ''; ?>><?php echo esc_html($label); ?></option>
+                                <?php } } ?>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Blood Group</label>
+                            <select name="blood_group">
+                                <option value="">Select Blood Group</option>
+                                <?php if ($blood_group_field) { foreach ($blood_group_field['choices'] as $value => $label) { ?>
+                                    <option value="<?php echo esc_attr($value); ?>" <?php echo ($selected_student->meta['blood_group'][0] ?? '') === $value ? 'selected' : ''; ?>><?php echo esc_html($label); ?></option>
+                                <?php } } ?>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Height (cm)</label>
+                            <input type="number" name="height" step="0.1" value="<?php echo esc_attr($selected_student->meta['height'][0] ?? ''); ?>">
+                        </div>
+                        <div class="search-filters">
+                            <label>Weight (kg)</label>
+                            <input type="number" name="weight" step="0.1" value="<?php echo esc_attr($selected_student->meta['weight'][0] ?? ''); ?>">
+                        </div>
+                        <div class="search-filters">
+                            <label>Current Address</label>
+                            <textarea name="current_address"><?php echo esc_textarea($selected_student->meta['current_address'][0] ?? ''); ?></textarea>
+                        </div>
+                        <div class="search-filters">
+                            <label>Permanent Address</label>
+                            <textarea name="permanent_address"><?php echo esc_textarea($selected_student->meta['permanent_address'][0] ?? ''); ?></textarea>
+                        </div>
+                        <div class="search-filters">
+                            <label>Profile Photo</label>
+                            <?php if (!empty($selected_student->meta['student_profile_photo'][0])) { ?>
+                                <img src="<?php echo wp_get_attachment_url($selected_student->meta['student_profile_photo'][0]); ?>" style="max-width: 200px;">
+                            <?php } ?>
+                            <input type="file" name="student_profile_photo" accept="image/*">
+                        </div>
+                        <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_student_edit'); ?>">
+                        <input type="hidden" name="su_p_edit_student" value="1">
+                        <button type="submit" class="button edu-button-primary">Update Student</button>
+                        <?php if (!$ajax_mode) { ?>
+                            <a href="<?php echo admin_url('admin.php?page=su-p-students-management'); ?>" class="button">Cancel</a>
+                        <?php } ?>
+                    </form>
+        <?php
+    }
+    ?>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        jQuery(document).ready(function($) {
+            const loader = $('#edu-loader');
+            function showLoader() { loader.show(); }
+            function hideLoader() { loader.hide(); }
+
+            $('#edit-center-id').on('change', function() {
+                const centerId = $(this).val();
+                if (centerId) {
+                    showLoader();
+                    $.ajax({
+                        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                        method: 'POST',
+                        data: {
+                            action: 'su_p_get_class_sections',
+                            center_id: centerId,
+                            nonce: '<?php echo wp_create_nonce('su_p_student_nonce'); ?>'
+                        },
+                        success: function(response) {
+                            hideLoader();
+                            if (response.success) {
+                                const classes = response.data;
+                                let classOptions = '<option value="">Select Class</option>';
+                                classes.forEach(cls => {
+                                    const selected = cls.class_name === '<?php echo esc_js($selected_student->meta['class_name'][0] ?? ''); ?>' ? 'selected' : '';
+                                    classOptions += `<option value="${cls.class_name}" ${selected}>${cls.class_name}</option>`;
+                                });
+                                $('#edit-class-name').html(classOptions);
+                                $('#edit-class-name').trigger('change');
+                            }
+                        }
+                    });
+                } else {
+                    $('#edit-class-name').html('<option value="">Select Class</option>');
+                    $('#edit-section').html('<option value="">Select Class First</option>').prop('disabled', true);
+                }
+            });
+
+            $('#edit-class-name').on('change', function() {
+                const centerId = $('#edit-center-id').val();
+                const selectedClass = $(this).val();
+                if (selectedClass && centerId) {
+                    showLoader();
+                    $.ajax({
+                        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                        method: 'POST',
+                        data: {
+                            action: 'su_p_get_class_sections',
+                            center_id: centerId,
+                            nonce: '<?php echo wp_create_nonce('su_p_student_nonce'); ?>'
+                        },
+                        success: function(response) {
+                            hideLoader();
+                            if (response.success) {
+                                const classes = response.data;
+                                const selectedClassData = classes.find(cls => cls.class_name === selectedClass);
+                                let sectionOptions = '<option value="">Select Section</option>';
+                                if (selectedClassData && selectedClassData.sections) {
+                                    const sections = selectedClassData.sections.split(',');
+                                    sections.forEach(section => {
+                                        const selected = section === '<?php echo esc_js($selected_student->meta['section'][0] ?? ''); ?>' ? 'selected' : '';
+                                        sectionOptions += `<option value="${section}" ${selected}>${section}</option>`;
+                                    });
+                                }
+                                $('#edit-section').html(sectionOptions).prop('disabled', false);
+                            }
+                        }
+                    });
+                }
+            });
+
+            <?php if ($selected_student) { ?>
+                $('#edit-center-id').trigger('change');
+            <?php } ?>
+
+            $('#edit-student-form').on('submit', function(e) {
+                e.preventDefault();
+                showLoader();
+                const formData = new FormData(this);
+                formData.append('action', 'su_p_edit_student');
+                $.ajax({
+                    url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        hideLoader();
+                        if (response.success) {
+                            alert('Student updated successfully');
+                            <?php if ($ajax_mode) { ?>
+                                $('#modal-container').hide().html('');
+                                window.refreshStudentsTable();
+                            <?php } else { ?>
+                                window.location.href = '<?php echo admin_url('admin.php?page=su-p-students-management'); ?>';
+                            <?php } ?>
+                        } else {
+                            // Safely handle the message
+                            const message = response.data && response.data.message ? response.data.message : 'An error occurred while updating the student.';
+                            $('#edit-student-form-container').prepend(message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        hideLoader();
+                        $('#edit-student-form-container').prepend('<div class="alert alert-danger">AJAX error: ' + error + '</div>');
+                    }
+                });
+            });
+        });
+        </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Delete Student Function (Delete)
+// Delete Student Function (Delete)
+// Delete Student Function (Delete)
+function render_su_p_delete_students($ajax_mode = false, $student_id = 0) {
+    if (!current_user_can('manage_options')) {
+        return $ajax_mode ? '<p>You must be a Super Administrator to delete students.</p>' : '<p>You must be a Super Administrator to delete students.</p>';
+    }
+
+    global $wpdb;
+    $delete_message = '';
+    $selected_student_id = $student_id;
+
+    if (isset($_POST['su_p_delete_student']) && check_admin_referer('su_p_student_delete', 'nonce')) {
+        $student_post_id = intval($_POST['student_post_id']);
+        if (empty($student_post_id)) {
+            $delete_message = '<div class="alert alert-danger">Invalid student ID.</div>';
+        } else {
+            $result = wp_delete_post($student_post_id, true);
+            if ($result === false) {
+                error_log("Failed to delete student post ID: $student_post_id. User: " . get_current_user_id());
+                $delete_message = '<div class="alert alert-danger">Failed to delete student. Check debug.log.</div>';
+            } else {
+                $delete_message = '<div class="alert alert-success">Student deleted successfully.</div>';
+            }
+        }
+        if ($ajax_mode) {
+            wp_send_json([
+                'success' => strpos($delete_message, 'success') !== false,
+                'data' => ['message' => $delete_message]
+            ]);
+            exit; // Ensure no further output
+        }
+    }
+
+    ob_start();
+    if ($ajax_mode) {
+        ?>
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" onclick="jQuery('#modal-container').hide().html('');">×</span>
+            <h3>Confirm Deletion</h3>
+            <div id="delete-student-container">
+                <?php if ($delete_message) echo $delete_message; ?>
+                <?php if ($selected_student_id) { ?>
+                    <p>Are you sure you want to delete student "<?php echo esc_html(get_post_meta($selected_student_id, 'student_id', true)); ?>"?</p>
+                    <form id="delete-student-form" method="post">
+                <?php } ?>
+        <?php
+    } else {
+        ?>
+        <div class="management-main-wrapper">
+            <div class="management-content-wrapper">
+                <div id="edu-loader" class="edu-loader" style="display: none;">
+                    <div class="edu-loader-container">
+                        <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                    </div>
+                </div>
+                <?php echo render_su_p_students_management(); // Include the table ?>
+                <div class="management-section">
+                    <h2>Delete Student</h2>
+                    <div id="delete-student-container">
+                        <?php if ($delete_message) echo $delete_message; ?>
+                        <?php if ($selected_student_id) { ?>
+                            <p>Are you sure you want to delete student "<?php echo esc_html(get_post_meta($selected_student_id, 'student_id', true)); ?>"?</p>
+                            <form id="delete-student-form" method="post">
+                        <?php } ?>
+        <?php
+    }
+    if ($selected_student_id) {
+        ?>
+                        <input type="hidden" name="student_post_id" value="<?php echo esc_attr($selected_student_id); ?>">
+                        <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_student_delete'); ?>">
+                        <input type="hidden" name="su_p_delete_student" value="1">
+                        <button type="submit" class="button edu-button-delete">Delete</button>
+                        <button type="button" class="button" onclick="<?php echo $ajax_mode ? "jQuery('#modal-container').hide().html('');" : "window.location.href='" . admin_url('admin.php?page=su-p-students-management') . "';"; ?>">Cancel</button>
+                    </form>
+        <?php
+    }
+    ?>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        jQuery(document).ready(function($) {
+            const loader = $('#edu-loader');
+            function showLoader() { loader.show(); }
+            function hideLoader() { loader.hide(); }
+
+            $('#delete-student-form').on('submit', function(e) {
+                e.preventDefault();
+                showLoader();
+                const formData = new FormData(this);
+                formData.append('action', 'su_p_delete_student');
+                $.ajax({
+                    url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        hideLoader();
+                        if (response.success) {
+                            alert('Student deleted successfully');
+                            <?php if ($ajax_mode) { ?>
+                                $('#modal-container').hide().html('');
+                                window.refreshStudentsTable();
+                            <?php } else { ?>
+                                window.location.href = '<?php echo admin_url('admin.php?page=su-p-students-management'); ?>';
+                            <?php } ?>
+                        } else {
+                            // Safely handle the message
+                            const message = response.data && response.data.message ? response.data.message : 'An error occurred while deleting the student.';
+                            $('#delete-student-container').prepend(message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        hideLoader();
+                        $('#delete-student-container').prepend('<div class="alert alert-danger">AJAX error: ' + error + '</div>');
+                    }
+                });
+            });
+        });
+        </script>
+    <?php
+    return ob_get_clean();
+}
+// AJAX Handlers
 add_action('wp_ajax_su_p_fetch_students', 'su_p_fetch_students');
 function su_p_fetch_students() {
     check_ajax_referer('su_p_student_nonce', 'nonce');
     global $wpdb;
-    $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
-    $per_page = isset($_POST['per_page']) ? intval($_POST['per_page']) : 10;
-    $search = isset($_POST['search']) ? sanitize_text_field($_POST['search']) : '';
-    $center_filter = isset($_POST['center_filter']) ? sanitize_text_field($_POST['center_filter']) : '';
+    $page = intval($_POST['page']) ?: 1;
+    $per_page = intval($_POST['per_page']) ?: 10;
+    $search = sanitize_text_field($_POST['search']);
+    $center_filter = sanitize_text_field($_POST['center_filter']);
     $offset = ($page - 1) * $per_page;
 
     $args = [
@@ -3718,48 +5457,53 @@ function su_p_fetch_students() {
             ['key' => 'student_id', 'value' => $search, 'compare' => 'LIKE'],
             ['key' => 'student_name', 'value' => $search, 'compare' => 'LIKE'],
             ['key' => 'student_email', 'value' => $search, 'compare' => 'LIKE'],
-            ['key' => 'phone_number', 'value' => 'LIKE']
+            ['key' => 'phone_number', 'value' => $search, 'compare' => 'LIKE']
         ];
     }
     if ($center_filter) {
-        $args['meta_query'][] = ['key' => 'educational_center_id', 'value' => $center_filter, 'compare' => '='];
+        $args['meta_query'][] = ['key' => 'educational_center_id', 'value' => $center_filter];
     }
 
     $query = new WP_Query($args);
     $students = [];
     foreach ($query->posts as $post) {
-        $center_id = get_post_meta($post->ID, 'educational_center_id', true);
-        $center = $center_id ? get_posts(['post_type' => 'educational-center', 'meta_key' => 'educational_center_id', 'meta_value' => $center_id, 'posts_per_page' => 1])[0] : null;
+        $meta = get_post_meta($post->ID);
+        $center_id = $meta['educational_center_id'][0] ?? '';
+        $center = get_posts(['post_type' => 'educational-center', 'meta_key' => 'educational_center_id', 'meta_value' => $center_id, 'posts_per_page' => 1]);
         $students[] = [
             'ID' => $post->ID,
-            'student_id' => get_post_meta($post->ID, 'student_id', true),
+            'student_id' => $meta['student_id'][0] ?? '',
             'educational_center_id' => $center_id,
-            'center_name' => $center ? $center->post_title : 'N/A',
-            'student_name' => get_post_meta($post->ID, 'student_name', true),
-            'class_name' => get_post_meta($post->ID, 'class_name', true),
-            'section' => get_post_meta($post->ID, 'section', true),
-            'roll_number' => get_post_meta($post->ID, 'roll_number', true),
-            'student_email' => get_post_meta($post->ID, 'student_email', true),
-            'phone_number' => get_post_meta($post->ID, 'phone_number', true)
+            'center_name' => $center ? $center[0]->post_title : 'N/A',
+            'student_name' => $meta['student_name'][0] ?? '',
+            'student_email' => $meta['student_email'][0] ?? '',
+            'phone_number' => $meta['phone_number'][0] ?? '',
+            'class' => $meta['class_name'][0] ?? '',
+            'section' => $meta['section'][0] ?? '',
+            'roll_number' => $meta['roll_number'][0] ?? '',
+            'admission_number' => $meta['admission_number'][0] ?? ''
         ];
     }
-    $total = $query->found_posts;
-    wp_send_json_success(['students' => $students, 'total' => $total]);
+    wp_send_json_success(['students' => $students, 'total' => $query->found_posts]);
 }
 
-// Fetch Class Sections
+add_action('wp_ajax_su_p_generate_student_id', 'su_p_generate_student_id');
+function su_p_generate_student_id() {
+    check_ajax_referer('su_p_student_nonce', 'nonce');
+    $center_id = sanitize_text_field($_POST['center_id']);
+    if (empty($center_id)) {
+        wp_send_json_error(['message' => 'Center ID is required']);
+    }
+    $student_id = get_unique_id_for_role('students', $center_id);
+    wp_send_json_success(['student_id' => $student_id]);
+}
+
 add_action('wp_ajax_su_p_get_class_sections', 'su_p_get_class_sections');
 function su_p_get_class_sections() {
     check_ajax_referer('su_p_student_nonce', 'nonce');
     global $wpdb;
     $center_id = sanitize_text_field($_POST['center_id']);
-    $table_name = $wpdb->prefix . 'class_sections';
-
-    $classes = $wpdb->get_results(
-        $wpdb->prepare("SELECT class_name, sections FROM $table_name WHERE education_center_id = %s", $center_id),
-        ARRAY_A
-    );
-
+    $classes = $wpdb->get_results($wpdb->prepare("SELECT class_name, sections FROM {$wpdb->prefix}class_sections WHERE education_center_id = %s", $center_id), ARRAY_A);
     if ($classes) {
         wp_send_json_success($classes);
     } else {
@@ -3767,152 +5511,56 @@ function su_p_get_class_sections() {
     }
 }
 
-// Add Student
+add_action('wp_ajax_su_p_get_add_form', 'su_p_get_add_form');
+function su_p_get_add_form() {
+    check_ajax_referer('su_p_student_nonce', 'nonce');
+    wp_send_json_success(['html' => render_su_p_add_students(true)]);
+}
+
+add_action('wp_ajax_su_p_get_edit_form', 'su_p_get_edit_form');
+function su_p_get_edit_form() {
+    check_ajax_referer('su_p_student_nonce', 'nonce');
+    $student_id = intval($_POST['student_id']);
+    wp_send_json_success(['html' => render_su_p_edit_students(true, $student_id)]);
+}
+
+add_action('wp_ajax_su_p_get_delete_form', 'su_p_get_delete_form');
+function su_p_get_delete_form() {
+    check_ajax_referer('su_p_student_nonce', 'nonce');
+    $student_id = intval($_POST['student_id']);
+    wp_send_json_success(['html' => render_su_p_delete_students(true, $student_id)]);
+}
+
 add_action('wp_ajax_su_p_add_student', 'su_p_add_student');
 function su_p_add_student() {
-    check_ajax_referer('su_p_student_nonce', 'nonce');
-    $post_id = wp_insert_post([
-        'post_title' => sanitize_text_field($_POST['student_name']),
-        'post_type' => 'students',
-        'post_status' => 'publish'
-    ]);
-    if ($post_id) {
-        update_post_meta($post_id, 'student_id', sanitize_text_field($_POST['student_id']));
-        update_post_meta($post_id, 'educational_center_id', sanitize_text_field($_POST['educational_center_id']));
-        update_post_meta($post_id, 'admission_number', sanitize_text_field($_POST['admission_number']));
-        update_post_meta($post_id, 'student_name', sanitize_text_field($_POST['student_name']));
-        update_post_meta($post_id, 'student_email', sanitize_email($_POST['student_email']));
-        update_post_meta($post_id, 'phone_number', sanitize_text_field($_POST['phone_number']));
-        update_post_meta($post_id, 'class_name', sanitize_text_field($_POST['class_name']));
-        update_post_meta($post_id, 'section', sanitize_text_field($_POST['section']));
-        update_post_meta($post_id, 'gender', sanitize_text_field($_POST['gender']));
-        update_post_meta($post_id, 'date_of_birth', sanitize_text_field($_POST['date_of_birth']));
-        update_post_meta($post_id, 'religion', sanitize_text_field($_POST['religion']));
-        if (!empty($_FILES['student_profile_photo']['name'])) {
-            require_once(ABSPATH . 'wp-admin/includes/image.php');
-            $attachment_id = media_handle_upload('student_profile_photo', $post_id);
-            if (!is_wp_error($attachment_id)) {
-                update_post_meta($post_id, 'student_profile_photo', $attachment_id);
-            }
-        }
-        update_post_meta($post_id, 'blood_group', sanitize_text_field($_POST['blood_group']));
-        update_post_meta($post_id, 'height', sanitize_text_field($_POST['height']));
-        update_post_meta($post_id, 'weight', sanitize_text_field($_POST['weight']));
-        update_post_meta($post_id, 'current_address', sanitize_textarea_field($_POST['current_address']));
-        update_post_meta($post_id, 'permanent_address', sanitize_textarea_field($_POST['permanent_address']));
-        update_post_meta($post_id, 'roll_number', sanitize_text_field($_POST['roll_number']));
-        update_post_meta($post_id, 'admission_date', sanitize_text_field($_POST['admission_date']));
-        wp_send_json_success(['message' => 'Student added']);
-    } else {
-        wp_send_json_error(['message' => 'Failed to add student']);
-    }
+    check_ajax_referer('su_p_student_add', 'nonce');
+    ob_start();
+    render_su_p_add_students(true);
+    $output = ob_get_clean();
+    wp_send_json_success(['html' => $output]);
 }
 
-// Get Student
-add_action('wp_ajax_su_p_get_student', 'su_p_get_student');
-function su_p_get_student() {
-    check_ajax_referer('su_p_student_nonce', 'nonce');
-    $student_id = intval($_POST['student_id']);
-    $post = get_post($student_id);
-    if ($post && $post->post_type === 'students') {
-        $student = [
-            'ID' => $post->ID,
-            'student_id' => get_post_meta($post->ID, 'student_id', true),
-            'educational_center_id' => get_post_meta($post->ID, 'educational_center_id', true),
-            'admission_number' => get_post_meta($post->ID, 'admission_number', true),
-            'student_name' => get_post_meta($post->ID, 'student_name', true),
-            'student_email' => get_post_meta($post->ID, 'student_email', true),
-            'phone_number' => get_post_meta($post->ID, 'phone_number', true),
-            'class_name' => get_post_meta($post->ID, 'class_name', true),
-            'section' => get_post_meta($post->ID, 'section', true),
-            'gender' => get_post_meta($post->ID, 'gender', true),
-            'date_of_birth' => get_post_meta($post->ID, 'date_of_birth', true),
-            'religion' => get_post_meta($post->ID, 'religion', true),
-            'student_profile_photo_url' => wp_get_attachment_url(get_post_meta($post->ID, 'student_profile_photo', true)),
-            'blood_group' => get_post_meta($post->ID, 'blood_group', true),
-            'height' => get_post_meta($post->ID, 'height', true),
-            'weight' => get_post_meta($post->ID, 'weight', true),
-            'current_address' => get_post_meta($post->ID, 'current_address', true),
-            'permanent_address' => get_post_meta($post->ID, 'permanent_address', true),
-            'roll_number' => get_post_meta($post->ID, 'roll_number', true),
-            'admission_date' => get_post_meta($post->ID, 'admission_date', true)
-        ];
-        wp_send_json_success($student);
-    } else {
-        wp_send_json_error(['message' => 'Student not found']);
-    }
+add_action('wp_ajax_su_p_edit_student', 'su_p_edit_student');
+function su_p_edit_student() {
+    check_ajax_referer('su_p_student_edit', 'nonce');
+    ob_start();
+    render_su_p_edit_students(true);
+    $output = ob_get_clean();
+    wp_send_json_success(['html' => $output]);
 }
 
-// Update Student
-add_action('wp_ajax_su_p_update_student', 'su_p_update_student');
-function su_p_update_student() {
-    check_ajax_referer('su_p_student_nonce', 'nonce');
-    $post_id = intval($_POST['student_post_id']);
-    $student_id = sanitize_text_field($_POST['student_id']);
-    $educational_center_id = sanitize_text_field($_POST['educational_center_id']);
-
-    $args = [
-        'post_type' => 'students',
-        'post_status' => 'publish',
-        'meta_query' => [
-            'relation' => 'AND',
-            ['key' => 'student_id', 'value' => $student_id, 'compare' => '='],
-            ['key' => 'educational_center_id', 'value' => $educational_center_id, 'compare' => '=']
-        ],
-        'posts_per_page' => 1,
-        'exclude' => [$post_id]
-    ];
-    $existing = new WP_Query($args);
-    // if ($existing->have_posts()) {
-    //     wp_send_json_error(['message' => 'Student ID and Educational Center ID combination must be unique']);
-    //     return;
-    // }
-
-    $updated = wp_update_post([
-        'ID' => $post_id,
-        'post_title' => sanitize_text_field($_POST['student_name'])
-    ]);
-    if ($updated && !is_wp_error($updated)) {
-        update_post_meta($post_id, 'admission_number', sanitize_text_field($_POST['admission_number']));
-        update_post_meta($post_id, 'student_name', sanitize_text_field($_POST['student_name']));
-        update_post_meta($post_id, 'student_email', sanitize_email($_POST['student_email']));
-        update_post_meta($post_id, 'phone_number', sanitize_text_field($_POST['phone_number']));
-        update_post_meta($post_id, 'class_name', sanitize_text_field($_POST['class_name']));
-        update_post_meta($post_id, 'section', sanitize_text_field($_POST['section']));
-        update_post_meta($post_id, 'gender', sanitize_text_field($_POST['gender']));
-        update_post_meta($post_id, 'date_of_birth', sanitize_text_field($_POST['date_of_birth']));
-        update_post_meta($post_id, 'religion', sanitize_text_field($_POST['religion']));
-        if (!empty($_FILES['student_profile_photo']['name'])) {
-            require_once(ABSPATH . 'wp-admin/includes/image.php');
-            $attachment_id = media_handle_upload('student_profile_photo', $post_id);
-            if (!is_wp_error($attachment_id)) {
-                update_post_meta($post_id, 'student_profile_photo', $attachment_id);
-            }
-        }
-        update_post_meta($post_id, 'blood_group', sanitize_text_field($_POST['blood_group']));
-        update_post_meta($post_id, 'height', sanitize_text_field($_POST['height']));
-        update_post_meta($post_id, 'weight', sanitize_text_field($_POST['weight']));
-        update_post_meta($post_id, 'current_address', sanitize_textarea_field($_POST['current_address']));
-        update_post_meta($post_id, 'permanent_address', sanitize_textarea_field($_POST['permanent_address']));
-        update_post_meta($post_id, 'roll_number', sanitize_text_field($_POST['roll_number']));
-        update_post_meta($post_id, 'admission_date', sanitize_text_field($_POST['admission_date']));
-        wp_send_json_success(['message' => 'Student updated']);
-    } else {
-        wp_send_json_error(['message' => 'Failed to update student']);
-    }
-}
-
-// Delete Student
 add_action('wp_ajax_su_p_delete_student', 'su_p_delete_student');
 function su_p_delete_student() {
-    check_ajax_referer('su_p_student_nonce', 'nonce');
-    $student_id = intval($_POST['student_id']);
-    if (wp_delete_post($student_id, true)) {
-        wp_send_json_success(['message' => 'Student deleted']);
-    } else {
-        wp_send_json_error(['message' => 'Failed to delete student']);
-    }
+    check_ajax_referer('su_p_student_delete', 'nonce');
+    ob_start();
+    render_su_p_delete_students(true);
+    $output = ob_get_clean();
+    wp_send_json_success(['html' => $output]);
 }
+
+
+
+
 
 //staff
 function render_su_p_staff() {
@@ -14648,6 +16296,11064 @@ function su_p_delete_timetable() {
     }
     exit;
 }
+//
+function render_su_p_add_timetable() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    $class_table = $wpdb->prefix . 'class_sections';
+    $subject_table = $wpdb->prefix . 'subjects';
+    $all_classes = $wpdb->get_results("SELECT id, class_name, sections, education_center_id FROM $class_table");
+    $subjects = $wpdb->get_results("SELECT subject_id, subject_name FROM $subject_table");
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Add Timetable Slot</h2>
+                <form id="add-timetable-form" method="POST">
+                    <div class="search-filters">
+                        <label for="add-center-id">Education Center</label>
+                        <select id="add-center-id" name="education_center_id" required>
+                            <option value="">Select Center</option>
+                            <?php
+                            foreach ($centers as $center) {
+                                $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                                echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title . " ($center_id)") . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label for="add-class-id">Class</label>
+                        <select id="add-class-id" name="class_id" required>
+                            <option value="">Select Class</option>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label for="add-section">Section</label>
+                        <select id="add-section" name="section" required>
+                            <option value="">Select Section</option>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label for="add-subject-id">Subject</label>
+                        <select id="add-subject-id" name="subject_id">
+                            <option value="">None</option>
+                            <?php
+                            foreach ($subjects as $subject) {
+                                echo "<option value='" . esc_attr($subject->subject_id) . "'>" . esc_html($subject->subject_name) . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label for="add-day">Day</label>
+                        <select id="add-day" name="day" required>
+                            <option value="">Select Day</option>
+                            <?php foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day) : ?>
+                                <option value="<?php echo $day; ?>"><?php echo $day; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label for="add-start-time">Start Time</label>
+                        <input type="time" id="add-start-time" name="start_time" required>
+                    </div>
+                    <div class="search-filters">
+                        <label for="add-end-time">End Time</label>
+                        <input type="time" id="add-end-time" name="end_time" required>
+                    </div>
+                    <input type="hidden" name="action" value="su_p_add_timetable_standalone">
+                    <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_timetable_nonce'); ?>">
+                    <button type="submit">Add Timetable Slot</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        const allClasses = <?php echo json_encode(array_map(function($class) {
+            return [
+                'id' => $class->id,
+                'class_name' => $class->class_name,
+                'education_center_id' => $class->education_center_id,
+                'sections' => array_filter(explode(',', $class->sections))
+            ];
+        }, $all_classes)); ?>;
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        function updateAddClasses() {
+            const centerId = $('#add-center-id').val();
+            $('#add-class-id').empty().append('<option value="">Select Class</option>');
+            allClasses.forEach(cls => {
+                if (cls.education_center_id === centerId) {
+                    $('#add-class-id').append(`<option value="${cls.id}">${cls.class_name}</option>`);
+                }
+            });
+            updateAddSections();
+        }
+
+        function updateAddSections() {
+            const classId = $('#add-class-id').val();
+            const classData = allClasses.find(c => c.id.toString() === classId.toString());
+            $('#add-section').empty().append('<option value="">Select Section</option>');
+            if (classData && classData.sections) {
+                classData.sections.forEach(section => {
+                    $('#add-section').append(`<option value="${section}">${section}</option>`);
+                });
+            }
+        }
+
+        // Attach event handlers using jQuery
+        $('#add-center-id').on('change', updateAddClasses);
+        $('#add-class-id').on('change', updateAddSections);
+
+        $('#add-timetable-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const formData = $(this).serialize();
+
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Timetable slot added successfully');
+                        $('#add-timetable-form')[0].reset();
+                    } else {
+                        alert('Error: ' + (response.data.message || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('AJAX error: ' + error);
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// AJAX Handler for Standalone Add
+add_action('wp_ajax_su_p_add_timetable_standalone', 'su_p_add_timetable_standalone');
+function su_p_add_timetable_standalone() {
+    check_ajax_referer('su_p_timetable_nonce', 'nonce');
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'timetables';
+
+    $center_id = sanitize_text_field($_POST['education_center_id'] ?? '');
+    $class_id = intval($_POST['class_id'] ?? 0);
+    $section = sanitize_text_field($_POST['section'] ?? '');
+    $subject_id = !empty($_POST['subject_id']) ? intval($_POST['subject_id']) : null;
+    $day = sanitize_text_field($_POST['day'] ?? '');
+    $start_time = sanitize_text_field($_POST['start_time'] ?? '');
+    $end_time = sanitize_text_field($_POST['end_time'] ?? '');
+
+    if (empty($center_id) || empty($class_id) || empty($section) || empty($day) || empty($start_time) || empty($end_time)) {
+        wp_send_json_error(['message' => 'All fields except subject are required']);
+        wp_die();
+    }
+
+    if ($start_time >= $end_time) {
+        wp_send_json_error(['message' => 'Start time must be before end time']);
+        wp_die();
+    }
+
+    $conflict = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM $table_name 
+         WHERE education_center_id = %s AND class_id = %d AND section = %s AND day = %s AND (
+            (start_time <= %s AND end_time > %s) OR 
+            (start_time < %s AND end_time >= %s)
+         )",
+        $center_id, $class_id, $section, $day, $start_time, $start_time, $end_time, $end_time
+    ));
+
+    if ($conflict > 0) {
+        wp_send_json_error(['message' => 'Time conflict detected']);
+        wp_die();
+    }
+
+    $result = $wpdb->insert(
+        $table_name,
+        [
+            'education_center_id' => $center_id,
+            'class_id' => $class_id,
+            'section' => $section,
+            'subject_id' => $subject_id,
+            'day' => $day,
+            'start_time' => $start_time,
+            'end_time' => $end_time
+        ],
+        ['%s', '%d', '%s', '%d', '%s', '%s', '%s']
+    );
+
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to add timetable slot: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success(['message' => 'Timetable slot added successfully']);
+    }
+    wp_die();
+}
+
+function render_su_p_edit_timetable() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'timetables';
+    $class_table = $wpdb->prefix . 'class_sections';
+    $subject_table = $wpdb->prefix . 'subjects';
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    $all_classes = $wpdb->get_results("SELECT id, class_name, sections, education_center_id FROM $class_table");
+    $subjects = $wpdb->get_results("SELECT subject_id, subject_name FROM $subject_table");
+
+    // Fetch all timetable slots
+    $query = "SELECT t.*, c.class_name, s.subject_name 
+              FROM $table_name t 
+              JOIN $class_table c ON t.class_id = c.id 
+              LEFT JOIN $subject_table s ON t.subject_id = s.subject_id 
+              ORDER BY t.day, t.start_time";
+    $timetable_slots = $wpdb->get_results($query);
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Edit Timetable Slots</h2>
+                <div class="management-table-wrapper">
+                    <table id="timetable-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Day</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Class Name</th>
+                                <th>Section</th>
+                                <th>Subject</th>
+                                <th>Education Center ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            if (!empty($timetable_slots)) {
+                                foreach ($timetable_slots as $slot) {
+                                    echo "<tr>
+                                        <td>" . esc_html($slot->timetable_id) . "</td>
+                                        <td>" . esc_html($slot->day) . "</td>
+                                        <td>" . esc_html($slot->start_time) . "</td>
+                                        <td>" . esc_html($slot->end_time) . "</td>
+                                        <td>" . esc_html($slot->class_name) . "</td>
+                                        <td>" . esc_html($slot->section) . "</td>
+                                        <td>" . esc_html($slot->subject_name ?: 'N/A') . "</td>
+                                        <td>" . esc_html($slot->education_center_id) . "</td>
+                                        <td>
+                                            <button class='edit-timetable' data-timetable-id='" . esc_attr($slot->timetable_id) . "'>Edit</button>
+                                        </td>
+                                    </tr>";
+                                }
+                            } else {
+                                echo '<tr><td colspan="9">No timetable slots found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Edit Timetable Modal -->
+                <div class="edu-modal" id="edit-timetable-modal" style="display: none;">
+                    <div class="edu-modal-content">
+                        <span class="edu-modal-close" data-modal="edit-timetable-modal">×</span>
+                        <h3>Edit Timetable Slot</h3>
+                        <form id="edit-timetable-form" method="POST">
+                            <input type="hidden" id="edit-timetable-id" name="timetable_id">
+                            <div class="search-filters">
+                                <label for="edit-center-id">Education Center</label>
+                                <select id="edit-center-id" name="education_center_id" required onchange="updateEditClasses()">
+                                    <option value="">Select Center</option>
+                                    <?php
+                                    foreach ($centers as $center) {
+                                        $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                                        echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title . " ($center_id)") . "</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="search-filters">
+                                <label for="edit-class-id">Class</label>
+                                <select id="edit-class-id" name="class_id" required onchange="updateEditSections()">
+                                    <option value="">Select Class</option>
+                                </select>
+                            </div>
+                            <div class="search-filters">
+                                <label for="edit-section">Section</label>
+                                <select id="edit-section" name="section" required>
+                                    <option value="">Select Section</option>
+                                </select>
+                            </div>
+                            <div class="search-filters">
+                                <label for="edit-subject-id">Subject</label>
+                                <select id="edit-subject-id" name="subject_id">
+                                    <option value="">None</option>
+                                    <?php
+                                    foreach ($subjects as $subject) {
+                                        echo "<option value='" . esc_attr($subject->subject_id) . "'>" . esc_html($subject->subject_name) . "</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="search-filters">
+                                <label for="edit-day">Day</label>
+                                <select id="edit-day" name="day" required>
+                                    <option value="">Select Day</option>
+                                    <?php foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day) : ?>
+                                        <option value="<?php echo $day; ?>"><?php echo $day; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="search-filters">
+                                <label for="edit-start-time">Start Time</label>
+                                <input type="time" id="edit-start-time" name="start_time" required>
+                            </div>
+                            <div class="search-filters">
+                                <label for="edit-end-time">End Time</label>
+                                <input type="time" id="edit-end-time" name="end_time" required>
+                            </div>
+                            <input type="hidden" name="action" value="su_p_edit_timetable_standalone">
+                            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_timetable_nonce'); ?>">
+                            <button type="submit" id="update-timetable">Update Slot</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        const allSlots = <?php echo json_encode(array_map(function($slot) {
+            return [
+                'id' => $slot->timetable_id,
+                'day' => $slot->day,
+                'start_time' => $slot->start_time,
+                'end_time' => $slot->end_time,
+                'class_name' => $slot->class_name,
+                'class_id' => $slot->class_id,
+                'section' => $slot->section,
+                'subject_name' => $slot->subject_name ?: 'N/A',
+                'subject_id' => $slot->subject_id,
+                'education_center_id' => $slot->education_center_id
+            ];
+        }, $timetable_slots)); ?>;
+
+        const allClasses = <?php echo json_encode(array_map(function($class) {
+            return [
+                'id' => $class->id,
+                'class_name' => $class->class_name,
+                'education_center_id' => $class->education_center_id,
+                'sections' => array_filter(explode(',', $class->sections))
+            ];
+        }, $all_classes)); ?>;
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+        function openModal(modalId) { $(modalId).css('display', 'flex'); }
+        function closeModal(modalId) { $(modalId).css('display', 'none'); }
+
+        function updateEditClasses() {
+            const centerId = $('#edit-center-id').val();
+            $('#edit-class-id').empty().append('<option value="">Select Class</option>');
+            allClasses.forEach(cls => {
+                if (cls.education_center_id === centerId) {
+                    $('#edit-class-id').append(`<option value="${cls.id}">${cls.class_name}</option>`);
+                }
+            });
+            updateEditSections();
+        }
+
+        function updateEditSections() {
+            const classId = $('#edit-class-id').val();
+            const classData = allClasses.find(c => c.id.toString() === classId.toString());
+            $('#edit-section').empty().append('<option value="">Select Section</option>');
+            if (classData && classData.sections) {
+                classData.sections.forEach(section => {
+                    $('#edit-section').append(`<option value="${section}">${section}</option>`);
+                });
+            }
+        }
+
+        // Event handlers for dropdowns
+        $('#edit-center-id').on('change', updateEditClasses);
+        $('#edit-class-id').on('change', updateEditSections);
+
+        // Edit Button Click
+        $(document).on('click', '.edit-timetable', function() {
+            const timetableId = $(this).data('timetable-id').toString();
+            const slot = allSlots.find(s => s.id.toString() === timetableId);
+
+            if (slot) {
+                $('#edit-timetable-id').val(slot.id);
+                $('#edit-center-id').val(slot.education_center_id);
+                updateEditClasses();
+                $('#edit-class-id').val(slot.class_id);
+                updateEditSections();
+                $('#edit-section').val(slot.section);
+                $('#edit-subject-id').val(slot.subject_id || '');
+                $('#edit-day').val(slot.day);
+                $('#edit-start-time').val(slot.start_time);
+                $('#edit-end-time').val(slot.end_time);
+
+                openModal('#edit-timetable-modal');
+            } else {
+                console.error('Timetable slot not found for ID:', timetableId);
+                alert('Timetable slot not found.');
+            }
+        });
+
+        // Modal Close
+        $('.edu-modal-close').on('click', function() {
+            closeModal('#' + $(this).data('modal'));
+        });
+
+        $(document).on('click', '.edu-modal', function(event) {
+            if ($(event.target).hasClass('edu-modal')) {
+                closeModal('#' + event.target.id);
+            }
+        });
+
+        // Form Submission via AJAX
+        $('#edit-timetable-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+
+            const formData = $(this).serialize();
+            $.ajax({
+                url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', // Use WordPress AJAX endpoint
+                type: 'POST',
+                data: formData,
+                dataType: 'json', // Expect JSON response
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Timetable slot updated successfully');
+                        closeModal('#edit-timetable-modal');
+                        location.reload(); // Refresh table
+                    } else {
+                        alert('Error: ' + (response.data.message || 'Unknown error occurred during update'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('AJAX error: ' + error + ' - ' + xhr.statusText);
+                    console.error('AJAX Error:', xhr.responseText);
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// AJAX Handler for Standalone Edit (Corrected)
+add_action('wp_ajax_su_p_edit_timetable_standalone', 'su_p_edit_timetable_standalone');
+function su_p_edit_timetable_standalone() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'timetables';
+
+    // Check nonce for security
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'su_p_timetable_nonce')) {
+        wp_send_json_error(['message' => 'Invalid security token']);
+        wp_die();
+    }
+
+    $timetable_id = intval($_POST['timetable_id'] ?? 0);
+    $center_id = sanitize_text_field($_POST['education_center_id'] ?? '');
+    $class_id = intval($_POST['class_id'] ?? 0);
+    $section = sanitize_text_field($_POST['section'] ?? '');
+    $subject_id = !empty($_POST['subject_id']) ? intval($_POST['subject_id']) : null;
+    $day = sanitize_text_field($_POST['day'] ?? '');
+    $start_time = sanitize_text_field($_POST['start_time'] ?? '');
+    $end_time = sanitize_text_field($_POST['end_time'] ?? '');
+
+    // Validation
+    if (empty($timetable_id) || empty($center_id) || empty($class_id) || empty($section) || empty($day) || empty($start_time) || empty($end_time)) {
+        wp_send_json_error(['message' => 'All fields except subject are required']);
+        wp_die();
+    }
+
+    if ($start_time >= $end_time) {
+        wp_send_json_error(['message' => 'Start time must be before end time']);
+        wp_die();
+    }
+
+    // Check for time conflicts
+    $conflict = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM $table_name 
+         WHERE education_center_id = %s AND class_id = %d AND section = %s AND day = %s AND (
+            (start_time <= %s AND end_time > %s) OR 
+            (start_time < %s AND end_time >= %s)
+         ) AND timetable_id != %d",
+        $center_id, $class_id, $section, $day, $start_time, $start_time, $end_time, $end_time, $timetable_id
+    ));
+
+    if ($conflict > 0) {
+        wp_send_json_error(['message' => 'Time conflict detected']);
+        wp_die();
+    }
+
+    // Update the timetable slot
+    $result = $wpdb->update(
+        $table_name,
+        [
+            'education_center_id' => $center_id,
+            'class_id' => $class_id,
+            'section' => $section,
+            'subject_id' => $subject_id,
+            'day' => $day,
+            'start_time' => $start_time,
+            'end_time' => $end_time
+        ],
+        ['timetable_id' => $timetable_id],
+        ['%s', '%d', '%s', '%d', '%s', '%s', '%s'],
+        ['%d']
+    );
+
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to update timetable slot: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success(['message' => 'Timetable slot updated successfully']);
+    }
+    wp_die();
+}
+
+function render_su_p_delete_timetable() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'timetables';
+    $class_table = $wpdb->prefix . 'class_sections';
+    $subject_table = $wpdb->prefix . 'subjects';
+
+    // Fetch all timetable slots
+    $query = "SELECT t.*, c.class_name, s.subject_name 
+              FROM $table_name t 
+              JOIN $class_table c ON t.class_id = c.id 
+              LEFT JOIN $subject_table s ON t.subject_id = s.subject_id 
+              ORDER BY t.day, t.start_time";
+    $timetable_slots = $wpdb->get_results($query);
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Delete Timetable Slots</h2>
+                <div class="management-table-wrapper">
+                    <table id="timetable-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Day</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Class Name</th>
+                                <th>Section</th>
+                                <th>Subject</th>
+                                <th>Education Center ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            if (!empty($timetable_slots)) {
+                                foreach ($timetable_slots as $slot) {
+                                    echo "<tr>
+                                        <td>" . esc_html($slot->timetable_id) . "</td>
+                                        <td>" . esc_html($slot->day) . "</td>
+                                        <td>" . esc_html($slot->start_time) . "</td>
+                                        <td>" . esc_html($slot->end_time) . "</td>
+                                        <td>" . esc_html($slot->class_name) . "</td>
+                                        <td>" . esc_html($slot->section) . "</td>
+                                        <td>" . esc_html($slot->subject_name ?: 'N/A') . "</td>
+                                        <td>" . esc_html($slot->education_center_id) . "</td>
+                                        <td>
+                                            <button class='delete-timetable' data-timetable-id='" . esc_attr($slot->timetable_id) . "'>Delete</button>
+                                        </td>
+                                    </tr>";
+                                }
+                            } else {
+                                echo '<tr><td colspan="9">No timetable slots found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        const allSlots = <?php echo json_encode(array_map(function($slot) {
+            return [
+                'id' => $slot->timetable_id,
+                'day' => $slot->day,
+                'start_time' => $slot->start_time,
+                'end_time' => $slot->end_time,
+                'class_name' => $slot->class_name,
+                'class_id' => $slot->class_id,
+                'section' => $slot->section,
+                'subject_name' => $slot->subject_name ?: 'N/A',
+                'subject_id' => $slot->subject_id,
+                'education_center_id' => $slot->education_center_id
+            ];
+        }, $timetable_slots)); ?>;
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        // Delete Functionality
+        $(document).on('click', '.delete-timetable', function() {
+            if (confirm('Are you sure you want to delete this timetable slot?')) {
+                showLoader();
+                const timetableId = $(this).data('timetable-id').toString();
+
+                fetch('<?php echo esc_url(admin_url('admin-ajax.php')); ?>', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        'action': 'su_p_delete_timetable_standalone', // Updated to match the standalone handler
+                        'timetable_id': timetableId,
+                        'nonce': '<?php echo wp_create_nonce('su_p_timetable_nonce'); ?>'
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    hideLoader();
+                    if (result.success) {
+                        alert('Timetable slot deleted successfully');
+                        // Remove the row from the table client-side
+                        $(`button[data-timetable-id="${timetableId}"]`).closest('tr').remove();
+                        // Update allSlots array
+                        const index = allSlots.findIndex(slot => slot.id.toString() === timetableId);
+                        if (index !== -1) allSlots.splice(index, 1);
+                        // Check if table is empty
+                        if ($('#timetable-table tbody tr').length === 0) {
+                            $('#timetable-table tbody').html('<tr><td colspan="9">No timetable slots found.</td></tr>');
+                        }
+                    } else {
+                        alert('Failed to delete timetable slot: ' + (result.data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    hideLoader();
+                    console.error('Delete error:', error);
+                    alert('An error occurred while deleting the timetable slot: ' + error.message);
+                });
+            }
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// AJAX Handler for Standalone Delete (Corrected)
+add_action('wp_ajax_su_p_delete_timetable_standalone', 'su_p_delete_timetable_standalone');
+function su_p_delete_timetable_standalone() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'timetables';
+
+    // Check nonce for security
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'su_p_timetable_nonce')) {
+        wp_send_json_error(['message' => 'Invalid security token']);
+        wp_die();
+    }
+
+    $timetable_id = intval($_POST['timetable_id'] ?? 0);
+    if (empty($timetable_id)) {
+        wp_send_json_error(['message' => 'Invalid timetable ID']);
+        wp_die();
+    }
+
+    $result = $wpdb->delete($table_name, ['timetable_id' => $timetable_id], ['%d']);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to delete timetable slot: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success(['message' => 'Timetable slot deleted successfully']);
+    }
+    wp_die();
+}
+
+//subjects
+// Main Subjects Management Function
+function render_su_p_subjects_management() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    
+    // Pagination and filter variables
+    $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+    $per_page = isset($_GET['per_page']) ? intval($_GET['per_page']) : 10;
+    $subject_name_search = isset($_GET['subject_name_search']) ? sanitize_text_field($_GET['subject_name_search']) : '';
+    $center_filter = isset($_GET['center_filter']) ? sanitize_text_field($_GET['center_filter']) : '';
+
+    // Fetch ALL subjects data initially
+    $table_name = $wpdb->prefix . 'subjects';
+    $query = "SELECT * FROM $table_name WHERE 1=1";
+    
+    $args = [];
+    if ($subject_name_search) {
+        $query .= " AND subject_name LIKE %s";
+        $args[] = '%' . $wpdb->esc_like($subject_name_search) . '%';
+    }
+    if ($center_filter) {
+        $query .= " AND education_center_id = %s";
+        $args[] = $center_filter;
+    }
+    
+    $query .= " ORDER BY subject_name";
+    $subjects = !empty($args) ? $wpdb->get_results($wpdb->prepare($query, $args)) : $wpdb->get_results($query);
+    $total = count($subjects);
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Subjects Management</h2>
+                <div class="search-filters">
+                    <input type="text" id="subject-name-search" placeholder="Search by Subject Name..." value="<?php echo esc_attr($subject_name_search); ?>">
+                    <select id="center-filter">
+                        <option value="">All Educational Centers</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='$center_id' " . selected($center_filter, $center_id, false) . ">" . esc_html($center->post_title) . " ($center_id)</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="actions">
+                    <button id="add-subject-btn">Add Subject</button>
+                    <select id="slots-per-page" name="per_page">
+                        <option value="10" <?php selected($per_page, 10); ?>>10</option>
+                        <option value="20" <?php selected($per_page, 20); ?>>20</option>
+                        <option value="50" <?php selected($per_page, 50); ?>>50</option>
+                    </select>
+                    <button id="prev-page" class="button" <?php echo $page <= 1 ? 'disabled' : ''; ?>>Previous</button>
+                    <span id="page-info">Page <?php echo $page; ?> of <?php echo ceil($total / $per_page); ?> (Total Records: <?php echo $total; ?>)</span>
+                    <button id="next-page" class="button" <?php echo $page >= ceil($total / $per_page) ? 'disabled' : ''; ?>>Next</button>
+                    <button id="refresh-table" class="button">Refresh</button>
+                </div>
+                <div class="management-table-wrapper">
+                    <div class="actions" id="export-tools">
+                        <button class="export-btn export-csv" aria-label="Export to CSV"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
+                        <button class="export-btn export-pdf" aria-label="Export to PDF"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
+                        <button class="export-btn export-excel" aria-label="Export to Excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
+                    </div>
+                    <table id="subjects-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Subject Name</th>
+                                <th>Teacher ID</th>
+                                <th>Education Center ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $start = ($page - 1) * $per_page;
+                            $end = min($start + $per_page, $total);
+                            for ($i = $start; $i < $end && $i < count($subjects); $i++) {
+                                $subject = $subjects[$i];
+                                echo "<tr>
+                                    <td>" . esc_html($subject->subject_id) . "</td>
+                                    <td>" . esc_html($subject->subject_name) . "</td>
+                                    <td>" . esc_html($subject->teacher_id ?: 'N/A') . "</td>
+                                    <td>" . esc_html($subject->education_center_id) . "</td>
+                                    <td>
+                                        <button class='edit-subject' data-subject-id='" . esc_attr($subject->subject_id) . "'>Edit</button>
+                                        <button class='delete-subject' data-subject-id='" . esc_attr($subject->subject_id) . "'>Delete</button>
+                                    </td>
+                                </tr>";
+                            }
+                            if (empty($subjects)) {
+                                echo '<tr><td colspan="5">No subjects found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Subject Modal -->
+    <div class="edu-modal" id="edit-subject-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="edit-subject-modal">×</span>
+            <h3>Edit Subject</h3>
+            <form id="edit-subject-form" method="POST">
+                <input type="hidden" id="edit-subject-id" name="subject_id">
+                <div class="search-filters">
+                    <label for="edit-center-id">Education Center</label>
+                    <select id="edit-center-id" name="education_center_id" required>
+                        <option value="">Select Center</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title . " ($center_id)") . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-subject-name">Subject Name</label>
+                    <input type="text" id="edit-subject-name" name="subject_name" required>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-teacher-id">Teacher ID</label>
+                    <input type="text" id="edit-teacher-id" name="teacher_id">
+                </div>
+                <input type="hidden" name="action" value="su_p_edit_subject_standalone">
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_subjects_nonce'); ?>">
+                <button type="submit">Update Subject</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        const allSubjects = <?php echo json_encode(array_map(function($subject) {
+            return [
+                'id' => $subject->subject_id,
+                'subject_name' => $subject->subject_name,
+                'teacher_id' => $subject->teacher_id ?: 'N/A',
+                'education_center_id' => $subject->education_center_id
+            ];
+        }, $subjects)); ?>;
+
+        let currentPage = <?php echo $page; ?>;
+        let perPage = <?php echo $per_page; ?>;
+        let totalRecords = <?php echo $total; ?>;
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+        function openModal(modalId) { $(modalId).css('display', 'flex'); }
+        function closeModal(modalId) { $(modalId).css('display', 'none'); }
+
+        function filterAndRender() {
+            showLoader();
+            const subjectNameSearch = $('#subject-name-search').val().toLowerCase();
+            const centerFilter = $('#center-filter').val();
+
+            let filteredSubjects = allSubjects.filter(subject => {
+                return (!subjectNameSearch || subject.subject_name.toLowerCase().includes(subjectNameSearch)) &&
+                       (!centerFilter || subject.education_center_id === centerFilter);
+            });
+
+            totalRecords = filteredSubjects.length;
+            const totalPages = Math.ceil(totalRecords / perPage);
+            currentPage = Math.min(currentPage, Math.max(1, totalPages));
+
+            const start = (currentPage - 1) * perPage;
+            const end = Math.min(start + perPage, filteredSubjects.length);
+            const paginatedSubjects = filteredSubjects.slice(start, end);
+
+            let html = '';
+            if (paginatedSubjects.length > 0) {
+                paginatedSubjects.forEach(subject => {
+                    html += `<tr>
+                        <td>${subject.id}</td>
+                        <td>${subject.subject_name}</td>
+                        <td>${subject.teacher_id}</td>
+                        <td>${subject.education_center_id}</td>
+                        <td>
+                            <button class="edit-subject" data-subject-id="${subject.id}">Edit</button>
+                            <button class="delete-subject" data-subject-id="${subject.id}">Delete</button>
+                        </td>
+                    </tr>`;
+                });
+            } else {
+                html = '<tr><td colspan="5">No subjects found.</td></tr>';
+            }
+            $('#subjects-table tbody').html(html);
+
+            $('#page-info').text(`Page ${currentPage} of ${totalPages} (Total Records: ${totalRecords})`);
+            $('#prev-page').prop('disabled', currentPage <= 1);
+            $('#next-page').prop('disabled', currentPage >= totalPages);
+
+            hideLoader();
+        }
+
+        // Event handlers
+        $('#subject-name-search').on('keyup', debounce(filterAndRender, 300));
+        $('#center-filter').on('change', filterAndRender);
+        $('#slots-per-page').on('change', function() {
+            perPage = parseInt($(this).val());
+            currentPage = 1;
+            filterAndRender();
+        });
+        $('#prev-page').on('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                filterAndRender();
+            }
+        });
+        $('#next-page').on('click', function() {
+            if (currentPage < Math.ceil(totalRecords / perPage)) {
+                currentPage++;
+                filterAndRender();
+            }
+        });
+        $('#refresh-table').on('click', function() {
+            $('#subject-name-search').val('');
+            $('#center-filter').val('');
+            currentPage = 1;
+            filterAndRender();
+        });
+
+        // Add Subject (redirect or modal logic can be added if preferred)
+        $('#add-subject-btn').on('click', function() {
+            window.location.href = '<?php echo admin_url('admin.php?page=su-p-add-subjects'); ?>';
+        });
+
+        // Edit Subject
+        $(document).on('click', '.edit-subject', function() {
+            const subjectId = $(this).data('subject-id').toString();
+            const subject = allSubjects.find(s => s.id.toString() === subjectId);
+
+            if (subject) {
+                $('#edit-subject-id').val(subject.id);
+                $('#edit-center-id').val(subject.education_center_id);
+                $('#edit-subject-name').val(subject.subject_name);
+                $('#edit-teacher-id').val(subject.teacher_id === 'N/A' ? '' : subject.teacher_id);
+
+                openModal('#edit-subject-modal');
+            } else {
+                console.error('Subject not found for ID:', subjectId);
+                alert('Subject not found.');
+            }
+        });
+
+        $('#edit-subject-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const formData = $(this).serialize();
+
+            $.ajax({
+                url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Subject updated successfully');
+                        closeModal('#edit-subject-modal');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + (response.data.message || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('AJAX error: ' + error);
+                }
+            });
+        });
+
+        // Delete Subject
+        $(document).on('click', '.delete-subject', function() {
+            if (confirm('Are you sure you want to delete this subject?')) {
+                showLoader();
+                const subjectId = $(this).data('subject-id').toString();
+
+                fetch('<?php echo esc_url(admin_url('admin-ajax.php')); ?>', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        'action': 'su_p_delete_subject_standalone',
+                        'subject_id': subjectId,
+                        'nonce': '<?php echo wp_create_nonce('su_p_subjects_nonce'); ?>'
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    hideLoader();
+                    if (result.success) {
+                        alert('Subject deleted successfully');
+                        location.reload();
+                    } else {
+                        alert('Failed to delete subject: ' + (result.data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    hideLoader();
+                    console.error('Delete error:', error);
+                    alert('An error occurred while deleting the subject: ' + error.message);
+                });
+            }
+        });
+
+        $('.edu-modal-close').on('click', function() {
+            closeModal('#' + $(this).data('modal'));
+        });
+
+        $(document).on('click', '.edu-modal', function(event) {
+            if ($(event.target).hasClass('edu-modal')) {
+                closeModal('#' + event.target.id);
+            }
+        });
+
+        // Export functionality
+        $('.export-csv').on('click', function() {
+            const headers = ['ID', 'Subject Name', 'Teacher ID', 'Education Center ID'];
+            const csvRows = [headers.join(',')];
+            const filteredSubjects = getFilteredSubjects();
+            filteredSubjects.forEach(row => {
+                const values = [row.id, row.subject_name, row.teacher_id, row.education_center_id].map(value => `"${value}"`);
+                csvRows.push(values.join(','));
+            });
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'subjects.csv';
+            link.click();
+        });
+
+        $('.export-pdf').on('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(16);
+            doc.text('Subjects Report', 10, 10);
+            doc.setFontSize(12);
+            const filteredSubjects = getFilteredSubjects();
+            const tableData = filteredSubjects.map(row => [row.id, row.subject_name, row.teacher_id, row.education_center_id]);
+            doc.autoTable({
+                head: [['ID', 'Subject Name', 'Teacher ID', 'Education Center ID']],
+                body: tableData,
+                startY: 20,
+                styles: { fontSize: 10, cellPadding: 2 },
+                headStyles: { fillColor: [44, 109, 251] }
+            });
+            doc.save('subjects.pdf');
+        });
+
+        $('.export-excel').on('click', function() {
+            const filteredSubjects = getFilteredSubjects();
+            const worksheetData = filteredSubjects.map(row => ({
+                'ID': row.id,
+                'Subject Name': row.subject_name,
+                'Teacher ID': row.teacher_id,
+                'Education Center ID': row.education_center_id
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Subjects');
+            XLSX.writeFile(workbook, 'subjects.xlsx');
+        });
+
+        function getFilteredSubjects() {
+            const subjectNameSearch = $('#subject-name-search').val().toLowerCase();
+            const centerFilter = $('#center-filter').val();
+            return allSubjects.filter(subject => {
+                return (!subjectNameSearch || subject.subject_name.toLowerCase().includes(subjectNameSearch)) &&
+                       (!centerFilter || subject.education_center_id === centerFilter);
+            });
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Initial render
+        filterAndRender();
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Standalone Add Subjects Function
+function render_su_p_add_subjects() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Add Subject</h2>
+                <form id="add-subject-form" method="POST">
+                    <div class="search-filters">
+                        <label for="add-center-id">Education Center</label>
+                        <select id="add-center-id" name="education_center_id" required>
+                            <option value="">Select Center</option>
+                            <?php
+                            foreach ($centers as $center) {
+                                $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                                echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title . " ($center_id)") . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label for="add-subject-name">Subject Name</label>
+                        <input type="text" id="add-subject-name" name="subject_name" required>
+                    </div>
+                    <div class="search-filters">
+                        <label for="add-teacher-id">Teacher ID</label>
+                        <input type="text" id="add-teacher-id" name="teacher_id">
+                    </div>
+                    <input type="hidden" name="action" value="su_p_add_subject_standalone">
+                    <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_subjects_nonce'); ?>">
+                    <button type="submit">Add Subject</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        $('#add-subject-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const formData = $(this).serialize();
+
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Subject added successfully');
+                        $('#add-subject-form')[0].reset();
+                    } else {
+                        alert('Error: ' + (response.data.message || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('AJAX error: ' + error);
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Standalone Edit Subjects Function
+function render_su_p_edit_subjects() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'subjects';
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    $subjects = $wpdb->get_results("SELECT * FROM $table_name ORDER BY subject_name");
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Edit Subjects</h2>
+                <div class="management-table-wrapper">
+                    <table id="subjects-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Subject Name</th>
+                                <th>Teacher ID</th>
+                                <th>Education Center ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            if (!empty($subjects)) {
+                                foreach ($subjects as $subject) {
+                                    echo "<tr>
+                                        <td>" . esc_html($subject->subject_id) . "</td>
+                                        <td>" . esc_html($subject->subject_name) . "</td>
+                                        <td>" . esc_html($subject->teacher_id ?: 'N/A') . "</td>
+                                        <td>" . esc_html($subject->education_center_id) . "</td>
+                                        <td>
+                                            <button class='edit-subject' data-subject-id='" . esc_attr($subject->subject_id) . "'>Edit</button>
+                                        </td>
+                                    </tr>";
+                                }
+                            } else {
+                                echo '<tr><td colspan="5">No subjects found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Edit Subject Modal -->
+                <div class="edu-modal" id="edit-subject-modal" style="display: none;">
+                    <div class="edu-modal-content">
+                        <span class="edu-modal-close" data-modal="edit-subject-modal">×</span>
+                        <h3>Edit Subject</h3>
+                        <form id="edit-subject-form" method="POST">
+                            <input type="hidden" id="edit-subject-id" name="subject_id">
+                            <div class="search-filters">
+                                <label for="edit-center-id">Education Center</label>
+                                <select id="edit-center-id" name="education_center_id" required>
+                                    <option value="">Select Center</option>
+                                    <?php
+                                    foreach ($centers as $center) {
+                                        $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                                        echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title . " ($center_id)") . "</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="search-filters">
+                                <label for="edit-subject-name">Subject Name</label>
+                                <input type="text" id="edit-subject-name" name="subject_name" required>
+                            </div>
+                            <div class="search-filters">
+                                <label for="edit-teacher-id">Teacher ID</label>
+                                <input type="text" id="edit-teacher-id" name="teacher_id">
+                            </div>
+                            <input type="hidden" name="action" value="su_p_edit_subject_standalone">
+                            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_subjects_nonce'); ?>">
+                            <button type="submit">Update Subject</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        const allSubjects = <?php echo json_encode(array_map(function($subject) {
+            return [
+                'id' => $subject->subject_id,
+                'subject_name' => $subject->subject_name,
+                'teacher_id' => $subject->teacher_id ?: 'N/A',
+                'education_center_id' => $subject->education_center_id
+            ];
+        }, $subjects)); ?>;
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+        function openModal(modalId) { $(modalId).css('display', 'flex'); }
+        function closeModal(modalId) { $(modalId).css('display', 'none'); }
+
+        $(document).on('click', '.edit-subject', function() {
+            const subjectId = $(this).data('subject-id').toString();
+            const subject = allSubjects.find(s => s.id.toString() === subjectId);
+
+            if (subject) {
+                $('#edit-subject-id').val(subject.id);
+                $('#edit-center-id').val(subject.education_center_id);
+                $('#edit-subject-name').val(subject.subject_name);
+                $('#edit-teacher-id').val(subject.teacher_id === 'N/A' ? '' : subject.teacher_id);
+
+                openModal('#edit-subject-modal');
+            } else {
+                console.error('Subject not found for ID:', subjectId);
+                alert('Subject not found.');
+            }
+        });
+
+        $('#edit-subject-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const formData = $(this).serialize();
+
+            $.ajax({
+                url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Subject updated successfully');
+                        closeModal('#edit-subject-modal');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + (response.data.message || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('AJAX error: ' + error);
+                }
+            });
+        });
+
+        $('.edu-modal-close').on('click', function() {
+            closeModal('#' + $(this).data('modal'));
+        });
+
+        $(document).on('click', '.edu-modal', function(event) {
+            if ($(event.target).hasClass('edu-modal')) {
+                closeModal('#' + event.target.id);
+            }
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Standalone Delete Subjects Function
+function render_su_p_delete_subjects() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'subjects';
+    $subjects = $wpdb->get_results("SELECT * FROM $table_name ORDER BY subject_name");
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Delete Subjects</h2>
+                <div class="management-table-wrapper">
+                    <table id="subjects-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Subject Name</th>
+                                <th>Teacher ID</th>
+                                <th>Education Center ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            if (!empty($subjects)) {
+                                foreach ($subjects as $subject) {
+                                    echo "<tr>
+                                        <td>" . esc_html($subject->subject_id) . "</td>
+                                        <td>" . esc_html($subject->subject_name) . "</td>
+                                        <td>" . esc_html($subject->teacher_id ?: 'N/A') . "</td>
+                                        <td>" . esc_html($subject->education_center_id) . "</td>
+                                        <td>
+                                            <button class='delete-subject' data-subject-id='" . esc_attr($subject->subject_id) . "'>Delete</button>
+                                        </td>
+                                    </tr>";
+                                }
+                            } else {
+                                echo '<tr><td colspan="5">No subjects found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        const allSubjects = <?php echo json_encode(array_map(function($subject) {
+            return [
+                'id' => $subject->subject_id,
+                'subject_name' => $subject->subject_name,
+                'teacher_id' => $subject->teacher_id ?: 'N/A',
+                'education_center_id' => $subject->education_center_id
+            ];
+        }, $subjects)); ?>;
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        $(document).on('click', '.delete-subject', function() {
+            if (confirm('Are you sure you want to delete this subject?')) {
+                showLoader();
+                const subjectId = $(this).data('subject-id').toString();
+
+                fetch('<?php echo esc_url(admin_url('admin-ajax.php')); ?>', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        'action': 'su_p_delete_subject_standalone',
+                        'subject_id': subjectId,
+                        'nonce': '<?php echo wp_create_nonce('su_p_subjects_nonce'); ?>'
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    hideLoader();
+                    if (result.success) {
+                        alert('Subject deleted successfully');
+                        $(`button[data-subject-id="${subjectId}"]`).closest('tr').remove();
+                        const index = allSubjects.findIndex(subject => subject.id.toString() === subjectId);
+                        if (index !== -1) allSubjects.splice(index, 1);
+                        if ($('#subjects-table tbody tr').length === 0) {
+                            $('#subjects-table tbody').html('<tr><td colspan="5">No subjects found.</td></tr>');
+                        }
+                    } else {
+                        alert('Failed to delete subject: ' + (result.data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    hideLoader();
+                    console.error('Delete error:', error);
+                    alert('An error occurred while deleting the subject: ' + error.message);
+                });
+            }
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// AJAX Handler for Add Subject
+add_action('wp_ajax_su_p_add_subject_standalone', 'su_p_add_subject_standalone');
+function su_p_add_subject_standalone() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'subjects';
+
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'su_p_subjects_nonce')) {
+        wp_send_json_error(['message' => 'Invalid security token']);
+        wp_die();
+    }
+
+    $center_id = sanitize_text_field($_POST['education_center_id'] ?? '');
+    $subject_name = sanitize_text_field($_POST['subject_name'] ?? '');
+    $teacher_id = sanitize_text_field($_POST['teacher_id'] ?? '');
+
+    if (empty($center_id) || empty($subject_name)) {
+        wp_send_json_error(['message' => 'Education Center ID and Subject Name are required']);
+        wp_die();
+    }
+
+    $result = $wpdb->insert(
+        $table_name,
+        [
+            'education_center_id' => $center_id,
+            'subject_name' => $subject_name,
+            'teacher_id' => $teacher_id ?: null
+        ],
+        ['%s', '%s', '%s']
+    );
+
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to add subject: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success(['message' => 'Subject added successfully']);
+    }
+    wp_die();
+}
+
+// AJAX Handler for Edit Subject
+add_action('wp_ajax_su_p_edit_subject_standalone', 'su_p_edit_subject_standalone');
+function su_p_edit_subject_standalone() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'subjects';
+
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'su_p_subjects_nonce')) {
+        wp_send_json_error(['message' => 'Invalid security token']);
+        wp_die();
+    }
+
+    $subject_id = intval($_POST['subject_id'] ?? 0);
+    $center_id = sanitize_text_field($_POST['education_center_id'] ?? '');
+    $subject_name = sanitize_text_field($_POST['subject_name'] ?? '');
+    $teacher_id = sanitize_text_field($_POST['teacher_id'] ?? '');
+
+    if (empty($subject_id) || empty($center_id) || empty($subject_name)) {
+        wp_send_json_error(['message' => 'Subject ID, Education Center ID, and Subject Name are required']);
+        wp_die();
+    }
+
+    $result = $wpdb->update(
+        $table_name,
+        [
+            'education_center_id' => $center_id,
+            'subject_name' => $subject_name,
+            'teacher_id' => $teacher_id ?: null
+        ],
+        ['subject_id' => $subject_id],
+        ['%s', '%s', '%s'],
+        ['%d']
+    );
+
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to update subject: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success(['message' => 'Subject updated successfully']);
+    }
+    wp_die();
+}
+
+// AJAX Handler for Delete Subject
+add_action('wp_ajax_su_p_delete_subject_standalone', 'su_p_delete_subject_standalone');
+function su_p_delete_subject_standalone() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'subjects';
+
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'su_p_subjects_nonce')) {
+        wp_send_json_error(['message' => 'Invalid security token']);
+        wp_die();
+    }
+
+    $subject_id = intval($_POST['subject_id'] ?? 0);
+    if (empty($subject_id)) {
+        wp_send_json_error(['message' => 'Invalid subject ID']);
+        wp_die();
+    }
+
+    $result = $wpdb->delete($table_name, ['subject_id' => $subject_id], ['%d']);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to delete subject: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success(['message' => 'Subject deleted successfully']);
+    }
+    wp_die();
+}
+
+//homework
+// Main Homework Management Function
+function render_su_p_homework_management() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+
+    // Pagination and filter variables
+    $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+    $per_page = isset($_GET['per_page']) ? intval($_GET['per_page']) : 10;
+    $title_search = isset($_GET['title_search']) ? sanitize_text_field($_GET['title_search']) : '';
+    $center_filter = isset($_GET['center_filter']) ? sanitize_text_field($_GET['center_filter']) : '';
+    $class_filter = isset($_GET['class_filter']) ? intval($_GET['class_filter']) : '';
+    $section_filter = isset($_GET['section_filter']) ? sanitize_text_field($_GET['section_filter']) : '';
+
+    // Fetch ALL homework data initially
+    $homework_table = $wpdb->prefix . 'homework';
+    $class_table = $wpdb->prefix . 'class_sections';
+    $subject_table = $wpdb->prefix . 'subjects';
+
+    $query = "SELECT h.*, c.class_name, c.id as class_id, s.subject_name 
+              FROM $homework_table h 
+              JOIN $class_table c ON h.class_name = c.class_name AND h.education_center_id = c.education_center_id
+              LEFT JOIN $subject_table s ON h.subject_id = s.subject_id 
+              WHERE 1=1";
+
+    $args = [];
+    if ($title_search) {
+        $query .= " AND h.title LIKE %s";
+        $args[] = '%' . $wpdb->esc_like($title_search) . '%';
+    }
+    if ($center_filter) {
+        $query .= " AND h.education_center_id = %s";
+        $args[] = $center_filter;
+    }
+    if ($class_filter) {
+        $query .= " AND c.id = %d";
+        $args[] = $class_filter;
+    }
+    if ($section_filter) {
+        $query .= " AND h.section = %s";
+        $args[] = $section_filter;
+    }
+
+    $query .= " ORDER BY h.due_date";
+    $homeworks = !empty($args) ? $wpdb->get_results($wpdb->prepare($query, $args)) : $wpdb->get_results($query);
+    $total = count($homeworks);
+
+    // Fetch classes and subjects
+    $classes_query = $center_filter 
+        ? $wpdb->prepare("SELECT id, class_name, sections, education_center_id FROM $class_table WHERE education_center_id = %s", $center_filter) 
+        : "SELECT id, class_name, sections, education_center_id FROM $class_table";
+    $all_classes = $wpdb->get_results($classes_query);
+    $sections_data = [];
+    foreach ($all_classes as $class) {
+        $sections_data[$class->id] = array_filter(explode(',', $class->sections));
+    }
+
+    $subjects_query = $center_filter 
+        ? $wpdb->prepare("SELECT subject_id, subject_name FROM $subject_table WHERE education_center_id = %s", $center_filter) 
+        : "SELECT subject_id, subject_name FROM $subject_table";
+    $subjects = $wpdb->get_results($subjects_query);
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Homework Management</h2>
+                <div class="search-filters">
+                    <input type="text" id="title-search" placeholder="Search by Title..." value="<?php echo esc_attr($title_search); ?>">
+                    <select id="center-filter">
+                        <option value="">All Educational Centers</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='$center_id' " . selected($center_filter, $center_id, false) . ">" . esc_html($center->post_title) . " ($center_id)</option>";
+                        }
+                        ?>
+                    </select>
+                    <select id="class-filter">
+                        <option value="">All Classes</option>
+                        <?php
+                        foreach ($all_classes as $class) {
+                            echo "<option value='" . esc_attr($class->id) . "' " . selected($class_filter, $class->id, false) . ">" . esc_html($class->class_name) . "</option>";
+                        }
+                        ?>
+                    </select>
+                    <select id="section-filter">
+                        <option value="">All Sections</option>
+                        <?php
+                        $unique_sections = [];
+                        foreach ($sections_data as $sections) {
+                            foreach ($sections as $sec) {
+                                if (!in_array($sec, $unique_sections)) {
+                                    $unique_sections[] = $sec;
+                                    echo "<option value='$sec' " . selected($section_filter, $sec, false) . ">" . esc_html($sec) . "</option>";
+                                }
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="actions">
+                    <button id="add-homework-btn">Assign Homework</button>
+                    <select id="slots-per-page" name="per_page">
+                        <option value="10" <?php selected($per_page, 10); ?>>10</option>
+                        <option value="20" <?php selected($per_page, 20); ?>>20</option>
+                        <option value="50" <?php selected($per_page, 50); ?>>50</option>
+                    </select>
+                    <button id="prev-page" class="button" <?php echo $page <= 1 ? 'disabled' : ''; ?>>Previous</button>
+                    <span id="page-info">Page <?php echo $page; ?> of <?php echo ceil($total / $per_page); ?> (Total Records: <?php echo $total; ?>)</span>
+                    <button id="next-page" class="button" <?php echo $page >= ceil($total / $per_page) ? 'disabled' : ''; ?>>Next</button>
+                    <button id="refresh-table" class="button">Refresh</button>
+                </div>
+                <div class="management-table-wrapper">
+                    <div class="actions" id="export-tools">
+                        <button class="export-btn export-csv" aria-label="Export to CSV"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
+                        <button class="export-btn export-pdf" aria-label="Export to PDF"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
+                        <button class="export-btn export-excel" aria-label="Export to Excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
+                    </div>
+                    <table id="homework-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Subject</th>
+                                <th>Class</th>
+                                <th>Section</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Education Center ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $start = ($page - 1) * $per_page;
+                            $end = min($start + $per_page, $total);
+                            for ($i = $start; $i < $end && $i < count($homeworks); $i++) {
+                                $homework = $homeworks[$i];
+                                echo "<tr>
+                                    <td>" . esc_html($homework->homework_id) . "</td>
+                                    <td>" . esc_html($homework->title) . "</td>
+                                    <td>" . esc_html($homework->subject_name ?: 'N/A') . "</td>
+                                    <td>" . esc_html($homework->class_name) . "</td>
+                                    <td>" . esc_html($homework->section) . "</td>
+                                    <td>" . esc_html($homework->due_date) . "</td>
+                                    <td>" . esc_html($homework->status) . "</td>
+                                    <td>" . esc_html($homework->education_center_id) . "</td>
+                                    <td>
+                                        <button class='edit-homework' data-homework-id='" . esc_attr($homework->homework_id) . "'>Edit</button>
+                                        <button class='delete-homework' data-homework-id='" . esc_attr($homework->homework_id) . "'>Delete</button>
+                                        <button class='mark-complete' data-homework-id='" . esc_attr($homework->homework_id) . "' " . ($homework->status === 'completed' ? 'disabled' : '') . ">Mark Complete</button>
+                                    </td>
+                                </tr>";
+                            }
+                            if (empty($homeworks)) {
+                                echo '<tr><td colspan="9">No homework assigned yet.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Homework Modal -->
+    <div class="edu-modal" id="edit-homework-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="edit-homework-modal">×</span>
+            <h3>Edit Homework</h3>
+            <form id="edit-homework-form" method="POST">
+                <input type="hidden" id="edit-homework-id" name="homework_id">
+                <div class="search-filters">
+                    <label for="edit-center-id">Education Center</label>
+                    <select id="edit-center-id" name="education_center_id" required onchange="updateEditClasses()">
+                        <option value="">Select Center</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title . " ($center_id)") . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-class-id">Class</label>
+                    <select id="edit-class-id" name="class_id" required onchange="updateEditSections()">
+                        <option value="">Select Class</option>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-section">Section</label>
+                    <select id="edit-section" name="section" required>
+                        <option value="">Select Section</option>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-subject-id">Subject</label>
+                    <select id="edit-subject-id" name="subject_id" required>
+                        <option value="">Select Subject</option>
+                        <?php
+                        foreach ($subjects as $subject) {
+                            echo "<option value='" . esc_attr($subject->subject_id) . "'>" . esc_html($subject->subject_name) . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-title">Title</label>
+                    <input type="text" id="edit-title" name="title" required>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-description">Description</label>
+                    <textarea id="edit-description" name="description" rows="3" required></textarea>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-due-date">Due Date</label>
+                    <input type="date" id="edit-due-date" name="due_date" required min="<?php echo date('Y-m-d'); ?>">
+                </div>
+                <input type="hidden" name="action" value="su_p_edit_homework_standalone">
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_homework_nonce'); ?>">
+                <button type="submit">Update Homework</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        const allHomeworks = <?php echo json_encode(array_map(function($homework) {
+            return [
+                'id' => $homework->homework_id,
+                'title' => $homework->title,
+                'subject_id' => $homework->subject_id,
+                'subject_name' => $homework->subject_name ?: 'N/A',
+                'class_name' => $homework->class_name,
+                'class_id' => $homework->class_id, // Use pre-fetched class_id from the JOIN
+                'section' => $homework->section,
+                'due_date' => $homework->due_date,
+                'status' => $homework->status,
+                'education_center_id' => $homework->education_center_id,
+                'description' => $homework->description
+            ];
+        }, $homeworks)); ?>;
+
+        const allClasses = <?php echo json_encode(array_map(function($class) {
+            return [
+                'id' => $class->id,
+                'class_name' => $class->class_name,
+                'education_center_id' => $class->education_center_id,
+                'sections' => array_filter(explode(',', $class->sections))
+            ];
+        }, $all_classes)); ?>;
+
+        let currentPage = <?php echo $page; ?>;
+        let perPage = <?php echo $per_page; ?>;
+        let totalRecords = <?php echo $total; ?>;
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+        function openModal(modalId) { $(modalId).css('display', 'flex'); }
+        function closeModal(modalId) { $(modalId).css('display', 'none'); }
+
+        function filterAndRender() {
+            showLoader();
+            const titleSearch = $('#title-search').val().toLowerCase();
+            const centerFilter = $('#center-filter').val();
+            const classFilter = $('#class-filter').val();
+            const sectionFilter = $('#section-filter').val();
+
+            let filteredHomeworks = allHomeworks.filter(homework => {
+                return (!titleSearch || homework.title.toLowerCase().includes(titleSearch)) &&
+                       (!centerFilter || homework.education_center_id === centerFilter) &&
+                       (!classFilter || homework.class_id == classFilter) &&
+                       (!sectionFilter || homework.section === sectionFilter);
+            });
+
+            totalRecords = filteredHomeworks.length;
+            const totalPages = Math.ceil(totalRecords / perPage);
+            currentPage = Math.min(currentPage, Math.max(1, totalPages));
+
+            const start = (currentPage - 1) * perPage;
+            const end = Math.min(start + perPage, filteredHomeworks.length);
+            const paginatedHomeworks = filteredHomeworks.slice(start, end);
+
+            let html = '';
+            if (paginatedHomeworks.length > 0) {
+                paginatedHomeworks.forEach(homework => {
+                    html += `<tr>
+                        <td>${homework.id}</td>
+                        <td>${homework.title}</td>
+                        <td>${homework.subject_name}</td>
+                        <td>${homework.class_name}</td>
+                        <td>${homework.section}</td>
+                        <td>${homework.due_date}</td>
+                        <td>${homework.status}</td>
+                        <td>${homework.education_center_id}</td>
+                        <td>
+                            <button class="edit-homework" data-homework-id="${homework.id}">Edit</button>
+                            <button class="delete-homework" data-homework-id="${homework.id}">Delete</button>
+                            <button class="mark-complete" data-homework-id="${homework.id}" ${homework.status === 'completed' ? 'disabled' : ''}>Mark Complete</button>
+                        </td>
+                    </tr>`;
+                });
+            } else {
+                html = '<tr><td colspan="9">No homework assigned yet.</td></tr>';
+            }
+            $('#homework-table tbody').html(html);
+
+            $('#page-info').text(`Page ${currentPage} of ${totalPages} (Total Records: ${totalRecords})`);
+            $('#prev-page').prop('disabled', currentPage <= 1);
+            $('#next-page').prop('disabled', currentPage >= totalPages);
+
+            hideLoader();
+        }
+
+        // Event handlers
+        $('#title-search').on('keyup', debounce(filterAndRender, 300));
+        $('#center-filter, #class-filter, #section-filter').on('change', filterAndRender);
+        $('#slots-per-page').on('change', function() {
+            perPage = parseInt($(this).val());
+            currentPage = 1;
+            filterAndRender();
+        });
+        $('#prev-page').on('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                filterAndRender();
+            }
+        });
+        $('#next-page').on('click', function() {
+            if (currentPage < Math.ceil(totalRecords / perPage)) {
+                currentPage++;
+                filterAndRender();
+            }
+        });
+        $('#refresh-table').on('click', function() {
+            $('#title-search').val('');
+            $('#center-filter').val('');
+            $('#class-filter').val('');
+            $('#section-filter').val('');
+            currentPage = 1;
+            filterAndRender();
+        });
+
+        $('#add-homework-btn').on('click', function() {
+            window.location.href = '<?php echo admin_url('admin.php?page=su-p-add-homework'); ?>';
+        });
+
+        // Edit Homework
+        $(document).on('click', '.edit-homework', function() {
+            const homeworkId = $(this).data('homework-id').toString();
+            const homework = allHomeworks.find(h => h.id.toString() === homeworkId);
+
+            if (homework) {
+                $('#edit-homework-id').val(homework.id);
+                $('#edit-center-id').val(homework.education_center_id);
+                updateEditClasses();
+                $('#edit-class-id').val(homework.class_id);
+                updateEditSections();
+                $('#edit-section').val(homework.section);
+                $('#edit-subject-id').val(homework.subject_id);
+                $('#edit-title').val(homework.title);
+                $('#edit-description').val(homework.description);
+                $('#edit-due-date').val(homework.due_date);
+
+                openModal('#edit-homework-modal');
+            } else {
+                alert('Homework not found.');
+            }
+        });
+
+        // Edit Form Submission
+        $('#edit-homework-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const formData = $(this).serialize();
+
+            $.ajax({
+                url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Homework updated successfully');
+                        closeModal('#edit-homework-modal');
+                        const homeworkId = $('#edit-homework-id').val();
+                        const updatedHomework = allHomeworks.find(h => h.id.toString() === homeworkId);
+                        if (updatedHomework) {
+                            updatedHomework.education_center_id = $('#edit-center-id').val();
+                            updatedHomework.class_id = $('#edit-class-id').val();
+                            updatedHomework.class_name = $('#edit-class-id option:selected').text();
+                            updatedHomework.section = $('#edit-section').val();
+                            updatedHomework.subject_id = $('#edit-subject-id').val();
+                            updatedHomework.subject_name = $('#edit-subject-id option:selected').text() === 'Select Subject' ? 'N/A' : $('#edit-subject-id option:selected').text();
+                            updatedHomework.title = $('#edit-title').val();
+                            updatedHomework.description = $('#edit-description').val();
+                            updatedHomework.due_date = $('#edit-due-date').val();
+                        }
+                        filterAndRender();
+                    } else {
+                        alert('Error: ' + (response.data.message || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('AJAX error: ' + error);
+                }
+            });
+        });
+
+        // Delete Homework
+        $(document).on('click', '.delete-homework', function() {
+            if (confirm('Are you sure you want to delete this homework?')) {
+                showLoader();
+                const homeworkId = $(this).data('homework-id').toString();
+
+                $.ajax({
+                    url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+                    type: 'POST',
+                    data: {
+                        action: 'su_p_delete_homework_standalone',
+                        homework_id: homeworkId,
+                        nonce: '<?php echo wp_create_nonce('su_p_homework_nonce'); ?>'
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        hideLoader();
+                        if (response.success) {
+                            alert('Homework deleted successfully');
+                            const index = allHomeworks.findIndex(h => h.id.toString() === homeworkId);
+                            if (index !== -1) {
+                                allHomeworks.splice(index, 1);
+                            }
+                            filterAndRender();
+                        } else {
+                            alert('Failed to delete homework: ' + (response.data.message || 'Unknown error'));
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        hideLoader();
+                        alert('AJAX error: ' + error);
+                    }
+                });
+            }
+        });
+
+        // Mark Complete
+        $(document).on('click', '.mark-complete', function() {
+            const homeworkId = $(this).data('homework-id').toString();
+            showLoader();
+
+            $.ajax({
+                url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+                type: 'POST',
+                data: {
+                    action: 'su_p_mark_homework_complete',
+                    homework_id: homeworkId,
+                    nonce: '<?php echo wp_create_nonce('su_p_homework_nonce'); ?>'
+                },
+                dataType: 'json',
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        const homework = allHomeworks.find(h => h.id.toString() === homeworkId);
+                        if (homework) {
+                            homework.status = 'completed';
+                            filterAndRender();
+                        }
+                    } else {
+                        alert('Error marking homework as complete: ' + (response.data.message || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('AJAX error: ' + error);
+                }
+            });
+        });
+
+        $('.edu-modal-close').on('click', function() {
+            closeModal('#' + $(this).data('modal'));
+        });
+
+        $(document).on('click', '.edu-modal', function(event) {
+            if ($(event.target).hasClass('edu-modal')) {
+                closeModal('#' + event.target.id);
+            }
+        });
+
+        // Export functionality
+        $('.export-csv').on('click', function() {
+            const headers = ['ID', 'Title', 'Subject', 'Class', 'Section', 'Due Date', 'Status', 'Education Center ID'];
+            const csvRows = [headers.join(',')];
+            const filteredHomeworks = getFilteredHomeworks();
+            filteredHomeworks.forEach(row => {
+                const values = [row.id, row.title, row.subject_name, row.class_name, row.section, row.due_date, row.status, row.education_center_id].map(value => `"${value}"`);
+                csvRows.push(values.join(','));
+            });
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'homework.csv';
+            link.click();
+        });
+
+        $('.export-pdf').on('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(16);
+            doc.text('Homework Report', 10, 10);
+            doc.setFontSize(12);
+            const filteredHomeworks = getFilteredHomeworks();
+            const tableData = filteredHomeworks.map(row => [row.id, row.title, row.subject_name, row.class_name, row.section, row.due_date, row.status, row.education_center_id]);
+            doc.autoTable({
+                head: [['ID', 'Title', 'Subject', 'Class', 'Section', 'Due Date', 'Status', 'Education Center ID']],
+                body: tableData,
+                startY: 20,
+                styles: { fontSize: 10, cellPadding: 2 },
+                headStyles: { fillColor: [44, 109, 251] }
+            });
+            doc.save('homework.pdf');
+        });
+
+        $('.export-excel').on('click', function() {
+            const filteredHomeworks = getFilteredHomeworks();
+            const worksheetData = filteredHomeworks.map(row => ({
+                'ID': row.id,
+                'Title': row.title,
+                'Subject': row.subject_name,
+                'Class': row.class_name,
+                'Section': row.section,
+                'Due Date': row.due_date,
+                'Status': row.status,
+                'Education Center ID': row.education_center_id
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Homework');
+            XLSX.writeFile(workbook, 'homework.xlsx');
+        });
+
+        function getFilteredHomeworks() {
+            const titleSearch = $('#title-search').val().toLowerCase();
+            const centerFilter = $('#center-filter').val();
+            const classFilter = $('#class-filter').val();
+            const sectionFilter = $('#section-filter').val();
+            return allHomeworks.filter(homework => {
+                return (!titleSearch || homework.title.toLowerCase().includes(titleSearch)) &&
+                       (!centerFilter || homework.education_center_id === centerFilter) &&
+                       (!classFilter || homework.class_id == classFilter) &&
+                       (!sectionFilter || homework.section === sectionFilter);
+            });
+        }
+
+        function updateEditClasses() {
+            const centerId = $('#edit-center-id').val();
+            $('#edit-class-id').empty().append('<option value="">Select Class</option>');
+            allClasses.forEach(cls => {
+                if (cls.education_center_id === centerId) {
+                    $('#edit-class-id').append(`<option value="${cls.id}">${cls.class_name}</option>`);
+                }
+            });
+            updateEditSections();
+        }
+
+        function updateEditSections() {
+            const classId = $('#edit-class-id').val();
+            const classData = allClasses.find(c => c.id.toString() === classId.toString());
+            $('#edit-section').empty().append('<option value="">Select Section</option>');
+            if (classData && classData.sections) {
+                classData.sections.forEach(section => {
+                    $('#edit-section').append(`<option value="${section}">${section}</option>`);
+                });
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        filterAndRender();
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Standalone Add Homework Function
+function render_su_p_add_homework() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    $class_table = $wpdb->prefix . 'class_sections';
+    $subject_table = $wpdb->prefix . 'subjects';
+    $all_classes = $wpdb->get_results("SELECT id, class_name, sections, education_center_id FROM $class_table");
+    $subjects = $wpdb->get_results("SELECT subject_id, subject_name FROM $subject_table");
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Assign New Homework</h2>
+                <form id="add-homework-form" method="POST">
+                    <div class="search-filters">
+                        <label for="add-center-id">Education Center</label>
+                        <select id="add-center-id" name="education_center_id" required>
+                            <option value="">Select Center</option>
+                            <?php
+                            foreach ($centers as $center) {
+                                $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                                echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title . " ($center_id)") . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label for="add-class-id">Class</label>
+                        <select id="add-class-id" name="class_id" required>
+                            <option value="">Select Class</option>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label for="add-section">Section</label>
+                        <select id="add-section" name="section" required>
+                            <option value="">Select Section</option>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label for="add-subject-id">Subject</label>
+                        <select id="add-subject-id" name="subject_id" required>
+                            <option value="">Select Subject</option>
+                            <?php
+                            foreach ($subjects as $subject) {
+                                echo "<option value='" . esc_attr($subject->subject_id) . "'>" . esc_html($subject->subject_name) . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label for="add-title">Title</label>
+                        <input type="text" id="add-title" name="title" required>
+                    </div>
+                    <div class="search-filters">
+                        <label for="add-description">Description</label>
+                        <textarea id="add-description" name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="search-filters">
+                        <label for="add-due-date">Due Date</label>
+                        <input type="date" id="add-due-date" name="due_date" required min="<?php echo date('Y-m-d'); ?>">
+                    </div>
+                    <input type="hidden" name="action" value="su_p_add_homework_standalone">
+                    <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_homework_nonce'); ?>">
+                    <button type="submit">Assign Homework</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        const allClasses = <?php echo json_encode(array_map(function($class) {
+            return [
+                'id' => $class->id,
+                'class_name' => $class->class_name,
+                'education_center_id' => $class->education_center_id,
+                'sections' => array_filter(explode(',', $class->sections))
+            ];
+        }, $all_classes)); ?>;
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        function updateAddClasses() {
+            const centerId = $('#add-center-id').val();
+            $('#add-class-id').empty().append('<option value="">Select Class</option>');
+            allClasses.forEach(cls => {
+                if (cls.education_center_id === centerId) {
+                    $('#add-class-id').append(`<option value="${cls.id}">${cls.class_name}</option>`);
+                }
+            });
+            updateAddSections();
+        }
+
+        function updateAddSections() {
+            const classId = $('#add-class-id').val();
+            const classData = allClasses.find(c => c.id.toString() === classId.toString());
+            $('#add-section').empty().append('<option value="">Select Section</option>');
+            if (classData && classData.sections) {
+                classData.sections.forEach(section => {
+                    $('#add-section').append(`<option value="${section}">${section}</option>`);
+                });
+            }
+        }
+
+        $('#add-center-id').on('change', updateAddClasses);
+        $('#add-class-id').on('change', updateAddSections);
+
+        $('#add-homework-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const formData = $(this).serialize();
+
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Homework assigned successfully');
+                        $('#add-homework-form')[0].reset();
+                        $('#add-class-id').html('<option value="">Select Class</option>');
+                        $('#add-section').html('<option value="">Select Section</option>');
+                    } else {
+                        alert('Error: ' + (response.data.message || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('AJAX error: ' + error);
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Standalone Edit Homework Function
+function render_su_p_edit_homework() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    $homework_table = $wpdb->prefix . 'homework';
+    $class_table = $wpdb->prefix . 'class_sections';
+    $subject_table = $wpdb->prefix . 'subjects';
+
+    $query = "SELECT h.*, c.class_name, c.id as class_id, s.subject_name 
+              FROM $homework_table h 
+              JOIN $class_table c ON h.class_name = c.class_name AND h.education_center_id = c.education_center_id
+              LEFT JOIN $subject_table s ON h.subject_id = s.subject_id 
+              ORDER BY h.due_date";
+    $homeworks = $wpdb->get_results($query);
+
+    $all_classes = $wpdb->get_results("SELECT id, class_name, sections, education_center_id FROM $class_table");
+    $subjects = $wpdb->get_results("SELECT subject_id, subject_name FROM $subject_table");
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Edit Homework</h2>
+                <div class="management-table-wrapper">
+                    <table id="homework-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Subject</th>
+                                <th>Class</th>
+                                <th>Section</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Education Center ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            if (!empty($homeworks)) {
+                                foreach ($homeworks as $homework) {
+                                    echo "<tr>
+                                        <td>" . esc_html($homework->homework_id) . "</td>
+                                        <td>" . esc_html($homework->title) . "</td>
+                                        <td>" . esc_html($homework->subject_name ?: 'N/A') . "</td>
+                                        <td>" . esc_html($homework->class_name) . "</td>
+                                        <td>" . esc_html($homework->section) . "</td>
+                                        <td>" . esc_html($homework->due_date) . "</td>
+                                        <td>" . esc_html($homework->status) . "</td>
+                                        <td>" . esc_html($homework->education_center_id) . "</td>
+                                        <td>
+                                            <button class='edit-homework' data-homework-id='" . esc_attr($homework->homework_id) . "'>Edit</button>
+                                        </td>
+                                    </tr>";
+                                }
+                            } else {
+                                echo '<tr><td colspan="9">No homework found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Edit Homework Modal -->
+                <div class="edu-modal" id="edit-homework-modal" style="display: none;">
+                    <div class="edu-modal-content">
+                        <span class="edu-modal-close" data-modal="edit-homework-modal">×</span>
+                        <h3>Edit Homework</h3>
+                        <form id="edit-homework-form" method="POST">
+                            <input type="hidden" id="edit-homework-id" name="homework_id">
+                            <div class="search-filters">
+                                <label for="edit-center-id">Education Center</label>
+                                <select id="edit-center-id" name="education_center_id" required onchange="updateEditClasses()">
+                                    <option value="">Select Center</option>
+                                    <?php
+                                    foreach ($centers as $center) {
+                                        $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                                        echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title . " ($center_id)") . "</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="search-filters">
+                                <label for="edit-class-id">Class</label>
+                                <select id="edit-class-id" name="class_id" required onchange="updateEditSections()">
+                                    <option value="">Select Class</option>
+                                </select>
+                            </div>
+                            <div class="search-filters">
+                                <label for="edit-section">Section</label>
+                                <select id="edit-section" name="section" required>
+                                    <option value="">Select Section</option>
+                                </select>
+                            </div>
+                            <div class="search-filters">
+                                <label for="edit-subject-id">Subject</label>
+                                <select id="edit-subject-id" name="subject_id" required>
+                                    <option value="">Select Subject</option>
+                                    <?php
+                                    foreach ($subjects as $subject) {
+                                        echo "<option value='" . esc_attr($subject->subject_id) . "'>" . esc_html($subject->subject_name) . "</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="search-filters">
+                                <label for="edit-title">Title</label>
+                                <input type="text" id="edit-title" name="title" required>
+                            </div>
+                            <div class="search-filters">
+                                <label for="edit-description">Description</label>
+                                <textarea id="edit-description" name="description" rows="3" required></textarea>
+                            </div>
+                            <div class="search-filters">
+                                <label for="edit-due-date">Due Date</label>
+                                <input type="date" id="edit-due-date" name="due_date" required min="<?php echo date('Y-m-d'); ?>">
+                            </div>
+                            <input type="hidden" name="action" value="su_p_edit_homework_standalone">
+                            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_homework_nonce'); ?>">
+                            <button type="submit">Update Homework</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        const allHomeworks = <?php echo json_encode(array_map(function($homework) {
+            return [
+                'id' => $homework->homework_id,
+                'title' => $homework->title,
+                'subject_id' => $homework->subject_id,
+                'subject_name' => $homework->subject_name ?: 'N/A',
+                'class_name' => $homework->class_name,
+                'class_id' => $homework->class_id,
+                'section' => $homework->section,
+                'due_date' => $homework->due_date,
+                'status' => $homework->status,
+                'education_center_id' => $homework->education_center_id,
+                'description' => $homework->description
+            ];
+        }, $homeworks)); ?>;
+
+        const allClasses = <?php echo json_encode(array_map(function($class) {
+            return [
+                'id' => $class->id,
+                'class_name' => $class->class_name,
+                'education_center_id' => $class->education_center_id,
+                'sections' => array_filter(explode(',', $class->sections))
+            ];
+        }, $all_classes)); ?>;
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+        function openModal(modalId) { $(modalId).css('display', 'flex'); }
+        function closeModal(modalId) { $(modalId).css('display', 'none'); }
+
+        $(document).on('click', '.edit-homework', function() {
+            const homeworkId = $(this).data('homework-id').toString();
+            const homework = allHomeworks.find(h => h.id.toString() === homeworkId);
+
+            if (homework) {
+                $('#edit-homework-id').val(homework.id);
+                $('#edit-center-id').val(homework.education_center_id);
+                updateEditClasses();
+                $('#edit-class-id').val(homework.class_id);
+                updateEditSections();
+                $('#edit-section').val(homework.section);
+                $('#edit-subject-id').val(homework.subject_id);
+                $('#edit-title').val(homework.title);
+                $('#edit-description').val(homework.description);
+                $('#edit-due-date').val(homework.due_date);
+
+                openModal('#edit-homework-modal');
+            } else {
+                alert('Homework not found.');
+            }
+        });
+
+        $('#edit-homework-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const formData = $(this).serialize();
+
+            $.ajax({
+                url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Homework updated successfully');
+                        closeModal('#edit-homework-modal');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + (response.data.message || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('AJAX error: ' + error);
+                }
+            });
+        });
+
+        function updateEditClasses() {
+            const centerId = $('#edit-center-id').val();
+            $('#edit-class-id').empty().append('<option value="">Select Class</option>');
+            allClasses.forEach(cls => {
+                if (cls.education_center_id === centerId) {
+                    $('#edit-class-id').append(`<option value="${cls.id}">${cls.class_name}</option>`);
+                }
+            });
+            updateEditSections();
+        }
+
+        function updateEditSections() {
+            const classId = $('#edit-class-id').val();
+            const classData = allClasses.find(c => c.id.toString() === classId.toString());
+            $('#edit-section').empty().append('<option value="">Select Section</option>');
+            if (classData && classData.sections) {
+                classData.sections.forEach(section => {
+                    $('#edit-section').append(`<option value="${section}">${section}</option>`);
+                });
+            }
+        }
+
+        $('.edu-modal-close').on('click', function() {
+            closeModal('#' + $(this).data('modal'));
+        });
+
+        $(document).on('click', '.edu-modal', function(event) {
+            if ($(event.target).hasClass('edu-modal')) {
+                closeModal('#' + event.target.id);
+            }
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Standalone Delete Homework Function
+function render_su_p_delete_homework() {
+    global $wpdb;
+    $homework_table = $wpdb->prefix . 'homework';
+    $class_table = $wpdb->prefix . 'class_sections';
+    $subject_table = $wpdb->prefix . 'subjects';
+
+    $query = "SELECT h.*, c.class_name, c.id as class_id, s.subject_name 
+              FROM $homework_table h 
+              JOIN $class_table c ON h.class_name = c.class_name AND h.education_center_id = c.education_center_id
+              LEFT JOIN $subject_table s ON h.subject_id = s.subject_id 
+              ORDER BY h.due_date";
+    $homeworks = $wpdb->get_results($query);
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Delete Homework</h2>
+                <div class="management-table-wrapper">
+                    <table id="homework-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Subject</th>
+                                <th>Class</th>
+                                <th>Section</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Education Center ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            if (!empty($homeworks)) {
+                                foreach ($homeworks as $homework) {
+                                    echo "<tr>
+                                        <td>" . esc_html($homework->homework_id) . "</td>
+                                        <td>" . esc_html($homework->title) . "</td>
+                                        <td>" . esc_html($homework->subject_name ?: 'N/A') . "</td>
+                                        <td>" . esc_html($homework->class_name) . "</td>
+                                        <td>" . esc_html($homework->section) . "</td>
+                                        <td>" . esc_html($homework->due_date) . "</td>
+                                        <td>" . esc_html($homework->status) . "</td>
+                                        <td>" . esc_html($homework->education_center_id) . "</td>
+                                        <td>
+                                            <button class='delete-homework' data-homework-id='" . esc_attr($homework->homework_id) . "'>Delete</button>
+                                        </td>
+                                    </tr>";
+                                }
+                            } else {
+                                echo '<tr><td colspan="9">No homework found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        const allHomeworks = <?php echo json_encode(array_map(function($homework) {
+            return [
+                'id' => $homework->homework_id,
+                'title' => $homework->title,
+                'subject_name' => $homework->subject_name ?: 'N/A',
+                'class_name' => $homework->class_name,
+                'section' => $homework->section,
+                'due_date' => $homework->due_date,
+                'status' => $homework->status,
+                'education_center_id' => $homework->education_center_id
+            ];
+        }, $homeworks)); ?>;
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        $(document).on('click', '.delete-homework', function() {
+            if (confirm('Are you sure you want to delete this homework?')) {
+                showLoader();
+                const homeworkId = $(this).data('homework-id').toString();
+
+                fetch('<?php echo esc_url(admin_url('admin-ajax.php')); ?>', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        'action': 'su_p_delete_homework_standalone',
+                        'homework_id': homeworkId,
+                        'nonce': '<?php echo wp_create_nonce('su_p_homework_nonce'); ?>'
+                    })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    hideLoader();
+                    if (result.success) {
+                        alert('Homework deleted successfully');
+                        $(`button[data-homework-id="${homeworkId}"]`).closest('tr').remove();
+                        const index = allHomeworks.findIndex(h => h.id.toString() === homeworkId);
+                        if (index !== -1) allHomeworks.splice(index, 1);
+                        if ($('#homework-table tbody tr').length === 0) {
+                            $('#homework-table tbody').html('<tr><td colspan="9">No homework found.</td></tr>');
+                        }
+                    } else {
+                        alert('Failed to delete homework: ' + (result.data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    hideLoader();
+                    alert('An error occurred: ' + error.message);
+                });
+            }
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// AJAX Handler for Add Homework
+add_action('wp_ajax_su_p_add_homework_standalone', 'su_p_add_homework_standalone');
+function su_p_add_homework_standalone() {
+    global $wpdb;
+
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'su_p_homework_nonce')) {
+        wp_send_json_error(['message' => 'Invalid security token']);
+        wp_die();
+    }
+
+    $education_center_id = sanitize_text_field($_POST['education_center_id'] ?? '');
+    $class_id = intval($_POST['class_id'] ?? 0);
+    $section = sanitize_text_field($_POST['section'] ?? '');
+    $subject_id = intval($_POST['subject_id'] ?? 0);
+    $title = sanitize_text_field($_POST['title'] ?? '');
+    $description = sanitize_textarea_field($_POST['description'] ?? '');
+    $due_date = sanitize_text_field($_POST['due_date'] ?? '');
+
+    if (empty($education_center_id) || empty($class_id) || empty($section) || empty($subject_id) || empty($title) || empty($description) || empty($due_date)) {
+        wp_send_json_error(['message' => 'All fields are required']);
+        wp_die();
+    }
+
+    $class_table = $wpdb->prefix . 'class_sections';
+    $class_name = $wpdb->get_var($wpdb->prepare("SELECT class_name FROM $class_table WHERE id = %d AND education_center_id = %s", $class_id, $education_center_id));
+    if (!$class_name) {
+        wp_send_json_error(['message' => 'Invalid class or education center']);
+        wp_die();
+    }
+
+    $homework_table = $wpdb->prefix . 'homework';
+    $result = $wpdb->insert(
+        $homework_table,
+        [
+            'education_center_id' => $education_center_id,
+            'class_name' => $class_name,
+            'section' => $section,
+            'subject_id' => $subject_id,
+            'title' => $title,
+            'description' => $description,
+            'due_date' => $due_date,
+            'status' => 'active'
+        ],
+        ['%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s']
+    );
+
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to assign homework: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success(['message' => 'Homework assigned successfully']);
+    }
+    wp_die();
+}
+
+// AJAX Handler for Edit Homework
+add_action('wp_ajax_su_p_edit_homework_standalone', 'su_p_edit_homework_standalone');
+function su_p_edit_homework_standalone() {
+    global $wpdb;
+
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'su_p_homework_nonce')) {
+        wp_send_json_error(['message' => 'Invalid security token']);
+        wp_die();
+    }
+
+    $homework_id = intval($_POST['homework_id'] ?? 0);
+    $education_center_id = sanitize_text_field($_POST['education_center_id'] ?? '');
+    $class_id = intval($_POST['class_id'] ?? 0);
+    $section = sanitize_text_field($_POST['section'] ?? '');
+    $subject_id = intval($_POST['subject_id'] ?? 0);
+    $title = sanitize_text_field($_POST['title'] ?? '');
+    $description = sanitize_textarea_field($_POST['description'] ?? '');
+    $due_date = sanitize_text_field($_POST['due_date'] ?? '');
+
+    if (empty($homework_id) || empty($education_center_id) || empty($class_id) || empty($section) || empty($subject_id) || empty($title) || empty($description) || empty($due_date)) {
+        wp_send_json_error(['message' => 'All fields are required']);
+        wp_die();
+    }
+
+    $class_table = $wpdb->prefix . 'class_sections';
+    $class_name = $wpdb->get_var($wpdb->prepare("SELECT class_name FROM $class_table WHERE id = %d AND education_center_id = %s", $class_id, $education_center_id));
+    if (!$class_name) {
+        wp_send_json_error(['message' => 'Invalid class or education center']);
+        wp_die();
+    }
+
+    $homework_table = $wpdb->prefix . 'homework';
+    $result = $wpdb->update(
+        $homework_table,
+        [
+            'education_center_id' => $education_center_id,
+            'class' => $class_name,
+            'section' => $section,
+            'subject_id' => $subject_id,
+            'title' => $title,
+            'description' => $description,
+            'due_date' => $due_date
+        ],
+        ['homework_id' => $homework_id],
+        ['%s', '%s', '%s', '%d', '%s', '%s', '%s'],
+        ['%d']
+    );
+
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to update homework: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success(['message' => 'Homework updated successfully']);
+    }
+    wp_die();
+}
+
+// AJAX Handler for Delete Homework
+add_action('wp_ajax_su_p_delete_homework_standalone', 'su_p_delete_homework_standalone');
+function su_p_delete_homework_standalone() {
+    global $wpdb;
+
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'su_p_homework_nonce')) {
+        wp_send_json_error(['message' => 'Invalid security token']);
+        wp_die();
+    }
+
+    $homework_id = intval($_POST['homework_id'] ?? 0);
+    if (empty($homework_id)) {
+        wp_send_json_error(['message' => 'Invalid homework ID']);
+        wp_die();
+    }
+
+    $homework_table = $wpdb->prefix . 'homework';
+    $result = $wpdb->delete($homework_table, ['homework_id' => $homework_id], ['%d']);
+
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to delete homework: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success(['message' => 'Homework deleted successfully']);
+    }
+    wp_die();
+}
+
+// AJAX Handler for Mark Homework Complete
+add_action('wp_ajax_su_p_mark_homework_complete', 'su_p_mark_homework_complete');
+function su_p_mark_homework_complete() {
+    global $wpdb;
+
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'su_p_homework_nonce')) {
+        wp_send_json_error(['message' => 'Invalid security token']);
+        wp_die();
+    }
+
+    $homework_id = intval($_POST['homework_id'] ?? 0);
+    if (empty($homework_id)) {
+        wp_send_json_error(['message' => 'Invalid homework ID']);
+        wp_die();
+    }
+
+    $homework_table = $wpdb->prefix . 'homework';
+    $result = $wpdb->update(
+        $homework_table,
+        ['status' => 'completed'],
+        ['homework_id' => $homework_id],
+        ['%s'],
+        ['%d']
+    );
+
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to mark homework as complete: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success(['message' => 'Homework marked as complete']);
+    }
+    wp_die();
+}
+
+//departments
+// Helper: Get Departments with Teacher Count
+// Helper: Get Departments with Teacher Count (kept for reference, not directly used here)
+function get_departments_with_teacher_count2($education_center_id) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'departments';
+    $departments = $wpdb->get_results($wpdb->prepare(
+        "SELECT * FROM $table_name WHERE education_center_id = %s ORDER BY department_name",
+        $education_center_id
+    ));
+
+    foreach ($departments as $dept) {
+        $teachers = get_posts([
+            'post_type' => 'teacher',
+            'numberposts' => -1,
+            'meta_query' => [
+                'relation' => 'AND',
+                ['key' => 'teacher_department', 'value' => $dept->department_name, 'compare' => '='],
+                ['key' => 'educational_center_id', 'value' => $dept->education_center_id, 'compare' => '=']
+            ]
+        ]);
+        $dept->teacher_count = count($teachers);
+        $dept->teachers = array_map(function($teacher) {
+            return [
+                'id' => $teacher->ID,
+                'name' => !empty($teacher->teacher_name) ? $teacher->teacher_name : $teacher->post_title
+            ];
+        }, $teachers);
+    }
+    return $departments;
+}
+
+// Main Department Management Function (Read/List)
+function render_su_p_department_management() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    $current_user = wp_get_current_user();
+    $education_center_id = is_teacher($current_user->ID) ? educational_center_teacher_id() : get_educational_center_data();
+
+    // Pagination and filter variables
+    $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+    $per_page = isset($_GET['per_page']) ? intval($_GET['per_page']) : 10;
+    $name_search = isset($_GET['name_search']) ? sanitize_text_field($_GET['name_search']) : '';
+    $center_filter = isset($_GET['center_filter']) ? sanitize_text_field($_GET['center_filter']) : '';
+
+    // Fetch all departments with a single query
+    $department_table = $wpdb->prefix . 'departments';
+    $query = "SELECT d.* FROM $department_table d WHERE 1=1";
+    $args = [];
+    if ($name_search) {
+        $query .= " AND d.department_name LIKE %s";
+        $args[] = '%' . $wpdb->esc_like($name_search) . '%';
+    }
+    if ($center_filter) {
+        $query .= " AND d.education_center_id = %s";
+        $args[] = $center_filter;
+    } else {
+        // Super admin sees all centers unless filtered
+        if (is_teacher($current_user->ID)) {
+            $query .= " AND d.education_center_id = %s";
+            $args[] = $education_center_id;
+        }
+    }
+    $query .= " ORDER BY d.department_name";
+    $departments = !empty($args) ? $wpdb->get_results($wpdb->prepare($query, $args)) : $wpdb->get_results($query);
+    $total = count($departments);
+
+    // Enrich departments with teacher count
+    foreach ($departments as $dept) {
+        $teachers = get_posts([
+            'post_type' => 'teacher',
+            'numberposts' => -1,
+            'meta_query' => [
+                'relation' => 'AND',
+                ['key' => 'teacher_department', 'value' => $dept->department_name, 'compare' => '='],
+                ['key' => 'educational_center_id', 'value' => $dept->education_center_id, 'compare' => '=']
+            ]
+        ]);
+        $dept->teacher_count = count($teachers);
+        $dept->teachers = array_map(function($teacher) {
+            return [
+                'id' => $teacher->ID,
+                'name' => !empty($teacher->teacher_name) ? $teacher->teacher_name : $teacher->post_title
+            ];
+        }, $teachers);
+    }
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Department Management</h2>
+                <div class="search-filters">
+                    <input type="text" id="name-search" placeholder="Search by Name..." value="<?php echo esc_attr($name_search); ?>">
+                    <select id="center-filter">
+                        <option value="">All Educational Centers</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='$center_id' " . selected($center_filter, $center_id, false) . ">" . esc_html($center->post_title) . " ($center_id)</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="actions">
+                    <?php if (!is_teacher($current_user->ID)) { ?>
+                        <button id="add-department-btn">Add Department</button>
+                    <?php } ?>
+                    <select id="slots-per-page" name="per_page">
+                        <option value="10" <?php selected($per_page, 10); ?>>10</option>
+                        <option value="20" <?php selected($per_page, 20); ?>>20</option>
+                        <option value="50" <?php selected($per_page, 50); ?>>50</option>
+                    </select>
+                    <button id="prev-page" class="button" <?php echo $page <= 1 ? 'disabled' : ''; ?>>Previous</button>
+                    <span id="page-info">Page <?php echo $page; ?> of <?php echo ceil($total / $per_page); ?> (Total Records: <?php echo $total; ?>)</span>
+                    <button id="next-page" class="button" <?php echo $page >= ceil($total / $per_page) ? 'disabled' : ''; ?>>Next</button>
+                    <button id="refresh-table" class="button">Refresh</button>
+                </div>
+                <div class="management-table-wrapper">
+                    <div class="actions" id="export-tools">
+                        <button class="export-btn export-csv" aria-label="Export to CSV"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
+                        <button class="export-btn export-pdf" aria-label="Export to PDF"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
+                        <button class="export-btn export-excel" aria-label="Export to Excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
+                    </div>
+                    <table id="department-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Teacher Count</th>
+                                <th>Education Center ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $start = ($page - 1) * $per_page;
+                            $end = min($start + $per_page, $total);
+                            for ($i = $start; $i < $end && $i < count($departments); $i++) {
+                                $dept = $departments[$i];
+                                echo "<tr>
+                                    <td>" . esc_html($dept->department_id) . "</td>
+                                    <td>" . esc_html($dept->department_name) . "</td>
+                                    <td>" . esc_html($dept->teacher_count) . "</td>
+                                    <td>" . esc_html($dept->education_center_id) . "</td>
+                                    <td>
+                                        <button class='view-teachers' data-dept-id='" . esc_attr($dept->department_id) . "'>View Teachers</button>
+                                        " . (!is_teacher($current_user->ID) ? "
+                                        <button class='edit-department' data-dept-id='" . esc_attr($dept->department_id) . "'>Edit</button>
+                                        <button class='delete-department' data-dept-id='" . esc_attr($dept->department_id) . "'>Delete</button>
+                                        " : "") . "
+                                    </td>
+                                </tr>";
+                            }
+                            if (empty($departments)) {
+                                echo '<tr><td colspan="5">No departments found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Teachers Modal -->
+    <div class="edu-modal" id="view-teachers-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="view-teachers-modal">×</span>
+            <h3>Teacher Details</h3>
+            <div id="teacher-details-container"></div>
+        </div>
+    </div>
+
+    <!-- Edit Department Modal -->
+    <div class="edu-modal" id="edit-department-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="edit-department-modal">×</span>
+            <h3>Edit Department</h3>
+            <form id="edit-department-form" method="POST">
+                <input type="hidden" id="edit-dept-id" name="department_id">
+                <div class="search-filters">
+                    <label for="edit-center-id">Education Center</label>
+                    <select id="edit-center-id" name="education_center_id" required>
+                        <option value="">Select Center</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title . " ($center_id)") . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-name">Department Name</label>
+                    <input type="text" id="edit-name" name="department_name" required>
+                </div>
+                <input type="hidden" name="action" value="su_p_update_department">
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_department_nonce'); ?>">
+                <button type="submit">Update Department</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        const allDepartments = <?php echo json_encode(array_map(function($dept) {
+            return [
+                'id' => $dept->department_id,
+                'name' => $dept->department_name,
+                'teacher_count' => $dept->teacher_count,
+                'teachers' => $dept->teachers,
+                'education_center_id' => $dept->education_center_id
+            ];
+        }, $departments)); ?>;
+
+        let currentPage = <?php echo $page; ?>;
+        let perPage = <?php echo $per_page; ?>;
+        let totalRecords = <?php echo $total; ?>;
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+        function openModal(modalId) { $(modalId).css('display', 'flex'); }
+        function closeModal(modalId) { $(modalId).css('display', 'none'); }
+
+        function filterAndRender() {
+            showLoader();
+            const nameSearch = $('#name-search').val().toLowerCase();
+            const centerFilter = $('#center-filter').val();
+
+            let filteredDepartments = allDepartments.filter(dept => {
+                return (!nameSearch || dept.name.toLowerCase().includes(nameSearch)) &&
+                       (!centerFilter || dept.education_center_id === centerFilter);
+            });
+
+            totalRecords = filteredDepartments.length;
+            const totalPages = Math.ceil(totalRecords / perPage);
+            currentPage = Math.min(currentPage, Math.max(1, totalPages));
+
+            const start = (currentPage - 1) * perPage;
+            const end = Math.min(start + perPage, filteredDepartments.length);
+            const paginatedDepartments = filteredDepartments.slice(start, end);
+
+            let html = '';
+            if (paginatedDepartments.length > 0) {
+                paginatedDepartments.forEach(dept => {
+                    html += `<tr>
+                        <td>${dept.id}</td>
+                        <td>${dept.name}</td>
+                        <td>${dept.teacher_count}</td>
+                        <td>${dept.education_center_id}</td>
+                        <td>
+                            <button class="view-teachers" data-dept-id="${dept.id}">View Teachers</button>
+                            <?php if (!is_teacher($current_user->ID)) { ?>
+                            <button class="edit-department" data-dept-id="${dept.id}">Edit</button>
+                            <button class="delete-department" data-dept-id="${dept.id}">Delete</button>
+                            <?php } ?>
+                        </td>
+                    </tr>`;
+                });
+            } else {
+                html = '<tr><td colspan="5">No departments found.</td></tr>';
+            }
+            $('#department-table tbody').html(html);
+
+            $('#page-info').text(`Page ${currentPage} of ${totalPages} (Total Records: ${totalRecords})`);
+            $('#prev-page').prop('disabled', currentPage <= 1);
+            $('#next-page').prop('disabled', currentPage >= totalPages);
+
+            hideLoader();
+        }
+
+        // Event handlers
+        $('#name-search').on('keyup', debounce(filterAndRender, 300));
+        $('#center-filter').on('change', filterAndRender);
+        $('#slots-per-page').on('change', function() {
+            perPage = parseInt($(this).val());
+            currentPage = 1;
+            filterAndRender();
+        });
+        $('#prev-page').on('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                filterAndRender();
+            }
+        });
+        $('#next-page').on('click', function() {
+            if (currentPage < Math.ceil(totalRecords / perPage)) {
+                currentPage++;
+                filterAndRender();
+            }
+        });
+        $('#refresh-table').on('click', function() {
+            $('#name-search').val('');
+            $('#center-filter').val('');
+            currentPage = 1;
+            filterAndRender();
+        });
+
+        <?php if (!is_teacher($current_user->ID)) { ?>
+        $('#add-department-btn').on('click', function() {
+            window.location.href = '<?php echo admin_url('admin.php?page=su-p-add-department'); ?>';
+        });
+
+        // Edit Department
+        $(document).on('click', '.edit-department', function() {
+            const deptId = $(this).data('dept-id').toString();
+            const dept = allDepartments.find(d => d.id.toString() === deptId);
+
+            if (dept) {
+                $('#edit-dept-id').val(dept.id);
+                $('#edit-center-id').val(dept.education_center_id);
+                $('#edit-name').val(dept.name);
+                openModal('#edit-department-modal');
+            } else {
+                alert('Department not found.');
+            }
+        });
+
+        $('#edit-department-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const formData = $(this).serialize();
+
+            $.ajax({
+                url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Department updated successfully');
+                        closeModal('#edit-department-modal');
+                        const deptId = $('#edit-dept-id').val();
+                        const updatedDept = allDepartments.find(d => d.id.toString() === deptId);
+                        if (updatedDept) {
+                            updatedDept.education_center_id = $('#edit-center-id').val();
+                            updatedDept.name = $('#edit-name').val();
+                            // Teacher count remains unchanged unless reassignment logic is added
+                        }
+                        filterAndRender();
+                    } else {
+                        alert('Error: ' + (response.data.message || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('AJAX error: ' + error);
+                }
+            });
+        });
+
+        // Delete Department
+        $(document).on('click', '.delete-department', function() {
+            if (confirm('Are you sure you want to delete this department?')) {
+                showLoader();
+                const deptId = $(this).data('dept-id').toString();
+
+                $.ajax({
+                    url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+                    type: 'POST',
+                    data: {
+                        action: 'su_p_delete_department',
+                        department_id: deptId,
+                        nonce: '<?php echo wp_create_nonce('su_p_department_nonce'); ?>'
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        hideLoader();
+                        if (response.success) {
+                            alert('Department deleted successfully');
+                            const index = allDepartments.findIndex(d => d.id.toString() === deptId);
+                            if (index !== -1) {
+                                allDepartments.splice(index, 1);
+                            }
+                            filterAndRender();
+                        } else {
+                            alert('Failed to delete department: ' + (response.data.message || 'Unknown error'));
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        hideLoader();
+                        alert('AJAX error: ' + error);
+                    }
+                });
+            }
+        });
+        <?php } ?>
+
+        // View Teachers
+        $(document).on('click', '.view-teachers', function() {
+            const deptId = $(this).data('dept-id').toString();
+            const dept = allDepartments.find(d => d.id.toString() === deptId);
+
+            if (dept) {
+                let html = `<h4>${dept.name}</h4>`;
+                if (dept.teacher_count > 0) {
+                    html += '<ul>';
+                    dept.teachers.forEach(teacher => {
+                        html += `<li>${teacher.id} - ${teacher.name}</li>`;
+                    });
+                    html += '</ul>';
+                } else {
+                    html += '<p>No teachers assigned.</p>';
+                }
+                $('#teacher-details-container').html(html);
+                openModal('#view-teachers-modal');
+            } else {
+                alert('Department not found.');
+            }
+        });
+
+        $('.edu-modal-close').on('click', function() {
+            closeModal('#' + $(this).data('modal'));
+        });
+
+        $(document).on('click', '.edu-modal', function(event) {
+            if ($(event.target).hasClass('edu-modal')) {
+                closeModal('#' + event.target.id);
+            }
+        });
+
+        // Export functionality
+        $('.export-csv').on('click', function() {
+            const headers = ['ID', 'Name', 'Teacher Count', 'Education Center ID'];
+            const csvRows = [headers.join(',')];
+            const filteredDepartments = getFilteredDepartments();
+            filteredDepartments.forEach(dept => {
+                const values = [dept.id, dept.name, dept.teacher_count, dept.education_center_id].map(value => `"${value}"`);
+                csvRows.push(values.join(','));
+            });
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'departments.csv';
+            link.click();
+        });
+
+        $('.export-pdf').on('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(16);
+            doc.text('Department Report', 10, 10);
+            doc.setFontSize(12);
+            const filteredDepartments = getFilteredDepartments();
+            const tableData = filteredDepartments.map(dept => [dept.id, dept.name, dept.teacher_count, dept.education_center_id]);
+            doc.autoTable({
+                head: [['ID', 'Name', 'Teacher Count', 'Education Center ID']],
+                body: tableData,
+                startY: 20,
+                styles: { fontSize: 10, cellPadding: 2 },
+                headStyles: { fillColor: [44, 109, 251] }
+            });
+            doc.save('departments.pdf');
+        });
+
+        $('.export-excel').on('click', function() {
+            const filteredDepartments = getFilteredDepartments();
+            const worksheetData = filteredDepartments.map(dept => ({
+                'ID': dept.id,
+                'Name': dept.name,
+                'Teacher Count': dept.teacher_count,
+                'Education Center ID': dept.education_center_id
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Departments');
+            XLSX.writeFile(workbook, 'departments.xlsx');
+        });
+
+        function getFilteredDepartments() {
+            const nameSearch = $('#name-search').val().toLowerCase();
+            const centerFilter = $('#center-filter').val();
+            return allDepartments.filter(dept => {
+                return (!nameSearch || dept.name.toLowerCase().includes(nameSearch)) &&
+                       (!centerFilter || dept.education_center_id === centerFilter);
+            });
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        filterAndRender();
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Add Department Function (Create)
+function render_su_p_add_department() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    $current_user = wp_get_current_user();
+    $education_center_id = is_teacher($current_user->ID) ? educational_center_teacher_id() : get_educational_center_data();
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Add New Department</h2>
+                <form id="add-department-form" method="POST">
+                    <div class="search-filters">
+                        <label for="add-center-id">Education Center</label>
+                        <select id="add-center-id" name="education_center_id" required>
+                            <option value="">Select Center</option>
+                            <?php
+                            foreach ($centers as $center) {
+                                $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                                echo "<option value='" . esc_attr($center_id) . "' " . selected($education_center_id, $center_id, false) . ">" . esc_html($center->post_title . " ($center_id)") . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label for="add-name">Department Name</label>
+                        <input type="text" id="add-name" name="department_name" required>
+                    </div>
+                    <input type="hidden" name="action" value="su_p_add_department">
+                    <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_department_nonce'); ?>">
+                    <button type="submit">Add Department</button>
+                    <a href="<?php echo admin_url('admin.php?page=su-p-department-management'); ?>" class="button">Back to Departments</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        $('#add-department-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const formData = $(this).serialize();
+
+            $.ajax({
+                url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Department added successfully');
+                        window.location.href = '<?php echo admin_url('admin.php?page=su-p-department-management'); ?>';
+                    } else {
+                        alert('Error: ' + (response.data.message || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('AJAX error: ' + error);
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+// Edit Department Function (Edit/Update)
+// Edit Department Function (Edit/Update)
+function render_su_p_edit_department() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+
+    // Fetch all departments
+    $department_table = $wpdb->prefix . 'departments';
+    $departments = $wpdb->get_results("SELECT * FROM $department_table ORDER BY department_name");
+
+    // Enrich departments with teacher count
+    foreach ($departments as $dept) {
+        $teachers = get_posts([
+            'post_type' => 'teacher',
+            'numberposts' => -1,
+            'meta_query' => [
+                'relation' => 'AND',
+                ['key' => 'teacher_department', 'value' => $dept->department_name, 'compare' => '='],
+                ['key' => 'educational_center_id', 'value' => $dept->education_center_id, 'compare' => '=']
+            ]
+        ]);
+        $dept->teacher_count = count($teachers);
+    }
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Edit Departments</h2>
+                <div class="management-table-wrapper">
+                    <table id="department-table" class="management-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Teacher Count</th>
+                                <th>Education Center ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            if (!empty($departments)) {
+                                foreach ($departments as $dept) {
+                                    echo "<tr data-dept-id='" . esc_attr($dept->department_id) . "'>
+                                        <td>" . esc_html($dept->department_id) . "</td>
+                                        <td>" . esc_html($dept->department_name) . "</td>
+                                        <td>" . esc_html($dept->teacher_count) . "</td>
+                                        <td>" . esc_html($dept->education_center_id) . "</td>
+                                        <td>
+                                            <button class='edit-department' data-dept-id='" . esc_attr($dept->department_id) . "' data-name='" . esc_attr($dept->department_name) . "' data-center-id='" . esc_attr($dept->education_center_id) . "'>Edit</button>
+                                        </td>
+                                    </tr>";
+                                }
+                            } else {
+                                echo '<tr><td colspan="5">No departments found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="actions">
+                    <a href="<?php echo admin_url('admin.php?page=su-p-department-management'); ?>" class="button">Back to Departments</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Department Modal -->
+    <div class="edu-modal" id="edit-department-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="edit-department-modal">×</span>
+            <h3>Edit Department</h3>
+            <form id="edit-department-form" method="POST">
+                <input type="hidden" id="edit-dept-id" name="department_id">
+                <div class="search-filters">
+                    <label for="edit-center-id">Education Center</label>
+                    <select id="edit-center-id" name="education_center_id" required>
+                        <option value="">Select Center</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title . " ($center_id)") . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-name">Department Name</label>
+                    <input type="text" id="edit-name" name="department_name" required>
+                </div>
+                <input type="hidden" name="action" value="su_p_update_department">
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_department_nonce'); ?>">
+                <button type="submit">Update Department</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+        function openModal(modalId) { $(modalId).css('display', 'flex'); }
+        function closeModal(modalId) { $(modalId).css('display', 'none'); }
+
+        // Edit Department
+        $(document).on('click', '.edit-department', function() {
+            const deptId = $(this).data('dept-id');
+            const deptName = $(this).data('name');
+            const centerId = $(this).data('center-id');
+
+            $('#edit-dept-id').val(deptId);
+            $('#edit-center-id').val(centerId);
+            $('#edit-name').val(deptName);
+            openModal('#edit-department-modal');
+        });
+
+        $('#edit-department-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const formData = $(this).serialize();
+            const deptId = $('#edit-dept-id').val();
+
+            $.ajax({
+                url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Department updated successfully');
+                        closeModal('#edit-department-modal');
+                        // Update table row dynamically
+                        const row = $(`tr[data-dept-id="${deptId}"]`);
+                        row.find('td:eq(1)').text($('#edit-name').val()); // Update Name
+                        row.find('td:eq(3)').text($('#edit-center-id').val()); // Update Education Center ID
+                        row.find('.edit-department').data('name', $('#edit-name').val()).attr('data-name', $('#edit-name').val());
+                        row.find('.edit-department').data('center-id', $('#edit-center-id').val()).attr('data-center-id', $('#edit-center-id').val());
+                    } else {
+                        alert('Error: ' + (response.data.message || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('AJAX error: ' + error);
+                }
+            });
+        });
+
+        $('.edu-modal-close').on('click', function() {
+            closeModal('#' + $(this).data('modal'));
+        });
+
+        $(document).on('click', '.edu-modal', function(event) {
+            if ($(event.target).hasClass('edu-modal')) {
+                closeModal('#' + event.target.id);
+            }
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+// Delete Department Function (Delete)
+// Delete Department Function (Delete)
+function render_su_p_delete_department() {
+    global $wpdb;
+
+    // Fetch all departments
+    $department_table = $wpdb->prefix . 'departments';
+    $departments = $wpdb->get_results("SELECT * FROM $department_table ORDER BY department_name");
+
+    // Enrich departments with teacher count
+    foreach ($departments as $dept) {
+        $teachers = get_posts([
+            'post_type' => 'teacher',
+            'numberposts' => -1,
+            'meta_query' => [
+                'relation' => 'AND',
+                ['key' => 'teacher_department', 'value' => $dept->department_name, 'compare' => '='],
+                ['key' => 'educational_center_id', 'value' => $dept->education_center_id, 'compare' => '=']
+            ]
+        ]);
+        $dept->teacher_count = count($teachers);
+    }
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Delete Departments</h2>
+                <div class="management-table-wrapper">
+                    <table id="department-table" class="management-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Teacher Count</th>
+                                <th>Education Center ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            if (!empty($departments)) {
+                                foreach ($departments as $dept) {
+                                    echo "<tr data-dept-id='" . esc_attr($dept->department_id) . "'>
+                                        <td>" . esc_html($dept->department_id) . "</td>
+                                        <td>" . esc_html($dept->department_name) . "</td>
+                                        <td>" . esc_html($dept->teacher_count) . "</td>
+                                        <td>" . esc_html($dept->education_center_id) . "</td>
+                                        <td>
+                                            <button class='delete-department' data-dept-id='" . esc_attr($dept->department_id) . "'>Delete</button>
+                                        </td>
+                                    </tr>";
+                                }
+                            } else {
+                                echo '<tr><td colspan="5">No departments found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="actions">
+                    <a href="<?php echo admin_url('admin.php?page=su-p-department-management'); ?>" class="button">Back to Departments</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        // Delete Department
+        $(document).on('click', '.delete-department', function() {
+            if (confirm('Are you sure you want to delete this department?')) {
+                showLoader();
+                const deptId = $(this).data('dept-id');
+
+                $.ajax({
+                    url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+                    type: 'POST',
+                    data: {
+                        action: 'su_p_delete_department',
+                        department_id: deptId,
+                        nonce: '<?php echo wp_create_nonce('su_p_department_nonce'); ?>'
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        hideLoader();
+                        if (response.success) {
+                            alert('Department deleted successfully');
+                            $(`tr[data-dept-id="${deptId}"]`).remove(); // Remove row from table
+                            if ($('#department-table tbody tr').length === 0) {
+                                $('#department-table tbody').html('<tr><td colspan="5">No departments found.</td></tr>');
+                            }
+                        } else {
+                            alert('Error: ' + (response.data.message || 'Unknown error'));
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        hideLoader();
+                        alert('AJAX error: ' + error);
+                    }
+                });
+            }
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+// AJAX Handlers
+
+// Add Department
+add_action('wp_ajax_su_p_add_department', 'su_p_add_department_callback');
+function su_p_add_department_callback() {
+    global $wpdb;
+    check_ajax_referer('su_p_department_nonce', 'nonce');
+
+    $education_center_id = sanitize_text_field($_POST['education_center_id']);
+    $department_name = sanitize_text_field($_POST['department_name']);
+    $table_name = $wpdb->prefix . 'departments';
+
+    if (empty($department_name) || empty($education_center_id)) {
+        wp_send_json_error(['message' => 'Department name and education center are required']);
+    } else {
+        $existing = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM $table_name WHERE department_name = %s AND education_center_id = %s",
+            $department_name, $education_center_id
+        ));
+        if ($existing > 0) {
+            wp_send_json_error(['message' => 'Department already exists for this education center']);
+        } else {
+            $inserted = $wpdb->insert(
+                $table_name,
+                ['department_name' => $department_name, 'education_center_id' => $education_center_id],
+                ['%s', '%s']
+            );
+            if ($inserted) {
+                wp_send_json_success(['message' => 'Department added successfully']);
+            } else {
+                wp_send_json_error(['message' => 'Failed to add department']);
+            }
+        }
+    }
+    wp_die();
+}
+
+// Update Department
+add_action('wp_ajax_su_p_update_department', 'su_p_update_department_callback');
+function su_p_update_department_callback() {
+    global $wpdb;
+    check_ajax_referer('su_p_department_nonce', 'nonce');
+
+    $department_id = intval($_POST['department_id']);
+    $education_center_id = sanitize_text_field($_POST['education_center_id']);
+    $department_name = sanitize_text_field($_POST['department_name']);
+    $table_name = $wpdb->prefix . 'departments';
+
+    if (empty($department_name) || empty($education_center_id)) {
+        wp_send_json_error(['message' => 'Department name and education center are required']);
+    } else {
+        $existing = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM $table_name WHERE department_name = %s AND education_center_id = %s AND department_id != %d",
+            $department_name, $education_center_id, $department_id
+        ));
+        if ($existing > 0) {
+            wp_send_json_error(['message' => 'Department name already exists for this education center']);
+        } else {
+            $updated = $wpdb->update(
+                $table_name,
+                ['department_name' => $department_name, 'education_center_id' => $education_center_id],
+                ['department_id' => $department_id],
+                ['%s', '%s'],
+                ['%d']
+            );
+            if ($updated !== false) {
+                wp_send_json_success(['message' => 'Department updated successfully']);
+            } else {
+                wp_send_json_error(['message' => 'Failed to update department']);
+            }
+        }
+    }
+    wp_die();
+}
+
+// Delete Department
+add_action('wp_ajax_su_p_delete_department', 'su_p_delete_department_callback');
+function su_p_delete_department_callback() {
+    global $wpdb;
+    check_ajax_referer('su_p_department_nonce', 'nonce');
+
+    $department_id = intval($_POST['department_id']);
+    $table_name = $wpdb->prefix . 'departments';
+
+    $deleted = $wpdb->delete(
+        $table_name,
+        ['department_id' => $department_id],
+        ['%d']
+    );
+
+    if ($deleted !== false && $deleted > 0) {
+        wp_send_json_success(['message' => 'Department deleted successfully']);
+    } else {
+        wp_send_json_error(['message' => 'Failed to delete department']);
+    }
+    wp_die();
+}
+
+//parents Main Parents Management Function (Read Only)
+function render_su_p_parents_management() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to view this dashboard.</p>';
+    }
+
+    global $wpdb;
+    $parents = get_posts([
+        'post_type' => 'parent',
+        'posts_per_page' => -1,
+        'orderby' => 'meta_value',
+        'meta_key' => 'parent_name',
+        'order' => 'ASC'
+    ]);
+
+    foreach ($parents as $parent) {
+        $parent->parent_id = get_post_meta($parent->ID, 'parent_id', true);
+        $parent->parent_name = get_post_meta($parent->ID, 'parent_name', true);
+        $parent->parent_email = get_post_meta($parent->ID, 'parent_email', true);
+        $parent->parent_phone_number = get_post_meta($parent->ID, 'parent_phone_number', true);
+        $parent->educational_center_id = get_post_meta($parent->ID, 'educational_center_id', true);
+        $parent->parent_student_ids = get_post_meta($parent->ID, 'parent_student_ids', true);
+    }
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Parents Management</h2>
+                <div class="management-table-wrapper">
+                    <table id="parents-table" class="management-table">
+                        <thead>
+                            <tr>
+                                <th>Parent ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone Number</th>
+                                <th>Education Center ID</th>
+                                <th>Student IDs</th>
+                            </tr>
+                        </thead>
+                        <tbody id="parents-tbody">
+                            <?php
+                            if (!empty($parents)) {
+                                foreach ($parents as $parent) {
+                                    echo "<tr data-parent-id='" . esc_attr($parent->ID) . "'>
+                                        <td>" . esc_html($parent->parent_id) . "</td>
+                                        <td>" . esc_html($parent->parent_name) . "</td>
+                                        <td>" . esc_html($parent->parent_email) . "</td>
+                                        <td>" . esc_html($parent->parent_phone_number) . "</td>
+                                        <td>" . esc_html($parent->educational_center_id) . "</td>
+                                        <td>" . esc_html($parent->parent_student_ids) . "</td>
+                                    </tr>";
+                                }
+                            } else {
+                                echo '<tr><td colspan="6">No parents found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="actions">
+                    <a href="<?php echo admin_url('admin.php?page=su-p-add-parents'); ?>" class="button">Add Parent</a>
+                    <a href="<?php echo admin_url('admin.php?page=su-p-edit-parents'); ?>" class="button">Edit Parents</a>
+                    <a href="<?php echo admin_url('admin.php?page=su-p-delete-parents'); ?>" class="button">Delete Parents</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Add Parent Function
+function render_su_p_add_parents() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to add parents.</p>';
+    }
+
+    global $wpdb;
+    $centers = get_posts([
+        'post_type' => 'educational-center',
+        'posts_per_page' => -1,
+        'post_status' => 'publish'
+    ]);
+
+    $parent_ids = [];
+    foreach ($centers as $center) {
+        $center_id = get_post_meta($center->ID, 'educational_center_id', true) ?: $center->ID;
+        $parent_ids[$center_id] = get_unique_id_for_role('parents', $center_id);
+    }
+
+    $add_message = '';
+    if (isset($_POST['su_p_add_parent']) && check_admin_referer('su_p_parent_add', 'nonce')) {
+        $education_center_id = sanitize_text_field($_POST['educational_center_id']);
+        $parent_id = get_unique_id_for_role('parents', $education_center_id);
+        $fields = [
+            'parent_student_ids' => sanitize_text_field($_POST['parent_student_ids']),
+            'parent_name' => sanitize_text_field($_POST['parent_name']),
+            'parent_email' => sanitize_email($_POST['parent_email']),
+            'parent_phone_number' => sanitize_text_field($_POST['parent_phone_number']),
+            'parent_gender' => sanitize_text_field($_POST['parent_gender']),
+            'parent_date_of_birth' => sanitize_text_field($_POST['parent_date_of_birth']),
+            'parent_religion' => sanitize_text_field($_POST['parent_religion']),
+            'parent_blood_group' => sanitize_text_field($_POST['parent_blood_group']),
+            'parent_height' => sanitize_text_field($_POST['parent_height']),
+            'parent_weight' => sanitize_text_field($_POST['parent_weight']),
+            'parent_current_address' => sanitize_textarea_field($_POST['parent_current_address']),
+            'parent_permanent_address' => sanitize_textarea_field($_POST['parent_permanent_address'])
+        ];
+
+        if (empty($education_center_id) || empty($fields['parent_name']) || empty($fields['parent_email'])) {
+            $add_message = '<div class="alert alert-danger">Required fields are missing.</div>';
+        } else {
+            $exists = get_posts([
+                'post_type' => 'parent',
+                'meta_query' => [
+                    ['key' => 'parent_id', 'value' => $parent_id],
+                    ['key' => 'educational_center_id', 'value' => $education_center_id]
+                ]
+            ]);
+
+            if (!empty($exists)) {
+                $add_message = '<div class="alert alert-danger">Parent ID already exists for this center.</div>';
+            } else {
+                $meta_input = array_merge(['parent_id' => $parent_id, 'educational_center_id' => $education_center_id], $fields);
+                if (!empty($_FILES['parent_profile_photo']['name'])) {
+                    $upload = wp_handle_upload($_FILES['parent_profile_photo'], ['test_form' => false]);
+                    if (isset($upload['error'])) {
+                        $add_message = '<div class="alert alert-danger">File upload error: ' . esc_html($upload['error']) . '</div>';
+                    } elseif (isset($upload['file'])) {
+                        $attachment_id = wp_insert_attachment([
+                            'post_mime_type' => $upload['type'],
+                            'post_title' => basename($upload['file']),
+                            'post_content' => '',
+                            'post_status' => 'inherit'
+                        ], $upload['file']);
+                        wp_generate_attachment_metadata($attachment_id, $upload['file']);
+                        $meta_input['parent_profile_photo'] = $attachment_id;
+                    }
+                }
+
+                $post_id = wp_insert_post([
+                    'post_title' => $parent_id,
+                    'post_type' => 'parent',
+                    'post_status' => 'publish',
+                    'meta_input' => $meta_input
+                ]);
+
+                if (is_wp_error($post_id)) {
+                    $add_message = '<div class="alert alert-danger">Error adding parent: ' . esc_html($post_id->get_error_message()) . '</div>';
+                } elseif ($post_id) {
+                    $add_message = '<div class="alert alert-success">Parent added successfully.</div>';
+                    wp_redirect($_SERVER['REQUEST_URI']);
+
+                } else {
+                    $add_message = '<div class="alert alert-danger">Failed to add parent.</div>';
+                }
+            }
+        }
+    }
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Add Parent</h2>
+                <div id="add-parent-form-container">
+                    <?php if ($add_message) echo $add_message; ?>
+                    <form id="add-parent-form" method="post" enctype="multipart/form-data">
+                        <div class="search-filters">
+                            <label>Parent ID</label>
+                            <input type="text" id="add-parent-id" name="parent_id" readonly>
+                        </div>
+                        <div class="search-filters">
+                            <label>Education Center</label>
+                            <select id="add-center-id" name="educational_center_id" required>
+                                <option value="">Select Center</option>
+                                <?php foreach ($centers as $center) {
+                                    $center_id = get_post_meta($center->ID, 'educational_center_id', true) ?: $center->ID;
+                                    echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title) . "</option>";
+                                } ?>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Student IDs</label>
+                            <input type="text" name="parent_student_ids">
+                        </div>
+                        <div class="search-filters">
+                            <label>Parent Name</label>
+                            <input type="text" name="parent_name" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Email</label>
+                            <input type="email" name="parent_email" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Phone Number</label>
+                            <input type="text" name="parent_phone_number">
+                        </div>
+                        <div class="search-filters">
+                            <label>Gender</label>
+                            <select name="parent_gender">
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Date of Birth</label>
+                            <input type="date" name="parent_date_of_birth">
+                        </div>
+                        <div class="search-filters">
+                            <label>Religion</label>
+                            <select name="parent_religion">
+                                <option value="">Select Religion</option>
+                                <option value="christianity">Christianity</option>
+                                <option value="islam">Islam</option>
+                                <option value="hinduism">Hinduism</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Blood Group</label>
+                            <select name="parent_blood_group">
+                                <option value="">Select Blood Group</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Height (cm)</label>
+                            <input type="number" name="parent_height" step="0.1">
+                        </div>
+                        <div class="search-filters">
+                            <label>Weight (kg)</label>
+                            <input type="number" name="parent_weight" step="0.1">
+                        </div>
+                        <div class="search-filters">
+                            <label>Current Address</label>
+                            <textarea name="parent_current_address"></textarea>
+                        </div>
+                        <div class="search-filters">
+                            <label>Permanent Address</label>
+                            <textarea name="parent_permanent_address"></textarea>
+                        </div>
+                        <div class="search-filters">
+                            <label>Profile Photo</label>
+                            <input type="file" name="parent_profile_photo">
+                        </div>
+                        <?php wp_nonce_field('su_p_parent_add', 'nonce'); ?>
+                        <input type="hidden" name="su_p_add_parent" value="1">
+                        <div class="actions">
+                            <button type="submit" class="button">Add Parent</button>
+                            <a href="<?php echo admin_url('admin.php?page=su-p-parents-management'); ?>" class="button">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loader = document.getElementById('edu-loader');
+        const parentIds = <?php echo json_encode($parent_ids); ?>;
+
+        function showLoader() { loader.style.display = 'block'; }
+        function hideLoader() { loader.style.display = 'none'; }
+
+        document.getElementById('add-center-id').addEventListener('change', function() {
+            const centerId = this.value;
+            document.getElementById('add-parent-id').value = centerId ? parentIds[centerId] : '';
+        });
+
+        document.getElementById('add-parent-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            this.submit();
+            setTimeout(() => {
+                <?php if (isset($_POST['su_p_add_parent']) && strpos($add_message, 'success') !== false) { ?>
+                    alert('Parent added successfully');
+                    window.location.href = '<?php echo admin_url('admin.php?page=su-p-parents-management'); ?>';
+                <?php } else { ?>
+                    hideLoader();
+                    <?php if ($add_message) { ?>
+                        document.getElementById('add-parent-form-container').innerHTML = '<?php echo addslashes($add_message); ?>' + document.getElementById('add-parent-form-container').innerHTML;
+                    <?php } ?>
+                <?php } ?>
+            }, 500);
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Edit Parent Function
+function render_su_p_edit_parents() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to edit parents.</p>';
+    }
+
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1, 'post_status' => 'publish']);
+    $parents = get_posts(['post_type' => 'parent', 'posts_per_page' => -1, 'orderby' => 'meta_value', 'meta_key' => 'parent_name', 'order' => 'ASC']);
+
+    foreach ($parents as $parent) {
+        $parent->parent_id = get_post_meta($parent->ID, 'parent_id', true);
+        $parent->parent_name = get_post_meta($parent->ID, 'parent_name', true);
+        $parent->parent_email = get_post_meta($parent->ID, 'parent_email', true);
+        $parent->parent_phone_number = get_post_meta($parent->ID, 'parent_phone_number', true);
+        $parent->educational_center_id = get_post_meta($parent->ID, 'educational_center_id', true);
+        $parent->parent_student_ids = get_post_meta($parent->ID, 'parent_student_ids', true);
+        $parent->parent_gender = get_post_meta($parent->ID, 'parent_gender', true);
+        $parent->parent_date_of_birth = get_post_meta($parent->ID, 'parent_date_of_birth', true);
+        $parent->parent_religion = get_post_meta($parent->ID, 'parent_religion', true);
+        $parent->parent_blood_group = get_post_meta($parent->ID, 'parent_blood_group', true);
+        $parent->parent_height = get_post_meta($parent->ID, 'parent_height', true);
+        $parent->parent_weight = get_post_meta($parent->ID, 'parent_weight', true);
+        $parent->parent_current_address = get_post_meta($parent->ID, 'parent_current_address', true);
+        $parent->parent_permanent_address = get_post_meta($parent->ID, 'parent_permanent_address', true);
+        $parent->parent_profile_photo = get_post_meta($parent->ID, 'parent_profile_photo', true);
+        $parent->profile_picture_url = $parent->parent_profile_photo ? wp_get_attachment_url($parent->parent_profile_photo) : '';
+    }
+
+    $edit_message = '';
+    if (isset($_POST['su_p_edit_parent']) && check_admin_referer('su_p_parent_edit', 'nonce')) {
+        $parent_post_id = intval($_POST['parent_post_id']);
+        $fields = [
+            'educational_center_id' => sanitize_text_field($_POST['educational_center_id']),
+            'parent_student_ids' => sanitize_text_field($_POST['parent_student_ids']),
+            'parent_name' => sanitize_text_field($_POST['parent_name']),
+            'parent_email' => sanitize_email($_POST['parent_email']),
+            'parent_phone_number' => sanitize_text_field($_POST['parent_phone_number']),
+            'parent_gender' => sanitize_text_field($_POST['parent_gender']),
+            'parent_date_of_birth' => sanitize_text_field($_POST['parent_date_of_birth']),
+            'parent_religion' => sanitize_text_field($_POST['parent_religion']),
+            'parent_blood_group' => sanitize_text_field($_POST['parent_blood_group']),
+            'parent_height' => sanitize_text_field($_POST['parent_height']),
+            'parent_weight' => sanitize_text_field($_POST['parent_weight']),
+            'parent_current_address' => sanitize_textarea_field($_POST['parent_current_address']),
+            'parent_permanent_address' => sanitize_textarea_field($_POST['parent_permanent_address'])
+        ];
+
+        if (empty($parent_post_id) || empty($fields['parent_name']) || empty($fields['parent_email'])) {
+            $edit_message = '<div class="alert alert-danger">Required fields are missing.</div>';
+        } else {
+            $updated = wp_update_post(['ID' => $parent_post_id, 'post_title' => get_post_meta($parent_post_id, 'parent_id', true)]);
+            if (is_wp_error($updated)) {
+                $edit_message = '<div class="alert alert-danger">Error updating parent: ' . esc_html($updated->get_error_message()) . '</div>';
+            } elseif ($updated !== 0) {
+                foreach ($fields as $key => $value) {
+                    update_post_meta($parent_post_id, $key, $value);
+                }
+                if (!empty($_FILES['parent_profile_photo']['name'])) {
+                    $upload = wp_handle_upload($_FILES['parent_profile_photo'], ['test_form' => false]);
+                    if (isset($upload['error'])) {
+                        $edit_message = '<div class="alert alert-danger">File upload error: ' . esc_html($upload['error']) . '</div>';
+                    } elseif (isset($upload['file'])) {
+                        $attachment_id = wp_insert_attachment([
+                            'post_mime_type' => $upload['type'],
+                            'post_title' => basename($upload['file']),
+                            'post_content' => '',
+                            'post_status' => 'inherit'
+                        ], $upload['file']);
+                        wp_generate_attachment_metadata($attachment_id, $upload['file']);
+                        update_post_meta($parent_post_id, 'parent_profile_photo', $attachment_id);
+                    }
+                }
+                $edit_message = '<div class="alert alert-success">Parent updated successfully.</div>';
+                wp_redirect($_SERVER['REQUEST_URI']);
+
+            } else {
+                $edit_message = '<div class="alert alert-danger">Failed to update parent.</div>';
+            }
+        }
+    }
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Edit Parents</h2>
+                <div class="management-table-wrapper">
+                    <table id="parents-table" class="management-table">
+                        <thead>
+                            <tr>
+                                <th>Parent ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone Number</th>
+                                <th>Education Center ID</th>
+                                <th>Student IDs</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="parents-tbody">
+                            <?php
+                            if (!empty($parents)) {
+                                foreach ($parents as $parent) {
+                                    echo "<tr data-parent-id='" . esc_attr($parent->ID) . "'>
+                                        <td>" . esc_html($parent->parent_id) . "</td>
+                                        <td>" . esc_html($parent->parent_name) . "</td>
+                                        <td>" . esc_html($parent->parent_email) . "</td>
+                                        <td>" . esc_html($parent->parent_phone_number) . "</td>
+                                        <td>" . esc_html($parent->educational_center_id) . "</td>
+                                        <td>" . esc_html($parent->parent_student_ids) . "</td>
+                                        <td>
+                                            <button class='button edit-parent-modal-btn'
+                                                data-parent-id='" . esc_attr($parent->ID) . "'
+                                                data-name='" . esc_attr($parent->parent_name) . "'
+                                                data-email='" . esc_attr($parent->parent_email) . "'
+                                                data-phone='" . esc_attr($parent->parent_phone_number) . "'
+                                                data-center-id='" . esc_attr($parent->educational_center_id) . "'
+                                                data-student-ids='" . esc_attr($parent->parent_student_ids) . "'
+                                                data-gender='" . esc_attr($parent->parent_gender) . "'
+                                                data-dob='" . esc_attr($parent->parent_date_of_birth) . "'
+                                                data-religion='" . esc_attr($parent->parent_religion) . "'
+                                                data-blood-group='" . esc_attr($parent->parent_blood_group) . "'
+                                                data-height='" . esc_attr($parent->parent_height) . "'
+                                                data-weight='" . esc_attr($parent->parent_weight) . "'
+                                                data-current-address='" . esc_attr($parent->parent_current_address) . "'
+                                                data-permanent-address='" . esc_attr($parent->parent_permanent_address) . "'
+                                                data-profile-photo='" . esc_attr($parent->profile_picture_url) . "'>Edit</button>
+                                        </td>
+                                    </tr>";
+                                }
+                            } else {
+                                echo '<tr><td colspan="7">No parents found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="actions">
+                    <a href="<?php echo admin_url('admin.php?page=su-p-parents-management'); ?>" class="button">Back to Parents</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="edu-modal" id="editParentModal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="editParentModal">×</span>
+            <h3>Edit Parent</h3>
+            <div id="edit-parent-form-container">
+                <?php if ($edit_message) echo $edit_message; ?>
+                <form id="edit-parent-form" method="post" enctype="multipart/form-data">
+                    <input type="hidden" id="edit-parent-post-id" name="parent_post_id">
+                    <div class="search-filters">
+                        <label>Parent ID</label>
+                        <input type="text" id="edit-parent-id" name="parent_id" readonly>
+                    </div>
+                    <div class="search-filters">
+                        <label>Education Center</label>
+                        <select id="edit-center-id" name="educational_center_id" required>
+                            <option value="">Select Center</option>
+                            <?php foreach ($centers as $center) {
+                                $center_id = get_post_meta($center->ID, 'educational_center_id', true) ?: $center->ID;
+                                echo "<option value='" . esc_attr($center_id) . "'>" . esc_html($center->post_title) . "</option>";
+                            } ?>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label>Student IDs</label>
+                        <input type="text" id="edit-student-ids" name="parent_student_ids">
+                    </div>
+                    <div class="search-filters">
+                        <label>Parent Name</label>
+                        <input type="text" id="edit-name" name="parent_name" required>
+                    </div>
+                    <div class="search-filters">
+                        <label>Email</label>
+                        <input type="email" id="edit-email" name="parent_email" required>
+                    </div>
+                    <div class="search-filters">
+                        <label>Phone Number</label>
+                        <input type="text" id="edit-phone" name="parent_phone_number">
+                    </div>
+                    <div class="search-filters">
+                        <label>Gender</label>
+                        <select id="edit-gender" name="parent_gender">
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label>Date of Birth</label>
+                        <input type="date" id="edit-dob" name="parent_date_of_birth">
+                    </div>
+                    <div class="search-filters">
+                        <label>Religion</label>
+                        <select id="edit-religion" name="parent_religion">
+                            <option value="">Select Religion</option>
+                            <option value="christianity">Christianity</option>
+                            <option value="islam">Islam</option>
+                            <option value="hinduism">Hinduism</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label>Blood Group</label>
+                        <select id="edit-blood-group" name="parent_blood_group">
+                            <option value="">Select Blood Group</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label>Height (cm)</label>
+                        <input type="number" id="edit-height" name="parent_height" step="0.1">
+                    </div>
+                    <div class="search-filters">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="edit-weight" name="parent_weight" step="0.1">
+                    </div>
+                    <div class="search-filters">
+                        <label>Current Address</label>
+                        <textarea id="edit-current-address" name="parent_current_address"></textarea>
+                    </div>
+                    <div class="search-filters">
+                        <label>Permanent Address</label>
+                        <textarea id="edit-permanent-address" name="parent_permanent_address"></textarea>
+                    </div>
+                    <div class="search-filters">
+                        <label>Profile Photo</label>
+                        <img id="edit-profile-photo-preview" style="max-width: 200px; display: none;">
+                        <input type="file" id="edit-profile-photo" name="parent_profile_photo">
+                    </div>
+                    <?php wp_nonce_field('su_p_parent_edit', 'nonce'); ?>
+                    <input type="hidden" name="su_p_edit_parent" value="1">
+                    <button type="submit" class="button">Update Parent</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loader = document.getElementById('edu-loader');
+        const modal = document.getElementById('editParentModal');
+        const tbody = document.getElementById('parents-tbody');
+
+        function showLoader() { loader.style.display = 'block'; }
+        function hideLoader() { loader.style.display = 'none'; }
+        function showModal() { modal.style.display = 'flex'; }
+        function hideModal() { modal.style.display = 'none'; }
+
+        tbody.addEventListener('click', function(e) {
+            if (e.target.classList.contains('edit-parent-modal-btn')) {
+                const btn = e.target;
+                document.getElementById('edit-parent-post-id').value = btn.dataset.parentId;
+                document.getElementById('edit-parent-id').value = btn.closest('tr').cells[0].textContent;
+                document.getElementById('edit-center-id').value = btn.dataset.centerId;
+                document.getElementById('edit-student-ids').value = btn.dataset.studentIds;
+                document.getElementById('edit-name').value = btn.dataset.name;
+                document.getElementById('edit-email').value = btn.dataset.email;
+                document.getElementById('edit-phone').value = btn.dataset.phone;
+                document.getElementById('edit-gender').value = btn.dataset.gender;
+                document.getElementById('edit-dob').value = btn.dataset.dob;
+                document.getElementById('edit-religion').value = btn.dataset.religion;
+                document.getElementById('edit-blood-group').value = btn.dataset.bloodGroup;
+                document.getElementById('edit-height').value = btn.dataset.height;
+                document.getElementById('edit-weight').value = btn.dataset.weight;
+                document.getElementById('edit-current-address').value = btn.dataset.currentAddress;
+                document.getElementById('edit-permanent-address').value = btn.dataset.permanentAddress;
+                const preview = document.getElementById('edit-profile-photo-preview');
+                if (btn.dataset.profilePhoto) {
+                    preview.src = btn.dataset.profilePhoto;
+                    preview.style.display = 'block';
+                } else {
+                    preview.style.display = 'none';
+                }
+                showModal();
+            }
+        });
+
+        document.querySelector('.edu-modal-close').addEventListener('click', hideModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(); });
+
+        document.getElementById('edit-profile-photo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('edit-profile-photo-preview').src = e.target.result;
+                    document.getElementById('edit-profile-photo-preview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('edit-parent-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            this.submit(); // Trigger PHP processing
+            setTimeout(() => {
+                <?php if (isset($_POST['su_p_edit_parent']) && strpos($edit_message, 'success') !== false) { ?>
+                    const formData = new FormData(this);
+                    const data = Object.fromEntries(formData);
+                    const row = document.querySelector(`tr[data-parent-id="${data.parent_post_id}"]`);
+                    row.cells[1].textContent = data.parent_name;
+                    row.cells[2].textContent = data.parent_email;
+                    row.cells[3].textContent = data.parent_phone_number;
+                    row.cells[4].textContent = data.educational_center_id;
+                    row.cells[5].textContent = data.parent_student_ids;
+                    const btn = row.querySelector('.edit-parent-modal-btn');
+                    btn.dataset.name = data.parent_name;
+                    btn.dataset.email = data.parent_email;
+                    btn.dataset.phone = data.parent_phone_number;
+                    btn.dataset.centerId = data.educational_center_id;
+                    btn.dataset.studentIds = data.parent_student_ids;
+                    btn.dataset.gender = data.parent_gender;
+                    btn.dataset.dob = data.parent_date_of_birth;
+                    btn.dataset.religion = data.parent_religion;
+                    btn.dataset.bloodGroup = data.parent_blood_group;
+                    btn.dataset.height = data.parent_height;
+                    btn.dataset.weight = data.parent_weight;
+                    btn.dataset.currentAddress = data.parent_current_address;
+                    btn.dataset.permanentAddress = data.parent_permanent_address;
+                    alert('Parent updated successfully');
+                    hideModal();
+                    hideLoader();
+                <?php } else { ?>
+                    hideLoader();
+                    <?php if ($edit_message) { ?>
+                        document.getElementById('edit-parent-form-container').innerHTML = '<?php echo addslashes($edit_message); ?>' + document.getElementById('edit-parent-form-container').innerHTML;
+                    <?php } ?>
+                <?php } ?>
+            }, 500);
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Delete Parent Function
+function render_su_p_delete_parents() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to delete parents.</p>';
+    }
+
+    global $wpdb;
+    $parents = get_posts(['post_type' => 'parent', 'posts_per_page' => -1, 'orderby' => 'meta_value', 'meta_key' => 'parent_name', 'order' => 'ASC']);
+
+    foreach ($parents as $parent) {
+        $parent->parent_id = get_post_meta($parent->ID, 'parent_id', true);
+        $parent->parent_name = get_post_meta($parent->ID, 'parent_name', true);
+        $parent->parent_email = get_post_meta($parent->ID, 'parent_email', true);
+        $parent->parent_phone_number = get_post_meta($parent->ID, 'parent_phone_number', true);
+        $parent->educational_center_id = get_post_meta($parent->ID, 'educational_center_id', true);
+        $parent->parent_student_ids = get_post_meta($parent->ID, 'parent_student_ids', true);
+    }
+
+    $delete_message = '';
+    if (isset($_POST['su_p_delete_parent']) && check_admin_referer('su_p_parent_delete', 'nonce')) {
+        $parent_post_id = intval($_POST['parent_post_id']);
+        if (empty($parent_post_id)) {
+            $delete_message = '<div class="alert alert-danger">Invalid parent ID.</div>';
+        } else {
+            $result = wp_delete_post($parent_post_id, true);
+            if ($result === false) {
+                error_log("Failed to delete parent post ID: $parent_post_id. User: " . get_current_user_id());
+                $delete_message = '<div class="alert alert-danger">Failed to delete parent. Check debug.log.</div>';
+            } else {
+                $delete_message = '<div class="alert alert-success">Parent deleted successfully.</div>';
+            }
+        }
+        wp_redirect($_SERVER['REQUEST_URI']);
+
+    }
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Delete Parents</h2>
+                <div class="management-table-wrapper">
+                    <table id="parents-table" class="management-table">
+                        <thead>
+                            <tr>
+                                <th>Parent ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone Number</th>
+                                <th>Education Center ID</th>
+                                <th>Student IDs</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="parents-tbody">
+                            <?php
+                            if (!empty($parents)) {
+                                foreach ($parents as $parent) {
+                                    echo "<tr data-parent-id='" . esc_attr($parent->ID) . "'>
+                                        <td>" . esc_html($parent->parent_id) . "</td>
+                                        <td>" . esc_html($parent->parent_name) . "</td>
+                                        <td>" . esc_html($parent->parent_email) . "</td>
+                                        <td>" . esc_html($parent->parent_phone_number) . "</td>
+                                        <td>" . esc_html($parent->educational_center_id) . "</td>
+                                        <td>" . esc_html($parent->parent_student_ids) . "</td>
+                                        <td>
+                                            <button class='button delete-parent-modal-btn' data-parent-id='" . esc_attr($parent->ID) . "'>Delete</button>
+                                        </td>
+                                    </tr>";
+                                }
+                            } else {
+                                echo '<tr><td colspan="7">No parents found.</td></tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="actions">
+                    <a href="<?php echo admin_url('admin.php?page=su-p-parents-management'); ?>" class="button">Back to Parents</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="edu-modal" id="deleteParentModal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="deleteParentModal">×</span>
+            <h3>Confirm Deletion</h3>
+            <div id="delete-parent-container">
+                <?php if ($delete_message) echo $delete_message; ?>
+                <p id="delete-parent-text"></p>
+                <form id="delete-parent-form" method="post">
+                    <input type="hidden" id="delete-parent-id" name="parent_post_id">
+                    <?php wp_nonce_field('su_p_parent_delete', 'nonce'); ?>
+                    <input type="hidden" name="su_p_delete_parent" value="1">
+                    <button type="submit" class="button">Delete</button>
+                    <button type="button" class="button cancel-delete" onclick="document.getElementById('deleteParentModal').style.display='none'">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loader = document.getElementById('edu-loader');
+        const modal = document.getElementById('deleteParentModal');
+        const tbody = document.getElementById('parents-tbody');
+
+        function showLoader() { loader.style.display = 'block'; }
+        function hideLoader() { loader.style.display = 'none'; }
+        function showModal() { modal.style.display = 'flex'; }
+        function hideModal() { modal.style.display = 'none'; }
+
+        tbody.addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-parent-modal-btn')) {
+                const parentId = e.target.getAttribute('data-parent-id');
+                document.getElementById('delete-parent-id').value = parentId;
+                document.getElementById('delete-parent-text').textContent = `Are you sure you want to delete parent "${e.target.closest('tr').cells[0].textContent}"?`;
+                showModal();
+            }
+        });
+
+        document.querySelector('.edu-modal-close').addEventListener('click', hideModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(); });
+
+        document.getElementById('delete-parent-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const parentId = document.getElementById('delete-parent-id').value;
+
+            // Simulate form submission without reloading (inline PHP check)
+            const form = this;
+            form.submit(); // Trigger PHP processing
+
+            setTimeout(() => {
+                <?php if (isset($_POST['su_p_delete_parent']) && strpos($delete_message, 'success') !== false) { ?>
+                    const row = document.querySelector(`tr[data-parent-id="${parentId}"]`);
+                    if (row) {
+                        row.remove();
+                        if (tbody.children.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="7">No parents found.</td></tr>';
+                        }
+                        alert('Parent deleted successfully');
+                    }
+                    hideModal();
+                    hideLoader();
+                <?php } else { ?>
+                    hideLoader();
+                    <?php if ($delete_message) { ?>
+                        document.getElementById('delete-parent-container').innerHTML = '<?php echo addslashes($delete_message); ?>' + document.getElementById('delete-parent-container').innerHTML;
+                    <?php } ?>
+                <?php } ?>
+            }, 500);
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+//invetory
+// Validation Helper Function
+function validate_inventory_data($item_id, $name, $category, $quantity, $status, $low_stock_threshold, $education_center_id) {
+    if (empty($item_id) || empty($name) || empty($category) || $quantity < 0 || empty($status) || $low_stock_threshold < 1 || empty($education_center_id)) {
+        return 'Invalid input data: All fields are required, and quantity/low stock must be valid.';
+    }
+    return true;
+}
+
+// Main Inventory Management Function (Read)
+function render_su_p_inventory_management() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to view this dashboard.</p>';
+    }
+
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1, 'post_status' => 'publish']);
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Inventory Management</h2>
+                <div class="edu-students-actions" style="margin-bottom: 20px;">
+                    <a href="<?php echo admin_url('admin.php?page=su-p-add-inventory'); ?>" class="button edu-button-primary">Add New Item</a>
+                    <input type="text" id="name-search" class="edu-search-input" placeholder="Search by Item Name..." style="margin-left: 20px; padding: 8px; width: 300px;">
+                    <select id="center-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Educational Centers</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                        }
+                        ?>
+                    </select>
+                    <select id="category-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Categories</option>
+                        <option value="Equipment">Equipment</option>
+                        <option value="Stationery">Stationery</option>
+                        <option value="Furniture">Furniture</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <select id="status-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Statuses</option>
+                        <option value="Available">Available</option>
+                        <option value="Issued">Issued</option>
+                        <option value="Damaged">Damaged</option>
+                    </select>
+                </div>
+                <div class="edu-pagination" style="margin: 20px 0;">
+                    <label for="items-per-page">Show:</label>
+                    <select id="items-per-page" class="edu-select" style="margin-right: 20px;">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                    <button class="edu-button edu-button-nav" id="prev-page" disabled>Previous</button>
+                    <span id="page-info" style="margin: 0 10px;"></span>
+                    <button class="edu-button edu-button-nav" id="next-page">Next</button>
+                </div>
+                <div class="management-table-wrapper">
+                    <div class="export-tools" id="export-tools" style="margin-bottom: 10px;"></div>
+                    <table id="inventory-table" class="management-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                                <th>Status</th>
+                                <th>Low Stock</th>
+                                <th>Center ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-tbody">
+                            <!-- Populated via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="actions">
+                    <button class="button" id="refresh-table">Refresh</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        let currentPage = 1;
+        let perPage = 10;
+        let searchQuery = '';
+        let centerFilter = '';
+        let categoryFilter = '';
+        let statusFilter = '';
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        function getTableData() {
+            const table = $('#inventory-table')[0];
+            if (!table) return [];
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim()).slice(0, -1);
+            const rows = Array.from(table.querySelectorAll('tbody tr')).map(row => {
+                const cells = Array.from(row.querySelectorAll('td')).slice(0, -1);
+                return cells.map(td => td.textContent.trim());
+            });
+            return [headers, ...rows];
+        }
+
+        function exportToCSV() {
+            const data = getTableData();
+            const csv = data.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `inventory_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+        }
+
+        function exportToExcel() {
+            if (!window.XLSX) { console.error('XLSX library not loaded'); return; }
+            const data = getTableData();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
+            XLSX.writeFile(wb, `inventory_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+            const data = getTableData();
+            const instituteName = 'Istituto';
+            const instituteLogo = '<?php echo esc_js(plugin_dir_url(__DIR__) . 'logo-instituto.jpg'); ?>';
+            const pageWidth = doc.internal.pageSize.width;
+            const margin = 10;
+            const borderColor = [70, 131, 180];
+
+            doc.setDrawColor(...borderColor);
+            doc.setLineWidth(1);
+            doc.rect(margin, margin, pageWidth - 2 * margin, doc.internal.pageSize.height - 2 * margin);
+            if (instituteLogo) {
+                try { doc.addImage(instituteLogo, 'JPEG', (pageWidth - 24) / 2, 15, 24, 24); } catch (e) {}
+            }
+            doc.setFontSize(18);
+            doc.setTextColor(...borderColor);
+            doc.text(instituteName.toUpperCase(), pageWidth / 2, 45, { align: 'center' });
+            doc.setFontSize(12);
+            doc.setTextColor(102);
+            doc.text('Inventory List', pageWidth / 2, 55, { align: 'center' });
+            doc.setDrawColor(...borderColor);
+            doc.line(margin + 5, 60, pageWidth - margin - 5, 60);
+
+            const details = [['Date', new Date().toLocaleDateString()], ['Total Items', String(data.length - 1)]];
+            let y = 70;
+            details.forEach(([label, value]) => {
+                doc.setFillColor(245, 245, 245);
+                doc.rect(margin + 5, y, 50, 6, 'F');
+                doc.setTextColor(...borderColor);
+                doc.setFont('helvetica', 'bold');
+                doc.text(label, margin + 7, y + 4);
+                doc.setTextColor(51);
+                doc.setFont('helvetica', 'normal');
+                doc.text(String(value), margin + 60, y + 4);
+                y += 6;
+            });
+
+            if (typeof doc.autoTable === 'function' && data.length > 1) {
+                doc.autoTable({
+                    startY: y + 10,
+                    head: [data[0]],
+                    body: data.slice(1),
+                    theme: 'striped',
+                    styles: { fontSize: 11, cellPadding: 2, overflow: 'linebreak', halign: 'center' },
+                    headStyles: { fillColor: borderColor, textColor: [255, 255, 255], fontStyle: 'bold' }
+                });
+                const finalY = doc.lastAutoTable.finalY || y + 10;
+                doc.setFontSize(9);
+                doc.setTextColor(102);
+                doc.text(`Generated by Instituto on ${new Date().toISOString().slice(0,10)}`, pageWidth / 2, finalY + 20, { align: 'center' });
+                doc.save(`inventory_${new Date().toISOString().slice(0,10)}.pdf`);
+            }
+        }
+
+        function copyToClipboard() {
+            const data = getTableData();
+            const text = data.map(row => row.join('\t')).join('\n');
+            navigator.clipboard.writeText(text).then(() => alert('Inventory copied to clipboard!'));
+        }
+
+        function printInventory() {
+            const printWindow = window.open('', '_blank');
+            const data = getTableData();
+            const instituteName = 'Istituto';
+            const instituteLogo = '<?php echo esc_js(plugin_dir_url(__DIR__) . 'logo-instituto.jpg'); ?>';
+            printWindow.document.write(`
+                <html>
+                <head><title>Inventory List</title>
+                <style>
+                    @media print {
+                        body { font-family: Helvetica, sans-serif; margin: 10mm; width: 190mm; }
+                        .page { border: 4px solid #4683b4; padding: 5mm; box-sizing: border-box; width: 100%; max-width: 190mm; }
+                        .header { text-align: center; border-bottom: 2px solid #4683b4; margin-bottom: 10mm; }
+                        .header img { width: 60px; height: 60px; margin-bottom: 5mm; }
+                        .header h1 { font-size: 18pt; color: #4683b4; margin: 0; text-transform: uppercase; }
+                        .header .subtitle { font-size: 12pt; color: #666; margin: 0; }
+                        table { width: 100%; border-collapse: collapse; margin: 10mm 0; table-layout: fixed; }
+                        th, td { border: 1px solid #e5e5e5; padding: 8px; text-align: center; word-wrap: break-word; font-size: 10pt; }
+                        th { background: #4683b4; color: white; font-weight: bold; }
+                        tr:nth-child(even) { background: #f9f9f9; }
+                        .footer { text-align: center; font-size: 9pt; color: #666; margin-top: 10mm; }
+                        @page { size: A4; margin: 10mm; }
+                    }
+                </style></head>
+                <body>
+                    <div class="page">
+                        <div class="header">
+                            ${instituteLogo ? `<img src="${instituteLogo}" alt="Logo" onerror="this.style.display='none';this.nextSibling.style.display='block';"><p style="display:none;">No logo available</p>` : '<p>No logo available</p>'}
+                            <h1>${instituteName.toUpperCase()}</h1>
+                            <p class="subtitle">Inventory List</p>
+                        </div>
+                        <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                        <p><strong>Total Items:</strong> ${data.length - 1}</p>
+                        <table>
+                            <thead><tr>${data[0].map(header => `<th>${header}</th>`).join('')}</tr></thead>
+                            <tbody>${data.slice(1).map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>
+                        </table>
+                        <div class="footer">
+                            <p>Generated by Instituto on ${new Date().toISOString().slice(0,10)}</p>
+                        </div>
+                    </div>
+                </body></html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+        }
+
+        function setupExportButtons() {
+            const tools = $('#export-tools');
+            tools.html(`
+                <button class="export-btn export-csv" aria-label="Export to CSV"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
+                <button class="export-btn export-pdf" aria-label="Export to PDF"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
+                <button class="export-btn export-excel" aria-label="Export to Excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
+                <button class="export-btn export-copy" aria-label="Copy to Clipboard"><i class="fas fa-copy"></i><span class="tooltip">Copy to Clipboard</span></button>
+                <button class="export-btn export-print" aria-label="Print"><i class="fas fa-print"></i><span class="tooltip">Print</span></button>
+            `);
+            tools.find('.export-csv').on('click', exportToCSV);
+            tools.find('.export-pdf').on('click', generatePDF);
+            tools.find('.export-excel').on('click', exportToExcel);
+            tools.find('.export-copy').on('click', copyToClipboard);
+            tools.find('.export-print').on('click', printInventory);
+        }
+
+        function loadInventory(page, limit, name, center, category, status) {
+            showLoader();
+            $.post({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                data: {
+                    action: 'su_p_fetch_inventory',
+                    page: page,
+                    per_page: limit,
+                    name_search: name,
+                    center_filter: center,
+                    category_filter: category,
+                    status_filter: status,
+                    nonce: '<?php echo wp_create_nonce('su_p_inventory_nonce'); ?>'
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        const items = response.data.items;
+                        const total = response.data.total;
+                        let html = '';
+                        items.forEach(item => {
+                            const lowStock = item.quantity <= item.low_stock_threshold ? '<span class="badge bg-danger">Low</span>' : '<span class="badge bg-success">OK</span>';
+                            html += `
+                                <tr data-item-id="${item.item_id}">
+                                    <td>${item.item_id}</td>
+                                    <td>${item.name}</td>
+                                    <td>${item.category}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>${item.status}</td>
+                                    <td>${lowStock}</td>
+                                    <td>${item.education_center_id}</td>
+                                    <td>
+                                        <button class="edu-button edu-button-edit" data-item-id="${item.item_id}">Edit</button>
+                                        <button class="edu-button edu-button-delete" data-item-id="${item.item_id}">Delete</button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        $('#inventory-tbody').html(html);
+                        setupExportButtons();
+
+                        const totalPages = Math.ceil(total / limit);
+                        $('#page-info').text(`Page ${page} of ${totalPages}`);
+                        $('#prev-page').prop('disabled', page === 1);
+                        $('#next-page').prop('disabled', page === totalPages);
+
+                        $('.edu-button-edit').on('click', function() {
+                            const itemId = $(this).data('item-id');
+                            showEditModal(itemId);
+                        });
+                        $('.edu-button-delete').on('click', function() {
+                            const itemId = $(this).data('item-id');
+                            showDeleteModal(itemId);
+                        });
+                    } else {
+                        $('#inventory-tbody').html('<tr><td colspan="8">No inventory items found.</td></tr>');
+                        $('#export-tools').html('');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    console.error('Error fetching inventory:', error);
+                    $('#inventory-tbody').html('<tr><td colspan="8">Error loading inventory.</td></tr>');
+                    $('#export-tools').html('');
+                }
+            });
+        }
+
+        function showEditModal(itemId) {
+            $('body').append('<div id="edit-modal-placeholder"></div>');
+            $.post({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                data: {
+                    action: 'su_p_get_inventory_edit_form',
+                    item_id: itemId,
+                    nonce: '<?php echo wp_create_nonce('su_p_inventory_nonce'); ?>'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#edit-modal-placeholder').html(response.data);
+                    } else {
+                        alert('Failed to load edit form: ' + response.data.message);
+                    }
+                },
+                error: function() {
+                    alert('Error loading edit form.');
+                }
+            });
+        }
+
+        function showDeleteModal(itemId) {
+            $('body').append('<div id="delete-modal-placeholder"></div>');
+            $.post({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                data: {
+                    action: 'su_p_get_inventory_delete_form',
+                    item_id: itemId,
+                    nonce: '<?php echo wp_create_nonce('su_p_inventory_nonce'); ?>'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#delete-modal-placeholder').html(response.data);
+                    } else {
+                        alert('Failed to load delete form: ' + response.data.message);
+                    }
+                },
+                error: function() {
+                    alert('Error loading delete form.');
+                }
+            });
+        }
+
+        loadInventory(currentPage, perPage, searchQuery, centerFilter, categoryFilter, statusFilter);
+
+        $('#name-search').on('input', function() {
+            searchQuery = $(this).val();
+            currentPage = 1;
+            loadInventory(currentPage, perPage, searchQuery, centerFilter, categoryFilter, statusFilter);
+        });
+
+        $('#center-filter').on('change', function() {
+            centerFilter = $(this).val();
+            currentPage = 1;
+            loadInventory(currentPage, perPage, searchQuery, centerFilter, categoryFilter, statusFilter);
+        });
+
+        $('#category-filter').on('change', function() {
+            categoryFilter = $(this).val();
+            currentPage = 1;
+            loadInventory(currentPage, perPage, searchQuery, centerFilter, categoryFilter, statusFilter);
+        });
+
+        $('#status-filter').on('change', function() {
+            statusFilter = $(this).val();
+            currentPage = 1;
+            loadInventory(currentPage, perPage, searchQuery, centerFilter, categoryFilter, statusFilter);
+        });
+
+        $('#items-per-page').on('change', function() {
+            perPage = parseInt($(this).val());
+            currentPage = 1;
+            loadInventory(currentPage, perPage, searchQuery, centerFilter, categoryFilter, statusFilter);
+        });
+
+        $('#next-page').on('click', function() {
+            currentPage++;
+            loadInventory(currentPage, perPage, searchQuery, centerFilter, categoryFilter, statusFilter);
+        });
+
+        $('#prev-page').on('click', function() {
+            currentPage--;
+            loadInventory(currentPage, perPage, searchQuery, centerFilter, categoryFilter, statusFilter);
+        });
+
+        $('#refresh-table').on('click', function() {
+            currentPage = 1;
+            searchQuery = '';
+            centerFilter = '';
+            categoryFilter = '';
+            statusFilter = '';
+            $('#name-search').val('');
+            $('#center-filter').val('');
+            $('#category-filter').val('');
+            $('#status-filter').val('');
+            loadInventory(currentPage, perPage, searchQuery, centerFilter, categoryFilter, statusFilter);
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Add Inventory Function (Create)
+function render_su_p_add_inventory() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to add inventory items.</p>';
+    }
+
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1, 'post_status' => 'publish']);
+    $add_message = '';
+
+    if (isset($_POST['su_p_add_inventory']) && check_admin_referer('su_p_inventory_add', 'nonce')) {
+        $item_id = sanitize_text_field($_POST['item_id']);
+        $name = sanitize_text_field($_POST['name']);
+        $category = sanitize_text_field($_POST['category']);
+        $quantity = intval($_POST['quantity']);
+        $status = sanitize_text_field($_POST['status']);
+        $low_stock_threshold = intval($_POST['low_stock_threshold']);
+        $education_center_id = sanitize_text_field($_POST['education_center_id']);
+
+        $validation = validate_inventory_data($item_id, $name, $category, $quantity, $status, $low_stock_threshold, $education_center_id);
+        if ($validation !== true) {
+            $add_message = '<div class="alert alert-danger">' . esc_html($validation) . '</div>';
+        } else {
+            $table_name = $wpdb->prefix . 'inventory';
+            $exists = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE item_id = %s", $item_id));
+            if ($exists) {
+                $add_message = '<div class="alert alert-danger">Item ID already exists.</div>';
+            } else {
+                $result = $wpdb->insert(
+                    $table_name,
+                    [
+                        'item_id' => $item_id,
+                        'name' => $name,
+                        'category' => $category,
+                        'quantity' => $quantity,
+                        'status' => $status,
+                        'low_stock_threshold' => $low_stock_threshold,
+                        'education_center_id' => $education_center_id
+                    ],
+                    ['%s', '%s', '%s', '%d', '%s', '%d', '%s']
+                );
+                if ($result !== false) {
+                    $add_message = '<div class="alert alert-success">Inventory item added successfully.</div>';
+                } else {
+                    $add_message = '<div class="alert alert-danger">Failed to add item: ' . esc_html($wpdb->last_error) . '</div>';
+                }
+            }
+        }
+    }
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Add Inventory Item</h2>
+                <div id="add-inventory-form-container">
+                    <?php if ($add_message) echo $add_message; ?>
+                    <form id="add-inventory-form" method="post">
+                        <div class="search-filters">
+                            <label>Education Center</label>
+                            <select id="add-center-id" name="education_center_id" required>
+                                <option value="">Select Center</option>
+                                <?php
+                                foreach ($centers as $center) {
+                                    $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                                    echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Item ID</label>
+                            <input type="text" id="add-item-id" name="item_id" readonly required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Name</label>
+                            <input type="text" name="name" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Category</label>
+                            <select name="category" required>
+                                <option value="">Select Category</option>
+                                <option value="Equipment">Equipment</option>
+                                <option value="Stationery">Stationery</option>
+                                <option value="Furniture">Furniture</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Quantity</label>
+                            <input type="number" name="quantity" min="0" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>Status</label>
+                            <select name="status" required>
+                                <option value="">Select Status</option>
+                                <option value="Available">Available</option>
+                                <option value="Issued">Issued</option>
+                                <option value="Damaged">Damaged</option>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Low Stock Threshold</label>
+                            <input type="number" name="low_stock_threshold" min="1" value="5" required>
+                        </div>
+                        <?php wp_nonce_field('su_p_inventory_add', 'nonce'); ?>
+                        <input type="hidden" name="su_p_add_inventory" value="1">
+                        <div class="actions">
+                            <button type="submit" class="button edu-button-primary">Add Item</button>
+                            <a href="<?php echo admin_url('admin.php?page=su-p-inventory-management'); ?>" class="button">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        $('#add-center-id').on('change', function() {
+            const centerId = $(this).val();
+            if (centerId) {
+                showLoader();
+                $.post({
+                    url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                    data: {
+                        action: 'su_p_generate_inventory_id',
+                        center_id: centerId,
+                        nonce: '<?php echo wp_create_nonce('su_p_inventory_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        hideLoader();
+                        if (response.success) {
+                            $('#add-item-id').val(response.data.item_id);
+                        } else {
+                            $('#add-item-id').val('');
+                            alert('Failed to generate Item ID');
+                        }
+                    },
+                    error: function() {
+                        hideLoader();
+                        $('#add-item-id').val('');
+                        alert('Error generating Item ID');
+                    }
+                });
+            } else {
+                $('#add-item-id').val('');
+            }
+        });
+
+        $('#add-inventory-form').on('submit', function(e) {
+            showLoader();
+            setTimeout(() => {
+                <?php if (isset($_POST['su_p_add_inventory']) && strpos($add_message, 'success') !== false) { ?>
+                    alert('Inventory item added successfully');
+                    window.location.href = '<?php echo admin_url('admin.php?page=su-p-inventory-management'); ?>';
+                <?php } else { ?>
+                    hideLoader();
+                    <?php if ($add_message) { ?>
+                        $('#add-inventory-form-container').prepend('<?php echo addslashes($add_message); ?>');
+                    <?php } ?>
+                <?php } ?>
+            }, 500);
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Edit Inventory Function (Update)
+function render_su_p_edit_inventory() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to edit inventory items.</p>';
+    }
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Edit Inventory Items</h2>
+                <p>Select an item from the main management page to edit.</p>
+                <div class="actions">
+                    <a href="<?php echo admin_url('admin.php?page=su-p-inventory-management'); ?>" class="button">Back to Inventory</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Delete Inventory Function (Delete)
+function render_su_p_delete_inventory() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to delete inventory items.</p>';
+    }
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Delete Inventory Items</h2>
+                <p>Select an item from the main management page to delete.</p>
+                <div class="actions">
+                    <a href="<?php echo admin_url('admin.php?page=su-p-inventory-management'); ?>" class="button">Back to Inventory</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// View Inventory Function
+function render_su_p_view_inventory() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to view inventory items.</p>';
+    }
+
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1, 'post_status' => 'publish']);
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>View Inventory Items</h2>
+                <div class="edu-students-actions" style="margin-bottom: 20px;">
+                    <input type="text" id="name-search" class="edu-search-input" placeholder="Search by Item Name..." style="padding: 8px; width: 300px;">
+                    <select id="center-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Educational Centers</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                        }
+                        ?>
+                    </select>
+                    <select id="category-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Categories</option>
+                        <option value="Equipment">Equipment</option>
+                        <option value="Stationery">Stationery</option>
+                        <option value="Furniture">Furniture</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <select id="status-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Statuses</option>
+                        <option value="Available">Available</option>
+                        <option value="Issued">Issued</option>
+                        <option value="Damaged">Damaged</option>
+                    </select>
+                </div>
+                <div class="management-table-wrapper">
+                    <table id="inventory-table" class="management-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                                <th>Status</th>
+                                <th>Low Stock</th>
+                                <th>Center ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-tbody">
+                            <!-- Populated via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        let searchQuery = '';
+        let centerFilter = '';
+        let categoryFilter = '';
+        let statusFilter = '';
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        function loadInventory(name, center, category, status) {
+            showLoader();
+            $.post({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                data: {
+                    action: 'su_p_fetch_inventory',
+                    page: 1,
+                    per_page: -1, // Fetch all for view page
+                    name_search: name,
+                    center_filter: center,
+                    category_filter: category,
+                    status_filter: status,
+                    nonce: '<?php echo wp_create_nonce('su_p_inventory_nonce'); ?>'
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        const items = response.data.items;
+                        let html = '';
+                        items.forEach(item => {
+                            const lowStock = item.quantity <= item.low_stock_threshold ? '<span class="badge bg-danger">Low</span>' : '<span class="badge bg-success">OK</span>';
+                            html += `
+                                <tr>
+                                    <td>${item.item_id}</td>
+                                    <td>${item.name}</td>
+                                    <td>${item.category}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>${item.status}</td>
+                                    <td>${lowStock}</td>
+                                    <td>${item.education_center_id}</td>
+                                </tr>
+                            `;
+                        });
+                        $('#inventory-tbody').html(html);
+                    } else {
+                        $('#inventory-tbody').html('<tr><td colspan="7">No inventory items found.</td></tr>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    console.error('Error fetching inventory:', error);
+                    $('#inventory-tbody').html('<tr><td colspan="7">Error loading inventory.</td></tr>');
+                }
+            });
+        }
+
+        loadInventory(searchQuery, centerFilter, categoryFilter, statusFilter);
+
+        $('#name-search').on('input', function() {
+            searchQuery = $(this).val();
+            loadInventory(searchQuery, centerFilter, categoryFilter, statusFilter);
+        });
+
+        $('#center-filter').on('change', function() {
+            centerFilter = $(this).val();
+            loadInventory(searchQuery, centerFilter, categoryFilter, statusFilter);
+        });
+
+        $('#category-filter').on('change', function() {
+            categoryFilter = $(this).val();
+            loadInventory(searchQuery, centerFilter, categoryFilter, statusFilter);
+        });
+
+        $('#status-filter').on('change', function() {
+            statusFilter = $(this).val();
+            loadInventory(searchQuery, centerFilter, categoryFilter, statusFilter);
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// AJAX Handlers
+add_action('wp_ajax_su_p_fetch_inventory', 'su_p_fetch_inventory');
+function su_p_fetch_inventory() {
+    check_ajax_referer('su_p_inventory_nonce', 'nonce');
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'inventory';
+    $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
+    $per_page = isset($_POST['per_page']) ? intval($_POST['per_page']) : 10;
+    $name_search = isset($_POST['name_search']) ? sanitize_text_field($_POST['name_search']) : '';
+    $center_filter = isset($_POST['center_filter']) ? sanitize_text_field($_POST['center_filter']) : '';
+    $category_filter = isset($_POST['category_filter']) ? sanitize_text_field($_POST['category_filter']) : '';
+    $status_filter = isset($_POST['status_filter']) ? sanitize_text_field($_POST['status_filter']) : '';
+
+    $query = "SELECT * FROM $table_name WHERE 1=1";
+    $count_query = "SELECT COUNT(*) FROM $table_name WHERE 1=1";
+    $args = [];
+
+    if ($name_search) {
+        $query .= " AND name LIKE %s";
+        $count_query .= " AND name LIKE %s";
+        $args[] = '%' . $wpdb->esc_like($name_search) . '%';
+    }
+    if ($center_filter) {
+        $query .= " AND education_center_id = %s";
+        $count_query .= " AND education_center_id = %s";
+        $args[] = $center_filter;
+    }
+    if ($category_filter) {
+        $query .= " AND category = %s";
+        $count_query .= " AND category = %s";
+        $args[] = $category_filter;
+    }
+    if ($status_filter) {
+        $query .= " AND status = %s";
+        $count_query .= " AND status = %s";
+        $args[] = $status_filter;
+    }
+
+    $query .= " ORDER BY item_id";
+    if ($per_page > 0) {
+        $offset = ($page - 1) * $per_page;
+        $query .= " LIMIT %d OFFSET %d";
+        $args[] = $per_page;
+        $args[] = $offset;
+    }
+
+    $items = !empty($args) ? $wpdb->get_results($wpdb->prepare($query, $args), ARRAY_A) : $wpdb->get_results($query, ARRAY_A);
+    $total = !empty($args) ? $wpdb->get_var($wpdb->prepare($count_query, array_slice($args, 0, -2))) : $wpdb->get_var($count_query);
+
+    wp_send_json_success(['items' => $items, 'total' => $total]);
+}
+
+add_action('wp_ajax_su_p_generate_inventory_id', 'su_p_generate_inventory_id');
+function su_p_generate_inventory_id() {
+    check_ajax_referer('su_p_inventory_nonce', 'nonce');
+    $center_id = sanitize_text_field($_POST['center_id']);
+    if (empty($center_id)) {
+        wp_send_json_error(['message' => 'Center ID is required']);
+    }
+    $item_id = $center_id . '-' . time(); // Simple unique ID; replace with your logic if needed
+    wp_send_json_success(['item_id' => $item_id]);
+}
+
+add_action('wp_ajax_su_p_get_inventory_edit_form', 'su_p_get_inventory_edit_form');
+function su_p_get_inventory_edit_form() {
+    check_ajax_referer('su_p_inventory_nonce', 'nonce');
+    global $wpdb;
+    $item_id = sanitize_text_field($_POST['item_id']);
+    $table_name = $wpdb->prefix . 'inventory';
+    $item = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE item_id = %s", $item_id), ARRAY_A);
+    if (!$item) {
+        wp_send_json_error(['message' => 'Invalid item ID']);
+    }
+
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1, 'post_status' => 'publish']);
+    ob_start();
+    ?>
+    <div class="edu-modal" id="editInventoryModal" style="display: flex;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" onclick="jQuery('#editInventoryModal').remove();">×</span>
+            <h3>Edit Inventory Item</h3>
+            <div id="edit-inventory-form-container">
+                <form id="edit-inventory-form" method="post">
+                    <input type="hidden" name="item_id" value="<?php echo esc_attr($item['item_id']); ?>">
+                    <div class="search-filters">
+                        <label>Education Center</label>
+                        <select name="education_center_id" required>
+                            <option value="">Select Center</option>
+                            <?php
+                            foreach ($centers as $center) {
+                                $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                                $selected = $center_id === $item['education_center_id'] ? 'selected' : '';
+                                echo "<option value='$center_id' $selected>" . esc_html($center->post_title) . " ($center_id)</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label>Name</label>
+                        <input type="text" name="name" value="<?php echo esc_attr($item['name']); ?>" required>
+                    </div>
+                    <div class="search-filters">
+                        <label>Category</label>
+                        <select name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Equipment" <?php selected($item['category'], 'Equipment'); ?>>Equipment</option>
+                            <option value="Stationery" <?php selected($item['category'], 'Stationery'); ?>>Stationery</option>
+                            <option value="Furniture" <?php selected($item['category'], 'Furniture'); ?>>Furniture</option>
+                            <option value="Other" <?php selected($item['category'], 'Other'); ?>>Other</option>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label>Quantity</label>
+                        <input type="number" name="quantity" min="0" value="<?php echo esc_attr($item['quantity']); ?>" required>
+                    </div>
+                    <div class="search-filters">
+                        <label>Status</label>
+                        <select name="status" required>
+                            <option value="">Select Status</option>
+                            <option value="Available" <?php selected($item['status'], 'Available'); ?>>Available</option>
+                            <option value="Issued" <?php selected($item['status'], 'Issued'); ?>>Issued</option>
+                            <option value="Damaged" <?php selected($item['status'], 'Damaged'); ?>>Damaged</option>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label>Low Stock Threshold</label>
+                        <input type="number" name="low_stock_threshold" min="1" value="<?php echo esc_attr($item['low_stock_threshold']); ?>" required>
+                    </div>
+                    <input type="hidden" name="action" value="su_p_update_inventory">
+                    <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_inventory_nonce'); ?>">
+                    <button type="submit" class="button edu-button-primary">Update Item</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+    jQuery(document).ready(function($) {
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        $('#edit-inventory-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const formData = new FormData(this);
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Inventory item updated successfully');
+                        $('#editInventoryModal').remove();
+                        $('#refresh-table').trigger('click');
+                    } else {
+                        $('#edit-inventory-form-container').prepend(`<div class="alert alert-danger">${response.data.message}</div>`);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    alert('Error updating inventory item.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    wp_send_json_success(ob_get_clean());
+}
+
+add_action('wp_ajax_su_p_update_inventory', 'su_p_update_inventory');
+function su_p_update_inventory() {
+    check_ajax_referer('su_p_inventory_nonce', 'nonce');
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'inventory';
+    $item_id = sanitize_text_field($_POST['item_id']);
+    $name = sanitize_text_field($_POST['name']);
+    $category = sanitize_text_field($_POST['category']);
+    $quantity = intval($_POST['quantity']);
+    $status = sanitize_text_field($_POST['status']);
+    $low_stock_threshold = intval($_POST['low_stock_threshold']);
+    $education_center_id = sanitize_text_field($_POST['education_center_id']);
+
+    $validation = validate_inventory_data($item_id, $name, $category, $quantity, $status, $low_stock_threshold, $education_center_id);
+    if ($validation !== true) {
+        wp_send_json_error(['message' => $validation]);
+    }
+
+    $result = $wpdb->update(
+        $table_name,
+        [
+            'name' => $name,
+            'category' => $category,
+            'quantity' => $quantity,
+            'status' => $status,
+            'low_stock_threshold' => $low_stock_threshold,
+            'education_center_id' => $education_center_id
+        ],
+        ['item_id' => $item_id],
+        ['%s', '%s', '%d', '%s', '%d', '%s'],
+        ['%s']
+    );
+
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to update item: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success();
+    }
+}
+
+add_action('wp_ajax_su_p_get_inventory_delete_form', 'su_p_get_inventory_delete_form');
+function su_p_get_inventory_delete_form() {
+    check_ajax_referer('su_p_inventory_nonce', 'nonce');
+    global $wpdb;
+    $item_id = sanitize_text_field($_POST['item_id']);
+    $table_name = $wpdb->prefix . 'inventory';
+    $item = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE item_id = %s", $item_id), ARRAY_A);
+    if (!$item) {
+        wp_send_json_error(['message' => 'Invalid item ID']);
+    }
+
+    ob_start();
+    ?>
+    <div class="edu-modal" id="deleteInventoryModal" style="display: flex;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" onclick="jQuery('#deleteInventoryModal').remove();">×</span>
+            <h3>Confirm Deletion</h3>
+            <div id="delete-inventory-container">
+                <p>Are you sure you want to delete item "<?php echo esc_html($item['item_id']); ?>"?</p>
+                <table class="management-table-wrapper">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Status</th>
+                            <th>Low Stock</th>
+                            <th>Center ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><?php echo esc_html($item['item_id']); ?></td>
+                            <td><?php echo esc_html($item['name']); ?></td>
+                            <td><?php echo esc_html($item['category']); ?></td>
+                            <td><?php echo esc_html($item['quantity']); ?></td>
+                            <td><?php echo esc_html($item['status']); ?></td>
+                            <td><?php echo $item['quantity'] <= $item['low_stock_threshold'] ? '<span class="badge bg-danger">Low</span>' : '<span class="badge bg-success">OK</span>'; ?></td>
+                            <td><?php echo esc_html($item['education_center_id']); ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <form id="delete-inventory-form" method="post">
+                    <input type="hidden" name="item_id" value="<?php echo esc_attr($item['item_id']); ?>">
+                    <input type="hidden" name="action" value="su_p_delete_inventory">
+                    <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_inventory_nonce'); ?>">
+                    <button type="submit" class="button edu-button-delete">Delete</button>
+                    <button type="button" class="button" onclick="jQuery('#deleteInventoryModal').remove();">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+    jQuery(document).ready(function($) {
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        $('#delete-inventory-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const formData = new FormData(this);
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Inventory item deleted successfully');
+                        $('#deleteInventoryModal').remove();
+                        $('#refresh-table').trigger('click');
+                    } else {
+                        $('#delete-inventory-container').prepend(`<div class="alert alert-danger">${response.data.message}</div>`);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    alert('Error deleting inventory item.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    wp_send_json_success(ob_get_clean());
+}
+
+add_action('wp_ajax_su_p_delete_inventory', 'su_p_delete_inventory');
+function su_p_delete_inventory() {
+    check_ajax_referer('su_p_inventory_nonce', 'nonce');
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'inventory';
+    $item_id = sanitize_text_field($_POST['item_id']);
+    if (empty($item_id)) {
+        wp_send_json_error(['message' => 'Invalid item ID']);
+    }
+
+    $result = $wpdb->delete($table_name, ['item_id' => $item_id], ['%s']);
+    if ($result === false) {
+        error_log("Failed to delete inventory item ID: $item_id. User: " . get_current_user_id());
+        wp_send_json_error(['message' => 'Failed to delete item: Check debug.log']);
+    } else {
+        wp_send_json_success();
+    }
+}
+
+// Validation Helper Function
+function validate_transaction_data($item_id, $user_id, $user_type, $action, $status, $is_update = false) {
+    global $wpdb;
+    
+    // For updates, skip item_id validation since it's readonly
+    if (!$is_update) {
+        if (empty($item_id)) return 'Item ID is required';
+        if ($wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}inventory WHERE item_id = %s", $item_id)) == 0) {
+            return 'Item ID does not exist';
+        }
+    }
+
+    if (empty($user_id)) return 'User ID is required';
+    if (!in_array($user_type, ['Student', 'Staff'])) return 'Invalid user type';
+    if (!in_array($action, ['Issue', 'Return'])) return 'Invalid action'; // Ensure case matches form values
+    if (!in_array($status, ['Pending', 'Completed'])) return 'Invalid status';
+    return true;
+}
+// Main Transaction Management Function (Read)
+function render_su_p_transaction_management() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to view this dashboard.</p>';
+    }
+
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1, 'post_status' => 'publish']);
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Transaction Management</h2>
+                <div class="edu-students-actions" style="margin-bottom: 20px;">
+                    <a href="<?php echo admin_url('admin.php?page=su-p-add-transaction'); ?>" class="button edu-button-primary">Add New Transaction</a>
+                    <input type="text" id="item-search" class="edu-search-input" placeholder="Search by Item Name..." style="margin-left: 20px; padding: 8px; width: 300px;">
+                    <select id="center-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Centers</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                        }
+                        ?>
+                    </select>
+                    <select id="action-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Actions</option>
+                        <option value="Issue">Issue</option>
+                        <option value="Return">Return</option>
+                    </select>
+                    <select id="status-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Statuses</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <div class="edu-pagination" style="margin: 20px 0;">
+                    <label for="items-per-page">Show:</label>
+                    <select id="items-per-page" class="edu-select" style="margin-right: 20px;">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                    <button class="edu-button edu-button-nav" id="prev-page" disabled>Previous</button>
+                    <span id="page-info" style="margin: 0 10px;"></span>
+                    <button class="edu-button edu-button-nav" id="next-page">Next</button>
+                </div>
+                <div class="management-table-wrapper">
+                    <div class="export-tools" id="export-tools" style="margin-bottom: 10px;"></div>
+                    <table id="transaction-table" class="management-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Item ID</th>
+                                <th>Item Name</th>
+                                <th>User ID</th>
+                                <th>User Type</th>
+                                <th>Action</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Center ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaction-tbody">
+                            <!-- Populated via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="actions">
+                    <button class="button" id="refresh-table">Refresh</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        let currentPage = 1;
+        let perPage = 10;
+        let searchQuery = '';
+        let centerFilter = '';
+        let actionFilter = '';
+        let statusFilter = '';
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        function getTableData() {
+            const table = $('#transaction-table')[0];
+            if (!table) return [];
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim()).slice(0, -1);
+            const rows = Array.from(table.querySelectorAll('tbody tr')).map(row => {
+                const cells = Array.from(row.querySelectorAll('td')).slice(0, -1);
+                return cells.map(td => td.textContent.trim());
+            });
+            return [headers, ...rows];
+        }
+
+        function exportToCSV() {
+            const data = getTableData();
+            const csv = data.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `transactions_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+        }
+
+        function exportToExcel() {
+            if (!window.XLSX) { console.error('XLSX library not loaded'); return; }
+            const data = getTableData();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
+            XLSX.writeFile(wb, `transactions_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+            const data = getTableData();
+            const instituteName = 'Istituto';
+            const instituteLogo = '<?php echo esc_js(plugin_dir_url(__DIR__) . 'logo-instituto.jpg'); ?>';
+            const pageWidth = doc.internal.pageSize.width;
+            const margin = 10;
+            const borderColor = [70, 131, 180];
+
+            doc.setDrawColor(...borderColor);
+            doc.setLineWidth(1);
+            doc.rect(margin, margin, pageWidth - 2 * margin, doc.internal.pageSize.height - 2 * margin);
+            if (instituteLogo) {
+                try { doc.addImage(instituteLogo, 'JPEG', (pageWidth - 24) / 2, 15, 24, 24); } catch (e) {}
+            }
+            doc.setFontSize(18);
+            doc.setTextColor(...borderColor);
+            doc.text(instituteName.toUpperCase(), pageWidth / 2, 45, { align: 'center' });
+            doc.setFontSize(12);
+            doc.setTextColor(102);
+            doc.text('Transaction List', pageWidth / 2, 55, { align: 'center' });
+            doc.setDrawColor(...borderColor);
+            doc.line(margin + 5, 60, pageWidth - margin - 5, 60);
+
+            const details = [['Date', new Date().toLocaleDateString()], ['Total Transactions', String(data.length - 1)]];
+            let y = 70;
+            details.forEach(([label, value]) => {
+                doc.setFillColor(245, 245, 245);
+                doc.rect(margin + 5, y, 50, 6, 'F');
+                doc.setTextColor(...borderColor);
+                doc.setFont('helvetica', 'bold');
+                doc.text(label, margin + 7, y + 4);
+                doc.setTextColor(51);
+                doc.setFont('helvetica', 'normal');
+                doc.text(String(value), margin + 60, y + 4);
+                y += 6;
+            });
+
+            if (typeof doc.autoTable === 'function' && data.length > 1) {
+                doc.autoTable({
+                    startY: y + 10,
+                    head: [data[0]],
+                    body: data.slice(1),
+                    theme: 'striped',
+                    styles: { fontSize: 11, cellPadding: 2, overflow: 'linebreak', halign: 'center' },
+                    headStyles: { fillColor: borderColor, textColor: [255, 255, 255], fontStyle: 'bold' }
+                });
+                const finalY = doc.lastAutoTable.finalY || y + 10;
+                doc.setFontSize(9);
+                doc.setTextColor(102);
+                doc.text(`Generated by Instituto on ${new Date().toISOString().slice(0,10)}`, pageWidth / 2, finalY + 20, { align: 'center' });
+                doc.save(`transactions_${new Date().toISOString().slice(0,10)}.pdf`);
+            }
+        }
+
+        function copyToClipboard() {
+            const data = getTableData();
+            const text = data.map(row => row.join('\t')).join('\n');
+            navigator.clipboard.writeText(text).then(() => alert('Transactions copied to clipboard!'));
+        }
+
+        function printTransactions() {
+            const printWindow = window.open('', '_blank');
+            const data = getTableData();
+            const instituteName = 'Istituto';
+            const instituteLogo = '<?php echo esc_js(plugin_dir_url(__DIR__) . 'logo-instituto.jpg'); ?>';
+            printWindow.document.write(`
+                <html>
+                <head><title>Transaction List</title>
+                <style>
+                    @media print {
+                        body { font-family: Helvetica, sans-serif; margin: 10mm; width: 190mm; }
+                        .page { border: 4px solid #4683b4; padding: 5mm; box-sizing: border-box; width: 100%; max-width: 190mm; }
+                        .header { text-align: center; border-bottom: 2px solid #4683b4; margin-bottom: 10mm; }
+                        .header img { width: 60px; height: 60px; margin-bottom: 5mm; }
+                        .header h1 { font-size: 18pt; color: #4683b4; margin: 0; text-transform: uppercase; }
+                        .header .subtitle { font-size: 12pt; color: #666; margin: 0; }
+                        table { width: 100%; border-collapse: collapse; margin: 10mm 0; table-layout: fixed; }
+                        th, td { border: 1px solid #e5e5e5; padding: 8px; text-align: center; word-wrap: break-word; font-size: 10pt; }
+                        th { background: #4683b4; color: white; font-weight: bold; }
+                        tr:nth-child(even) { background: #f9f9f9; }
+                        .footer { text-align: center; font-size: 9pt; color: #666; margin-top: 10mm; }
+                        @page { size: A4; margin: 10mm; }
+                    }
+                </style></head>
+                <body>
+                    <div class="page">
+                        <div class="header">
+                            ${instituteLogo ? `<img src="${instituteLogo}" alt="Logo" onerror="this.style.display='none';this.nextSibling.style.display='block';"><p style="display:none;">No logo available</p>` : '<p>No logo available</p>'}
+                            <h1>${instituteName.toUpperCase()}</h1>
+                            <p class="subtitle">Transaction List</p>
+                        </div>
+                        <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                        <p><strong>Total Transactions:</strong> ${data.length - 1}</p>
+                        <table>
+                            <thead><tr>${data[0].map(header => `<th>${header}</th>`).join('')}</tr></thead>
+                            <tbody>${data.slice(1).map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>
+                        </table>
+                        <div class="footer">
+                            <p>Generated by Instituto on ${new Date().toISOString().slice(0,10)}</p>
+                        </div>
+                    </div>
+                </body></html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+        }
+
+        function setupExportButtons() {
+            const tools = $('#export-tools');
+            tools.html(`
+                <button class="export-btn export-csv" aria-label="Export to CSV"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
+                <button class="export-btn export-pdf" aria-label="Export to PDF"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
+                <button class="export-btn export-excel" aria-label="Export to Excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
+                <button class="export-btn export-copy" aria-label="Copy to Clipboard"><i class="fas fa-copy"></i><span class="tooltip">Copy to Clipboard</span></button>
+                <button class="export-btn export-print" aria-label="Print"><i class="fas fa-print"></i><span class="tooltip">Print</span></button>
+            `);
+            tools.find('.export-csv').on('click', exportToCSV);
+            tools.find('.export-pdf').on('click', generatePDF);
+            tools.find('.export-excel').on('click', exportToExcel);
+            tools.find('.export-copy').on('click', copyToClipboard);
+            tools.find('.export-print').on('click', printTransactions);
+        }
+
+        function loadTransactions(page, limit, item, center, action, status) {
+            showLoader();
+            $.post({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                data: {
+                    action: 'su_p_fetch_transactions',
+                    page: page,
+                    per_page: limit,
+                    item_search: item,
+                    center_filter: center,
+                    action_filter: action,
+                    status_filter: status,
+                    nonce: '<?php echo wp_create_nonce('su_p_transaction_nonce'); ?>'
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        const transactions = response.data.transactions;
+                        const total = response.data.total;
+                        let html = '';
+                        transactions.forEach(trans => {
+                            const statusBadge = trans.status === 'Completed' ? 'bg-success' : 'bg-warning';
+                            html += `
+                                <tr data-trans-id="${trans.transaction_id}">
+                                    <td>${trans.transaction_id}</td>
+                                    <td>${trans.item_id}</td>
+                                    <td>${trans.name}</td>
+                                    <td>${trans.user_id}</td>
+                                    <td>${trans.user_type}</td>
+                                    <td>${trans.action}</td>
+                                    <td><span class="badge ${statusBadge}">${trans.status}</span></td>
+                                    <td>${trans.date}</td>
+                                    <td>${trans.education_center_id}</td>
+                                    <td>
+                                        <button class="edu-button edu-button-edit" data-trans-id="${trans.transaction_id}">Edit</button>
+                                        <button class="edu-button edu-button-delete" data-trans-id="${trans.transaction_id}">Delete</button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        $('#transaction-tbody').html(html);
+                        setupExportButtons();
+
+                        const totalPages = Math.ceil(total / limit);
+                        $('#page-info').text(`Page ${page} of ${totalPages}`);
+                        $('#prev-page').prop('disabled', page === 1);
+                        $('#next-page').prop('disabled', page === totalPages);
+
+                        $('.edu-button-edit').on('click', function() {
+                            const transId = $(this).data('trans-id');
+                            showEditModal(transId);
+                        });
+                        $('.edu-button-delete').on('click', function() {
+                            const transId = $(this).data('trans-id');
+                            showDeleteModal(transId);
+                        });
+                    } else {
+                        $('#transaction-tbody').html('<tr><td colspan="10">No transactions found.</td></tr>');
+                        $('#export-tools').html('');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    console.error('Error fetching transactions:', error);
+                    $('#transaction-tbody').html('<tr><td colspan="10">Error loading transactions.</td></tr>');
+                    $('#export-tools').html('');
+                }
+            });
+        }
+
+        function showEditModal(transId) {
+            if ($('#editTransactionModal').length) $('#editTransactionModal').remove();
+            $('body').append('<div id="edit-modal-placeholder"></div>');
+            $.post({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                data: {
+                    action: 'su_p_get_transaction_edit_form',
+                    trans_id: transId,
+                    nonce: '<?php echo wp_create_nonce('su_p_transaction_nonce'); ?>'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#edit-modal-placeholder').html(response.data);
+                    } else {
+                        alert('Failed to load edit form: ' + response.data.message);
+                    }
+                },
+                error: function() {
+                    alert('Error loading edit form.');
+                }
+            });
+        }
+
+        function showDeleteModal(transId) {
+            if ($('#deleteTransactionModal').length) $('#deleteTransactionModal').remove();
+            $('body').append('<div id="delete-modal-placeholder"></div>');
+            $.post({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                data: {
+                    action: 'su_p_get_transaction_delete_form',
+                    trans_id: transId,
+                    nonce: '<?php echo wp_create_nonce('su_p_transaction_nonce'); ?>'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#delete-modal-placeholder').html(response.data);
+                    } else {
+                        alert('Failed to load delete form: ' + response.data.message);
+                    }
+                },
+                error: function() {
+                    alert('Error loading delete form.');
+                }
+            });
+        }
+
+        loadTransactions(currentPage, perPage, searchQuery, centerFilter, actionFilter, statusFilter);
+
+        $('#item-search').on('input', function() {
+            searchQuery = $(this).val();
+            currentPage = 1;
+            loadTransactions(currentPage, perPage, searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+
+        $('#center-filter').on('change', function() {
+            centerFilter = $(this).val();
+            currentPage = 1;
+            loadTransactions(currentPage, perPage, searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+
+        $('#action-filter').on('change', function() {
+            actionFilter = $(this).val();
+            currentPage = 1;
+            loadTransactions(currentPage, perPage, searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+
+        $('#status-filter').on('change', function() {
+            statusFilter = $(this).val();
+            currentPage = 1;
+            loadTransactions(currentPage, perPage, searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+
+        $('#items-per-page').on('change', function() {
+            perPage = parseInt($(this).val());
+            currentPage = 1;
+            loadTransactions(currentPage, perPage, searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+
+        $('#next-page').on('click', function() {
+            currentPage++;
+            loadTransactions(currentPage, perPage, searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+
+        $('#prev-page').on('click', function() {
+            currentPage--;
+            loadTransactions(currentPage, perPage, searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+
+        $('#refresh-table').on('click', function() {
+            currentPage = 1;
+            searchQuery = '';
+            centerFilter = '';
+            actionFilter = '';
+            statusFilter = '';
+            $('#item-search').val('');
+            $('#center-filter').val('');
+            $('#action-filter').val('');
+            $('#status-filter').val('');
+            loadTransactions(currentPage, perPage, searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Add Transaction Function (Create) - Modified to require center selection first
+function render_su_p_add_transaction() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to add transactions.</p>';
+    }
+
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1, 'post_status' => 'publish']);
+    $add_message = '';
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Add Transaction</h2>
+                <div id="add-transaction-form-container">
+                    <?php if ($add_message) echo $add_message; ?>
+                    <form id="add-transaction-form" method="post">
+                        <div class="search-filters">
+                            <label>Educational Center</label>
+                            <select name="education_center_id" id="education-center-select" required>
+                                <option value="">Select Center</option>
+                                <?php
+                                foreach ($centers as $center) {
+                                    $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                                    echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Item ID</label>
+                            <select name="item_id" id="item-id-select" required disabled>
+                                <option value="">Select Center First</option>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>User ID</label>
+                            <input type="text" name="user_id" required>
+                        </div>
+                        <div class="search-filters">
+                            <label>User Type</label>
+                            <select name="user_type" required>
+                                <option value="">Select Type</option>
+                                <option value="Student">Student</option>
+                                <option value="Staff">Staff</option>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Action</label>
+                            <select name="action" required>
+                                <option value="">Select Action</option>
+                                <option value="Issue">Issue</option>
+                                <option value="Return">Return</option>
+                            </select>
+                        </div>
+                        <div class="search-filters">
+                            <label>Status</label>
+                            <select name="status" required>
+                                <option value="">Select Status</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                        <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_transaction_nonce'); ?>">
+                        <input type="hidden" name="action" value="su_p_add_transaction">
+                        <div class="actions">
+                            <button type="submit" class="button edu-button-primary">Add Transaction</button>
+                            <a href="<?php echo admin_url('admin.php?page=su-p-transaction-management'); ?>" class="button">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        $('#education-center-select').on('change', function() {
+            const centerId = $(this).val();
+            if (centerId) {
+                showLoader();
+                $.post({
+                    url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                    data: {
+                        action: 'su_p_fetch_items_by_center',
+                        center_id: centerId,
+                        nonce: '<?php echo wp_create_nonce('su_p_transaction_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        hideLoader();
+                        if (response.success) {
+                            let options = '<option value="">Select Item</option>';
+                            response.data.forEach(item => {
+                                options += `<option value="${item.item_id}">${item.item_id} - ${item.name}</option>`;
+                            });
+                            $('#item-id-select').html(options).prop('disabled', false);
+                        } else {
+                            $('#item-id-select').html('<option value="">No items found</option>').prop('disabled', true);
+                        }
+                    },
+                    error: function() {
+                        hideLoader();
+                        alert('Error fetching items');
+                    }
+                });
+            } else {
+                $('#item-id-select').html('<option value="">Select Center First</option>').prop('disabled', true);
+            }
+        });
+
+        $('#add-transaction-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const formData = new FormData(this);
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Transaction added successfully');
+                        window.location.href = '<?php echo admin_url('admin.php?page=su-p-transaction-management'); ?>';
+                    } else {
+                        $('#add-transaction-form-container').prepend(`<div class="alert alert-danger">${response.data.message}</div>`);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('Error adding transaction: ' + error);
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Edit Transaction Function (Update) - Modified to show table
+// su-p-edit-transaction
+function render_su_p_edit_transaction() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'inventory_transactions';
+    
+    // Get all transactions
+    $transactions = $wpdb->get_results("SELECT * FROM $table_name ORDER BY date DESC");
+
+    // Start output buffering
+    ob_start();
+    ?>
+    <div class="su-p-transactions-wrap">
+        <table class="wp-list-table widefat fixed striped">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Item ID</th>
+                    <th>User ID</th>
+                    <th>User Type</th>
+                    <th>Action</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($transactions as $transaction): ?>
+                    <tr>
+                        <td><?php echo esc_html($transaction->transaction_id); ?></td>
+                        <td><?php echo esc_html($transaction->item_id); ?></td>
+                        <td><?php echo esc_html($transaction->user_id); ?></td>
+                        <td><?php echo esc_html($transaction->user_type); ?></td>
+                        <td><?php echo esc_html($transaction->action); ?></td>
+                        <td><?php echo esc_html($transaction->date); ?></td>
+                        <td><?php echo esc_html($transaction->status); ?></td>
+                        <td>
+                            <button class="edu-button edu-button-edit" 
+                                    data-transaction-id="<?php echo esc_attr($transaction->transaction_id); ?>">
+                                Edit
+                            </button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+
+        <!-- Edit Modal -->
+        <div class="edu-modal">
+            <div class="edu-modal-content">
+                <span class="edu-modal-close">×</span>
+                <h3>Edit Transaction</h3>
+                <form class="edu-modal-form">
+                    <input type="hidden" name="transaction_id" id="edit_transaction_id">
+                    
+                    <div class="search-filters">
+                        <label>Item ID: <span id="display_item_id"></span></label>
+                    </div>
+                    <div class="search-filters">
+                        <label>User ID: <span id="display_user_id"></span></label>
+                    </div>
+
+                    <div class="search-filters">
+                        <label for="edit_user_type">User Type</label>
+                        <select id="edit_user_type" name="user_type">
+                            <option value="Staff">Staff</option>
+                            <option value="Student">Student</option>
+                        </select>
+                    </div>
+
+                    <div class="search-filters">
+                        <label for="edit_action">Action</label>
+                        <select id="edit_action" name="action">
+                            <option value="Issue">Issue</option>
+                            <option value="Return">Return</option>
+                        </select>
+                    </div>
+
+                    <div class="search-filters">
+                        <label for="edit_date">Date</label>
+                        <input type="datetime-local" id="edit_date" name="date">
+                    </div>
+
+                    <div class="search-filters">
+                        <label for="edit_status">Status</label>
+                        <select id="edit_status" name="status">
+                            <option value="Pending">Pending</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="edu-button edu-button-primary">Update Transaction</button>
+                    <div class="message"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        // Open modal and populate data
+        $('.edu-button-edit').on('click', function() {
+            var transactionId = $(this).data('transaction-id');
+            var $row = $(this).closest('tr');
+            
+            // Populate modal with current row data
+            $('#edit_transaction_id').val(transactionId);
+            $('#display_item_id').text($row.find('td:eq(1)').text());
+            $('#display_user_id').text($row.find('td:eq(2)').text());
+            $('#edit_user_type').val($row.find('td:eq(3)').text());
+            $('#edit_action').val($row.find('td:eq(4)').text());
+            $('#edit_date').val(new Date($row.find('td:eq(5)').text()).toISOString().slice(0,16));
+            $('#edit_status').val($row.find('td:eq(6)').text());
+            
+            $('.edu-modal').show();
+            $('.message').hide();
+        });
+
+        // Close modal
+        $('.edu-modal-close').on('click', function() {
+            $('.edu-modal').hide();
+        });
+
+        // Handle form submission
+        $('.edu-modal-form').on('submit', function(e) {
+            e.preventDefault();
+            
+            var $form = $(this);
+            var $message = $form.find('.message');
+
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                type: 'POST',
+                data: {
+                    action: 'su_p_update_transaction',
+                    transaction_id: $('#edit_transaction_id').val(),
+                    user_type: $('#edit_user_type').val(),
+                    action_type: $('#edit_action').val(),
+                    date: $('#edit_date').val(),
+                    status: $('#edit_status').val(),
+                    nonce: '<?php echo wp_create_nonce('su_p_update_transaction_nonce'); ?>'
+                },
+                beforeSend: function() {
+                    $message.html('Updating...').show();
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $message.html('Transaction updated successfully');
+                        // Update table row
+                        var $row = $('button[data-transaction-id="' + $('#edit_transaction_id').val() + '"]').closest('tr');
+                        $row.find('td:eq(3)').text($('#edit_user_type').val());
+                        $row.find('td:eq(4)').text($('#edit_action').val());
+                        $row.find('td:eq(5)').text(new Date($('#edit_date').val()).toLocaleString());
+                        $row.find('td:eq(6)').text($('#edit_status').val());
+                        setTimeout(() => $('.edu-modal').hide(), 1000);
+                    } else {
+                        $message.html(response.data.message || 'Error updating transaction');
+                    }
+                },
+                error: function() {
+                    $message.html('Server error occurred');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// AJAX handler (unchanged)
+add_action('wp_ajax_su_p_update_transaction', 'su_p_update_transaction_callback');
+function su_p_update_transaction_callback() {
+    global $wpdb;
+
+    if (!check_ajax_referer('su_p_update_transaction_nonce', 'nonce', false)) {
+        wp_send_json_error(['message' => 'Security check failed']);
+    }
+
+    $transaction_id = intval($_POST['transaction_id']);
+    $user_type = sanitize_text_field($_POST['user_type']);
+    $action = sanitize_text_field($_POST['action_type']);
+    $date = sanitize_text_field($_POST['date']);
+    $status = sanitize_text_field($_POST['status']);
+
+    if (!in_array($user_type, ['Staff', 'Student']) || 
+        !in_array($action, ['Issue', 'Return']) || 
+        !in_array($status, ['Pending', 'Completed'])) {
+        wp_send_json_error(['message' => 'Invalid input data']);
+    }
+
+    $table_name = $wpdb->prefix . 'inventory_transactions';
+    $updated = $wpdb->update(
+        $table_name,
+        [
+            'user_type' => $user_type,
+            'action' => $action,
+            'date' => date('Y-m-d H:i:s', strtotime($date)),
+            'status' => $status
+        ],
+        ['transaction_id' => $transaction_id],
+        ['%s', '%s', '%s', '%s'],
+        ['%d']
+    );
+
+    if ($updated !== false) {
+        wp_send_json_success();
+    } else {
+        wp_send_json_error(['message' => 'Failed to update transaction']);
+    }
+}
+
+// Delete Transaction Function (Delete) - Modified to show table
+function render_su_p_delete_transaction() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to delete transactions.</p>';
+    }
+
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1, 'post_status' => 'publish']);
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Delete Transactions</h2>
+                <div class="edu-students-actions" style="margin-bottom: 20px;">
+                    <input type="text" id="item-search" class="edu-search-input" placeholder="Search by Item Name..." style="padding: 8px; width: 300px;">
+                    <select id="center-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Centers</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                        }
+                        ?>
+                    </select>
+                    <select id="action-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Actions</option>
+                        <option value="Issue">Issue</option>
+                        <option value="Return">Return</option>
+                    </select>
+                    <select id="status-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Statuses</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <div class="management-table-wrapper">
+                    <table id="transaction-table" class="management-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Item ID</th>
+                                <th>Item Name</th>
+                                <th>User ID</th>
+                                <th>User Type</th>
+                                <th>Action</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Center ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaction-tbody">
+                            <!-- Populated via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="actions">
+                    <a href="<?php echo admin_url('admin.php?page=su-p-transaction-management'); ?>" class="button">Back to Transactions</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        let searchQuery = '';
+        let centerFilter = '';
+        let actionFilter = '';
+        let statusFilter = '';
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        function loadTransactions(item, center, action, status) {
+            showLoader();
+            $.post({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                data: {
+                    action: 'su_p_fetch_transactions',
+                    page: 1,
+                    per_page: -1,
+                    item_search: item,
+                    center_filter: center,
+                    action_filter: action,
+                    status_filter: status,
+                    nonce: '<?php echo wp_create_nonce('su_p_transaction_nonce'); ?>'
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        const transactions = response.data.transactions;
+                        let html = '';
+                        transactions.forEach(trans => {
+                            const statusBadge = trans.status === 'Completed' ? 'bg-success' : 'bg-warning';
+                            html += `
+                                <tr data-trans-id="${trans.transaction_id}">
+                                    <td>${trans.transaction_id}</td>
+                                    <td>${trans.item_id}</td>
+                                    <td>${trans.name}</td>
+                                    <td>${trans.user_id}</td>
+                                    <td>${trans.user_type}</td>
+                                    <td>${trans.action}</td>
+                                    <td><span class="badge ${statusBadge}">${trans.status}</span></td>
+                                    <td>${trans.date}</td>
+                                    <td>${trans.education_center_id}</td>
+                                    <td>
+                                        <button class="edu-button edu-button-delete" data-trans-id="${trans.transaction_id}">Delete</button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        $('#transaction-tbody').html(html);
+
+                        $('.edu-button-delete').on('click', function() {
+                            const transId = $(this).data('trans-id');
+                            showDeleteModal(transId);
+                        });
+                    } else {
+                        $('#transaction-tbody').html('<tr><td colspan="10">No transactions found.</td></tr>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    console.error('Error fetching transactions:', error);
+                    $('#transaction-tbody').html('<tr><td colspan="10">Error loading transactions.</td></tr>');
+                }
+            });
+        }
+
+        function showDeleteModal(transId) {
+            if ($('#deleteTransactionModal').length) $('#deleteTransactionModal').remove();
+            $('body').append('<div id="delete-modal-placeholder"></div>');
+            $.post({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                data: {
+                    action: 'su_p_get_transaction_delete_form',
+                    trans_id: transId,
+                    nonce: '<?php echo wp_create_nonce('su_p_transaction_nonce'); ?>'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#delete-modal-placeholder').html(response.data);
+                        setupDeleteForm();
+                    } else {
+                        alert('Failed to load delete form: ' + response.data.message);
+                    }
+                },
+                error: function() {
+                    alert('Error loading delete form.');
+                }
+            });
+        }
+
+        function setupDeleteForm() {
+            $('#deleteTransactionModal .edu-modal-close, #deleteTransactionModal .edu-modal-cancel').on('click', function() {
+                $('#deleteTransactionModal').fadeOut(300, function() {
+                    $(this).remove();
+                });
+            });
+
+            $(document).on('click', function(e) {
+                if ($(e.target).is('#deleteTransactionModal')) {
+                    $('#deleteTransactionModal').fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                }
+            });
+
+            $('#delete-transaction-form').on('submit', function(e) {
+                e.preventDefault();
+                showLoader();
+                const formData = new FormData(this);
+                $.ajax({
+                    url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        hideLoader();
+                        if (response.success) {
+                            alert('Transaction deleted successfully');
+                            $('#deleteTransactionModal').fadeOut(300, function() {
+                                $(this).remove();
+                            });
+                            loadTransactions(searchQuery, centerFilter, actionFilter, statusFilter);
+                        } else {
+                            $('#delete-transaction-container').prepend(`<div class="alert alert-danger">${response.data.message}</div>`);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        hideLoader();
+                        alert('Error deleting transaction: ' + error);
+                    }
+                });
+            });
+        }
+
+        loadTransactions(searchQuery, centerFilter, actionFilter, statusFilter);
+
+        $('#item-search').on('input', function() {
+            searchQuery = $(this).val();
+            loadTransactions(searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+
+        $('#center-filter').on('change', function() {
+            centerFilter = $(this).val();
+            loadTransactions(searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+
+        $('#action-filter').on('change', function() {
+            actionFilter = $(this).val();
+            loadTransactions(searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+
+        $('#status-filter').on('change', function() {
+            statusFilter = $(this).val();
+            loadTransactions(searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// View Transactions Function
+function render_su_p_view_transactions() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You must be a Super Administrator to view transactions.</p>';
+    }
+
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1, 'post_status' => 'publish']);
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>View Transactions</h2>
+                <div class="edu-students-actions" style="margin-bottom: 20px;">
+                    <input type="text" id="item-search" class="edu-search-input" placeholder="Search by Item Name..." style="padding: 8px; width: 300px;">
+                    <select id="center-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Centers</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                        }
+                        ?>
+                    </select>
+                    <select id="action-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Actions</option>
+                        <option value="Issue">Issue</option>
+                        <option value="Return">Return</option>
+                    </select>
+                    <select id="status-filter" class="edu-select" style="margin-left: 20px; padding: 8px;">
+                        <option value="">All Statuses</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <div class="management-table-wrapper">
+                    <table id="transaction-table" class="management-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Item ID</th>
+                                <th>Item Name</th>
+                                <th>User ID</th>
+                                <th>User Type</th>
+                                <th>Action</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Center ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaction-tbody">
+                            <!-- Populated via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        let searchQuery = '';
+        let centerFilter = '';
+        let actionFilter = '';
+        let statusFilter = '';
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        function loadTransactions(item, center, action, status) {
+            showLoader();
+            $.post({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                data: {
+                    action: 'su_p_fetch_transactions',
+                    page: 1,
+                    per_page: -1,
+                    item_search: item,
+                    center_filter: center,
+                    action_filter: action,
+                    status_filter: status,
+                    nonce: '<?php echo wp_create_nonce('su_p_transaction_nonce'); ?>'
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        const transactions = response.data.transactions;
+                        let html = '';
+                        transactions.forEach(trans => {
+                            const statusBadge = trans.status === 'Completed' ? 'bg-success' : 'bg-warning';
+                            html += `
+                                <tr>
+                                    <td>${trans.transaction_id}</td>
+                                    <td>${trans.item_id}</td>
+                                    <td>${trans.name}</td>
+                                    <td>${trans.user_id}</td>
+                                    <td>${trans.user_type}</td>
+                                    <td>${trans.action}</td>
+                                    <td><span class="badge ${statusBadge}">${trans.status}</span></td>
+                                    <td>${trans.date}</td>
+                                    <td>${trans.education_center_id}</td>
+                                </tr>
+                            `;
+                        });
+                        $('#transaction-tbody').html(html);
+                    } else {
+                        $('#transaction-tbody').html('<tr><td colspan="9">No transactions found.</td></tr>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    console.error('Error fetching transactions:', error);
+                    $('#transaction-tbody').html('<tr><td colspan="9">Error loading transactions.</td></tr>');
+                }
+            });
+        }
+
+        loadTransactions(searchQuery, centerFilter, actionFilter, statusFilter);
+
+        $('#item-search').on('input', function() {
+            searchQuery = $(this).val();
+            loadTransactions(searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+
+        $('#center-filter').on('change', function() {
+            centerFilter = $(this).val();
+            loadTransactions(searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+
+        $('#action-filter').on('change', function() {
+            actionFilter = $(this).val();
+            loadTransactions(searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+
+        $('#status-filter').on('change', function() {
+            statusFilter = $(this).val();
+            loadTransactions(searchQuery, centerFilter, actionFilter, statusFilter);
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// AJAX Handlers
+add_action('wp_ajax_su_p_fetch_transactions', 'su_p_fetch_transactions');
+function su_p_fetch_transactions() {
+    check_ajax_referer('su_p_transaction_nonce', 'nonce');
+    global $wpdb;
+    $trans_table = $wpdb->prefix . 'inventory_transactions';
+    $inv_table = $wpdb->prefix . 'inventory';
+    $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
+    $per_page = isset($_POST['per_page']) ? intval($_POST['per_page']) : 10;
+    $item_search = isset($_POST['item_search']) ? sanitize_text_field($_POST['item_search']) : '';
+    $center_filter = isset($_POST['center_filter']) ? sanitize_text_field($_POST['center_filter']) : '';
+    $action_filter = isset($_POST['action_filter']) ? sanitize_text_field($_POST['action_filter']) : '';
+    $status_filter = isset($_POST['status_filter']) ? sanitize_text_field($_POST['status_filter']) : '';
+
+    $query = "SELECT t.*, i.name, i.education_center_id FROM $trans_table t JOIN $inv_table i ON t.item_id = i.item_id WHERE 1=1";
+    $count_query = "SELECT COUNT(*) FROM $trans_table t JOIN $inv_table i ON t.item_id = i.item_id WHERE 1=1";
+    $args = [];
+
+    if ($item_search) {
+        $query .= " AND i.name LIKE %s";
+        $count_query .= " AND i.name LIKE %s";
+        $args[] = '%' . $wpdb->esc_like($item_search) . '%';
+    }
+    if ($center_filter) {
+        $query .= " AND i.education_center_id = %s";
+        $count_query .= " AND i.education_center_id = %s";
+        $args[] = $center_filter;
+    }
+    if ($action_filter) {
+        $query .= " AND t.action = %s";
+        $count_query .= " AND t.action = %s";
+        $args[] = $action_filter;
+    }
+    if ($status_filter) {
+        $query .= " AND t.status = %s";
+        $count_query .= " AND t.status = %s";
+        $args[] = $status_filter;
+    }
+
+    $query .= " ORDER BY t.date DESC";
+    if ($per_page > 0) {
+        $offset = ($page - 1) * $per_page;
+        $query .= " LIMIT %d OFFSET %d";
+        $args[] = $per_page;
+        $args[] = $offset;
+    }
+
+    $transactions = !empty($args) ? $wpdb->get_results($wpdb->prepare($query, $args), ARRAY_A) : $wpdb->get_results($query, ARRAY_A);
+    $total = !empty($args) ? $wpdb->get_var($wpdb->prepare($count_query, array_slice($args, 0, -2))) : $wpdb->get_var($count_query);
+
+    wp_send_json_success(['transactions' => $transactions, 'total' => $total]);
+}
+
+add_action('wp_ajax_su_p_add_transaction', 'su_p_add_transaction');
+function su_p_add_transaction() {
+    check_ajax_referer('su_p_transaction_nonce', 'nonce');
+    global $wpdb;
+    $trans_table = $wpdb->prefix . 'inventory_transactions';
+    $item_id = sanitize_text_field($_POST['item_id']);
+    $user_id = sanitize_text_field($_POST['user_id']);
+    $user_type = sanitize_text_field($_POST['user_type']);
+    $action = sanitize_text_field($_POST['action']);
+    $status = sanitize_text_field($_POST['status']);
+
+    $validation = validate_transaction_data($item_id, $user_id, $user_type, $action, $status);
+    if ($validation !== true) {
+        wp_send_json_error(['message' => $validation]);
+    }
+
+    $result = $wpdb->insert(
+        $trans_table,
+        [
+            'item_id' => $item_id,
+            'user_id' => $user_id,
+            'user_type' => $user_type,
+            'action' => $action,
+            'date' => current_time('mysql'),
+            'status' => $status
+        ],
+        ['%s', '%s', '%s', '%s', '%s', '%s']
+    );
+
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to add transaction: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success();
+    }
+}
+
+add_action('wp_ajax_su_p_get_transaction_edit_form', 'su_p_get_transaction_edit_form');
+function su_p_get_transaction_edit_form() {
+    check_ajax_referer('su_p_transaction_nonce', 'nonce');
+    global $wpdb;
+    $trans_id = intval($_POST['trans_id']);
+    $trans_table = $wpdb->prefix . 'inventory_transactions';
+    $inv_table = $wpdb->prefix . 'inventory';
+    $transaction = $wpdb->get_row($wpdb->prepare(
+        "SELECT t.*, i.name FROM $trans_table t JOIN $inv_table i ON t.item_id = i.item_id WHERE t.transaction_id = %d",
+        $trans_id
+    ), ARRAY_A);
+    if (!$transaction) {
+        wp_send_json_error(['message' => 'Invalid transaction ID']);
+    }
+
+    $name = isset($transaction['name']) ? esc_attr($transaction['name']) : 'Unknown Item';
+
+    ob_start();
+    ?>
+    <div class="edu-modal" id="editTransactionModal" style="display: flex;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close">×</span>
+            <h3>Edit Transaction</h3>
+            <div id="edit-transaction-form-container">
+                <form id="edit-transaction-form" method="post">
+                    <input type="hidden" name="transaction_id" value="<?php echo esc_attr($transaction['transaction_id']); ?>">
+                    <div class="search-filters">
+                        <label>Item ID</label>
+                        <input type="text" name="item_id" value="<?php echo esc_attr($transaction['item_id']); ?>" readonly required>
+                    </div>
+                    <div class="search-filters">
+                        <label>Item Name</label>
+                        <input type="text" value="<?php echo $name; ?>" readonly>
+                    </div>
+                    <div class="search-filters">
+                        <label>User ID</label>
+                        <input type="text" name="user_id" value="<?php echo esc_attr($transaction['user_id']); ?>" required>
+                    </div>
+                    <div class="search-filters">
+                        <label>User Type</label>
+                        <select name="user_type" required>
+                            <option value="">Select Type</option>
+                            <option value="Staff" <?php selected($transaction['user_type'], 'Staff'); ?>>Staff</option>
+                            <option value="Student" <?php selected($transaction['user_type'], 'Student'); ?>>Student</option>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label>Action</label>
+                        <select name="action" required>
+                            <option value="">Select Action</option>
+                            <option value="Issue" <?php selected($transaction['action'], 'Issue'); ?>>Issue</option>
+                            <option value="Return" <?php selected($transaction['action'], 'Return'); ?>>Return</option>
+                        </select>
+                    </div>
+                    <div class="search-filters">
+                        <label>Status</label>
+                        <select name="status" required>
+                            <option value="">Select Status</option>
+                            <option value="Pending" <?php selected($transaction['status'], 'Pending'); ?>>Pending</option>
+                            <option value="Completed" <?php selected($transaction['status'], 'Completed'); ?>>Completed</option>
+                        </select>
+                    </div>
+                    <input type="hidden" name="ajax_action" value="su_p_update_transaction"> <!-- Changed from "action" to "ajax_action" -->
+                    <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_transaction_nonce'); ?>">
+                    <button type="submit" class="button edu-button-primary">Update Transaction</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <?php
+    wp_send_json_success(ob_get_clean());
+}
+
+add_action('wp_ajax_su_p_get_transaction_delete_form', 'su_p_get_transaction_delete_form');
+function su_p_get_transaction_delete_form() {
+    check_ajax_referer('su_p_transaction_nonce', 'nonce');
+    global $wpdb;
+    $trans_id = intval($_POST['trans_id']);
+    $trans_table = $wpdb->prefix . 'inventory_transactions';
+    $inv_table = $wpdb->prefix . 'inventory';
+    $transaction = $wpdb->get_row($wpdb->prepare("SELECT t.*, i.name, i.education_center_id FROM $trans_table t JOIN $inv_table i ON t.item_id = i.item_id WHERE t.transaction_id = %d", $trans_id), ARRAY_A);
+    if (!$transaction) {
+        wp_send_json_error(['message' => 'Invalid transaction ID']);
+    }
+
+    ob_start();
+    ?>
+    <div class="edu-modal" id="deleteTransactionModal" style="display: flex;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close">&times;</span>
+            <h3>Confirm Deletion</h3>
+            <div id="delete-transaction-container">
+                <p>Are you sure you want to delete transaction ID "<?php echo esc_html($transaction['transaction_id']); ?>"?</p>
+                <table class="management-table-wrapper">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Item ID</th>
+                            <th>Item Name</th>
+                            <th>User ID</th>
+                            <th>User Type</th>
+                            <th>Action</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Center ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><?php echo esc_html($transaction['transaction_id']); ?></td>
+                            <td><?php echo esc_html($transaction['item_id']); ?></td>
+                            <td><?php echo esc_html($transaction['name']); ?></td>
+                            <td><?php echo esc_html($transaction['user_id']); ?></td>
+                            <td><?php echo esc_html($transaction['user_type']); ?></td>
+                            <td><?php echo esc_html($transaction['action']); ?></td>
+                            <td><span class="badge <?php echo $transaction['status'] === 'Completed' ? 'bg-success' : 'bg-warning'; ?>"><?php echo esc_html($transaction['status']); ?></span></td>
+                            <td><?php echo esc_html($transaction['date']); ?></td>
+                            <td><?php echo esc_html($transaction['education_center_id']); ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <form id="delete-transaction-form" method="post">
+                    <input type="hidden" name="transaction_id" value="<?php echo esc_attr($transaction['transaction_id']); ?>">
+                    <input type="hidden" name="action" value="su_p_delete_transaction">
+                    <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('su_p_transaction_nonce'); ?>">
+                    <button type="submit" class="button edu-button-delete">Delete</button>
+                    <button type="button" class="button edu-modal-cancel">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+    jQuery(document).ready(function($) {
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+
+        // Modal close handlers
+        $('#deleteTransactionModal .edu-modal-close, #deleteTransactionModal .edu-modal-cancel').on('click', function() {
+            $('#deleteTransactionModal').fadeOut(300, function() {
+                $(this).remove();
+            });
+        });
+
+        // Click outside to close
+        $(document).on('click', function(e) {
+            if ($(e.target).is('#deleteTransactionModal')) {
+                $('#deleteTransactionModal').fadeOut(300, function() {
+                    $(this).remove();
+                });
+            }
+        });
+
+        $('#delete-transaction-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoader();
+            const formData = new FormData(this);
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Transaction deleted successfully');
+                        $('#deleteTransactionModal').fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                        loadTransactions('<?php echo isset($searchQuery) ? $searchQuery : ''; ?>', 
+                                       '<?php echo isset($centerFilter) ? $centerFilter : ''; ?>', 
+                                       '<?php echo isset($actionFilter) ? $actionFilter : ''; ?>', 
+                                       '<?php echo isset($statusFilter) ? $statusFilter : ''; ?>');
+                    } else {
+                        $('#delete-transaction-container').prepend(`<div class="alert alert-danger">${response.data.message}</div>`);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    alert('Error deleting transaction.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    wp_send_json_success(ob_get_clean());
+}
+
+add_action('wp_ajax_su_p_delete_transaction', 'su_p_delete_transaction');
+function su_p_delete_transaction() {
+    check_ajax_referer('su_p_transaction_nonce', 'nonce');
+    global $wpdb;
+    $trans_table = $wpdb->prefix . 'inventory_transactions';
+    $transaction_id = intval($_POST['transaction_id']);
+    if (empty($transaction_id)) {
+        wp_send_json_error(['message' => 'Invalid transaction ID']);
+    }
+
+    $result = $wpdb->delete($trans_table, ['transaction_id' => $transaction_id], ['%d']);
+    if ($result === false) {
+        error_log("Failed to delete transaction ID: $transaction_id. User: " . get_current_user_id());
+        wp_send_json_error(['message' => 'Failed to delete transaction: Check debug.log']);
+    } else {
+        wp_send_json_success();
+    }
+}
+
+add_action('wp_ajax_su_p_fetch_items_by_center', 'su_p_fetch_items_by_center');
+function su_p_fetch_items_by_center() {
+    check_ajax_referer('su_p_transaction_nonce', 'nonce');
+    global $wpdb;
+    $center_id = sanitize_text_field($_POST['center_id']);
+    $inv_table = $wpdb->prefix . 'inventory';
+    
+    $items = $wpdb->get_results($wpdb->prepare(
+        "SELECT item_id, name FROM $inv_table WHERE education_center_id = %s",
+        $center_id
+    ), ARRAY_A);
+
+    if ($items) {
+        wp_send_json_success($items);
+    } else {
+        wp_send_json_error(['message' => 'No items found for this center']);
+    }
+}
+
+//message
+// Enqueue Styles and Scripts
+add_action('admin_enqueue_scripts', 'enigma_overlord_chat_enqueue');
+function enigma_overlord_chat_enqueue() {
+    wp_enqueue_style('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css');
+    wp_enqueue_style('bootstrap-icons', 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css');
+    wp_enqueue_script('jquery', 'https://code.jquery.com/jquery-3.6.0.min.js', [], null, true);
+    wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js', ['jquery'], null, true);
+    wp_enqueue_script('moment', 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js', [], null, true);
+    wp_add_inline_style('bootstrap', '
+        .chat-sidebar { max-height: 80vh; overflow-y: auto; border-right: 1px solid #ddd; }
+        .chat-message { padding: 10px; margin: 5px; border-radius: 5px; max-width: 70%; }
+        .chat-message.sent { background: #d4edda; align-self: flex-end; }
+        .chat-message.received { background: #f8f9fa; align-self: flex-start; }
+        .chat-header { background: #17a2b8; color: white; padding: 10px; }
+        .chat-messages { max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; }
+        .conversation-list { list-style: none; padding: 0; }
+        .conversation-item { padding: 10px; cursor: pointer; }
+        .conversation-item:hover { background: #f1f1f1; }
+        .conversation-item.active { background: #e9ecef; }
+    ');
+}
+
+// Main Chat Function
+function render_eo_chat() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You do not have permission to access this page.</p>';
+    }
+
+    global $wpdb;
+    $admins = $wpdb->get_results("SELECT institute_admin_id AS id, name, education_center_id FROM {$wpdb->prefix}institute_admins");
+
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Enigma Overlord Chat</h2>
+                <div id="enigma-overlord-chat" class="chat-container">
+                    <div class="chat-wrapper d-flex">
+                        <div class="chat-sidebar col-md-3">
+                            <div class="sidebar-header">
+                                <h4>Conversations <span id="unread-badge" class="badge bg-danger"></span>
+                                    <button id="enigma-refresh-conversations" class="btn btn-outline-light btn-sm" style="float: right;"><i class="bi bi-arrow-repeat"></i></button>
+                                </h4>
+                            </div>
+                            <ul id="enigma-overlord-conversations" class="conversation-list"></ul>
+                        </div>
+                        <div class="chat-main col-md-9">
+                            <div class="chat-header d-flex justify-content-between align-items-center">
+                                <h5 id="current-conversation">Select a conversation</h5>
+                                <div>
+                                    <button id="enigma-refresh-messages" class="btn btn-outline-light btn-sm"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+                                    <button id="new-chat" class="btn btn-outline-primary btn-sm">New Chat</button>
+                                    <button id="clear-conversation" class="btn btn-outline-secondary btn-sm" style="display:none;">Clear</button>
+                                </div>
+                            </div>
+                            <div id="enigma-overlord-message-list" class="chat-messages"></div>
+                            <form id="enigma-overlord-send-form" class="chat-form">
+                                <div class="input-group">
+                                    <textarea id="enigma-overlord-message-input" class="form-control" placeholder="Type your message..." rows="1" required></textarea>
+                                    <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i></button>
+                                </div>
+                                <div id="recipient-select" class="recipient-select" style="display:none;">
+                                    <select id="enigma-overlord-target-value" class="form-select">
+                                        <option value="">Select an Institute Admin</option>
+                                        <?php
+                                        foreach ($admins as $admin) {
+                                            $center_id = $admin->education_center_id;
+                                            $center = get_posts([
+                                                'post_type' => 'educational-center',
+                                                'meta_key' => 'educational_center_id',
+                                                'meta_value' => $center_id,
+                                                'posts_per_page' => 1
+                                            ]);
+                                            $center_name = $center ? $center[0]->post_title : 'Unknown Center';
+                                            echo "<option value='{$admin->id}|$center_id'>" . esc_html("{$admin->name} ({$admin->id} - $center_name)") . "</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <?php wp_nonce_field('enigma_overlord_chat_nonce', 'enigma_overlord_nonce_field'); ?>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .chat-loading { display: none; text-align: center; padding: 20px; color: #666; }
+        .chat-loading.active { display: block; }
+        .spinner { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+
+    <script>
+    jQuery(document).ready(function($) {
+        let selectedConversation = localStorage.getItem('enigma_overlord_selected_conversation') || '';
+        let currentRecipient = '';
+
+        function fetchMessages(conversationWith) {
+            $('#enigma-overlord-message-list').html('<div class="chat-loading active"><div class="spinner"></div><p>Loading messages...</p></div>');
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'enigma_overlord_fetch_messages',
+                    conversation_with: conversationWith,
+                    nonce: $('#enigma_overlord_nonce_field').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#enigma-overlord-message-list').html(response.data.html);
+                        $('#unread-badge').text(response.data.unread || '');
+                        const chatMessages = document.querySelector('#enigma-overlord-message-list');
+                        if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+                        updateTimestamps();
+                    } else {
+                        $('#enigma-overlord-message-list').html('<p>Error loading messages.</p>');
+                        console.error('Fetch messages failed:', response.data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#enigma-overlord-message-list').html('<p>Network error occurred.</p>');
+                    console.error('AJAX error:', status, error);
+                }
+            });
+        }
+
+        function updateConversations() {
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'enigma_overlord_fetch_conversations',
+                    nonce: $('#enigma_overlord_nonce_field').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#enigma-overlord-conversations').html(response.data);
+                        if (selectedConversation) {
+                            $(`#enigma-overlord-conversations li[data-conversation-with="${selectedConversation}"]`).addClass('active');
+                        }
+                    } else {
+                        console.error('Failed to fetch conversations:', response.data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', status, error);
+                }
+            });
+        }
+
+        function updateTimestamps() {
+            $('.chat-message .meta').each(function() {
+                const timestamp = $(this).data('timestamp');
+                $(this).text(`${$(this).text().split(' - ')[0]} - ${moment(timestamp).fromNow()}`);
+            });
+        }
+
+        $(document).on('click', '#enigma-overlord-conversations li', function() {
+            $('#enigma-overlord-conversations li').removeClass('active');
+            $(this).addClass('active');
+            selectedConversation = $(this).data('conversation-with');
+            currentRecipient = selectedConversation;
+            localStorage.setItem('enigma_overlord_selected_conversation', selectedConversation);
+            $('#current-conversation').text($(this).text());
+            $('#clear-conversation').show();
+            $('#new-chat').show();
+            $('#recipient-select').hide();
+            fetchMessages(selectedConversation);
+        });
+
+        $('#enigma-refresh-conversations').click(function() {
+            updateConversations();
+        });
+
+        $('#enigma-refresh-messages').click(function() {
+            if (selectedConversation) {
+                fetchMessages(selectedConversation);
+            }
+        });
+
+        $('#clear-conversation').click(function() {
+            selectedConversation = '';
+            currentRecipient = '';
+            localStorage.removeItem('enigma_overlord_selected_conversation');
+            $('#current-conversation').text('Select a conversation');
+            $('#clear-conversation').hide();
+            $('#new-chat').show();
+            $('#recipient-select').hide();
+            $('#enigma-overlord-message-list').empty();
+            $('#enigma-overlord-conversations li').removeClass('active');
+        });
+
+        $('#new-chat').click(function() {
+            selectedConversation = '';
+            currentRecipient = '';
+            localStorage.removeItem('enigma_overlord_selected_conversation');
+            $('#current-conversation').text('New Conversation');
+            $('#clear-conversation').show();
+            $('#new-chat').hide();
+            $('#recipient-select').show();
+            $('#enigma-overlord-message-list').empty();
+            $('#enigma-overlord-conversations li').removeClass('active');
+            $('#enigma-overlord-target-value').val('');
+        });
+
+        $('#enigma-overlord-send-form').submit(function(e) {
+            e.preventDefault();
+            const message = $('#enigma-overlord-message-input').val().trim();
+            if (!message) return;
+
+            let targetValue = $('#recipient-select').is(':visible') ? $('#enigma-overlord-target-value').val() : currentRecipient;
+            if (!targetValue) {
+                alert('Please select an institute admin.');
+                return;
+            }
+
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'enigma_overlord_send_message',
+                    message: message,
+                    target_value: targetValue,
+                    nonce: $('#enigma_overlord_nonce_field').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#enigma-overlord-message-input').val('');
+                        if ($('#recipient-select').is(':visible')) {
+                            currentRecipient = targetValue;
+                            $('#current-conversation').text($(`#enigma-overlord-target-value option[value="${targetValue}"]`).text());
+                            $('#clear-conversation').show();
+                            $('#new-chat').hide();
+                            $('#recipient-select').hide();
+                        }
+                        fetchMessages(currentRecipient);
+                        setTimeout(updateConversations, 500);
+                    } else {
+                        alert('Failed to send message: ' + (response.data?.error || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', status, error);
+                    alert('Network error occurred. Please try again.');
+                }
+            });
+        });
+
+        updateConversations();
+        if (selectedConversation) {
+            $(`#enigma-overlord-conversations li[data-conversation-with="${selectedConversation}"]`).addClass('active');
+            $('#current-conversation').text($(`#enigma-overlord-conversations li[data-conversation-with="${selectedConversation}"]`).text());
+            $('#clear-conversation').show();
+            $('#new-chat').show();
+            $('#recipient-select').hide();
+            fetchMessages(selectedConversation);
+        }
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// AJAX Send Message
+add_action('wp_ajax_enigma_overlord_send_message', 'enigma_overlord_ajax_send_message');
+function enigma_overlord_ajax_send_message() {
+    check_ajax_referer('enigma_overlord_chat_nonce', 'nonce');
+
+    $sender_id = 'enigma_overlord';
+    $message = sanitize_text_field($_POST['message'] ?? '');
+    $target_value = sanitize_text_field($_POST['target_value'] ?? '');
+
+    if (!$message || !$target_value) {
+        wp_send_json_error(['error' => 'Missing required fields']);
+        return;
+    }
+
+    list($receiver_id, $education_center_id) = explode('|', $target_value);
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_messages';
+
+    $success = $wpdb->insert(
+        $table,
+        [
+            'sender_id' => $sender_id,
+            'receiver_id' => $receiver_id,
+            'message' => $message,
+            'education_center_id' => $education_center_id,
+            'status' => 'sent',
+            'timestamp' => current_time('mysql'),
+        ],
+        ['%s', '%s', '%s', '%s', '%s', '%s']
+    );
+
+    if ($success) {
+        wp_send_json_success(['success' => 'Message sent!']);
+    } else {
+        wp_send_json_error(['error' => 'Failed to send message: ' . $wpdb->last_error]);
+    }
+}
+
+// AJAX Fetch Messages
+add_action('wp_ajax_enigma_overlord_fetch_messages', 'enigma_overlord_ajax_fetch_messages');
+function enigma_overlord_ajax_fetch_messages() {
+    ob_start();
+    check_ajax_referer('enigma_overlord_chat_nonce', 'nonce');
+
+    $conversation_with = sanitize_text_field($_POST['conversation_with'] ?? '');
+    if (!$conversation_with) {
+        wp_send_json_error(['error' => 'No conversation selected']);
+        return;
+    }
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_messages';
+    list($receiver_id, $education_center_id) = explode('|', $conversation_with);
+
+    $query = "SELECT * FROM $table 
+              WHERE education_center_id = %s 
+              AND ((sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s)) 
+              ORDER BY timestamp ASC 
+              LIMIT 50";
+    $messages = $wpdb->get_results($wpdb->prepare(
+        $query,
+        $education_center_id,
+        'enigma_overlord',
+        $receiver_id,
+        $receiver_id,
+        'enigma_overlord'
+    ));
+
+    $admins = $wpdb->get_results($wpdb->prepare(
+        "SELECT institute_admin_id AS id, name FROM {$wpdb->prefix}institute_admins WHERE education_center_id = %s",
+        $education_center_id
+    ));
+    $contact_map = [];
+    foreach ($admins as $admin) {
+        $contact_map[$admin->id] = $admin->name;
+    }
+
+    $output = '';
+    foreach ($messages as $msg) {
+        $sender_name = $msg->sender_id === 'enigma_overlord' ? 'You' : ($contact_map[$msg->sender_id] ?? 'Unknown');
+        $receiver_name = $msg->receiver_id === 'enigma_overlord' ? 'You' : ($contact_map[$msg->receiver_id] ?? 'Unknown');
+        $initials = strtoupper(substr($sender_name === 'You' ? 'Enigma Overlord' : $sender_name, 0, 2));
+        $output .= '<div class="chat-message ' . ($msg->sender_id === 'enigma_overlord' ? 'sent' : 'received') . '">';
+        $output .= '<div class="bubble">';
+        $output .= '<span class="avatar">' . esc_html($initials) . '</span>';
+        $output .= '<p>' . esc_html($msg->message) . '</p>';
+        $output .= '</div>';
+        $timestamp = $msg->timestamp ?? 'N/A';
+        $output .= '<div class="meta" data-timestamp="' . esc_attr($timestamp) . '">' .
+                  esc_html($sender_name) . ' to ' . esc_html($receiver_name) . ' - ' . esc_html($timestamp) .
+                  '</div>';
+        $output .= '</div>';
+    }
+
+    $unread_count = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM $table WHERE receiver_id = %s AND sender_id = %s AND status = 'sent' AND education_center_id = %s",
+        'enigma_overlord',
+        $receiver_id,
+        $education_center_id
+    ));
+
+    ob_end_clean();
+    wp_send_json_success(['html' => $output, 'unread' => $unread_count]);
+}
+
+// AJAX Fetch Conversations
+add_action('wp_ajax_enigma_overlord_fetch_conversations', 'enigma_overlord_ajax_fetch_conversations');
+function enigma_overlord_ajax_fetch_conversations() {
+    ob_start();
+    check_ajax_referer('enigma_overlord_chat_nonce', 'nonce');
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_messages';
+    $admins = $wpdb->get_results("SELECT institute_admin_id AS id, name, education_center_id FROM {$wpdb->prefix}institute_admins");
+
+    // Fetch conversations ordered by latest message
+    $query = "
+        SELECT DISTINCT 
+            CONCAT(
+                CASE 
+                    WHEN sender_id = 'enigma_overlord' THEN receiver_id 
+                    WHEN receiver_id = 'enigma_overlord' THEN sender_id 
+                END, 
+                '|', 
+                education_center_id
+            ) AS conversation_with,
+            MAX(timestamp) AS latest_message
+        FROM $table 
+        WHERE (sender_id = 'enigma_overlord' OR receiver_id = 'enigma_overlord')
+        AND (sender_id IN (SELECT institute_admin_id FROM {$wpdb->prefix}institute_admins) 
+             OR receiver_id IN (SELECT institute_admin_id FROM {$wpdb->prefix}institute_admins))
+        GROUP BY conversation_with
+        ORDER BY latest_message DESC
+    ";
+    $active_conversations = $wpdb->get_results($query);
+
+    $contact_map = [];
+    foreach ($admins as $admin) {
+        $center_id = $admin->education_center_id;
+        $center = get_posts([
+            'post_type' => 'educational-center',
+            'meta_key' => 'educational_center_id',
+            'meta_value' => $center_id,
+            'posts_per_page' => 1
+        ]);
+        $center_name = $center ? $center[0]->post_title : 'Unknown Center';
+        $contact_map["{$admin->id}|$center_id"] = "{$admin->name} ({$admin->id} - $center_name)";
+    }
+
+    $output = '';
+    $has_conversations = false;
+    foreach ($active_conversations as $conv) {
+        $conv_with = $conv->conversation_with;
+        $name = $contact_map[$conv_with] ?? 'Unknown';
+        $output .= '<li class="conversation-item" data-conversation-with="' . esc_attr($conv_with) . '">' . esc_html($name) . '</li>';
+        $has_conversations = true;
+    }
+    if (!$has_conversations) {
+        $output = '<li class="conversation-item text-muted">No conversations yet.</li>';
+    }
+
+    ob_end_clean();
+    wp_send_json_success($output);
+}
+//noticeboard
+// Enqueue Scripts and Styles for Admin Dashboard
+add_action('admin_enqueue_scripts', 'enigma_notice_board_enqueue_scripts');
+function enigma_notice_board_enqueue_scripts($hook) {
+    // Only enqueue on the specific super admin notice board page
+    if ($hook !== 'toplevel_page_enigma-overlord-notice-board') {
+        return;
+    }
+    wp_enqueue_style('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css');
+    wp_enqueue_style('bootstrap-icons', 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css');
+    wp_enqueue_script('jquery', 'https://code.jquery.com/jquery-3.6.0.min.js', [], null, true);
+    wp_enqueue_script('moment', 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js', [], '2.29.1', true);
+    wp_add_inline_style('bootstrap', '
+        .notice-board-container { max-width: 100%; margin: 20px auto; }
+        .notice-board-header { background: #17a2b8; color: white; padding: 10px; font-size: 1.5em; display: flex; justify-content: space-between; align-items: center; }
+        .announcement-list { border: 1px solid #ddd; padding: 10px; max-height: 60vh; overflow-y: auto; }
+        .announcement-item { border-bottom: 1px solid #eee; padding: 10px; }
+        .announcement-meta { font-weight: bold; color: #555; }
+        .announcement-message { margin: 5px 0; }
+        .announcement-timestamp { font-size: 0.9em; color: #888; }
+        .announcement-form { margin-top: 10px; }
+    ');
+}
+
+// S Notice Board Page
+function enigma_notice_board_page() {
+    if (!current_user_can('manage_options')) {
+        wp_die('You do not have permission to access this page.');
+    }
+
+    global $wpdb;
+    $username = 'enigma_overlord'; // Hardcoded super admin username
+    $announcements = enigma_get_announcements($username);
+    $recipients = enigma_get_recipient_options();
+
+    ob_start();
+    ?>
+    <div class="wrap">
+        <h1> Notice Board</h1>
+        <div id="enigma-notice-board" class="notice-board-container">
+            <div class="notice-board-header">
+                Super Admin Notice Board
+                <button id="enigma-refresh-announcements" class="btn btn-outline-light btn-sm"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+            </div>
+            <div id="announcement-list" class="announcement-list">
+                <?php foreach ($announcements as $ann): ?>
+                    <div class="announcement-item">
+                        <div class="announcement-content">
+                            <span class="announcement-meta">
+                                <?php echo esc_html($ann->sender_id === $username ? 'You' : $ann->sender_id); ?> 
+                                to <?php echo esc_html($recipients[$ann->receiver_id] ?? ucfirst($ann->receiver_id)); ?>
+                            </span>
+                            <p class="announcement-message"><?php echo esc_html($ann->message); ?></p>
+                        </div>
+                        <span class="announcement-timestamp" data-timestamp="<?php echo esc_attr($ann->timestamp); ?>">
+                            <?php echo esc_html($ann->timestamp); ?>
+                        </span>
+                    </div>
+                <?php endforeach; ?>
+                <?php if (empty($announcements)): ?>
+                    <div class="announcement-item">
+                        <p class="announcement-message text-muted">No announcements yet.</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <form id="enigma-announcement-form" class="announcement-form">
+                <div class="input-group">
+                    <textarea id="announcement-input" class="form-control" placeholder="Post a new announcement..." required></textarea>
+                    <select id="announcement-target" class="form-select">
+                        <?php foreach ($recipients as $value => $label): ?>
+                            <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Post</button>
+                </div>
+                <?php wp_nonce_field('enigma_notice_nonce', 'enigma_notice_nonce_field'); ?>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        function fetchAnnouncements() {
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_announcements',
+                    nonce: $('#enigma_notice_nonce_field').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#announcement-list').html(response.data.html);
+                        updateTimestamps();
+                    } else {
+                        console.log('Fetch failed: ' + (response.data ? response.data.message : 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('AJAX fetch error: ' + error);
+                }
+            });
+        }
+
+        function updateTimestamps() {
+            $('.announcement-timestamp').each(function() {
+                const timestamp = $(this).data('timestamp');
+                if (typeof moment !== 'undefined') {
+                    $(this).text(moment(timestamp).fromNow());
+                } else {
+                    console.log('Moment.js not loaded');
+                }
+            });
+        }
+
+        $('#enigma-announcement-form').on('submit', function(e) {
+            e.preventDefault();
+            var message = $('#announcement-input').val();
+            var target = $('#announcement-target').val();
+            var nonce = $('#enigma_notice_nonce_field').val();
+            console.log('Submitting announcement: ' + message + ' to ' + target);
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'enigma_send_announcement',
+                    message: message,
+                    target: target,
+                    nonce: nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        console.log('Announcement posted successfully');
+                        $('#announcement-input').val('');
+                        fetchAnnouncements();
+                    } else {
+                        console.log('Post failed: ' + (response.data ? response.data.message : 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('AJAX post error: ' + error);
+                }
+            });
+        });
+
+        $('#enigma-refresh-announcements').on('click', function() {
+            fetchAnnouncements();
+        });
+
+        fetchAnnouncements();
+        setInterval(fetchAnnouncements, 30000); // Auto-refresh every 30 seconds
+        updateTimestamps();
+    });
+    </script>
+    <?php
+    echo ob_get_clean();
+}
+
+// Super Admin Get Announcements
+function enigma_get_announcements($username) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_announcements';
+
+    // Super admin sees all announcements they sent or received across all centers
+    $query = "
+        SELECT * FROM $table 
+        WHERE (sender_id = %s OR receiver_id = 'enigma_overlord') 
+        ORDER BY timestamp DESC
+    ";
+    $prepared_query = $wpdb->prepare($query, $username);
+    error_log("Super admin announcements query: $prepared_query");
+    $results = $wpdb->get_results($prepared_query);
+    error_log("Super admin announcements for $username: " . print_r($results, true));
+    return $results;
+}
+
+// Super Admin Send Announcement
+function enigma_send_announcement($sender_id, $receiver_id, $message, $edu_center_id = null) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'aspire_announcements';
+    $data = [
+        'sender_id' => $sender_id,
+        'receiver_id' => $receiver_id,
+        'message' => sanitize_text_field($message),
+        'education_center_id' => $edu_center_id, // Null for super admin unless specified
+        'timestamp' => current_time('mysql')
+    ];
+    $result = $wpdb->insert($table, $data);
+    error_log("Send announcement result for $sender_id to $receiver_id: " . ($result ? 'Success' : 'Failed - ' . $wpdb->last_error));
+    return $result;
+}
+
+// Super Admin Recipient Options
+function enigma_get_recipient_options() {
+    return [
+        
+        'institute_admins' => 'All Institute Admins' // Super admin can broadcast to all admins
+    ];
+}
+
+// Super Admin AJAX Handlers
+add_action('wp_ajax_enigma_fetch_announcements', 'enigma_fetch_announcements');
+function enigma_fetch_announcements() {
+    check_ajax_referer('enigma_notice_nonce', 'nonce');
+    $username = 'enigma_overlord'; // Hardcoded for super admin
+    $announcements = enigma_get_announcements($username);
+    $recipients = enigma_get_recipient_options();
+
+    $output = '';
+    foreach ($announcements as $ann) {
+        $output .= '<div class="announcement-item">';
+        $output .= '<div class="announcement-content">';
+        $output .= '<span class="announcement-meta">' . esc_html($ann->sender_id === $username ? 'You' : $ann->sender_id) . ' to ';
+        $output .= esc_html($recipients[$ann->receiver_id] ?? ucfirst($ann->receiver_id)) . '</span>';
+        $output .= '<p class="announcement-message">' . esc_html($ann->message) . '</p>';
+        $output .= '</div>';
+        $output .= '<span class="announcement-timestamp" data-timestamp="' . esc_attr($ann->timestamp) . '">' . esc_html($ann->timestamp) . '</span>';
+        $output .= '</div>';
+    }
+    if (empty($announcements)) {
+        $output = '<div class="announcement-item"><p class="announcement-message text-muted">No announcements yet.</p></div>';
+    }
+    wp_send_json_success(['html' => $output]);
+}
+
+add_action('wp_ajax_enigma_send_announcement', 'enigma_send_announcement_handler');
+function enigma_send_announcement_handler() {
+    $nonce = $_POST['nonce'] ?? '';
+    if (!wp_verify_nonce($nonce, 'enigma_notice_nonce')) {
+        error_log("Super admin send failed: Invalid nonce - $nonce");
+        wp_send_json_error(['message' => 'Invalid nonce']);
+    }
+
+    $username = 'enigma_overlord'; // Hardcoded super admin
+    $message = sanitize_text_field($_POST['message'] ?? '');
+    $target = sanitize_text_field($_POST['target'] ?? '');
+    $valid_targets = array_keys(enigma_get_recipient_options());
+
+    error_log("Super admin send announcement: username=$username, target=$target, message=$message, nonce=$nonce");
+
+    if (!current_user_can('manage_options')) {
+        error_log("Super admin send failed: Not authorized");
+        wp_send_json_error(['message' => 'Permission denied']);
+    }
+
+    if (!in_array($target, $valid_targets)) {
+        error_log("Super admin send failed: Invalid target - $target");
+        wp_send_json_error(['message' => 'Invalid target']);
+    }
+
+    if (empty($message)) {
+        error_log("Super admin send failed: Empty message");
+        wp_send_json_error(['message' => 'Message cannot be empty']);
+    }
+
+    // If sending to all institute admins, loop through all centers
+    if ($target === 'institute_admins') {
+        global $wpdb;
+        $admins = $wpdb->get_results("SELECT institute_admin_id AS id, education_center_id FROM {$wpdb->prefix}institute_admins");
+        $success = true;
+        foreach ($admins as $admin) {
+            $result = enigma_send_announcement($username, $admin->id, $message, $admin->education_center_id);
+            if (!$result) {
+                $success = false;
+            }
+        }
+        if ($success) {
+            error_log("Super admin send success: Announcement posted to all institute admins");
+            wp_send_json_success();
+        } else {
+            error_log("Super admin send failed: Database insert error - " . $wpdb->last_error);
+            wp_send_json_error(['message' => 'Failed to post announcement to some admins']);
+        }
+    } else {
+        $result = enigma_send_announcement($username, $target, $message, null);
+        if ($result) {
+            error_log("Super admin send success: Announcement posted");
+            wp_send_json_success();
+        } else {
+            error_log("Super admin send failed: Database insert error - " . $wpdb->last_error);
+            wp_send_json_error(['message' => 'Failed to post announcement']);
+        }
+    }
+}
+
+
+//fees
+// Main Render Function (Dashboard with Modals)
+function render_enigma_fees_management() {
+    if (!current_user_can('manage_options')) {
+        wp_die('You do not have permission to access this page.');
+    }
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <!-- Loader SVG -->
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Fees Management</h2>
+                <div class="search-filters">
+                    <input type="text" id="fee-search" placeholder="Search by Student ID or Template...">
+                    <select id="center-filter">
+                        <option value="">All Educational Centers</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="actions">
+                    <button id="add-fee-btn">Add Fee</button>
+                    <button id="add-template-btn">Add Fee Template</button>
+                    <label for="fees-per-page">Show:</label>
+                    <select id="fees-per-page">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                    <button id="prev-page" disabled>Previous</button>
+                    <span id="page-info"></span>
+                    <button id="next-page">Next</button>
+                    <button id="refresh-data">Refresh</button>
+                </div>
+                <div class="management-table-wrapper">
+                    <div class="actions" id="export-tools"></div>
+                    <table id="fee-table" class="wp-list-table widefat fixed striped">
+                        <thead id="fee-table-head"></thead>
+                        <tbody id="fee-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Fee Modal -->
+    <div class="edu-modal" id="add-fee-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="add-fee-modal">×</span>
+            <h3>Add New Fee</h3>
+            <form id="add-fee-form">
+                <div class="search-filters">
+                    <label for="add-center-id">Educational Center</label>
+                    <select id="add-center-id" name="educational_center_id" required>
+                        <option value="">Select Center</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="add-student-id">Student</label>
+                    <select id="add-student-id" name="student_id" required>
+                        <option value="">Select a Center First</option>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="add-template-id">Fee Template</label>
+                    <select id="add-template-id" name="template_id" required>
+                        <option value="">Select a Center First</option>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="add-month-year">Month/Year</label>
+                    <input type="month" id="add-month-year" name="month_year" required>
+                </div>
+                <div class="search-filters">
+                    <label for="add-amount">Amount</label>
+                    <input type="number" id="add-amount" name="amount" step="0.01" min="0" required>
+                </div>
+                <div class="search-filters">
+                    <label for="add-status">Status</label>
+                    <select id="add-status" name="status" required>
+                        <option value="pending">Pending</option>
+                        <option value="paid">Paid</option>
+                    </select>
+                </div>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_fees_nonce'); ?>">
+                <button type="button" id="save-fee">Add Fee</button>
+            </form>
+            <div id="add-fee-message" class="message"></div>
+        </div>
+    </div>
+
+    <!-- Edit Fee Modal -->
+    <div class="edu-modal" id="edit-fee-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="edit-fee-modal">×</span>
+            <h3>Edit Fee</h3>
+            <form id="edit-fee-form">
+                <input type="hidden" id="edit-fee-id" name="fee_id">
+                <div class="search-filters">
+                    <label for="edit-center-id">Educational Center</label>
+                    <input type="text" id="edit-center-id" name="educational_center_id" readonly>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-student-id">Student ID</label>
+                    <input type="text" id="edit-student-id" name="student_id" readonly>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-template-id">Fee Template</label>
+                    <select id="edit-template-id" name="template_id" required>
+                        <option value="">Select Template</option>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-month-year">Month/Year</label>
+                    <input type="month" id="edit-month-year" name="month_year" required>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-amount">Amount</label>
+                    <input type="number" id="edit-amount" name="amount" step="0.01" min="0" required>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-status">Status</label>
+                    <select id="edit-status" name="status" required>
+                        <option value="pending">Pending</option>
+                        <option value="paid">Paid</option>
+                    </select>
+                </div>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_fees_nonce'); ?>">
+                <button type="button" id="update-fee">Update Fee</button>
+            </form>
+            <div id="edit-fee-message" class="message"></div>
+        </div>
+    </div>
+
+    <!-- Add Fee Template Modal -->
+    <div class="edu-modal" id="add-template-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="add-template-modal">×</span>
+            <h3>Add Fee Template</h3>
+            <form id="add-template-form">
+                <div class="search-filters">
+                    <label for="add-template-center-id">Educational Center</label>
+                    <select id="add-template-center-id" name="educational_center_id" required>
+                        <option value="">Select Center</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="add-template-name">Name</label>
+                    <input type="text" id="add-template-name" name="name" required>
+                </div>
+                <div class="search-filters">
+                    <label for="add-template-amount">Amount</label>
+                    <input type="number" id="add-template-amount" name="amount" step="0.01" min="0" required>
+                </div>
+                <div class="search-filters">
+                    <label for="add-template-frequency">Frequency</label>
+                    <select id="add-template-frequency" name="frequency" required>
+                        <option value="monthly">Monthly</option>
+                        <option value="quarterly">Quarterly</option>
+                        <option value="annual">Annual</option>
+                    </select>
+                </div>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_fees_nonce'); ?>">
+                <button type="button" id="save-template">Add Template</button>
+            </form>
+            <div id="add-template-message" class="message"></div>
+        </div>
+    </div>
+
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+    function openModal(modalId) { 
+        showLoader(); 
+        jQuery(modalId).css('display', 'flex'); 
+        setTimeout(hideLoader, 300); 
+        clearMessages(modalId);
+    }
+    function closeModal(modalId) { 
+        jQuery(modalId).css('display', 'none'); 
+        clearMessages(modalId); 
+        hideLoader(); 
+    }
+    function clearMessages(modalId) {
+        jQuery(modalId + ' .message').css({'background': '', 'color': ''}).text('');
+    }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_fees_nonce'); ?>';
+
+        let currentPage = 1;
+        let perPage = 10;
+        let feeSearch = '';
+        let centerFilter = '';
+
+        $('.edu-modal-close').on('click', function() { closeModal('#' + $(this).data('modal')); });
+        $(document).on('click', function(event) { if ($(event.target).hasClass('edu-modal')) closeModal('#' + event.target.id); });
+
+        function loadFees(page, limit, search, center, showLoading = true) {
+            if (showLoading) showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_fees',
+                    page: page,
+                    per_page: limit,
+                    search: search,
+                    center_filter: center,
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    if (showLoading) hideLoader();
+                    if (response.success) {
+                        $('#fee-table-head').html(response.data.table_head);
+                        $('#fee-table-body').html(response.data.fees);
+                        const totalPages = Math.ceil(response.data.total / limit);
+                        $('#page-info').text(`Page ${page} of ${totalPages} (Total Records: ${response.data.total})`);
+                        $('#prev-page').prop('disabled', page === 1);
+                        $('#next-page').prop('disabled', page === totalPages);
+                        setupExportButtons(response.data.fee_data);
+                    } else {
+                        $('#fee-table-body').html('<tr><td colspan="8">No fees found.</td></tr>');
+                        $('#export-tools').html('');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    $('#fee-table-body').html('<tr><td colspan="8">Error loading fees: ' + error + '</td></tr>');
+                }
+            });
+        }
+
+        function setupExportButtons(feeData) {
+            const tools = $('#export-tools');
+            tools.html(`
+                <button class="export-btn export-csv"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
+                <button class="export-btn export-pdf"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
+                <button class="export-btn export-excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
+            `);
+            tools.find('.export-csv').on('click', () => exportToCSV(feeData));
+            tools.find('.export-pdf').on('click', () => generatePDF(feeData));
+            tools.find('.export-excel').on('click', () => exportToExcel(feeData));
+        }
+
+        function exportToCSV(data) {
+            const headers = ['ID', 'Student ID', 'Edu Center ID', 'Template', 'Amount', 'Month/Year', 'Status'];
+            const csvRows = [headers.join(',')];
+            data.forEach(row => {
+                const values = [row.id, row.student_id, row.educational_center_id, row.template_name, row.amount, row.month_year, row.status].map(value => `"${value}"`);
+                csvRows.push(values.join(','));
+            });
+            const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'fees.csv';
+            link.click();
+        }
+
+        function generatePDF(data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(16);
+            doc.text('Fees Report', 10, 10);
+            doc.setFontSize(12);
+            const tableData = data.map(row => [row.id, row.student_id, row.educational_center_id, row.template_name, row.amount, row.month_year, row.status]);
+            doc.autoTable({
+                head: [['ID', 'Student ID', 'Edu Center ID', 'Template', 'Amount', 'Month/Year', 'Status']],
+                body: tableData,
+                startY: 20,
+                styles: { fontSize: 10, cellPadding: 2 },
+                headStyles: { fillColor: [44, 109, 251] }
+            });
+            doc.save('fees.pdf');
+        }
+
+        function exportToExcel(data) {
+            const worksheetData = data.map(row => ({
+                'ID': row.id,
+                'Student ID': row.student_id,
+                'Edu Center ID': row.educational_center_id,
+                'Template': row.template_name,
+                'Amount': row.amount,
+                'Month/Year': row.month_year,
+                'Status': row.status
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Fees');
+            XLSX.writeFile(workbook, 'fees.xlsx');
+        }
+
+        loadFees(currentPage, perPage, feeSearch, centerFilter);
+
+        $('#fee-search').on('input', debounce(function() {
+            feeSearch = $(this).val();
+            currentPage = 1;
+            loadFees(currentPage, perPage, feeSearch, centerFilter);
+        }, 500));
+
+        $('#center-filter').on('change', function() {
+            centerFilter = $(this).val();
+            currentPage = 1;
+            loadFees(currentPage, perPage, feeSearch, centerFilter);
+        });
+
+        $('#fees-per-page').on('change', function() {
+            perPage = parseInt($(this).val());
+            currentPage = 1;
+            loadFees(currentPage, perPage, feeSearch, centerFilter);
+        });
+
+        $('#next-page').on('click', function() {
+            currentPage++;
+            loadFees(currentPage, perPage, feeSearch, centerFilter);
+        });
+
+        $('#prev-page').on('click', function() {
+            currentPage--;
+            loadFees(currentPage, perPage, feeSearch, centerFilter);
+        });
+
+        $('#refresh-data').on('click', function() {
+            loadFees(currentPage, perPage, feeSearch, centerFilter);
+        });
+
+        $('#add-fee-btn').on('click', function() {
+            $('#add-student-id, #add-template-id').html('<option value="">Select a Center First</option>');
+            openModal('#add-fee-modal');
+        });
+
+        $('#add-center-id').on('change', function() {
+            const centerId = $(this).val();
+            if (!centerId) return;
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_get_students', center_id: centerId, nonce: ajaxNonce },
+                success: function(response) {
+                    if (response.success) $('#add-student-id').html(response.data.options);
+                },
+                complete: hideLoader
+            });
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_get_templates', center_id: centerId, nonce: ajaxNonce },
+                success: function(response) {
+                    if (response.success) $('#add-template-id').html(response.data.options);
+                },
+                complete: hideLoader
+            });
+        });
+
+        $('#save-fee').on('click', function() {
+            enigma_add_fee();
+        });
+
+        $('#fee-table-body').on('click', '.edit-fee', function() {
+            const feeId = $(this).data('fee-id');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_fee', fee_id: feeId, nonce: ajaxNonce },
+                success: function(response) {
+                    if (response.success) {
+                        $('#edit-fee-id').val(response.data.id);
+                        $('#edit-center-id').val(response.data.educational_center_id);
+                        $('#edit-student-id').val(response.data.student_id);
+                        $('#edit-month-year').val(response.data.month_year);
+                        $('#edit-amount').val(response.data.amount);
+                        $('#edit-status').val(response.data.status);
+                        $.ajax({
+                            url: ajaxUrl,
+                            method: 'POST',
+                            data: { action: 'enigma_get_templates', center_id: response.data.educational_center_id, nonce: ajaxNonce },
+                            success: function(resp) {
+                                if (resp.success) {
+                                    $('#edit-template-id').html(resp.data.options);
+                                    $('#edit-template-id').val(response.data.template_id);
+                                    openModal('#edit-fee-modal');
+                                }
+                            },
+                            complete: hideLoader
+                        });
+                    } else {
+                        hideLoader();
+                        alert('Error fetching fee: ' + response.data.message);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    alert('Error fetching fee data.');
+                }
+            });
+        });
+
+        $('#update-fee').on('click', function() {
+            enigma_edit_fee();
+        });
+
+        $('#fee-table-body').on('click', '.delete-fee', function() {
+            if (confirm('Are you sure you want to delete this fee?')) {
+                enigma_delete_fee($(this).data('fee-id'));
+            }
+        });
+
+        $('#add-template-btn').on('click', function() {
+            openModal('#add-template-modal');
+        });
+
+        $('#save-template').on('click', function() {
+            enigma_add_template();
+        });
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => { clearTimeout(timeout); func(...args); };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    });
+
+    function enigma_add_fee() {
+        const formData = new FormData(jQuery('#add-fee-form')[0]);
+        formData.append('action', 'enigma_add_fee');
+        showLoader();
+        jQuery.ajax({
+            url: '<?php echo esc_js(admin_url('admin-ajax.php')); ?>',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                hideLoader();
+                const $message = jQuery('#add-fee-message');
+                if (response.success) {
+                    $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                    setTimeout(() => {
+                        closeModal('#add-fee-modal');
+                        loadFees(currentPage, perPage, feeSearch, centerFilter, false);
+                    }, 2000);
+                } else {
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                    setTimeout(() => clearMessages('#add-fee-modal'), 3000);
+                }
+            },
+            error: function() {
+                hideLoader();
+                jQuery('#add-fee-message').css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+            }
+        });
+    }
+
+    function enigma_edit_fee() {
+        const formData = new FormData(jQuery('#edit-fee-form')[0]);
+        formData.append('action', 'enigma_edit_fee');
+        showLoader();
+        jQuery.ajax({
+            url: '<?php echo esc_js(admin_url('admin-ajax.php')); ?>',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                hideLoader();
+                const $message = jQuery('#edit-fee-message');
+                if (response.success) {
+                    $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                    setTimeout(() => {
+                        closeModal('#edit-fee-modal');
+                        loadFees(currentPage, perPage, feeSearch, centerFilter, false);
+                    }, 2000);
+                } else {
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                    setTimeout(() => clearMessages('#edit-fee-modal'), 3000);
+                }
+            },
+            error: function() {
+                hideLoader();
+                jQuery('#edit-fee-message').css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+            }
+        });
+    }
+
+    function enigma_delete_fee(feeId) {
+        showLoader();
+        jQuery.ajax({
+            url: '<?php echo esc_js(admin_url('admin-ajax.php')); ?>',
+            method: 'POST',
+            data: {
+                action: 'enigma_delete_fee',
+                fee_id: feeId,
+                nonce: '<?php echo wp_create_nonce('enigma_fees_nonce'); ?>'
+            },
+            success: function(response) {
+                hideLoader();
+                if (response.success) {
+                    loadFees(currentPage, perPage, feeSearch, centerFilter, false);
+                } else {
+                    alert('Error deleting fee: ' + (response.data?.message || 'Unknown error'));
+                }
+            },
+            error: function() {
+                hideLoader();
+                alert('Error: AJAX request failed.');
+            }
+        });
+    }
+
+    function enigma_add_template() {
+        const formData = new FormData(jQuery('#add-template-form')[0]);
+        formData.append('action', 'enigma_add_template');
+        showLoader();
+        jQuery.ajax({
+            url: '<?php echo esc_js(admin_url('admin-ajax.php')); ?>',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                hideLoader();
+                const $message = jQuery('#add-template-message');
+                if (response.success) {
+                    $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                    setTimeout(() => closeModal('#add-template-modal'), 2000);
+                } else {
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                    setTimeout(() => clearMessages('#add-template-modal'), 3000);
+                }
+            },
+            error: function() {
+                hideLoader();
+                jQuery('#add-template-message').css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+            }
+        });
+    }
+    </script>
+    <?php
+    wp_enqueue_style('enigma-fees-style', plugin_dir_url(__FILE__) . 'fees.css');
+    wp_enqueue_script('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js', [], '5.15.4', true);
+    wp_enqueue_script('jspdf', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', [], '2.5.1', true);
+    wp_enqueue_script('jspdf-autotable', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js', ['jspdf'], '3.5.23', true);
+    wp_enqueue_script('xlsx', 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', [], '0.18.5', true);
+    return ob_get_clean();
+}
+
+// AJAX Handlers for Fees
+add_action('wp_ajax_enigma_fetch_fees', 'enigma_fetch_fees');
+function enigma_fetch_fees() {
+    check_ajax_referer('enigma_fees_nonce', 'nonce');
+    global $wpdb;
+    $page = max(1, intval($_POST['page'] ?? 1));
+    $per_page = intval($_POST['per_page'] ?? 10);
+    $search = sanitize_text_field($_POST['search'] ?? '');
+    $center_filter = sanitize_text_field($_POST['center_filter'] ?? '');
+    $offset = ($page - 1) * $per_page;
+
+    $where = "WHERE 1=1";
+    if ($search) {
+        $where .= $wpdb->prepare(" AND (sf.student_id LIKE %s OR ft.name LIKE %s)", "%$search%", "%$search%");
+    }
+    if ($center_filter) {
+        $where .= $wpdb->prepare(" AND sf.education_center_id = %s", $center_filter);
+    }
+
+    $fees = $wpdb->get_results(
+        "SELECT sf.*, ft.name AS template_name 
+         FROM {$wpdb->prefix}student_fees sf 
+         LEFT JOIN {$wpdb->prefix}fee_templates ft ON sf.template_id = ft.id 
+         $where ORDER BY sf.month_year DESC LIMIT $offset, $per_page",
+        ARRAY_A
+    );
+    $total = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}student_fees sf $where");
+
+    $table_head = '<tr><th>ID</th><th>Student ID</th><th>Edu Center ID</th><th>Template</th><th>Amount</th><th>Month/Year</th><th>Status</th><th>Actions</th></tr>';
+    $fees_html = '';
+    $fee_data = [];
+    foreach ($fees as $fee) {
+        $fees_html .= "<tr>
+            <td>" . esc_html($fee['id']) . "</td>
+            <td>" . esc_html($fee['student_id']) . "</td>
+            <td>" . esc_html($fee['education_center_id']) . "</td>
+            <td>" . esc_html($fee['template_name'] ?? 'N/A') . "</td>
+            <td>" . esc_html(number_format($fee['amount'], 2)) . "</td>
+            <td>" . esc_html($fee['month_year']) . "</td>
+            <td>" . esc_html($fee['status']) . "</td>
+            <td>
+                <button class='edit-fee' data-fee-id='" . esc_attr($fee['id']) . "'>Edit</button>
+                <button class='delete-fee' data-fee-id='" . esc_attr($fee['id']) . "'>Delete</button>
+            </td>
+        </tr>";
+        $fee_data[] = [
+            'id' => $fee['id'],
+            'student_id' => $fee['student_id'],
+            'educational_center_id' => $fee['education_center_id'],
+            'template_name' => $fee['template_name'] ?? 'N/A',
+            'amount' => number_format($fee['amount'], 2),
+            'month_year' => $fee['month_year'],
+            'status' => $fee['status']
+        ];
+    }
+    if (!$fees) $fees_html = '<tr><td colspan="8">No fees found.</td></tr>';
+
+    wp_send_json_success([
+        'table_head' => $table_head,
+        'fees' => $fees_html,
+        'fee_data' => $fee_data,
+        'total' => $total ?: 0
+    ]);
+}
+
+add_action('wp_ajax_enigma_fetch_fee', 'enigma_fetch_fee');
+function enigma_fetch_fee() {
+    check_ajax_referer('enigma_fees_nonce', 'nonce');
+    global $wpdb;
+    $fee_id = intval($_POST['fee_id']);
+    $fee = $wpdb->get_row($wpdb->prepare(
+        "SELECT sf.*, ft.name AS template_name 
+         FROM {$wpdb->prefix}student_fees sf 
+         LEFT JOIN {$wpdb->prefix}fee_templates ft ON sf.template_id = ft.id 
+         WHERE sf.id = %d",
+        $fee_id
+    ), ARRAY_A);
+
+    if ($fee) {
+        wp_send_json_success([
+            'id' => $fee['id'],
+            'student_id' => $fee['student_id'],
+            'educational_center_id' => $fee['education_center_id'],
+            'template_id' => $fee['template_id'],
+            'template_name' => $fee['template_name'] ?? 'N/A',
+            'amount' => number_format($fee['amount'], 2, '.', ''),
+            'month_year' => $fee['month_year'],
+            'status' => $fee['status']
+        ]);
+    } else {
+        wp_send_json_error(['message' => 'Fee not found']);
+    }
+}
+
+add_action('wp_ajax_enigma_add_fee', 'enigma_add_fee');
+function enigma_add_fee() {
+    check_ajax_referer('enigma_fees_nonce', 'nonce');
+    global $wpdb;
+    $data = [
+        'student_id' => sanitize_text_field($_POST['student_id']),
+        'education_center_id' => sanitize_text_field($_POST['educational_center_id']),
+        'template_id' => intval($_POST['template_id']),
+        'amount' => floatval($_POST['amount']),
+        'month_year' => sanitize_text_field($_POST['month_year']),
+        'status' => sanitize_text_field($_POST['status'])
+    ];
+
+    if (empty($data['student_id']) || empty($data['education_center_id']) || empty($data['template_id'])) {
+        wp_send_json_error(['message' => 'All fields are required']);
+        exit;
+    }
+
+    $result = $wpdb->insert($wpdb->prefix . 'student_fees', $data);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to add fee: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Fee added successfully');
+    }
+}
+
+add_action('wp_ajax_enigma_edit_fee', 'enigma_edit_fee');
+function enigma_edit_fee() {
+    check_ajax_referer('enigma_fees_nonce', 'nonce');
+    global $wpdb;
+    $fee_id = intval($_POST['fee_id']);
+    $data = [
+        'template_id' => intval($_POST['template_id']),
+        'amount' => floatval($_POST['amount']),
+        'month_year' => sanitize_text_field($_POST['month_year']),
+        'status' => sanitize_text_field($_POST['status'])
+    ];
+
+    if (empty($fee_id) || empty($data['template_id'])) {
+        wp_send_json_error(['message' => 'All fields are required']);
+        exit;
+    }
+
+    $result = $wpdb->update($wpdb->prefix . 'student_fees', $data, ['id' => $fee_id]);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to update fee: ' + $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Fee updated successfully');
+    }
+}
+
+add_action('wp_ajax_enigma_delete_fee', 'enigma_delete_fee');
+function enigma_delete_fee() {
+    check_ajax_referer('enigma_fees_nonce', 'nonce');
+    global $wpdb;
+    $fee_id = intval($_POST['fee_id']);
+    if (empty($fee_id)) {
+        wp_send_json_error(['message' => 'Invalid fee ID']);
+        exit;
+    }
+
+    $result = $wpdb->delete($wpdb->prefix . 'student_fees', ['id' => $fee_id]);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to delete fee: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Fee deleted successfully');
+    }
+}
+
+// AJAX Handlers for Fee Templates
+add_action('wp_ajax_enigma_fetch_templates', 'enigma_fetch_templates');
+function enigma_fetch_templates() {
+    check_ajax_referer('enigma_fees_nonce', 'nonce');
+    global $wpdb;
+    $page = max(1, intval($_POST['page'] ?? 1));
+    $per_page = intval($_POST['per_page'] ?? 10);
+    $search = sanitize_text_field($_POST['search'] ?? '');
+    $center_filter = sanitize_text_field($_POST['center_filter'] ?? '');
+    $offset = ($page - 1) * $per_page;
+
+    $where = "WHERE 1=1";
+    if ($search) {
+        $where .= $wpdb->prepare(" AND ft.name LIKE %s", "%$search%");
+    }
+    if ($center_filter) {
+        $where .= $wpdb->prepare(" AND ft.education_center_id = %s", $center_filter);
+    }
+
+    $templates = $wpdb->get_results(
+        "SELECT ft.* FROM {$wpdb->prefix}fee_templates ft $where ORDER BY ft.id DESC LIMIT $offset, $per_page",
+        ARRAY_A
+    );
+    $total = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}fee_templates ft $where");
+
+    $table_head = '<tr><th>ID</th><th>Name</th><th>Amount</th><th>Frequency</th><th>Edu Center ID</th></tr>';
+    $templates_html = '';
+    $template_data = [];
+    foreach ($templates as $template) {
+        $templates_html .= "<tr>
+            <td>" . esc_html($template['id']) . "</td>
+            <td>" . esc_html($template['name']) . "</td>
+            <td>" . esc_html(number_format($template['amount'], 2)) . "</td>
+            <td>" . esc_html($template['frequency']) . "</td>
+            <td>" . esc_html($template['education_center_id']) . "</td>
+        </tr>";
+        $template_data[] = [
+            'id' => $template['id'],
+            'name' => $template['name'],
+            'amount' => number_format($template['amount'], 2),
+            'frequency' => $template['frequency'],
+            'education_center_id' => $template['education_center_id']
+        ];
+    }
+    if (!$templates) $templates_html = '<tr><td colspan="5">No templates found.</td></tr>';
+
+    wp_send_json_success([
+        'table_head' => $table_head,
+        'templates' => $templates_html,
+        'template_data' => $template_data,
+        'total' => $total ?: 0
+    ]);
+}
+
+add_action('wp_ajax_enigma_fetch_template', 'enigma_fetch_template');
+function enigma_fetch_template() {
+    check_ajax_referer('enigma_fees_nonce', 'nonce');
+    global $wpdb;
+    $template_id = intval($_POST['template_id']);
+    $template = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}fee_templates WHERE id = %d",
+        $template_id
+    ), ARRAY_A);
+
+    if ($template) {
+        wp_send_json_success([
+            'id' => $template['id'],
+            'name' => $template['name'],
+            'amount' => number_format($template['amount'], 2, '.', ''),
+            'frequency' => $template['frequency'],
+            'education_center_id' => $template['education_center_id']
+        ]);
+    } else {
+        wp_send_json_error(['message' => 'Template not found']);
+    }
+}
+
+add_action('wp_ajax_enigma_add_template', 'enigma_add_template');
+function enigma_add_template() {
+    check_ajax_referer('enigma_fees_nonce', 'nonce');
+    global $wpdb;
+    $data = [
+        'name' => sanitize_text_field($_POST['name']),
+        'amount' => floatval($_POST['amount']),
+        'frequency' => sanitize_text_field($_POST['frequency']),
+        'education_center_id' => sanitize_text_field($_POST['educational_center_id'])
+    ];
+
+    if (empty($data['education_center_id']) || empty($data['name'])) {
+        wp_send_json_error(['message' => 'All fields are required']);
+        exit;
+    }
+
+    $result = $wpdb->insert($wpdb->prefix . 'fee_templates', $data);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to add template: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Template added successfully');
+    }
+}
+
+add_action('wp_ajax_enigma_edit_template', 'enigma_edit_template');
+function enigma_edit_template() {
+    check_ajax_referer('enigma_fees_nonce', 'nonce');
+    global $wpdb;
+    $template_id = intval($_POST['template_id']);
+    $data = [
+        'name' => sanitize_text_field($_POST['name']),
+        'amount' => floatval($_POST['amount']),
+        'frequency' => sanitize_text_field($_POST['frequency']),
+        'education_center_id' => sanitize_text_field($_POST['educational_center_id'])
+    ];
+
+    if (empty($template_id) || empty($data['education_center_id']) || empty($data['name'])) {
+        wp_send_json_error(['message' => 'All fields are required']);
+        exit;
+    }
+
+    $result = $wpdb->update($wpdb->prefix . 'fee_templates', $data, ['id' => $template_id]);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to update template: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Template updated successfully');
+    }
+}
+
+add_action('wp_ajax_enigma_delete_template', 'enigma_delete_template');
+function enigma_delete_template() {
+    check_ajax_referer('enigma_fees_nonce', 'nonce');
+    global $wpdb;
+    $template_id = intval($_POST['template_id']);
+    if (empty($template_id)) {
+        wp_send_json_error(['message' => 'Invalid template ID']);
+        exit;
+    }
+
+    $result = $wpdb->delete($wpdb->prefix . 'fee_templates', ['id' => $template_id]);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to delete template: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Template deleted successfully');
+    }
+}
+
+add_action('wp_ajax_enigma_get_students', 'enigma_get_students');
+function enigma_get_students() {
+    check_ajax_referer('enigma_fees_nonce', 'nonce');
+    global $wpdb;
+    $center_id = sanitize_text_field($_POST['center_id']);
+    $students = get_posts([
+        'post_type' => 'students',
+        'posts_per_page' => -1,
+        'meta_query' => [['key' => 'educational_center_id', 'value' => $center_id]]
+    ]);
+
+    $options = '<option value="">Select a Student</option>';
+    foreach ($students as $student) {
+        $student_id = get_post_meta($student->ID, 'student_id', true);
+        $options .= "<option value='$student_id'>" . esc_html($student_id . ' - ' . $student->post_title) . "</option>";
+    }
+    wp_send_json_success(['options' => $options]);
+}
+
+add_action('wp_ajax_enigma_get_templates', 'enigma_get_templates');
+function enigma_get_templates() {
+    check_ajax_referer('enigma_fees_nonce', 'nonce');
+    global $wpdb;
+    $center_id = sanitize_text_field($_POST['center_id']);
+    $templates = $wpdb->get_results($wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}fee_templates WHERE education_center_id = %s",
+        $center_id
+    ));
+
+    $options = '<option value="">Select a Template</option>';
+    foreach ($templates as $template) {
+        $options .= "<option value='{$template->id}'>" . esc_html($template->name . ' ($' . number_format($template->amount, 2) . ')') . "</option>";
+    }
+    wp_send_json_success(['options' => $options]);
+}
+// Standalone Functions for Fees
+function render_enigma_add_fees_form() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Add New Fee</h2>
+        <div id="add-fee-message" class="message"></div>
+        <form id="standalone-add-fee-form">
+            <table class="form-table">
+                <tr>
+                    <th><label for="add-center-id">Educational Center</label></th>
+                    <td>
+                        <select id="add-center-id" name="educational_center_id" class="regular-text" required>
+                            <option value="">Select Center</option>
+                            <?php
+                            foreach ($centers as $center) {
+                                $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                                echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="add-student-id">Student</label></th>
+                    <td><select id="add-student-id" name="student_id" class="regular-text" required><option value="">Select a Center First</option></select></td>
+                </tr>
+                <tr>
+                    <th><label for="add-template-id">Fee Template</label></th>
+                    <td><select id="add-template-id" name="template_id" class="regular-text" required><option value="">Select a Center First</option></select></td>
+                </tr>
+                <tr>
+                    <th><label for="add-month-year">Month/Year</label></th>
+                    <td><input type="month" id="add-month-year" name="month_year" class="regular-text" required></td>
+                </tr>
+                <tr>
+                    <th><label for="add-amount">Amount</label></th>
+                    <td><input type="number" id="add-amount" name="amount" step="0.01" min="0" class="regular-text" required></td>
+                </tr>
+                <tr>
+                    <th><label for="add-status">Status</label></th>
+                    <td>
+                        <select id="add-status" name="status" class="regular-text" required>
+                            <option value="pending">Pending</option>
+                            <option value="paid">Paid</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_fees_nonce'); ?>">
+            <p class="submit"><button type="button" id="save-fee" class="button-primary">Add Fee</button></p>
+        </form>
+        <h3>Existing Fees</h3>
+        <table class="wp-list-table widefat fixed striped" id="add-fee-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student ID</th>
+                    <th>Edu Center ID</th>
+                    <th>Template</th>
+                    <th>Amount</th>
+                    <th>Month/Year</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="add-fee-table-body"></tbody>
+        </table>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_fees_nonce'); ?>';
+
+        function loadFees() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_fees',
+                    page: 1,
+                    per_page: 1000,
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#add-fee-table-body').html(response.data.fees.replace(/<td>.*?(Edit|Delete).*?<\/td>/g, ''));
+                    } else {
+                        $('#add-fee-table-body').html('<tr><td colspan="7">No fees found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#add-fee-table-body').html('<tr><td colspan="7">Error loading fees.</td></tr>');
+                }
+            });
+        }
+
+        loadFees();
+
+        $('#add-center-id').on('change', function() {
+            const centerId = $(this).val();
+            if (!centerId) return;
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_get_students', center_id: centerId, nonce: ajaxNonce },
+                success: function(response) {
+                    if (response.success) $('#add-student-id').html(response.data.options);
+                },
+                complete: hideLoader
+            });
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_get_templates', center_id: centerId, nonce: ajaxNonce },
+                success: function(response) {
+                    if (response.success) $('#add-template-id').html(response.data.options);
+                },
+                complete: hideLoader
+            });
+        });
+
+        $('#save-fee').on('click', function() {
+            const formData = new FormData($('#standalone-add-fee-form')[0]);
+            formData.append('action', 'enigma_add_fee');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#add-fee-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#standalone-add-fee-form')[0].reset();
+                        loadFees();
+                        setTimeout(() => $message.text(''), 4000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => $message.text(''), 4000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-fees-style', plugin_dir_url(__FILE__) . 'fees.css');
+    return ob_get_clean();
+}
+
+function render_enigma_edit_fees_form() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Edit Fees</h2>
+        <div id="edit-fee-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="edit-fee-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student ID</th>
+                    <th>Edu Center ID</th>
+                    <th>Template</th>
+                    <th>Amount</th>
+                    <th>Month/Year</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody id="edit-fee-table-body"></tbody>
+        </table>
+        <div id="edit-form-container" style="display: none; margin-top: 20px;">
+            <h3>Edit Fee</h3>
+            <form id="standalone-edit-fee-form">
+                <input type="hidden" id="edit-fee-id" name="fee_id">
+                <table class="form-table">
+                    <tr>
+                        <th><label for="edit-center-id">Educational Center</label></th>
+                        <td><input type="text" id="edit-center-id" name="educational_center_id" class="regular-text" readonly></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-student-id">Student ID</label></th>
+                        <td><input type="text" id="edit-student-id" name="student_id" class="regular-text" readonly></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-template-id">Fee Template</label></th>
+                        <td><select id="edit-template-id" name="template_id" class="regular-text" required><option value="">Loading Templates...</option></select></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-month-year">Month/Year</label></th>
+                        <td><input type="month" id="edit-month-year" name="month_year" class="regular-text" required></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-amount">Amount</label></th>
+                        <td><input type="number" id="edit-amount" name="amount" step="0.01" min="0" class="regular-text" required></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-status">Status</label></th>
+                        <td>
+                            <select id="edit-status" name="status" class="regular-text" required>
+                                <option value="pending">Pending</option>
+                                <option value="paid">Paid</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_fees_nonce'); ?>">
+                <p class="submit">
+                    <button type="button" id="update-fee" class="button-primary">Update Fee</button>
+                    <button type="button" class="button" onclick="jQuery('#edit-form-container').hide()">Cancel</button>
+                </p>
+            </form>
+        </div>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_fees_nonce'); ?>';
+
+        function loadFees() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_fees',
+                    page: 1,
+                    per_page: 1000,
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#edit-fee-table-body').html(response.data.fees);
+                    } else {
+                        $('#edit-fee-table-body').html('<tr><td colspan="8">No fees found.</td></tr>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    $('#edit-fee-table-body').html('<tr><td colspan="8">Error loading fees: ' + error + '</td></tr>');
+                }
+            });
+        }
+
+        loadFees();
+
+        $('#edit-fee-table-body').on('click', '.edit-fee', function() {
+            const feeId = $(this).data('fee-id');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_fee', fee_id: feeId, nonce: ajaxNonce },
+                success: function(response) {
+                    if (response.success) {
+                        $('#edit-fee-id').val(response.data.id);
+                        $('#edit-center-id').val(response.data.educational_center_id);
+                        $('#edit-student-id').val(response.data.student_id);
+                        $('#edit-month-year').val(response.data.month_year);
+                        $('#edit-amount').val(response.data.amount);
+                        $('#edit-status').val(response.data.status);
+
+                        // Fetch templates for the selected center
+                        $.ajax({
+                            url: ajaxUrl,
+                            method: 'POST',
+                            data: { 
+                                action: 'enigma_get_templates', 
+                                center_id: response.data.educational_center_id, 
+                                nonce: ajaxNonce 
+                            },
+                            success: function(resp) {
+                                if (resp.success && resp.data.options) {
+                                    $('#edit-template-id').html(resp.data.options);
+                                    $('#edit-template-id').val(response.data.template_id); // Set the current template
+                                    $('#edit-form-container').show();
+                                } else {
+                                    $('#edit-template-id').html('<option value="">No templates available</option>');
+                                    alert('No templates found for this center.');
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                $('#edit-template-id').html('<option value="">Error loading templates</option>');
+                                alert('Error fetching templates: ' + error);
+                            },
+                            complete: function() {
+                                hideLoader();
+                            }
+                        });
+                    } else {
+                        hideLoader();
+                        alert('Error fetching fee: ' + (response.data?.message || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('Error fetching fee data: ' + error);
+                }
+            });
+        });
+
+        $('#update-fee').on('click', function() {
+            const formData = new FormData($('#standalone-edit-fee-form')[0]);
+            formData.append('action', 'enigma_edit_fee');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#edit-fee-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#edit-form-container').hide();
+                        loadFees();
+                        setTimeout(() => $message.text(''), 4000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => $message.text(''), 4000);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed - ' + error);
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+function render_enigma_delete_fees_form() {
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Delete Fees</h2>
+        <div id="delete-fee-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="delete-fee-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student ID</th>
+                    <th>Edu Center ID</th>
+                    <th>Template</th>
+                    <th>Amount</th>
+                    <th>Month/Year</th>
+                    <th>Status</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="delete-fee-table-body"></tbody>
+        </table>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_fees_nonce'); ?>';
+
+        function loadFees() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_fees',
+                    page: 1,
+                    per_page: 1000,
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#delete-fee-table-body').html(response.data.fees);
+                    } else {
+                        $('#delete-fee-table-body').html('<tr><td colspan="8">No fees found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#delete-fee-table-body').html('<tr><td colspan="8">Error loading fees.</td></tr>');
+                }
+            });
+        }
+
+        loadFees();
+
+        $('#delete-fee-table-body').on('click', '.delete-fee', function() {
+            if (confirm('Are you sure you want to delete this fee?')) {
+                const feeId = $(this).data('fee-id');
+                showLoader();
+                $.ajax({
+                    url: ajaxUrl,
+                    method: 'POST',
+                    data: { action: 'enigma_delete_fee', fee_id: feeId, nonce: ajaxNonce },
+                    success: function(response) {
+                        hideLoader();
+                        const $message = $('#delete-fee-message');
+                        if (response.success) {
+                            $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                            loadFees();
+                            setTimeout(() => $message.text(''), 4000);
+                        } else {
+                            $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                            setTimeout(() => $message.text(''), 4000);
+                        }
+                    },
+                    error: function() {
+                        hideLoader();
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                    }
+                });
+            }
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-fees-style', plugin_dir_url(__FILE__) . 'fees.css');
+    return ob_get_clean();
+}
+
+// Standalone Functions for Fee Templates
+function render_enigma_view_fee_templates_form() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>View Fee Templates</h2>
+        <div class="search-filters">
+            <label for="view-center-filter">Filter by Educational Center:</label>
+            <select id="view-center-filter" class="regular-text">
+                <option value="">All Centers</option>
+                <?php
+                foreach ($centers as $center) {
+                    $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                    echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                }
+                ?>
+            </select>
+        </div>
+        <table class="wp-list-table widefat fixed striped" id="view-template-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Frequency</th>
+                    <th>Edu Center ID</th>
+                </tr>
+            </thead>
+            <tbody id="view-template-table-body"></tbody>
+        </table>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_fees_nonce'); ?>';
+
+        function loadTemplates(centerFilter = '') {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_templates',
+                    page: 1,
+                    per_page: 1000,
+                    center_filter: centerFilter,
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#view-template-table-body').html(response.data.templates);
+                    } else {
+                        $('#view-template-table-body').html('<tr><td colspan="5">No templates found.</td></tr>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    $('#view-template-table-body').html('<tr><td colspan="5">Error loading templates: ' + error + '</td></tr>');
+                }
+            });
+        }
+
+        loadTemplates();
+
+        $('#view-center-filter').on('change', function() {
+            const centerFilter = $(this).val();
+            loadTemplates(centerFilter);
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-fees-style', plugin_dir_url(__FILE__) . 'fees.css');
+    return ob_get_clean();
+}
+
+function render_enigma_add_fee_template_form() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Add New Fee Template</h2>
+        <div id="add-template-message" class="message"></div>
+        <form id="standalone-add-template-form">
+            <table class="form-table">
+                <tr>
+                    <th><label for="add-template-center-id">Educational Center</label></th>
+                    <td>
+                        <select id="add-template-center-id" name="educational_center_id" class="regular-text" required>
+                            <option value="">Select Center</option>
+                            <?php
+                            foreach ($centers as $center) {
+                                $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                                echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="add-template-name">Name</label></th>
+                    <td><input type="text" id="add-template-name" name="name" class="regular-text" required></td>
+                </tr>
+                <tr>
+                    <th><label for="add-template-amount">Amount</label></th>
+                    <td><input type="number" id="add-template-amount" name="amount" step="0.01" min="0" class="regular-text" required></td>
+                </tr>
+                <tr>
+                    <th><label for="add-template-frequency">Frequency</label></th>
+                    <td>
+                        <select id="add-template-frequency" name="frequency" class="regular-text" required>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="annual">Annual</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_fees_nonce'); ?>">
+            <p class="submit"><button type="button" id="save-template" class="button-primary">Add Template</button></p>
+        </form>
+        <h3>Existing Fee Templates</h3>
+        <table class="wp-list-table widefat fixed striped" id="add-template-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Frequency</th>
+                    <th>Edu Center ID</th>
+                </tr>
+            </thead>
+            <tbody id="add-template-table-body"></tbody>
+        </table>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_fees_nonce'); ?>';
+
+        function loadTemplates() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_templates',
+                    page: 1,
+                    per_page: 1000,
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#add-template-table-body').html(response.data.templates);
+                    } else {
+                        $('#add-template-table-body').html('<tr><td colspan="5">No templates found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#add-template-table-body').html('<tr><td colspan="5">Error loading templates.</td></tr>');
+                }
+            });
+        }
+
+        loadTemplates();
+
+        $('#save-template').on('click', function() {
+            const formData = new FormData($('#standalone-add-template-form')[0]);
+            formData.append('action', 'enigma_add_template');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#add-template-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#standalone-add-template-form')[0].reset();
+                        loadTemplates();
+                        setTimeout(() => $message.text(''), 4000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => $message.text(''), 4000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-fees-style', plugin_dir_url(__FILE__) . 'fees.css');
+    return ob_get_clean();
+}
+
+function render_enigma_edit_fee_template_form() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Edit Fee Templates</h2>
+        <div id="edit-template-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="edit-template-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Frequency</th>
+                    <th>Edu Center ID</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody id="edit-template-table-body"></tbody>
+        </table>
+        <div id="edit-form-container" style="display: none; margin-top: 20px;">
+            <h3>Edit Fee Template</h3>
+            <form id="standalone-edit-template-form">
+                <input type="hidden" id="edit-template-id" name="template_id">
+                <table class="form-table">
+                    <tr>
+                        <th><label for="edit-template-center-id">Educational Center</label></th>
+                        <td>
+                            <select id="edit-template-center-id" name="educational_center_id" class="regular-text" required>
+                                <option value="">Select Center</option>
+                                <?php
+                                foreach ($centers as $center) {
+                                    $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                                    echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                                }
+                                ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-template-name">Name</label></th>
+                        <td><input type="text" id="edit-template-name" name="name" class="regular-text" required></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-template-amount">Amount</label></th>
+                        <td><input type="number" id="edit-template-amount" name="amount" step="0.01" min="0" class="regular-text" required></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-template-frequency">Frequency</label></th>
+                        <td>
+                            <select id="edit-template-frequency" name="frequency" class="regular-text" required>
+                                <option value="monthly">Monthly</option>
+                                <option value="quarterly">Quarterly</option>
+                                <option value="annual">Annual</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_fees_nonce'); ?>">
+                <p class="submit">
+                    <button type="button" id="update-template" class="button-primary">Update Template</button>
+                    <button type="button" class="button" onclick="jQuery('#edit-form-container').hide()">Cancel</button>
+                </p>
+            </form>
+        </div>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_fees_nonce'); ?>';
+
+        function loadTemplates() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_templates',
+                    page: 1,
+                    per_page: 1000,
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        let html = '';
+                        response.data.template_data.forEach(template => {
+                            html += `<tr>
+                                <td>${template.id}</td>
+                                <td>${template.name}</td>
+                                <td>${template.amount}</td>
+                                <td>${template.frequency}</td>
+                                <td>${template.education_center_id}</td>
+                                <td><button class="edit-template" data-template-id="${template.id}">Edit</button></td>
+                            </tr>`;
+                        });
+                        $('#edit-template-table-body').html(html);
+                    } else {
+                        $('#edit-template-table-body').html('<tr><td colspan="6">No templates found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#edit-template-table-body').html('<tr><td colspan="6">Error loading templates.</td></tr>');
+                }
+            });
+        }
+
+        loadTemplates();
+
+        $('#edit-template-table-body').on('click', '.edit-template', function() {
+            const templateId = $(this).data('template-id');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_template', template_id: templateId, nonce: ajaxNonce },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#edit-template-id').val(response.data.id);
+                        $('#edit-template-center-id').val(response.data.education_center_id);
+                        $('#edit-template-name').val(response.data.name);
+                        $('#edit-template-amount').val(response.data.amount);
+                        $('#edit-template-frequency').val(response.data.frequency);
+                        $('#edit-form-container').show();
+                    } else {
+                        alert('Error fetching template: ' + response.data.message);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    alert('Error fetching template data.');
+                }
+            });
+        });
+
+        $('#update-template').on('click', function() {
+            const formData = new FormData($('#standalone-edit-template-form')[0]);
+            formData.append('action', 'enigma_edit_template');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#edit-template-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#edit-form-container').hide();
+                        loadTemplates();
+                        setTimeout(() => $message.text(''), 4000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => $message.text(''), 4000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-fees-style', plugin_dir_url(__FILE__) . 'fees.css');
+    return ob_get_clean();
+}
+
+function render_enigma_delete_fee_template_form() {
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Delete Fee Templates</h2>
+        <div id="delete-template-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="delete-template-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Frequency</th>
+                    <th>Edu Center ID</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="delete-template-table-body"></tbody>
+        </table>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_fees_nonce'); ?>';
+
+        function loadTemplates() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_templates',
+                    page: 1,
+                    per_page: 1000,
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        let html = '';
+                        response.data.template_data.forEach(template => {
+                            html += `<tr>
+                                <td>${template.id}</td>
+                                <td>${template.name}</td>
+                                <td>${template.amount}</td>
+                                <td>${template.frequency}</td>
+                                <td>${template.education_center_id}</td>
+                                <td><button class="delete-template" data-template-id="${template.id}">Delete</button></td>
+                            </tr>`;
+                        });
+                        $('#delete-template-table-body').html(html);
+                    } else {
+                        $('#delete-template-table-body').html('<tr><td colspan="6">No templates found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#delete-template-table-body').html('<tr><td colspan="6">Error loading templates.</td></tr>');
+                }
+            });
+        }
+
+        loadTemplates();
+
+        $('#delete-template-table-body').on('click', '.delete-template', function() {
+            if (confirm('Are you sure you want to delete this template?')) {
+                const templateId = $(this).data('template-id');
+                showLoader();
+                $.ajax({
+                    url: ajaxUrl,
+                    method: 'POST',
+                    data: { action: 'enigma_delete_template', template_id: templateId, nonce: ajaxNonce },
+                    success: function(response) {
+                        hideLoader();
+                        const $message = $('#delete-template-message');
+                        if (response.success) {
+                            $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                            loadTemplates();
+                            setTimeout(() => $message.text(''), 4000);
+                        } else {
+                            $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                            setTimeout(() => $message.text(''), 4000);
+                        }
+                    },
+                    error: function() {
+                        hideLoader();
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                    }
+                });
+            }
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-fees-style', plugin_dir_url(__FILE__) . 'fees.css');
+    return ob_get_clean();
+}
+
+//transport
+// function transport_fees_management_page() {
+//     echo render_view_transport_fees();
+// }
+
+// Transport Fees AJAX Handlers
+add_action('wp_ajax_enigma_fetch_transport_fees', 'enigma_fetch_transport_fees');
+function enigma_fetch_transport_fees() {
+    check_ajax_referer('enigma_transport_nonce', 'nonce');
+    global $wpdb;
+    $fees = $wpdb->get_results("SELECT tf.*, ft.name AS template_name 
+                                FROM {$wpdb->prefix}transport_fees tf 
+                                LEFT JOIN {$wpdb->prefix}fee_templates ft ON tf.template_id = ft.id");
+    ob_start();
+    foreach ($fees as $fee) {
+        ?>
+        <tr>
+            <td><?php echo esc_html($fee->id); ?></td>
+            <td><?php echo esc_html($fee->student_id); ?></td>
+            <td><?php echo esc_html($fee->education_center_id); ?></td>
+            <td><?php echo esc_html($fee->template_name ?: 'N/A'); ?></td>
+            <td><?php echo esc_html(number_format($fee->amount, 2)); ?></td>
+            <td><?php echo esc_html($fee->month_year); ?></td>
+            <td><?php echo esc_html($fee->status); ?></td>
+            <td><button class="edit-fee" data-fee-id="<?php echo esc_attr($fee->id); ?>">Edit</button></td>
+        </tr>
+        <?php
+    }
+    $html = ob_get_clean();
+    wp_send_json_success(['fees' => $html]);
+}
+
+add_action('wp_ajax_enigma_fetch_transport_fee', 'enigma_fetch_transport_fee');
+function enigma_fetch_transport_fee() {
+    check_ajax_referer('enigma_transport_nonce', 'nonce');
+    global $wpdb;
+    $fee_id = intval($_POST['fee_id']);
+    $fee = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}transport_fees WHERE id = %d", $fee_id));
+    wp_send_json_success($fee ? (array)$fee : []);
+}
+
+add_action('wp_ajax_enigma_edit_transport_fee', 'enigma_edit_transport_fee');
+function enigma_edit_transport_fee() {
+    check_ajax_referer('enigma_transport_nonce', 'nonce');
+    global $wpdb;
+    $data = [
+        'template_id' => sanitize_text_field($_POST['template_id']),
+        'amount' => floatval($_POST['amount']),
+        'month_year' => sanitize_text_field($_POST['month_year']),
+        'status' => sanitize_text_field($_POST['status']),
+        'payment_method' => sanitize_text_field($_POST['payment_method']),
+        'cheque_number' => sanitize_text_field($_POST['cheque_number'] ?: ''),
+        'paid_date' => sanitize_text_field($_POST['paid_date'] ?: '')
+    ];
+    $updated = $wpdb->update($wpdb->prefix . 'transport_fees', $data, ['id' => intval($_POST['fee_id'])]);
+    wp_send_json($updated !== false ? ['success' => true, 'data' => 'Fee updated successfully'] : ['success' => false, 'data' => ['message' => 'Failed to update fee']]);
+}
+
+add_action('wp_ajax_enigma_add_transport_fee', 'enigma_add_transport_fee');
+function enigma_add_transport_fee() {
+    check_ajax_referer('enigma_transport_nonce', 'nonce');
+    global $wpdb;
+    $data = [
+        'student_id' => sanitize_text_field($_POST['student_id']),
+        'education_center_id' => sanitize_text_field($_POST['educational_center_id']),
+        'template_id' => sanitize_text_field($_POST['template_id']),
+        'amount' => floatval($_POST['amount']),
+        'month_year' => sanitize_text_field($_POST['month_year']),
+        'status' => sanitize_text_field($_POST['status']),
+        'payment_method' => sanitize_text_field($_POST['payment_method']),
+        'cheque_number' => sanitize_text_field($_POST['cheque_number'] ?: ''),
+        'paid_date' => sanitize_text_field($_POST['paid_date'] ?: '')
+    ];
+    $inserted = $wpdb->insert($wpdb->prefix . 'transport_fees', $data);
+    wp_send_json($inserted ? ['success' => true, 'data' => 'Fee added successfully'] : ['success' => false, 'data' => ['message' => 'Failed to add fee']]);
+}
+
+add_action('wp_ajax_enigma_delete_transport_fee', 'enigma_delete_transport_fee');
+function enigma_delete_transport_fee() {
+    check_ajax_referer('enigma_transport_nonce', 'nonce');
+    global $wpdb;
+    $fee_id = intval($_POST['fee_id']);
+    $deleted = $wpdb->delete($wpdb->prefix . 'transport_fees', ['id' => $fee_id]);
+    wp_send_json($deleted ? ['success' => true, 'data' => 'Fee deleted successfully'] : ['success' => false, 'data' => ['message' => 'Failed to delete fee']]);
+}
+
+add_action('wp_ajax_enigma_get_transport_templates', 'enigma_get_transport_templates');
+function enigma_get_transport_templates() {
+    check_ajax_referer('enigma_transport_nonce', 'nonce');
+    global $wpdb;
+    $center_id = sanitize_text_field($_POST['center_id']);
+    $templates = $wpdb->get_results($wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}fee_templates WHERE education_center_id = %s AND name LIKE 'transport_%'",
+        $center_id
+    ));
+    $options = '<option value="">Select a Template</option>';
+    foreach ($templates as $template) {
+        $options .= "<option value='{$template->id}'>" . esc_html($template->name . ' ($' . number_format($template->amount, 2) . ')') . "</option>";
+    }
+    wp_send_json_success(['options' => $options]);
+}
+
+// Transport Enrollments AJAX Handlers
+add_action('wp_ajax_enigma_fetch_transport_enrollments', 'enigma_fetch_transport_enrollments');
+function enigma_fetch_transport_enrollments() {
+    check_ajax_referer('enigma_transport_nonce', 'nonce');
+    global $wpdb;
+    $enrollments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}transport_enrollments");
+    ob_start();
+    foreach ($enrollments as $enrollment) {
+        ?>
+        <tr>
+            <td><?php echo esc_html($enrollment->id); ?></td>
+            <td><?php echo esc_html($enrollment->student_id); ?></td>
+            <td><?php echo esc_html($enrollment->education_center_id); ?></td>
+            <td><?php echo esc_html($enrollment->enrollment_date); ?></td>
+            <td><?php echo $enrollment->active ? 'Active' : 'Inactive'; ?></td>
+            <td><button class="edit-enrollment" data-enrollment-id="<?php echo esc_attr($enrollment->id); ?>">Edit</button></td>
+        </tr>
+        <?php
+    }
+    $html = ob_get_clean();
+    wp_send_json_success(['enrollments' => $html]);
+}
+
+add_action('wp_ajax_enigma_fetch_transport_enrollment', 'enigma_fetch_transport_enrollment');
+function enigma_fetch_transport_enrollment() {
+    check_ajax_referer('enigma_transport_nonce', 'nonce');
+    global $wpdb;
+    $enrollment_id = intval($_POST['enrollment_id']);
+    $enrollment = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}transport_enrollments WHERE id = %d", $enrollment_id));
+    wp_send_json_success($enrollment ? (array)$enrollment : []);
+}
+
+add_action('wp_ajax_enigma_edit_transport_enrollment', 'enigma_edit_transport_enrollment');
+function enigma_edit_transport_enrollment() {
+    check_ajax_referer('enigma_transport_nonce', 'nonce');
+    global $wpdb;
+    $data = [
+        'enrollment_date' => sanitize_text_field($_POST['enrollment_date']),
+        'active' => intval($_POST['active'])
+    ];
+    $updated = $wpdb->update($wpdb->prefix . 'transport_enrollments', $data, ['id' => intval($_POST['enrollment_id'])]);
+    wp_send_json($updated !== false ? ['success' => true, 'data' => 'Enrollment updated successfully'] : ['success' => false, 'data' => ['message' => 'Failed to update enrollment']]);
+}
+
+add_action('wp_ajax_enigma_add_transport_enrollment', 'enigma_add_transport_enrollment');
+function enigma_add_transport_enrollment() {
+    check_ajax_referer('enigma_transport_nonce', 'nonce');
+    global $wpdb;
+    $data = [
+        'student_id' => sanitize_text_field($_POST['student_id']),
+        'education_center_id' => sanitize_text_field($_POST['educational_center_id']),
+        'enrollment_date' => sanitize_text_field($_POST['enrollment_date']),
+        'active' => intval($_POST['active'])
+    ];
+    $inserted = $wpdb->insert($wpdb->prefix . 'transport_enrollments', $data);
+    wp_send_json($inserted ? ['success' => true, 'data' => 'Enrollment added successfully'] : ['success' => false, 'data' => ['message' => 'Failed to add enrollment']]);
+}
+
+add_action('wp_ajax_enigma_delete_transport_enrollment', 'enigma_delete_transport_enrollment');
+function enigma_delete_transport_enrollment() {
+    check_ajax_referer('enigma_transport_nonce', 'nonce');
+    global $wpdb;
+    $enrollment_id = intval($_POST['enrollment_id']);
+    $deleted = $wpdb->delete($wpdb->prefix . 'transport_enrollments', ['id' => $enrollment_id]);
+    wp_send_json($deleted ? ['success' => true, 'data' => 'Enrollment deleted successfully'] : ['success' => false, 'data' => ['message' => 'Failed to delete enrollment']]);
+}
+
+// Render Functions for Transport Fees
+function render_view_transport_fees() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    ob_start();
+    ?>
+    <div class="wrap">
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>View Transport Fees</h2>
+        <div id="view-fee-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="view-fee-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student ID</th>
+                    <th>Edu Center ID</th>
+                    <th>Template</th>
+                    <th>Amount</th>
+                    <th>Month/Year</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody id="view-fee-table-body"></tbody>
+        </table>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_transport_nonce'); ?>';
+
+        function loadFees() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_transport_fees',
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#view-fee-table-body').html(response.data.fees);
+                    } else {
+                        $('#view-fee-table-body').html('<tr><td colspan="8">No fees found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#view-fee-table-body').html('<tr><td colspan="8">Error loading fees.</td></tr>');
+                }
+            });
+        }
+
+        loadFees();
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-transport-fees-style', plugin_dir_url(__FILE__) . 'transport_fees.css');
+    return ob_get_clean();
+}
+
+function render_add_transport_fees() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    ob_start();
+    ?>
+    <div class="wrap">
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Add Transport Fees</h2>
+        <div id="add-fee-message" class="message"></div>
+        <form id="standalone-add-fee-form">
+            <table class="form-table">
+                <tr>
+                    <th><label for="add-student-id">Student ID</label></th>
+                    <td><input type="text" id="add-student-id" name="student_id" class="regular-text" required></td>
+                </tr>
+                <tr>
+                    <th><label for="add-center-id">Educational Center</label></th>
+                    <td>
+                        <select id="add-center-id" name="educational_center_id" class="regular-text" required>
+                            <option value="">Select Center</option>
+                            <?php foreach ($centers as $center) : ?>
+                                <option value="<?php echo esc_attr($center->ID); ?>"><?php echo esc_html($center->post_title); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="add-template-id">Fee Template</label></th>
+                    <td><select id="add-template-id" name="template_id" class="regular-text" required><option value="">Select Template</option></select></td>
+                </tr>
+                <tr>
+                    <th><label for="add-month-year">Month/Year</label></th>
+                    <td><input type="month" id="add-month-year" name="month_year" class="regular-text" required></td>
+                </tr>
+                <tr>
+                    <th><label for="add-amount">Amount</label></th>
+                    <td><input type="number" id="add-amount" name="amount" step="0.01" min="0" class="regular-text" required></td>
+                </tr>
+                <tr>
+                    <th><label for="add-status">Status</label></th>
+                    <td>
+                        <select id="add-status" name="status" class="regular-text" required>
+                            <option value="pending">Pending</option>
+                            <option value="paid">Paid</option>
+                            <option value="overdue">Overdue</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="add-payment-method">Payment Method</label></th>
+                    <td>
+                        <select id="add-payment-method" name="payment_method" class="regular-text">
+                            <option value="">Select</option>
+                            <option value="cod">COD</option>
+                            <option value="cheque">Cheque</option>
+                            <option value="cash">Cash</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="add-cheque-number">Cheque Number</label></th>
+                    <td><input type="text" id="add-cheque-number" name="cheque_number" class="regular-text"></td>
+                </tr>
+                <tr>
+                    <th><label for="add-paid-date">Paid Date</label></th>
+                    <td><input type="date" id="add-paid-date" name="paid_date" class="regular-text"></td>
+                </tr>
+            </table>
+            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_transport_nonce'); ?>">
+            <p class="submit">
+                <button type="button" id="add-fee" class="button-primary">Add Fee</button>
+            </p>
+        </form>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_transport_nonce'); ?>';
+
+        $('#add-center-id').on('change', function() {
+            const centerId = $(this).val();
+            if (centerId) {
+                showLoader();
+                $.ajax({
+                    url: ajaxUrl,
+                    method: 'POST',
+                    data: { action: 'enigma_get_transport_templates', center_id: centerId, nonce: ajaxNonce },
+                    success: function(response) {
+                        hideLoader();
+                        if (response.success) {
+                            $('#add-template-id').html(response.data.options);
+                        } else {
+                            $('#add-template-id').html('<option value="">No templates available</option>');
+                        }
+                    },
+                    error: function() {
+                        hideLoader();
+                        $('#add-template-id').html('<option value="">Error loading templates</option>');
+                    }
+                });
+            }
+        });
+
+        $('#add-fee').on('click', function() {
+            const formData = new FormData($('#standalone-add-fee-form')[0]);
+            formData.append('action', 'enigma_add_transport_fee');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#add-fee-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#standalone-add-fee-form')[0].reset();
+                        setTimeout(() => $message.text(''), 4000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => $message.text(''), 4000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-transport-fees-style', plugin_dir_url(__FILE__) . 'transport_fees.css');
+    return ob_get_clean();
+}
+
+function render_edit_transport_fees() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    ob_start();
+    ?>
+    <div class="wrap">
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Edit Transport Fees</h2>
+        <div id="edit-fee-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="edit-fee-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student ID</th>
+                    <th>Edu Center ID</th>
+                    <th>Template</th>
+                    <th>Amount</th>
+                    <th>Month/Year</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody id="edit-fee-table-body"></tbody>
+        </table>
+        <div id="edit-form-container" style="display: none; margin-top: 20px;">
+            <h3>Edit Transport Fee</h3>
+            <form id="standalone-edit-fee-form">
+                <input type="hidden" id="edit-fee-id" name="fee_id">
+                <table class="form-table">
+                    <tr>
+                        <th><label for="edit-student-id">Student ID</label></th>
+                        <td><input type="text" id="edit-student-id" name="student_id" class="regular-text" readonly></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-center-id">Educational Center</label></th>
+                        <td><input type="text" id="edit-center-id" name="educational_center_id" class="regular-text" readonly></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-template-id">Fee Template</label></th>
+                        <td><select id="edit-template-id" name="template_id" class="regular-text" required><option value="">Select Template</option></select></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-month-year">Month/Year</label></th>
+                        <td><input type="month" id="edit-month-year" name="month_year" class="regular-text" required></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-amount">Amount</label></th>
+                        <td><input type="number" id="edit-amount" name="amount" step="0.01" min="0" class="regular-text" required></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-status">Status</label></th>
+                        <td>
+                            <select id="edit-status" name="status" class="regular-text" required>
+                                <option value="pending">Pending</option>
+                                <option value="paid">Paid</option>
+                                <option value="overdue">Overdue</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-payment-method">Payment Method</label></th>
+                        <td>
+                            <select id="edit-payment-method" name="payment_method" class="regular-text">
+                                <option value="">Select</option>
+                                <option value="cod">COD</option>
+                                <option value="cheque">Cheque</option>
+                                <option value="cash">Cash</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-cheque-number">Cheque Number</label></th>
+                        <td><input type="text" id="edit-cheque-number" name="cheque_number" class="regular-text"></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-paid-date">Paid Date</label></th>
+                        <td><input type="date" id="edit-paid-date" name="paid_date" class="regular-text"></td>
+                    </tr>
+                </table>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_transport_nonce'); ?>">
+                <p class="submit">
+                    <button type="button" id="update-fee" class="button-primary">Update Fee</button>
+                    <button type="button" class="button" onclick="jQuery('#edit-form-container').hide()">Cancel</button>
+                </p>
+            </form>
+        </div>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_transport_nonce'); ?>';
+
+        function loadFees() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_transport_fees',
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#edit-fee-table-body').html(response.data.fees);
+                    } else {
+                        $('#edit-fee-table-body').html('<tr><td colspan="8">No fees found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#edit-fee-table-body').html('<tr><td colspan="8">Error loading fees.</td></tr>');
+                }
+            });
+        }
+
+        loadFees();
+
+        $('#edit-fee-table-body').on('click', '.edit-fee', function() {
+            const feeId = $(this).data('fee-id');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_transport_fee', fee_id: feeId, nonce: ajaxNonce },
+                success: function(response) {
+                    if (response.success) {
+                        $('#edit-fee-id').val(response.data.id);
+                        $('#edit-student-id').val(response.data.student_id);
+                        $('#edit-center-id').val(response.data.education_center_id);
+                        $('#edit-month-year').val(response.data.month_year);
+                        $('#edit-amount').val(response.data.amount);
+                        $('#edit-status').val(response.data.status);
+                        $('#edit-payment-method').val(response.data.payment_method);
+                        $('#edit-cheque-number').val(response.data.cheque_number);
+                        $('#edit-paid-date').val(response.data.paid_date);
+                        $.ajax({
+                            url: ajaxUrl,
+                            method: 'POST',
+                            data: { action: 'enigma_get_transport_templates', center_id: response.data.education_center_id, nonce: ajaxNonce },
+                            success: function(resp) {
+                                if (resp.success) {
+                                    $('#edit-template-id').html(resp.data.options);
+                                    $('#edit-template-id').val(response.data.template_id);
+                                    $('#edit-form-container').show();
+                                }
+                            },
+                            complete: hideLoader
+                        });
+                    } else {
+                        hideLoader();
+                        alert('Error fetching fee: ' + response.data.message);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    alert('Error fetching fee data.');
+                }
+            });
+        });
+
+        $('#update-fee').on('click', function() {
+            const formData = new FormData($('#standalone-edit-fee-form')[0]);
+            formData.append('action', 'enigma_edit_transport_fee');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#edit-fee-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#edit-form-container').hide();
+                        loadFees();
+                        setTimeout(() => $message.text(''), 4000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => $message.text(''), 4000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-transport-fees-style', plugin_dir_url(__FILE__) . 'transport_fees.css');
+    return ob_get_clean();
+}
+
+function render_delete_transport_fees() {
+    ob_start();
+    ?>
+    <div class="wrap">
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Delete Transport Fees</h2>
+        <div id="delete-fee-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="delete-fee-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student ID</th>
+                    <th>Edu Center ID</th>
+                    <th>Template</th>
+                    <th>Amount</th>
+                    <th>Month/Year</th>
+                    <th>Status</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="delete-fee-table-body"></tbody>
+        </table>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_transport_nonce'); ?>';
+
+        function loadFees() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_transport_fees',
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#delete-fee-table-body').html(response.data.fees);
+                    } else {
+                        $('#delete-fee-table-body').html('<tr><td colspan="8">No fees found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#delete-fee-table-body').html('<tr><td colspan="8">Error loading fees.</td></tr>');
+                }
+            });
+        }
+
+        loadFees();
+
+        $('#delete-fee-table-body').on('click', '.delete-fee', function() {
+            if (confirm('Are you sure you want to delete this fee?')) {
+                const feeId = $(this).data('fee-id');
+                showLoader();
+                $.ajax({
+                    url: ajaxUrl,
+                    method: 'POST',
+                    data: { action: 'enigma_delete_transport_fee', fee_id: feeId, nonce: ajaxNonce },
+                    success: function(response) {
+                        hideLoader();
+                        const $message = $('#delete-fee-message');
+                        if (response.success) {
+                            $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                            loadFees();
+                            setTimeout(() => $message.text(''), 4000);
+                        } else {
+                            $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                            setTimeout(() => $message.text(''), 4000);
+                        }
+                    },
+                    error: function() {
+                        hideLoader();
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                    }
+                });
+            }
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-transport-fees-style', plugin_dir_url(__FILE__) . 'transport_fees.css');
+    return ob_get_clean();
+}
+
+// Render Functions for Transport Enrollments
+function render_view_transport_enrollments() {
+    ob_start();
+    ?>
+    <div class="wrap">
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>View Transport Enrollments</h2>
+        <div id="view-enrollment-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="view-enrollment-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student ID</th>
+                    <th>Edu Center ID</th>
+                    <th>Enrollment Date</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody id="view-enrollment-table-body"></tbody>
+        </table>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_transport_nonce'); ?>';
+
+        function loadEnrollments() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_transport_enrollments',
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#view-enrollment-table-body').html(response.data.enrollments);
+                    } else {
+                        $('#view-enrollment-table-body').html('<tr><td colspan="6">No enrollments found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#view-enrollment-table-body').html('<tr><td colspan="6">Error loading enrollments.</td></tr>');
+                }
+            });
+        }
+
+        loadEnrollments();
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-transport-fees-style', plugin_dir_url(__FILE__) . 'transport_fees.css');
+    return ob_get_clean();
+}
+
+function render_add_transport_enrollments() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    ob_start();
+    ?>
+    <div class="wrap">
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Add Transport Enrollments</h2>
+        <div id="add-enrollment-message" class="message"></div>
+        <form id="standalone-add-enrollment-form">
+            <table class="form-table">
+                <tr>
+                    <th><label for="add-student-id">Student ID</label></th>
+                    <td><input type="text" id="add-student-id" name="student_id" class="regular-text" required></td>
+                </tr>
+                <tr>
+                    <th><label for="add-center-id">Educational Center</label></th>
+                    <td>
+                        <select id="add-center-id" name="educational_center_id" class="regular-text" required>
+                            <option value="">Select Center</option>
+                            <?php foreach ($centers as $center) : ?>
+                                <option value="<?php echo esc_attr($center->ID); ?>"><?php echo esc_html($center->post_title); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="add-enrollment-date">Enrollment Date</label></th>
+                    <td><input type="date" id="add-enrollment-date" name="enrollment_date" class="regular-text" required></td>
+                </tr>
+                <tr>
+                    <th><label for="add-active">Active</label></th>
+                    <td><input type="checkbox" id="add-active" name="active" value="1" checked></td>
+                </tr>
+            </table>
+            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_transport_nonce'); ?>">
+            <p class="submit">
+                <button type="button" id="add-enrollment" class="button-primary">Add Enrollment</button>
+            </p>
+        </form>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_transport_nonce'); ?>';
+
+        $('#add-enrollment').on('click', function() {
+            const formData = new FormData($('#standalone-add-enrollment-form')[0]);
+            formData.append('action', 'enigma_add_transport_enrollment');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#add-enrollment-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#standalone-add-enrollment-form')[0].reset();
+                        setTimeout(() => $message.text(''), 4000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => $message.text(''), 4000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-transport-fees-style', plugin_dir_url(__FILE__) . 'transport_fees.css');
+    return ob_get_clean();
+}
+
+function render_edit_transport_enrollments() {
+    ob_start();
+    ?>
+    <div class="wrap">
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Edit Transport Enrollments</h2>
+        <div id="edit-enrollment-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="edit-enrollment-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student ID</th>
+                    <th>Edu Center ID</th>
+                    <th>Enrollment Date</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody id="edit-enrollment-table-body"></tbody>
+        </table>
+        <div id="edit-form-container" style="display: none; margin-top: 20px;">
+            <h3>Edit Transport Enrollment</h3>
+            <form id="standalone-edit-enrollment-form">
+                <input type="hidden" id="edit-enrollment-id" name="enrollment_id">
+                <table class="form-table">
+                    <tr>
+                        <th><label for="edit-student-id">Student ID</label></th>
+                        <td><input type="text" id="edit-student-id" name="student_id" class="regular-text" readonly></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-center-id">Educational Center</label></th>
+                        <td><input type="text" id="edit-center-id" name="educational_center_id" class="regular-text" readonly></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-enrollment-date">Enrollment Date</label></th>
+                        <td><input type="date" id="edit-enrollment-date" name="enrollment_date" class="regular-text" required></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-active">Active</label></th>
+                        <td><input type="checkbox" id="edit-active" name="active" value="1"></td>
+                    </tr>
+                </table>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_transport_nonce'); ?>">
+                <p class="submit">
+                    <button type="button" id="update-enrollment" class="button-primary">Update Enrollment</button>
+                    <button type="button" class="button" onclick="jQuery('#edit-form-container').hide()">Cancel</button>
+                </p>
+            </form>
+        </div>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_transport_nonce'); ?>';
+
+        function loadEnrollments() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_transport_enrollments',
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#edit-enrollment-table-body').html(response.data.enrollments);
+                    } else {
+                        $('#edit-enrollment-table-body').html('<tr><td colspan="6">No enrollments found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#edit-enrollment-table-body').html('<tr><td colspan="6">Error loading enrollments.</td></tr>');
+                }
+            });
+        }
+
+        loadEnrollments();
+
+        $('#edit-enrollment-table-body').on('click', '.edit-enrollment', function() {
+            const enrollmentId = $(this).data('enrollment-id');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_transport_enrollment', enrollment_id: enrollmentId, nonce: ajaxNonce },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#edit-enrollment-id').val(response.data.id);
+                        $('#edit-student-id').val(response.data.student_id);
+                        $('#edit-center-id').val(response.data.education_center_id);
+                        $('#edit-enrollment-date').val(response.data.enrollment_date);
+                        $('#edit-active').prop('checked', response.data.active == 1);
+                        $('#edit-form-container').show();
+                    } else {
+                        alert('Error fetching enrollment: ' + response.data.message);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    alert('Error fetching enrollment data.');
+                }
+            });
+        });
+
+        $('#update-enrollment').on('click', function() {
+            const formData = new FormData($('#standalone-edit-enrollment-form')[0]);
+            formData.append('action', 'enigma_edit_transport_enrollment');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#edit-enrollment-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#edit-form-container').hide();
+                        loadEnrollments();
+                        setTimeout(() => $message.text(''), 4000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => $message.text(''), 4000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-transport-fees-style', plugin_dir_url(__FILE__) . 'transport_fees.css');
+    return ob_get_clean();
+}
+
+function render_delete_transport_enrollments() {
+    ob_start();
+    ?>
+    <div class="wrap">
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Delete Transport Enrollments</h2>
+        <div id="delete-enrollment-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="delete-enrollment-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student ID</th>
+                    <th>Edu Center ID</th>
+                    <th>Enrollment Date</th>
+                    <th>Status</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="delete-enrollment-table-body"></tbody>
+        </table>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_transport_nonce'); ?>';
+
+        function loadEnrollments() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_transport_enrollments',
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#delete-enrollment-table-body').html(response.data.enrollments);
+                    } else {
+                        $('#delete-enrollment-table-body').html('<tr><td colspan="6">No enrollments found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#delete-enrollment-table-body').html('<tr><td colspan="6">Error loading enrollments.</td></tr>');
+                }
+            });
+        }
+
+        loadEnrollments();
+
+        $('#delete-enrollment-table-body').on('click', '.delete-enrollment', function() {
+            if (confirm('Are you sure you want to delete this enrollment?')) {
+                const enrollmentId = $(this).data('enrollment-id');
+                showLoader();
+                $.ajax({
+                    url: ajaxUrl,
+                    method: 'POST',
+                    data: { action: 'enigma_delete_transport_enrollment', enrollment_id: enrollmentId, nonce: ajaxNonce },
+                    success: function(response) {
+                        hideLoader();
+                        const $message = $('#delete-enrollment-message');
+                        if (response.success) {
+                            $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                            loadEnrollments();
+                            setTimeout(() => $message.text(''), 4000);
+                        } else {
+                            $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                            setTimeout(() => $message.text(''), 4000);
+                        }
+                    },
+                    error: function() {
+                        hideLoader();
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                    }
+                });
+            }
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-transport-fees-style', plugin_dir_url(__FILE__) . 'transport_fees.css');
+    return ob_get_clean();
+}
+
+
+
+
+
+
+
+
+
 
 
 
