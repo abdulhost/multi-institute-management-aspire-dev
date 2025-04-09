@@ -64,6 +64,7 @@ function aspire_reports_dashboard_shortcode($atts) {
     if (!is_user_logged_in()) {
         // wp_redirect(home_url('/login'));
         // exit();
+        return false;
     }
 
     $center_data = get_educational_center_data2();

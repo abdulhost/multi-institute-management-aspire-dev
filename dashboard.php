@@ -418,70 +418,79 @@ function render_admin_header($admin_user) {
                     </div>
 
                     <!-- Messages Dropdown -->
-                    <div class="header-messages">
-                        <a href="<?php echo $communication_link; ?>" class="action-btn" id="messages-toggle">
-                            <i class="fas fa-envelope fa-lg"></i>
-                            <span class="action-badge <?php echo $messages_count ? '' : 'd-none'; ?>" id="messages-count">
-                                <?php echo esc_html($messages_count ?: 0); ?>
-                            </span>
-                        </a>
-                        <div class="dropdown messages-dropdown" id="messages-dropdown">
-                            <div class="dropdown-header">
-                                <span>Messages (Last 7 Days)</span>
-                            </div>
-                            <ul class="dropdown-list">
-                                <?php if (!empty($unread_messages)): ?>
-                                    <?php foreach ($unread_messages as $msg): ?>
-                                        <li>
-                                            <span class="msg-content">
-                                                <span class="msg-sender"><?php echo esc_html($msg->sender_id); ?></span>:
-                                                <span class="msg-preview"><?php echo esc_html(wp_trim_words($msg->message, 5, '...')); ?></span>
-                                            </span>
-                                            <span class="msg-time"><?php echo esc_html(date('M d, Y', strtotime($msg->timestamp))); ?></span>
-                                        </li>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <li><span class="msg-preview">No new messages</span></li>
-                                <?php endif; ?>
-                            </ul>
-                            <?php if (!empty($unread_messages)): ?>
-                                <a href="<?php echo $communication_link; ?>" class="dropdown-footer">View All Messages</a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+                    <!-- Messages Dropdown -->
+<div class="header-messages">
+    <a href="<?php echo $communication_link; ?>" class="action-btn" id="messages-toggle">
+        <i class="fas fa-envelope fa-lg"></i>
+        <span class="action-badge <?php echo $messages_count ? '' : 'd-none'; ?>" id="messages-count">
+            <?php echo esc_html($messages_count ?: 0); ?>
+        </span>
+    </a>
+    <div class="dropdown messages-dropdown" id="messages-dropdown">
+        <div class="dropdown-header">
+            <span>Messages (Last 7 Days)</span>
+        </div>
+        <ul class="dropdown-list">
+            <?php if (!empty($unread_messages)): ?>
+                <?php foreach ($unread_messages as $msg): ?>
+                    <?php
+                    // Encode 'enigma_overlord' as 'Super Admin' for frontend display
+                    $display_sender = ($msg->sender_id === 'enigma_overlord') ? 'Super Admin' : $msg->sender_id;
+                    ?>
+                    <li>
+                        <span class="msg-content">
+                            <span class="msg-sender"><?php echo esc_html($display_sender); ?></span>:
+                            <span class="msg-preview"><?php echo esc_html(wp_trim_words($msg->message, 5, '...')); ?></span>
+                        </span>
+                        <span class="msg-time"><?php echo esc_html(date('M d, Y', strtotime($msg->timestamp))); ?></span>
+                    </li>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <li><span class="msg-preview">No new messages</span></li>
+            <?php endif; ?>
+        </ul>
+        <?php if (!empty($unread_messages)): ?>
+            <a href="<?php echo $communication_link; ?>" class="dropdown-footer">View All Messages</a>
+        <?php endif; ?>
+    </div>
+</div>
 
-                    <!-- Notifications Dropdown -->
-                    <div class="header-notifications">
-                        <a href="<?php echo $notifications_link; ?>" class="action-btn" id="notifications-toggle">
-                            <i class="fas fa-bell fa-lg"></i>
-                            <span class="action-badge <?php echo $notifications_count ? '' : 'd-none'; ?>" id="notifications-count">
-                                <?php echo esc_html($notifications_count ?: 0); ?>
-                            </span>
-                        </a>
-                        <div class="dropdown notifications-dropdown" id="notifications-dropdown">
-                            <div class="dropdown-header">
-                                <span>Notifications (Last 7 Days)</span>
-                            </div>
-                            <ul class="dropdown-list">
-                                <?php if (!empty($unread_announcements)): ?>
-                                    <?php foreach ($unread_announcements as $ann): ?>
-                                        <li>
-                                            <span class="msg-content">
-                                                <span class="msg-sender"><?php echo esc_html($ann->sender_id); ?></span>:
-                                                <span class="notif-text"><?php echo esc_html(wp_trim_words($ann->message, 5, '...')); ?></span>
-                                            </span>
-                                            <span class="notif-time"><?php echo esc_html(date('M d, Y', strtotime($ann->timestamp))); ?></span>
-                                        </li>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <li><span class="notif-text">No new notifications</span></li>
-                                <?php endif; ?>
-                            </ul>
-                            <?php if (!empty($unread_announcements)): ?>
-                                <a href="<?php echo $notifications_link; ?>" class="dropdown-footer">View All Notifications</a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+<!-- Notifications Dropdown -->
+<div class="header-notifications">
+    <a href="<?php echo $notifications_link; ?>" class="action-btn" id="notifications-toggle">
+        <i class="fas fa-bell fa-lg"></i>
+        <span class="action-badge <?php echo $notifications_count ? '' : 'd-none'; ?>" id="notifications-count">
+            <?php echo esc_html($notifications_count ?: 0); ?>
+        </span>
+    </a>
+    <div class="dropdown notifications-dropdown" id="notifications-dropdown">
+        <div class="dropdown-header">
+            <span>Notifications (Last 7 Days)</span>
+        </div>
+        <ul class="dropdown-list">
+            <?php if (!empty($unread_notifications)): ?>
+                <?php foreach ($unread_notifications as $ann): ?>
+                    <?php
+                    // Encode 'enigma_overlord' as 'Super Admin' for frontend display
+                    $display_sender = ($ann->sender_id === 'enigma_overlord') ? 'Super Admin' : $ann->sender_id;
+                    ?>
+                    <li>
+                        <span class="msg-content">
+                            <span class="msg-sender"><?php echo esc_html($display_sender); ?></span>:
+                            <span class="notif-text"><?php echo esc_html(wp_trim_words($ann->message, 5, '...')); ?></span>
+                        </span>
+                        <span class="notif-time"><?php echo esc_html(date('M d, Y', strtotime($ann->timestamp))); ?></span>
+                    </li>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <li><span class="notif-text">No new notifications</span></li>
+            <?php endif; ?>
+        </ul>
+        <?php if (!empty($unread_notifications)): ?>
+            <a href="<?php echo $notifications_link; ?>" class="dropdown-footer">View All</a>
+        <?php endif; ?>
+    </div>
+</div>
 
                     <!-- Settings -->
                     <div class="header-settings">

@@ -12,8 +12,9 @@ function edit_fees_frontend_shortcode() {
     
     // Check if user is logged in (optional, remove if not needed)
     if (!is_user_logged_in()) {
-        wp_redirect(home_url('/login'));
-        exit();
+        // wp_redirect(home_url('/login'));
+        // exit();
+        return false;
     }
 
     // Tables

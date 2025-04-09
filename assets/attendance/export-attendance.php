@@ -10,6 +10,7 @@ function export_attendance_shortcode($atts) {
     if (!is_user_logged_in()) {
         // wp_redirect(home_url('/login'));
         // exit();   
+        return false;
           }
 
     // $current_teacher_id = function_exists('get_current_teacher_id') ? get_current_teacher_id() : get_current_user_id();
@@ -25,8 +26,7 @@ function export_attendance_shortcode($atts) {
     }
     // $educational_center_id = get_educational_center_data();
     if (!$educational_center_id) {
-        wp_redirect(home_url('/login'));
-        exit();     }
+        return 'Please Login Again';    }
 
     global $wpdb;
     $table_name = $wpdb->prefix . 'student_attendance';

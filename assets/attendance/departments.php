@@ -12,8 +12,7 @@ function aspire_multiple_departments_dashboard_shortcode() {
     $table_name = $wpdb->prefix . 'departments';
 
     if (empty($education_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();     }
+        return 'Please Login Again';     }
 
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'departments';
 
@@ -99,8 +98,7 @@ function departments_list_shortcode() {
         educational_center_teacher_id() : 
         get_educational_center_data();
         if (empty($education_center_id)) {
-            wp_redirect(home_url('/login'));
-            exit();
+            return 'Please Login Again';
         }
     $departments = get_departments_with_teacher_count($education_center_id);
 
@@ -541,8 +539,7 @@ function add_department_shortcode() {
         educational_center_teacher_id() : 
         get_educational_center_data();
         if (empty($education_center_id)) {
-            wp_redirect(home_url('/login'));
-            exit();
+            return 'Please Login Again';
         }
     $table_name = $wpdb->prefix . 'departments';
 
@@ -618,8 +615,7 @@ function edit_department_shortcode() {
         educational_center_teacher_id() : 
         get_educational_center_data();
         if (empty($education_center_id)) {
-            wp_redirect(home_url('/login'));
-            exit();
+            return 'Please Login Again';
         }
     $departments = get_departments_with_teacher_count($education_center_id);
 
@@ -868,8 +864,7 @@ function delete_department_shortcode() {
         educational_center_teacher_id() : 
         get_educational_center_data();
         if (empty($education_center_id)) {
-            wp_redirect(home_url('/login'));
-            exit();
+            return 'Please Login Again';
         }
     $departments = get_departments_with_teacher_count($education_center_id);
 
@@ -1107,8 +1102,7 @@ function generate_department_pdf_callback() {
         educational_center_teacher_id() : 
         get_educational_center_data();
         if (empty($education_center_id)) {
-            wp_redirect(home_url('/login'));
-            exit();
+            return 'Please Login Again';
         }
     $departments = get_departments_with_teacher_count($education_center_id);
 
@@ -1271,8 +1265,7 @@ function load_department_edit_form_callback() {
         educational_center_teacher_id() : 
         get_educational_center_data();
         if (empty($education_center_id)) {
-            wp_redirect(home_url('/login'));
-            exit();
+            return 'Please Login Again';
         }
     $table_name = $wpdb->prefix . 'departments';
     $department = $wpdb->get_row($wpdb->prepare(
@@ -1313,8 +1306,7 @@ function update_department_callback() {
         educational_center_teacher_id() : 
         get_educational_center_data();
         if (empty($education_center_id)) {
-            wp_redirect(home_url('/login'));
-            exit();
+            return 'Please Login Again';
         }
     $table_name = $wpdb->prefix . 'departments';
     $department_id = isset($_POST['department_id']) ? intval($_POST['department_id']) : 0;
@@ -1358,8 +1350,7 @@ function load_department_delete_confirm_callback() {
         educational_center_teacher_id() : 
         get_educational_center_data();
         if (empty($education_center_id)) {
-            wp_redirect(home_url('/login'));
-            exit();
+            return 'Please Login Again';
         }
     $department = $wpdb->get_row($wpdb->prepare(
         "SELECT * FROM {$wpdb->prefix}departments WHERE department_id = %d AND education_center_id = %s",
@@ -1415,8 +1406,7 @@ function delete_department_callback() {
         educational_center_teacher_id() : 
         get_educational_center_data();
         if (empty($education_center_id)) {
-            wp_redirect(home_url('/login'));
-            exit();
+            return 'Please Login Again';
         }
     $deleted = $wpdb->delete(
         $wpdb->prefix . 'departments',
@@ -1445,8 +1435,7 @@ function bulk_delete_departments_callback() {
         educational_center_teacher_id() : 
         get_educational_center_data();
         if (empty($education_center_id)) {
-            wp_redirect(home_url('/login'));
-            exit();
+            return 'Please Login Again';
         }
     $department_ids = isset($_POST['department_ids']) ? array_map('intval', $_POST['department_ids']) : [];
 

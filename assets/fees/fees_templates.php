@@ -5,8 +5,11 @@ if (!defined('ABSPATH')) {
 
 function fee_templates_institute_dashboard_shortcode() {
     if (!is_user_logged_in()) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+        // wp_redirect(home_url('/login'));
+        // exit();  
+        return false;
+    
+    }
     global $wpdb;
 
     $education_center_id = get_educational_center_data();

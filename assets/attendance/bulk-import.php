@@ -27,8 +27,7 @@ function bulk_import_attendance_shortcode($atts) {
 
 
     if (!$educational_center_id) {
-        wp_redirect(home_url('/login'));
-        exit();     }
+        return 'Please Login Again';   }
 
     global $wpdb;
     $table_name = $wpdb->prefix . 'student_attendance';

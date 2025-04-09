@@ -5,8 +5,10 @@ if (!defined('ABSPATH')) {
 
 function my_education_erp_dashboard_shortcode() {
     if (!is_user_logged_in()) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+        // wp_redirect(home_url('/login'));
+        // exit();   
+        return false;
+     }
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'view-fees';
     $education_center_id = get_educational_center_data();
 

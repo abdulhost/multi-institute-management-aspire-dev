@@ -29,7 +29,7 @@ jQuery(document).ready(function($) {
                 url: attendance_entry_ajax.ajax_url,
                 method: 'POST',
                 data: {
-                    action: 'fetch_students_for_attendance',
+                    action: 'get_sections_data',
                     class: classVal,
                     section: sectionVal,
                     nonce: attendance_entry_ajax.nonce

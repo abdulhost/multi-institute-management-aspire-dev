@@ -5,16 +5,57 @@ if (!defined('ABSPATH')) {
 }
 
 // Enqueue scripts and styles
-function enqueue_attendance_entry_scripts() {
-    wp_enqueue_script('attendance-entry-js', plugins_url('js/attendance-entry.js', __FILE__), array('jquery'), '1.3', true);
+// function enqueue_attendance_entry_scripts() {
+//     wp_enqueue_script('attendance-entry-js', plugins_url('js/attendance-entry.js', __FILE__), array('jquery'), '1.3', true);
     
-    // Pass class_sections data to JavaScript
-    global $wpdb;
+//     // Pass class_sections data to JavaScript
+//     global $wpdb;
+//     $educational_center_id = get_educational_center_data();
+//     if (empty($educational_center_id)) {
+//         return 'Please Login Again';
+//     }
+//     $class_sections_table = $wpdb->prefix . 'class_sections';
+//     $class_sections = $wpdb->get_results(
+//         $wpdb->prepare(
+//             "SELECT * FROM $class_sections_table WHERE education_center_id = %s",
+//             $educational_center_id
+//         ),
+//         ARRAY_A
+//     );
+    
+//     $sections_data = [];
+//     foreach ($class_sections as $row) {
+//         $sections_data[$row['class_name']] = explode(',', $row['sections']);
+//     }
+
+//     wp_localize_script('attendance-entry-js', 'attendance_entry_ajax', array(
+//         'ajax_url' => admin_url('admin-ajax.php'),
+//         'nonce' => wp_create_nonce('attendance_entry_nonce'),
+//         'sections_data' => $sections_data
+//     ));
+// }
+// add_action('wp_enqueue_scripts', 'enqueue_attendance_entry_scripts');
+function enqueue_attendance_entry_scripts() {
+    // Enqueue the script unconditionally
+    wp_enqueue_script('attendance-entry-js', plugins_url('js/attendance-entry.js', __FILE__), array('jquery'), '1.3', true);
+
+    // Localize with minimal static data
+    wp_localize_script('attendance-entry-js', 'attendance_entry_ajax', array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('attendance_entry_nonce'),
+    ));
+}
+add_action('wp_enqueue_scripts', 'enqueue_attendance_entry_scripts');
+// AJAX handler to get sections data
+function get_sections_data_ajax() {
+    check_ajax_referer('attendance_entry_nonce', 'nonce');
+
     $educational_center_id = get_educational_center_data();
-    if (empty($educational_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();
+    if (is_string($educational_center_id)) {
+        wp_send_json_error(array('message' => $educational_center_id));
     }
+
+    global $wpdb;
     $class_sections_table = $wpdb->prefix . 'class_sections';
     $class_sections = $wpdb->get_results(
         $wpdb->prepare(
@@ -23,20 +64,16 @@ function enqueue_attendance_entry_scripts() {
         ),
         ARRAY_A
     );
-    
+
     $sections_data = [];
     foreach ($class_sections as $row) {
         $sections_data[$row['class_name']] = explode(',', $row['sections']);
     }
 
-    wp_localize_script('attendance-entry-js', 'attendance_entry_ajax', array(
-        'ajax_url' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('attendance_entry_nonce'),
-        'sections_data' => $sections_data
-    ));
+    wp_send_json_success(array('sections_data' => $sections_data));
 }
-add_action('wp_enqueue_scripts', 'enqueue_attendance_entry_scripts');
-
+add_action('wp_ajax_get_sections_data', 'get_sections_data_ajax');
+add_action('wp_ajax_nopriv_get_sections_data', 'get_sections_data_ajax'); // For non-logged-in users
 // Placeholder functions
 // function get_educational_center_data() {
 //     return 'center_1'; // Replace with actual implementation
@@ -55,8 +92,7 @@ function fetch_students_for_attendance() {
     $section = sanitize_text_field($_POST['section'] ?? '');
     $educational_center_id = get_educational_center_data();
     if (empty($educational_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();
+        return 'Please Login Again';
     }
     if (empty($class) || empty($section) || !$educational_center_id) {
         wp_send_json_error('Missing required fields.');
@@ -113,8 +149,7 @@ function submit_attendance() {
 
     $educational_center_id = get_educational_center_data();
     if (empty($educational_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();
+        return 'Please Login Again';
     }
     $teacher_id = get_current_teacher_id();
     $class = sanitize_text_field($_POST['class'] ?? '');
@@ -182,8 +217,9 @@ function display_attendance_entry_form() {
     $educational_center_id = get_educational_center_data();
 
     if (!$educational_center_id) {
-        wp_redirect(home_url('/login'));
-        exit(); 
+        // wp_redirect(home_url('/login'));
+        // exit(); 
+        return 'Please Login Again';
     }
 
     $class_sections = $wpdb->get_results(

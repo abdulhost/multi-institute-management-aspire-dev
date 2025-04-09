@@ -386,6 +386,11 @@ function su_p_dashboard_shortcode() {
                 case 'support':
                     echo render_su_p_support();
                     break;
+
+                    case 'change_password':
+                        echo render_change_password($current_user);
+                       break;
+                   
                 default:
                     echo render_instituto_dashboard();
             }
@@ -406,7 +411,7 @@ function render_su_p_header($su_p_user) {
 
     $dashboard_link = esc_url(home_url('/su_p-dashboard'));
     $notifications_link = esc_url(home_url('/su_p-dashboard?section=notifications'));
-    $settings_link = esc_url(home_url('/su_p-dashboard?section=settings'));
+    $settings_link = esc_url(home_url('/su_p-dashboard?section=change_password'));
     $logout_link = wp_logout_url(home_url()); // Assuming get_secure_logout_url_by_role() isn't defined yet
     $communication_link = esc_url(home_url('/su_p-dashboard?section=communication'));
 
@@ -587,7 +592,7 @@ function render_su_p_header($su_p_user) {
                                 </div>
                             </div>
                             <ul class="dropdown-list">
-                                <li><a href="<?php echo $settings_link; ?>" class="profile-link">Settings</a></li>
+                                <li><a href="<?php echo $settings_link; ?>" class="profile-link">Change Password</a></li>
                                 <li><a href="<?php echo $logout_link; ?>" class="profile-link logout">Logout</a></li>
                             </ul>
                         </div>

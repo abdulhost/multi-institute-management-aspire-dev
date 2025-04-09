@@ -7,8 +7,10 @@ if (!defined('ABSPATH')) {
 
 function add_parents_institute_dashboard_shortcode($atts) {
     if (!is_user_logged_in()) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+        // wp_redirect(home_url('/login'));
+        // exit();    
+        return false;
+    }
 
     // Determine educational_center_id and teacher_id based on user type
     if (is_teacher($atts)) { 

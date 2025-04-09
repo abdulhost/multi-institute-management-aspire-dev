@@ -7,8 +7,9 @@ if (!defined('ABSPATH')) {
 
 function edit_parents_institute_dashboard_shortcode($atts) {
     if (!is_user_logged_in()) {
-        wp_redirect(home_url('/login'));
-        exit();
+        // wp_redirect(home_url('/login'));
+        // exit();
+        return false;
     }
 
     // Get current user

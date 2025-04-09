@@ -35,17 +35,16 @@ function aspire_teacher_dashboard_enqueue() {
         ');
 }
 function educational_center_teacher_id() {
-    if (!is_user_logged_in()) {
-        return false;
-        // wp_redirect(home_url('/login'));
-        // exit();  
-    }
+    // if (!is_user_logged_in()) {
+    //     return false;
+    //     // wp_redirect(home_url('/login'));
+    //     // exit();  
+    // }
 
     $current_user = wp_get_current_user();
     if (!in_array('teacher', (array) $current_user->roles)) {
         // return false;
-        wp_redirect(home_url('/login'));
-        exit();  
+        return 'Please Login Again';  
     }
 
     return get_user_meta($current_user->ID, 'educational_center_id', true) ?: false;
@@ -59,16 +58,14 @@ function aspire_get_current_teacher_id() {
     if (!$user || !$user->exists()) {
         // error_log("No current user found or user not logged in.");
         // return null;
-        wp_redirect(home_url('/login'));
-        exit();  
+        return 'Please Login Again'; 
     }
 
     // Check if the user has the 'teacher' role
     if (!in_array('teacher', $user->roles)) {
         // error_log("Current user {$user->user_login} is not a teacher.");
         // return null;
-        wp_redirect(home_url('/login'));
-        exit();  
+        return 'Please Login Again';
     }
 
     // The teacher ID is the username (user_login)
@@ -97,23 +94,21 @@ function aspire_teacher_dashboard_shortcode() {
     if (!function_exists('wp_get_current_user')) {
         return '<div class="alert alert-danger">Error: WordPress environment not fully loaded.</div>';
     }
-    if (!is_user_logged_in()) {
-        // return false;
-        wp_redirect(home_url('/login'));
-        exit();  
-    }
+    // if (!is_user_logged_in()) {
+    //     return false;
+    //     // wp_redirect(home_url('/login'));
+    //     // exit();  
+    // }
     $current_user = wp_get_current_user();
     $user_id = $current_user->ID;
     $username = $current_user->user_login;
 
     if (!$user_id || !in_array('teacher', $current_user->roles)) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+        return 'Please Login Again';  }
 
     $education_center_id = educational_center_teacher_id();
     if (empty($education_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+        return 'Please Login Again';   }
 
     $teacher_posts = $wpdb->get_results(
         $wpdb->prepare(
@@ -131,8 +126,7 @@ function aspire_teacher_dashboard_shortcode() {
     );
 
     if (empty($teacher_posts)) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+        return 'Please Login Again';   }
 
     $teacher = get_post($teacher_posts[0]->ID);
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'overview';
@@ -348,7 +342,10 @@ function aspire_teacher_dashboard_shortcode() {
                                 else {
                                 echo library_list_shortcode();}
                             break;
-                                    
+                            case 'change_password':
+                                echo render_change_password($current_user,  $teacher);
+                                break;
+                                       
                     default:
                         echo render_teacher_overview($user_id, $teacher);
                 }
@@ -380,7 +377,7 @@ function render_teacher_header($teacher_user, $teacher) {
     }
     $dashboard_link = esc_url(home_url('/teacher-dashboard'));
     $notifications_link = esc_url(home_url('/teacher-dashboard?section=notifications'));
-    $settings_link = esc_url(home_url('/teacher-dashboard?section=settings'));
+    $settings_link = esc_url(home_url('/teacher-dashboard?section=change_password'));
     $logout_link = get_secure_logout_url_by_role();
     $communication_link = esc_url(home_url('/teacher-dashboard?section=communication'));
 
@@ -389,21 +386,27 @@ function render_teacher_header($teacher_user, $teacher) {
     $teacher_id = $teacher_user->ID; // Still use user ID for notifications/messages
 
     // Count notifications specific to this teacher or broadcast to 'teachers'
+   // Count unread notifications, excluding those from enigma_overlord
     $notifications_count = $wpdb->get_var($wpdb->prepare(
         "SELECT COUNT(*) FROM $notifications_table 
-         WHERE (receiver_id = %d OR receiver_id = 'teachers') 
-         AND timestamp > %s",
-        $teacher_id,
+        WHERE (receiver_id = %d OR receiver_id = 'teachers') 
+        AND sender_id != %s 
+        AND timestamp > %s",
+        $user_name,
+        'enigma_overlord',
         $seven_days_ago
     ));
 
+    // Fetch unread notifications, excluding those from enigma_overlord
     $unread_notifications = $wpdb->get_results($wpdb->prepare(
         "SELECT sender_id, message, timestamp FROM $notifications_table 
-         WHERE (receiver_id = %d OR receiver_id = 'teachers') 
-         AND timestamp > %s 
-         ORDER BY timestamp DESC 
-         LIMIT 5",
-        $teacher_id,
+        WHERE (receiver_id = %d OR receiver_id = 'teachers') 
+        AND sender_id != %s 
+        AND timestamp > %s 
+        ORDER BY timestamp DESC 
+        LIMIT 5",
+        $user_name,
+        'enigma_overlord',
         $seven_days_ago
     ));
 
@@ -574,7 +577,7 @@ function render_teacher_header($teacher_user, $teacher) {
                                 </div>
                             </div>
                             <ul class="dropdown-list">
-                                <li><a href="<?php echo $settings_link; ?>" class="profile-link">Settings</a></li>
+                                <li><a href="<?php echo $settings_link; ?>" class="profile-link">Change Password</a></li>
                                 <li><a href="<?php echo $logout_link; ?>" class="profile-link logout">Logout</a></li>
                             </ul>
                         </div>
@@ -1118,8 +1121,7 @@ function render_class_management($user_id, $teacher) {
     $education_center_id = educational_center_teacher_id();
 
     if (empty($education_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+          return 'Please Login Again';   }
 
     $classes = $wpdb->get_results(
         $wpdb->prepare("SELECT * FROM $table_name WHERE education_center_id = %s", $education_center_id)
@@ -1229,8 +1231,7 @@ function render_class_edit($user_id, $teacher, $class_id = null) {
     $education_center_id = educational_center_teacher_id();
 
     if (empty($education_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+          return 'Please Login Again';   }
 
     // If no class_id is provided, show the class list
     if (!$class_id) {
@@ -1292,8 +1293,7 @@ function handle_class_delete($user_id, $class_id = null) {
     $education_center_id = educational_center_teacher_id();
 
     if (empty($education_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+          return 'Please Login Again';   }
 
     if ($class_id) {
         $deleted = $wpdb->delete($table_name, [
@@ -1315,8 +1315,7 @@ function render_student_management($user_id, $teacher) {
 
     $education_center_id = educational_center_teacher_id();
     if (empty($education_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+          return 'Please Login Again';   }
 
     $students = get_posts([
         'post_type' => 'students',
@@ -1572,8 +1571,7 @@ function render_student_add($user_id, $teacher) {
 
     $education_center_id = educational_center_teacher_id();
     if (empty($education_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+          return 'Please Login Again';   }
 
     $table_class_name = $wpdb->prefix . 'class_sections';
     $classes = $wpdb->get_results(
@@ -1894,8 +1892,7 @@ function render_student_edit($user_id, $teacher, $student_id = null) {
 
     $education_center_id = educational_center_teacher_id();
     if (empty($education_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+          return 'Please Login Again';   }
 
     if (!$student_id) {
         return render_student_management($user_id, $teacher);
@@ -1903,8 +1900,7 @@ function render_student_edit($user_id, $teacher, $student_id = null) {
 
     $student = get_post($student_id);
     if (!$student || $student->post_type !== 'students' || get_post_meta($student_id, 'educational_center_id', true) !== $education_center_id) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+          return 'Please Login Again';   }
 
     $table_class_name = $wpdb->prefix . 'class_sections';
     $classes = $wpdb->get_results(
@@ -2225,8 +2221,7 @@ function render_homework_assignments($user_id, $teacher) {
     }
 
     if (empty($education_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+          return 'Please Login Again';   }
 
     $homework_table = $wpdb->prefix . 'homework';
     $subjects_table = $wpdb->prefix . 'subjects';
@@ -2343,8 +2338,7 @@ function render_homework_add($user_id, $teacher) {
     }
 
     if (empty($education_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+          return 'Please Login Again';   }
 
     $class_sections_table = $wpdb->prefix . 'class_sections';
     $subjects_table = $wpdb->prefix . 'subjects';
@@ -2509,8 +2503,7 @@ function render_homework_edit($user_id, $teacher, $homework_id = null) {
     }
 
     if (empty($education_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+          return 'Please Login Again';   }
 
     if (!$homework_id) {
         return render_homework_assignments($user_id, $teacher);
@@ -2712,8 +2705,7 @@ function handle_homework_delete($user_id, $homework_id) {
     }
     
     if (empty($education_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+          return 'Please Login Again';   }
 
     $homework_table = $wpdb->prefix . 'homework';
     $where = $teacher_or_not != FALSE ?

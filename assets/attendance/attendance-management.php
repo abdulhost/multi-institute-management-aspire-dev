@@ -33,8 +33,7 @@ function fetch_attendance_data($request) {
     $params = $request->get_params();
     $educational_center_id = get_educational_center_data();
     if (!$educational_center_id) {
-        wp_redirect(home_url('/login'));
-        exit(); 
+        return 'Please Login Again';
     }
 
     $class = sanitize_text_field($params['class'] ?? '');
@@ -203,8 +202,7 @@ function display_attendance_management() {
         return $educational_center_id;
     }
     if (empty($educational_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();
+        return 'Please Login Again';
     }
     $classes = $wpdb->get_col("SELECT DISTINCT class FROM $table_name WHERE education_center_id = '$educational_center_id'");
     $sections = $wpdb->get_col("SELECT DISTINCT section FROM $table_name WHERE education_center_id = '$educational_center_id'");

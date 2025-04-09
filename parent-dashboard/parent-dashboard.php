@@ -11,11 +11,11 @@ function is_parent($user_id) {
 }
 
 function educational_center_parent_id() {
-    if (!is_user_logged_in()) {
-        return false;
-        // wp_redirect(home_url('/login'));
-        // exit();  
-    }
+    // if (!is_user_logged_in()) {
+    //     return false;
+    //     // wp_redirect(home_url('/login'));
+    //     // exit();  
+    // }
 
     $current_user = wp_get_current_user();
     if (!in_array('parent', (array)$current_user->roles)) {
@@ -30,18 +30,19 @@ function educational_center_parent_id() {
 // Main Parent Dashboard Shortcode
 function aspire_parent_dashboard_shortcode() {
     global $wpdb;
-
+    
     if (!function_exists('wp_get_current_user')) {
         return '<div class="alert alert-danger">Some Error occured</div>';
     }
-
+    error_log("parent dash");
     $current_user = wp_get_current_user();
     $user_id = $current_user->ID;
     $username = $current_user->user_login;
 
     if (!$current_user->ID || !is_parent($current_user->ID)) {
-        wp_redirect(home_url('/login'));
-        exit();  
+        // wp_redirect(home_url('/login'));
+        // exit();  
+        return '<div class="alert alert-danger">Some Error occured</div>';
     }
     $edu_center_id = educational_center_parent_id();
     $parent_posts = $wpdb->get_results(
@@ -631,19 +632,26 @@ function render_parent_header($parent_user) {
          FROM $announcements_table 
          WHERE education_center_id = %s 
          AND receiver_id IN ('all', 'parents') 
+         AND sender_id != %s 
          AND timestamp > %s",
-        $edu_center_id, $seven_days_ago
+        $edu_center_id,
+        'enigma_overlord',
+        $seven_days_ago
     ));
-
+    
+    // Fetch unread announcements, excluding enigma_overlord
     $unread_announcements = $wpdb->get_results($wpdb->prepare(
         "SELECT sender_id, message, timestamp 
          FROM $announcements_table 
          WHERE education_center_id = %s 
          AND receiver_id IN ('all', 'parents') 
+         AND sender_id != %s 
          AND timestamp > %s 
          ORDER BY timestamp DESC 
          LIMIT 5",
-        $edu_center_id, $seven_days_ago
+        $edu_center_id,
+        'enigma_overlord',
+        $seven_days_ago
     ));
 
     ob_start();
@@ -2215,8 +2223,8 @@ function update_parent_profile_callback() {
     $educational_center_id = educational_center_parent_id();
     $stored_edu_center_id = get_post_meta($parent_post_id, 'educational_center_id', true);
     if ($stored_edu_center_id !== $educational_center_id) {
-        wp_redirect(home_url('/login'));
-        exit();  
+        // wp_redirect(home_url('/login'));
+        // exit();  
     }
 
     $fields = [

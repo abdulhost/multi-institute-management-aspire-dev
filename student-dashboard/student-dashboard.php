@@ -8,9 +8,9 @@ if (!defined('ABSPATH')) {
 // Function to retrieve Educational Center ID for a student
 function educational_center_student_id() {
     if (!is_user_logged_in()) {
-        // return false;
-        wp_redirect(home_url('/login'));
-        exit();  
+        return false;
+        // wp_redirect(home_url('/login'));
+        // exit();  
     }
 
     $current_user = wp_get_current_user();
@@ -166,6 +166,10 @@ function aspire_student_dashboard_shortcode() {
                     case 'inventory':
                         echo student_inventory_transactions_shortcode($student);
                         break;
+                        case 'change_password':
+                            echo render_change_password($current_user,  $student);
+                                                                        break;
+                       
                     default:
                         echo render_student_overview($user_id, $student);
                 }
@@ -183,39 +187,52 @@ function render_student_header($student_user, $student) {
     global $wpdb;
 
     // Use student post data for name and profile photo
-    $user_name = get_field('student_name', $student->ID) ?: "Student"; // Student name from ACF field
+    $user_name = get_field('student_id', $student->ID) ?: "Student"; // Student name from ACF field
     $user_email = $student_user->user_email; // Email from WP_User
 
     // Get the student profile photo (assuming it’s an ACF image array)
-    $avatar_data = get_field('student_profile_photo', $student->ID);
-    $avatar_url = $avatar_data ? esc_url($avatar_data['url']) : 'https://via.placeholder.com/150';
-
+    // $avatar_data = get_field('student_profile_photo', $student->ID);
+    // $avatar_url = $avatar_data ? esc_url($avatar_data['url']) : 'https://via.placeholder.com/150';
+    $avatar_url =  wp_get_attachment_url(get_post_meta($student->ID, 'student_profile_photo', true)) ?: 'https://via.placeholder.com/150';
+    // if ($avatar_url) {
+    //     // If it’s already a string URL, just use it with esc_url
+    //     $avatar_url = esc_url($avatar_url);
+    // } else {
+    //     // Fallback to a placeholder if no photo is set
+    //     $avatar_url = 'https://via.placeholder.com/150';
+    // }
     $dashboard_link = esc_url(home_url('/student-dashboard'));
     $notifications_link = esc_url(home_url('/student-dashboard?section=notifications'));
-    $settings_link = esc_url(home_url('/student-dashboard?section=settings'));
+    $settings_link = esc_url(home_url('/student-dashboard?section=change_password'));
     $logout_link = get_secure_logout_url_by_role();
     $communication_link = esc_url(home_url('/student-dashboard?section=communication'));
 
     $seven_days_ago = date('Y-m-d H:i:s', strtotime('-7 days'));
     $notifications_table = $wpdb->prefix . 'aspire_announcements';
     $student_id = $student_user->ID; // Use user ID for notifications/messages
+    error_log("stdduent id chat =: $user_name");
 
     // Count notifications specific to this student or broadcast to 'students'
     $notifications_count = $wpdb->get_var($wpdb->prepare(
         "SELECT COUNT(*) FROM $notifications_table 
          WHERE (receiver_id = %d OR receiver_id = 'students') 
+         AND sender_id != %s 
          AND timestamp > %s",
-        $student_id,
+        $user_name,
+        'enigma_overlord',
         $seven_days_ago
     ));
-
+    
+    // Fetch unread notifications, excluding enigma_overlord
     $unread_notifications = $wpdb->get_results($wpdb->prepare(
         "SELECT sender_id, message, timestamp FROM $notifications_table 
          WHERE (receiver_id = %d OR receiver_id = 'students') 
+         AND sender_id != %s 
          AND timestamp > %s 
          ORDER BY timestamp DESC 
          LIMIT 5",
-        $student_id,
+        $user_name,
+        'enigma_overlord',
         $seven_days_ago
     ));
 
@@ -227,7 +244,7 @@ function render_student_header($student_user, $student) {
          WHERE (receiver_id = %d OR receiver_id = 'students') 
          AND status = 'sent' 
          AND timestamp > %s",
-        $student_id,
+        $user_name,
         $seven_days_ago
     ));
 
@@ -239,7 +256,7 @@ function render_student_header($student_user, $student) {
          AND timestamp > %s 
          ORDER BY timestamp DESC 
          LIMIT 5",
-        $student_id,
+        $user_name,
         $seven_days_ago
     ));
 
@@ -386,7 +403,7 @@ function render_student_header($student_user, $student) {
                                 </div>
                             </div>
                             <ul class="dropdown-list">
-                                <li><a href="<?php echo $settings_link; ?>" class="profile-link">Settings</a></li>
+                                <li><a href="<?php echo $settings_link; ?>" class="profile-link">Change Password</a></li>
                                 <li><a href="<?php echo $logout_link; ?>" class="profile-link logout">Logout</a></li>
                             </ul>
                         </div>

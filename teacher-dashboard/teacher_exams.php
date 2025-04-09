@@ -4,8 +4,7 @@ function render_teacher_exams($user_id, $teacher) {
     global $wpdb;
     $education_center_id = educational_center_teacher_id();
     if (empty($education_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+        return 'Please Login Again';   }
     $exams = $wpdb->get_results($wpdb->prepare(
         "SELECT * FROM {$wpdb->prefix}exams WHERE education_center_id = %d",
         $education_center_id

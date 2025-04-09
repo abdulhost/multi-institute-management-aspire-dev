@@ -459,8 +459,9 @@ function restrict_dashboard_access() {
         
         // Check if the user is logged in
         if (!is_user_logged_in()) {
-            wp_redirect(home_url('/login'));  // Redirect to login page
-            exit;
+            // wp_redirect(home_url('/login'));  // Redirect to login page
+            // exit;
+            return false;
         }
 
         // Get the current logged-in user
@@ -601,7 +602,11 @@ function get_educational_center_data() {
     global $wpdb;
     $current_user = wp_get_current_user();
     $admin_id = $current_user->user_login;
-
+    $current_url = home_url(add_query_arg([]));
+    if (preg_match('/\.(css|js|png|jpg|jpeg|gif|svg)(\?.*)?$/i', $current_url)) {
+        error_log("get_educational_center_data() called in invalid context (asset): $current_url");
+        return null;
+    }
     $educational_center = get_posts(array(
         'post_type' => 'educational-center',
         'meta_key' => 'admin_id',
@@ -610,9 +615,49 @@ function get_educational_center_data() {
     ));
 
     error_log("inside edu func check");
-    if (empty($educational_center)) {error_log("tional Center found f");
-        return "<p>No Educational Center found for this Admin ID.</p>";
+    if (empty($educational_center)) {
+        error_log("No Educational Center found, preparing detailed error");
+
+        // Get call stack details using debug_backtrace
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2); // Limit to 2 levels for clarity
+        $caller = isset($backtrace[1]) ? $backtrace[1] : array('function' => 'unknown', 'file' => 'unknown', 'line' => 'unknown');
+        $calling_function = $caller['function'] ?? 'unknown';
+        $calling_file = $caller['file'] ?? 'unknown';
+        $calling_line = $caller['line'] ?? 'unknown';
+
+        // Build detailed error message
+        $error_message = "<div style='border: 2px solid red; padding: 20px; margin: 20px; background: #ffe6e6;'>";
+        $error_message .= "<h2>Debug Error: No Educational Center Found</h2>";
+        $error_message .= "<p><strong>Current User:</strong> " . (is_user_logged_in() ? wp_get_current_user()->user_login : "Not logged in") . "</p>";
+        $error_message .= "<p><strong>Admin ID:</strong> " . esc_html($admin_id) . "</p>";
+        $error_message .= "<p><strong>Post Type Queried:</strong> educational-center</p>";
+        $error_message .= "<p><strong>Meta Key:</strong> admin_id</p>";
+        $error_message .= "<p><strong>Meta Value Expected:</strong> " . esc_html($admin_id) . "</p>";
+        $error_message .= "<p><strong>Posts Returned:</strong> " . (is_array($educational_center) ? count($educational_center) : "Not an array") . "</p>";
+        $error_message .= "<p><strong>Raw Query Result:</strong> <pre>" . print_r($educational_center, true) . "</pre></p>";
+        $error_message .= "<p><strong>Current Page URL:</strong> " . esc_url(home_url(add_query_arg([]))) . "</p>";
+        $error_message .= "<p><strong>Called From:</strong> Function: " . esc_html($calling_function) . " in File: " . esc_html(basename($calling_file)) . " at Line: " . esc_html($calling_line) . "</p>";
+        $error_message .= "<p><strong>Possible Issues:</strong></p>";
+        $error_message .= "<ul>";
+        $error_message .= "<li>Is the user logged in? Check if <code>is_user_logged_in()</code> is false.</li>";
+        $error_message .= "<li>Does an 'educational-center' post exist with meta 'admin_id' = '$admin_id'?</li>";
+        $error_message .= "<li>Is this code running on the login page or unexpectedly?</li>";
+        $error_message .= "</ul>";
+        $error_message .= "<p>Please <a href='" . esc_url(home_url('/login')) . "'>log in again</a> or contact support with this info.</p>";
+        $error_message .= "</div>";
+
+        // Enhanced error logging
+        error_log("Educational Center Error for user: $admin_id");
+        error_log("User Logged In: " . (is_user_logged_in() ? 'Yes' : 'No'));
+        error_log("Admin ID: $admin_id");
+        error_log("Posts Returned: " . (is_array($educational_center) ? count($educational_center) : "Not an array"));
+        error_log("Raw Query Result: " . print_r($educational_center, true));
+        error_log("Current URL: " . home_url(add_query_arg([])));
+        error_log("Called From: Function: $calling_function in File: " . basename($calling_file) . " at Line: $calling_line");
+
+        return $error_message;
     }
+
     error_log("inside edu func check2");
     return get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
 }

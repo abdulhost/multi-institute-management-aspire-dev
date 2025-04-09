@@ -216,8 +216,7 @@ function fetch_teacher_attendance_data($request) {
 function aspire_teacher_attendance_dashboard_shortcode() {
     $education_center_id = get_educational_center_data();
     if (empty($education_center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();    }
+        return 'Please Login Again';   }
 
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'teachers-attendance';
 
@@ -380,8 +379,7 @@ function display_add_teacher_attendance_section() {
     $table_name = $wpdb->prefix . 'teacher_attendance';
     $center_id = get_educational_center_data();
     if (empty($center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();
+        return 'Please Login Again';
     }
     $teachers = get_teachers_by_center($center_id);
 
@@ -470,8 +468,7 @@ function display_edit_teacher_attendance_section() {
     $table_name = $wpdb->prefix . 'teacher_attendance';
     $center_id = get_educational_center_data();
     if (!$center_id) {
-        wp_redirect(home_url('/login'));
-        exit(); 
+        return 'Please Login Again';
     }
 
     $teachers = get_teachers_by_center($center_id);
@@ -656,8 +653,7 @@ function update_edit_form_callback() {
     $month = isset($_POST['month']) ? sanitize_text_field($_POST['month']) : '';
     $center_id = get_educational_center_data();
     if (empty($center_id)) {
-        wp_redirect(home_url('/login'));
-        exit();
+        return 'Please Login Again';
     }
     $months_html = '<option value="">-- All Months --</option>';
     $months = $wpdb->get_results($wpdb->prepare(
@@ -699,8 +695,7 @@ function display_bulk_import_teacher_attendance_section() {
 
     $center_id = get_educational_center_data();
     if (!$center_id) {
-        wp_redirect(home_url('/login'));
-        exit(); 
+        return 'Please Login Again';
     }
 
     global $wpdb;
@@ -1079,8 +1074,7 @@ function export_teacher_attendance_shortcode($atts) {
 
     $educational_center_id = get_educational_center_data();
     if (!$educational_center_id) {
-        wp_redirect(home_url('/login'));
-        exit(); 
+        return 'Please Login Again';
     }
 
     global $wpdb;

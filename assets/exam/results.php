@@ -19,6 +19,7 @@ function results_institute_dashboard_shortcode() {
     if (!is_user_logged_in()) {
         // wp_redirect(home_url('/login'));
         //     exit();
+        return false;
     }
 
     // Fetch educational center data
