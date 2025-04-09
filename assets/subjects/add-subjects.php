@@ -25,7 +25,8 @@ function display_subjects_add($atts) {
     }
     
     if (!$educational_center_id) {
-        return '<p>Unable to retrieve educational center information.</p>';
+        wp_redirect(home_url('/login'));
+            exit();
     }
 
     // Process form submission
@@ -70,6 +71,10 @@ exit;
         <?php
           if (is_teacher($atts)) { 
         } else {
+            echo render_admin_header(wp_get_current_user());
+          if (!is_center_subscribed($educational_center_id)) {
+              return render_subscription_expired_message($educational_center_id);
+          }
         $active_section = 'add-subject';
         include(plugin_dir_path(__FILE__) . '../sidebar.php');}
         ?>

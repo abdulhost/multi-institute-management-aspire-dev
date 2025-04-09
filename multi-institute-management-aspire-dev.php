@@ -609,10 +609,11 @@ function get_educational_center_data() {
         'posts_per_page' => 1,
     ));
 
-    if (empty($educational_center)) {
+    error_log("inside edu func check");
+    if (empty($educational_center)) {error_log("tional Center found f");
         return "<p>No Educational Center found for this Admin ID.</p>";
     }
-
+    error_log("inside edu func check2");
     return get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
 }
 // Helper function to get teacher ID
@@ -753,6 +754,12 @@ function get_unique_id_for_role($role_type, $center_id = '') {
     global $wpdb;
 
     $configs = [
+        'educational-center' => [
+            'type'        => 'post_type',
+            'entity_name' => 'educational-center',
+            'prefix'      => 'EDU-',
+            'field_name'  => 'educational_center_id',
+        ],
         'students' => [
             'type'        => 'post_type',
             'entity_name' => 'students',
@@ -1506,6 +1513,7 @@ include plugin_dir_path(__FILE__) . 'assets/class-timetable.php';
 include plugin_dir_path(__FILE__) . 'interface.php';
 include plugin_dir_path(__FILE__) . 'subjects_interface.php';
 include plugin_dir_path(__FILE__) . 'db.php';
+include plugin_dir_path(__FILE__) . 'subs-db.php';
 include plugin_dir_path(__FILE__) . 'helper-func.php';
 // include plugin_dir_path(__FILE__) . 'test.php';
 
@@ -1945,6 +1953,7 @@ function render_change_password($current_user, $post_id = null) {
     <?php
     return ob_get_clean();
 }
+
 
 
 // function restrict_edit_class_section_access() {

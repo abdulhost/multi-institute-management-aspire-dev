@@ -15,11 +15,14 @@ function render_class_table($instance_id) {
 
     // Check if there is an Educational Center for this admin
     if (empty($educational_center)) {
-        return '<p>No Educational Center found for this Admin ID.</p>';
-    }
+        wp_redirect(home_url('/login')); // Redirect to login page
+        exit();    }
 
     $educational_center_id = get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
-
+    if (empty($educational_center_id)) {
+        wp_redirect(home_url('/login')); // Redirect to login page
+        exit();
+    }
     $class_sections = $wpdb->get_results("SELECT * FROM $table_name", ARRAY_A);
     $class_sections = $wpdb->get_results(
     $wpdb->prepare("SELECT * FROM $table_name WHERE education_center_id = %s", $educational_center_id),

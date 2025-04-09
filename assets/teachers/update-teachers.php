@@ -11,11 +11,20 @@ function edit_teachers_institute_dashboard_shortcode() {
         'posts_per_page' => 1,
     ));
 
+    // if (empty($educational_center)) {
+    //     return '<p>No Educational Center found for this Admin ID.</p>';
+    // }
     if (empty($educational_center)) {
-        return '<p>No Educational Center found for this Admin ID.</p>';
+        wp_redirect(home_url('/login'));
+        exit();
+    
     }
-
     $educational_center_id = get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
+    if (empty($educational_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    
+    }
     require_once(ABSPATH . 'wp-admin/includes/image.php');
 
     ob_start();
@@ -23,6 +32,10 @@ function edit_teachers_institute_dashboard_shortcode() {
     ?>
     <div class="attendance-main-wrapper" style="display: flex;">
         <?php
+          echo render_admin_header(wp_get_current_user());
+          if (!is_center_subscribed($educational_center_id)) {
+              return render_subscription_expired_message($educational_center_id);
+          }
         $active_section = 'update-teacher';
         include(plugin_dir_path(__FILE__) . '../sidebar.php');
         ?>

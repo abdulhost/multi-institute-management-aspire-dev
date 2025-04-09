@@ -333,6 +333,50 @@ function su_p_dashboard_shortcode() {
                 case 'notifications':
                     echo render_su_p_notifications();
                     break;
+                    case 'subscription':
+                        if ($action === 'add-subscription') {
+                            echo render_enigma_add_subscription_form();
+                        } 
+                        elseif ($action === 'edit-subscription') {
+                            echo render_enigma_edit_subscription_form();
+                        } 
+                        elseif ($action === 'delete-subscription') {
+                            echo render_enigma_delete_subscription_form();
+                        } 
+                         else {
+                            echo render_subscription_management();
+                        }
+                        break;  
+                       case 'subscription_plans':
+                            if ($action === 'add-subscription_plans') {
+                                echo render_enigma_add_subscription_plan_form();
+                            } 
+                            elseif ($action === 'edit-subscription_plans') {
+                                echo render_enigma_edit_subscription_plan_form();
+                            } 
+                            elseif ($action === 'delete-subscription_plans') {
+                                echo render_enigma_delete_subscription_plan_form();
+                            } 
+                             else {
+                                echo render_subscription_plans_page();
+                            }
+                            break;        
+                       
+                        case 'payment_methods':
+                            if ($action === 'add-payment_methods') {
+                                echo render_enigma_add_payment_method_form();
+                            } 
+                            elseif ($action === 'edit-payment_methods') {
+                                echo render_enigma_edit_payment_method_form();
+                            } 
+                            elseif ($action === 'delete-payment_methods') {
+                                echo render_enigma_delete_payment_method_form();
+                            } 
+                             else {
+                                echo render_payment_methods_page();
+                            }
+                            break;        
+
                 case 'settings':
                     echo render_su_p_settings();
                     break;
@@ -343,7 +387,7 @@ function su_p_dashboard_shortcode() {
                     echo render_su_p_support();
                     break;
                 default:
-                    echo render_su_p_overview();
+                    echo render_instituto_dashboard();
             }
             ?>
         </div>
@@ -358,7 +402,7 @@ function render_su_p_header($su_p_user) {
     global $wpdb;
     $user_name = $su_p_user->display_name;
     $user_email = $su_p_user->user_email;
-    $avatar_url = get_user_meta($su_p_user->ID, 'su_p_profile_photo', true) ? wp_get_attachment_url(get_user_meta($su_p_user->ID, 'su_p_profile_photo', true)) : 'https://via.placeholder.com/150';
+    $avatar_url =  plugin_dir_url(__FILE__) . '../logo instituto.jpg';
 
     $dashboard_link = esc_url(home_url('/su_p-dashboard'));
     $notifications_link = esc_url(home_url('/su_p-dashboard?section=notifications'));
@@ -406,8 +450,8 @@ function render_su_p_header($su_p_user) {
         <div class="header-container">
             <div class="header-left">
                 <a href="<?php echo $dashboard_link; ?>" class="header-logo">
-                    <img decoding="async" class="logo-image" src="<?php echo plugin_dir_url(__FILE__) . 'logo-su_p.png'; ?>" alt="su_p Logo">
-                    <span class="logo-text">su_p Dashboard</span>
+                    <img decoding="async" class="logo-image" src="<?php echo  esc_url($avatar_url); ?>" alt="su_p Logo">
+                    <span class="logo-text">Super Admin</span>
                 </a>
                 <div class="header-search">
                     <input type="text" placeholder="Search" class="search-input" id="header-search-input" aria-label="Search">
@@ -13088,7 +13132,7 @@ function su_p_library_management_dashboard_shortcode() {
                 </div>
                 <div id="edu-loader" class="edu-loader" style="display: none;">
                     <div class="edu-loader-container">
-                        <img src="<?php echo plugin_dir_url(__FILE__) . 'custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                        <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
                     </div>
                 </div>
             </div>
@@ -27346,11 +27390,2643 @@ function render_delete_transport_enrollments() {
     return ob_get_clean();
 }
 
+//subscription
+// Main Render Function (Dashboard with Modals)
+function render_subscription_management() {
+    if (!current_user_can('manage_options')) {
+        wp_die('You do not have permission to access this page.');
+    }
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <!-- Loader SVG -->
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Subscription Management</h2>
+                <div class="search-filters">
+                    <input type="text" id="subscription-search" placeholder="Search by Center ID or Plan...">
+                    <select id="center-filter">
+                        <option value="">All Educational Centers</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="actions">
+                    <button id="add-subscription-btn">Add Subscription</button>
+                    <label for="subscriptions-per-page">Show:</label>
+                    <select id="subscriptions-per-page">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                    <button id="prev-page" disabled>Previous</button>
+                    <span id="page-info"></span>
+                    <button id="next-page">Next</button>
+                    <button id="refresh-data">Refresh</button>
+                </div>
+                <div class="management-table-wrapper">
+                    <div class="actions" id="export-tools"></div>
+                    <table id="subscription-table" class="wp-list-table widefat fixed striped">
+                        <thead id="subscription-table-head"></thead>
+                        <tbody id="subscription-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Add Subscription Modal -->
+    <div class="edu-modal" id="add-subscription-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="add-subscription-modal">×</span>
+            <h3>Add New Subscription</h3>
+            <form id="add-subscription-form">
+                <div class="search-filters">
+                    <label for="add-new-center">Add New Center?</label>
+                    <select id="add-new-center" name="new_center" onchange="toggleCenterFields(this.value)">
+                        <option value="no">No, select existing</option>
+                        <option value="yes">Yes, create new</option>
+                    </select>
+                </div>
+                <div class="search-filters" id="existing_center_row">
+                    <label for="add-center-id">Educational Center</label>
+                    <select id="add-center-id" name="educational_center_id" required>
+                        <option value="">Select Center</option>
+                        <?php
+                        foreach ($centers as $center) {
+                            $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                            echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="search-filters new_center_field" style="display:none;">
+                    <label for="add-institute-logo">Institute Logo</label>
+                    <input type="file" id="add-institute-logo" name="institute_logo">
+                </div>
+                <div class="search-filters new_center_field" style="display:none;">
+                    <label for="add-location">Location</label>
+                    <input type="text" id="add-location" name="location">
+                </div>
+                <div class="search-filters new_center_field" style="display:none;">
+                    <label for="add-admin-id">Admin ID</label>
+                    <input type="text" id="add-admin-id" name="admin_id">
+                </div>
+                <div class="search-filters new_center_field" style="display:none;">
+                    <label for="add-mobile-number">Mobile Number</label>
+                    <input type="tel" id="add-mobile-number" name="mobile_number">
+                </div>
+                <div class="search-filters new_center_field" style="display:none;">
+                    <label for="add-email-id">Email ID</label>
+                    <input type="email" id="add-email-id" name="email_id">
+                </div>
+                <div class="search-filters new_center_field" style="display:none;">
+                    <label for="add-center-name">Center Name</label>
+                    <input type="text" id="add-center-name" name="educational_center_name">
+                </div>
+                <div class="search-filters">
+                    <label for="add-plan-type">Plan Type</label>
+                    <select id="add-plan-type" name="plan_type" required>
+                        <option value="">Select Plan</option>
+                        <?php foreach (get_subscription_plans() as $plan) : ?>
+                            <option value="<?php echo esc_attr($plan->plan_name); ?>">
+                                <?php echo esc_html("{$plan->plan_name} ({$plan->plan_duration}, \${$plan->plan_price})"); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="add-payment-method">Payment Method</label>
+                    <select id="add-payment-method" name="payment_method" required>
+                        <option value="">Select Method</option>
+                        <?php foreach (get_payment_methods() as $method) : ?>
+                            <option value="<?php echo esc_attr($method->method_name); ?>"><?php echo esc_html($method->method_name); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="add-transaction-id">Transaction ID</label>
+                    <input type="text" id="add-transaction-id" name="transaction_id" value="MANUAL-" required>
+                </div>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>">
+                <button type="button" id="save-subscription">Add Subscription</button>
+            </form>
+            <div id="add-subscription-message" class="message"></div>
+        </div>
+    </div>
 
+    <!-- Edit Subscription Modal -->
+    <div class="edu-modal" id="edit-subscription-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="edit-subscription-modal">×</span>
+            <h3>Edit Subscription</h3>
+            <form id="edit-subscription-form">
+                <input type="hidden" id="edit-subscription-id" name="subscription_id">
+                <div class="search-filters">
+                    <label for="edit-center-id">Educational Center</label>
+                    <input type="text" id="edit-center-id" name="educational_center_id" readonly>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-plan-type">Plan Type</label>
+                    <select id="edit-plan-type" name="plan_type" required>
+                        <option value="">Select Plan</option>
+                        <?php foreach (get_subscription_plans() as $plan) : ?>
+                            <option value="<?php echo esc_attr($plan->plan_name); ?>">
+                                <?php echo esc_html("{$plan->plan_name} ({$plan->plan_duration}, \${$plan->plan_price})"); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-payment-method">Payment Method</label>
+                    <select id="edit-payment-method" name="payment_method" required>
+                        <option value="">Select Method</option>
+                        <?php foreach (get_payment_methods() as $method) : ?>
+                            <option value="<?php echo esc_attr($method->method_name); ?>"><?php echo esc_html($method->method_name); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-transaction-id">Transaction ID</label>
+                    <input type="text" id="edit-transaction-id" name="transaction_id" required>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-status">Status</label>
+                    <select id="edit-status" name="subscription_status" required>
+                        <option value="pending">Pending</option>
+                        <option value="active">Active</option>
+                        <option value="expired">Expired</option>
+                    </select>
+                </div>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>">
+                <button type="button" id="update-subscription">Update Subscription</button>
+            </form>
+            <div id="edit-subscription-message" class="message"></div>
+        </div>
+    </div>
 
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+    function openModal(modalId) { 
+        showLoader(); 
+        jQuery(modalId).css('display', 'flex'); 
+        setTimeout(hideLoader, 300); 
+        clearMessages(modalId);
+    }
+    function closeModal(modalId) { 
+        jQuery(modalId).css('display', 'none'); 
+        clearMessages(modalId); 
+        hideLoader(); 
+    }
+    function clearMessages(modalId) {
+        jQuery(modalId + ' .message').css({'background': '', 'color': ''}).text('');
+    }
+    function toggleCenterFields(value) {
+        const existingRow = document.getElementById('existing_center_row');
+        const newFields = document.querySelectorAll('.new_center_field');
+        existingRow.style.display = value === 'no' ? '' : 'none';
+        newFields.forEach(el => el.style.display = value === 'yes' ? '' : 'none');
+        document.getElementById('add-center-id').required = value === 'no';
+        newFields.forEach(el => el.querySelector('input').required = value === 'yes');
+    }
 
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>';
 
+        let currentPage = 1;
+        let perPage = 10;
+        let subscriptionSearch = '';
+        let centerFilter = '';
+
+        $('.edu-modal-close').on('click', function() { closeModal('#' + $(this).data('modal')); });
+        $(document).on('click', function(event) { if ($(event.target).hasClass('edu-modal')) closeModal('#' + event.target.id); });
+
+        function loadSubscriptions(page, limit, search, center, showLoading = true) {
+            if (showLoading) showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_subscriptions',
+                    page: page,
+                    per_page: limit,
+                    search: search,
+                    center_filter: center,
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    if (showLoading) hideLoader();
+                    if (response.success) {
+                        $('#subscription-table-head').html(response.data.table_head);
+                        $('#subscription-table-body').html(response.data.subscriptions);
+                        const totalPages = Math.ceil(response.data.total / limit);
+                        $('#page-info').text(`Page ${page} of ${totalPages} (Total Records: ${response.data.total})`);
+                        $('#prev-page').prop('disabled', page === 1);
+                        $('#next-page').prop('disabled', page === totalPages);
+                        setupExportButtons(response.data.subscription_data);
+                    } else {
+                        $('#subscription-table-body').html('<tr><td colspan="8">No subscriptions found.</td></tr>');
+                        $('#export-tools').html('');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    $('#subscription-table-body').html('<tr><td colspan="8">Error loading subscriptions: ' + error + '</td></tr>');
+                }
+            });
+        }
+
+        function setupExportButtons(subscriptionData) {
+            const tools = $('#export-tools');
+            tools.html(`
+                <button class="export-btn export-csv"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
+                <button class="export-btn export-pdf"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
+                <button class="export-btn export-excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
+            `);
+            tools.find('.export-csv').on('click', () => exportToCSV(subscriptionData));
+            tools.find('.export-pdf').on('click', () => generatePDF(subscriptionData));
+            tools.find('.export-excel').on('click', () => exportToExcel(subscriptionData));
+        }
+
+        function exportToCSV(data) {
+            const headers = ['ID', 'Center ID', 'Plan Type', 'Status', 'Start Date', 'End Date', 'Payment Method', 'Transaction ID'];
+            const csvRows = [headers.join(',')];
+            data.forEach(row => {
+                const values = [row.id, row.educational_center_id, row.plan_type, row.subscription_status, row.subscription_start, row.subscription_end, row.payment_method, row.transaction_id].map(value => `"${value}"`);
+                csvRows.push(values.join(','));
+            });
+            const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'subscriptions.csv';
+            link.click();
+        }
+
+        function generatePDF(data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(16);
+            doc.text('Subscriptions Report', 10, 10);
+            doc.setFontSize(12);
+            const tableData = data.map(row => [row.id, row.educational_center_id, row.plan_type, row.subscription_status, row.subscription_start, row.subscription_end, row.payment_method, row.transaction_id]);
+            doc.autoTable({
+                head: [['ID', 'Center ID', 'Plan Type', 'Status', 'Start Date', 'End Date', 'Payment Method', 'Transaction ID']],
+                body: tableData,
+                startY: 20,
+                styles: { fontSize: 10, cellPadding: 2 },
+                headStyles: { fillColor: [44, 109, 251] }
+            });
+            doc.save('subscriptions.pdf');
+        }
+
+        function exportToExcel(data) {
+            const worksheetData = data.map(row => ({
+                'ID': row.id,
+                'Center ID': row.educational_center_id,
+                'Plan Type': row.plan_type,
+                'Status': row.subscription_status,
+                'Start Date': row.subscription_start,
+                'End Date': row.subscription_end,
+                'Payment Method': row.payment_method,
+                'Transaction ID': row.transaction_id
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Subscriptions');
+            XLSX.writeFile(workbook, 'subscriptions.xlsx');
+        }
+
+        loadSubscriptions(currentPage, perPage, subscriptionSearch, centerFilter);
+
+        $('#subscription-search').on('input', debounce(function() {
+            subscriptionSearch = $(this).val();
+            currentPage = 1;
+            loadSubscriptions(currentPage, perPage, subscriptionSearch, centerFilter);
+        }, 500));
+
+        $('#center-filter').on('change', function() {
+            centerFilter = $(this).val();
+            currentPage = 1;
+            loadSubscriptions(currentPage, perPage, subscriptionSearch, centerFilter);
+        });
+
+        $('#subscriptions-per-page').on('change', function() {
+            perPage = parseInt($(this).val());
+            currentPage = 1;
+            loadSubscriptions(currentPage, perPage, subscriptionSearch, centerFilter);
+        });
+
+        $('#next-page').on('click', function() {
+            currentPage++;
+            loadSubscriptions(currentPage, perPage, subscriptionSearch, centerFilter);
+        });
+
+        $('#prev-page').on('click', function() {
+            currentPage--;
+            loadSubscriptions(currentPage, perPage, subscriptionSearch, centerFilter);
+        });
+
+        $('#refresh-data').on('click', function() {
+            loadSubscriptions(currentPage, perPage, subscriptionSearch, centerFilter);
+        });
+
+        $('#add-subscription-btn').on('click', function() {
+            openModal('#add-subscription-modal');
+        });
+
+        $('#save-subscription').on('click', function() {
+            enigma_add_subscription();
+        });
+
+        $('#subscription-table-body').on('click', '.edit-subscription', function() {
+            const subscriptionId = $(this).data('subscription-id');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_subscription', subscription_id: subscriptionId, nonce: ajaxNonce },
+                success: function(response) {
+                    if (response.success) {
+                        $('#edit-subscription-id').val(response.data.id);
+                        $('#edit-center-id').val(response.data.educational_center_id);
+                        $('#edit-plan-type').val(response.data.plan_type);
+                        $('#edit-payment-method').val(response.data.payment_method);
+                        $('#edit-transaction-id').val(response.data.transaction_id);
+                        $('#edit-status').val(response.data.subscription_status);
+                        openModal('#edit-subscription-modal');
+                    } else {
+                        hideLoader();
+                        alert('Error fetching subscription: ' + response.data.message);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    alert('Error fetching subscription data.');
+                },
+                complete: hideLoader
+            });
+        });
+
+        $('#update-subscription').on('click', function() {
+            enigma_edit_subscription();
+        });
+
+        $('#subscription-table-body').on('click', '.delete-subscription', function() {
+            if (confirm('Are you sure you want to delete this subscription?')) {
+                enigma_delete_subscription($(this).data('subscription-id'));
+            }
+        });
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => { clearTimeout(timeout); func(...args); };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    });
+
+    function enigma_add_subscription() {
+        const formData = new FormData(jQuery('#add-subscription-form')[0]);
+        formData.append('action', 'enigma_add_subscription');
+        showLoader();
+        jQuery.ajax({
+            url: '<?php echo esc_js(admin_url('admin-ajax.php')); ?>',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                hideLoader();
+                const $message = jQuery('#add-subscription-message');
+                if (response.success) {
+                    $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                    setTimeout(() => {
+                        closeModal('#add-subscription-modal');
+                        loadSubscriptions(currentPage, perPage, subscriptionSearch, centerFilter, false);
+                    }, 2000);
+                } else {
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                    setTimeout(() => clearMessages('#add-subscription-modal'), 3000);
+                }
+            },
+            error: function() {
+                hideLoader();
+                jQuery('#add-subscription-message').css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+            }
+        });
+    }
+
+    function enigma_edit_subscription() {
+        const formData = new FormData(jQuery('#edit-subscription-form')[0]);
+        formData.append('action', 'enigma_edit_subscription');
+        showLoader();
+        jQuery.ajax({
+            url: '<?php echo esc_js(admin_url('admin-ajax.php')); ?>',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                hideLoader();
+                const $message = jQuery('#edit-subscription-message');
+                if (response.success) {
+                    $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                    setTimeout(() => {
+                        closeModal('#edit-subscription-modal');
+                        loadSubscriptions(currentPage, perPage, subscriptionSearch, centerFilter, false);
+                    }, 2000);
+                } else {
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                    setTimeout(() => clearMessages('#edit-subscription-modal'), 3000);
+                }
+            },
+            error: function() {
+                hideLoader();
+                jQuery('#edit-subscription-message').css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+            }
+        });
+    }
+
+    function enigma_delete_subscription(subscriptionId) {
+        showLoader();
+        jQuery.ajax({
+            url: '<?php echo esc_js(admin_url('admin-ajax.php')); ?>',
+            method: 'POST',
+            data: {
+                action: 'enigma_delete_subscription',
+                subscription_id: subscriptionId,
+                nonce: '<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>'
+            },
+            success: function(response) {
+                hideLoader();
+                if (response.success) {
+                    loadSubscriptions(currentPage, perPage, subscriptionSearch, centerFilter, false);
+                } else {
+                    alert('Error deleting subscription: ' + (response.data?.message || 'Unknown error'));
+                }
+            },
+            error: function() {
+                hideLoader();
+                alert('Error: AJAX request failed.');
+            }
+        });
+    }
+    </script>
+    <?php
+    // wp_enqueue_style('enigma-subscriptions-style', plugin_dir_url(__FILE__) . 'subscriptions.css');
+    // wp_enqueue_script('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js', [], '5.15.4', true);
+    // wp_enqueue_script('jspdf', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', [], '2.5.1', true);
+    // wp_enqueue_script('jspdf-autotable', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js', ['jspdf'], '3.5.23', true);
+    // wp_enqueue_script('xlsx', 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', [], '0.18.5', true);
+    return ob_get_clean();
+}
+
+// AJAX Handlers for Subscriptions
+add_action('wp_ajax_enigma_fetch_subscriptions', 'enigma_fetch_subscriptions');
+function enigma_fetch_subscriptions() {
+    check_ajax_referer('enigma_subscriptions_nonce', 'nonce');
+    global $wpdb;
+    $page = max(1, intval($_POST['page'] ?? 1));
+    $per_page = intval($_POST['per_page'] ?? 10);
+    $search = sanitize_text_field($_POST['search'] ?? '');
+    $center_filter = sanitize_text_field($_POST['center_filter'] ?? '');
+    $offset = ($page - 1) * $per_page;
+
+    $where = "WHERE 1=1";
+    if ($search) {
+        $where .= $wpdb->prepare(" AND (es.educational_center_id LIKE %s OR es.plan_type LIKE %s)", "%$search%", "%$search%");
+    }
+    if ($center_filter) {
+        $where .= $wpdb->prepare(" AND es.educational_center_id = %s", $center_filter);
+    }
+
+    $subscriptions = $wpdb->get_results(
+        "SELECT es.* 
+         FROM {$wpdb->prefix}edu_subscriptions es 
+         $where ORDER BY es.subscription_start DESC LIMIT $offset, $per_page",
+        ARRAY_A
+    );
+    $total = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}edu_subscriptions es $where");
+
+    $table_head = '<tr><th>ID</th><th>Center ID</th><th>Plan Type</th><th>Status</th><th>Start Date</th><th>End Date</th><th>Payment Method</th><th>Transaction ID</th><th>Actions</th></tr>';
+    $subscriptions_html = '';
+    $subscription_data = [];
+    foreach ($subscriptions as $subscription) {
+        $subscriptions_html .= "<tr>
+            <td>" . esc_html($subscription['id']) . "</td>
+            <td>" . esc_html($subscription['educational_center_id']) . "</td>
+            <td>" . esc_html($subscription['plan_type']) . "</td>
+            <td>" . esc_html($subscription['subscription_status']) . "</td>
+            <td>" . esc_html($subscription['subscription_start'] ?: 'N/A') . "</td>
+            <td>" . esc_html($subscription['subscription_end'] ?: 'N/A') . "</td>
+            <td>" . esc_html($subscription['payment_method']) . "</td>
+            <td>" . esc_html($subscription['transaction_id']) . "</td>
+            <td>
+                <button class='edit-subscription' data-subscription-id='" . esc_attr($subscription['id']) . "'>Edit</button>
+                <button class='delete-subscription' data-subscription-id='" . esc_attr($subscription['id']) . "'>Delete</button>
+            </td>
+        </tr>";
+        $subscription_data[] = [
+            'id' => $subscription['id'],
+            'educational_center_id' => $subscription['educational_center_id'],
+            'plan_type' => $subscription['plan_type'],
+            'subscription_status' => $subscription['subscription_status'],
+            'subscription_start' => $subscription['subscription_start'] ?: 'N/A',
+            'subscription_end' => $subscription['subscription_end'] ?: 'N/A',
+            'payment_method' => $subscription['payment_method'],
+            'transaction_id' => $subscription['transaction_id']
+        ];
+    }
+    if (!$subscriptions) $subscriptions_html = '<tr><td colspan="9">No subscriptions found.</td></tr>';
+
+    wp_send_json_success([
+        'table_head' => $table_head,
+        'subscriptions' => $subscriptions_html,
+        'subscription_data' => $subscription_data,
+        'total' => $total ?: 0
+    ]);
+}
+
+add_action('wp_ajax_enigma_fetch_subscription', 'enigma_fetch_subscription');
+function enigma_fetch_subscription() {
+    check_ajax_referer('enigma_subscriptions_nonce', 'nonce');
+    global $wpdb;
+    $subscription_id = intval($_POST['subscription_id']);
+    $subscription = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}edu_subscriptions WHERE id = %d",
+        $subscription_id
+    ), ARRAY_A);
+
+    if ($subscription) {
+        wp_send_json_success([
+            'id' => $subscription['id'],
+            'educational_center_id' => $subscription['educational_center_id'],
+            'plan_type' => $subscription['plan_type'],
+            'subscription_status' => $subscription['subscription_status'],
+            'subscription_start' => $subscription['subscription_start'],
+            'subscription_end' => $subscription['subscription_end'],
+            'payment_method' => $subscription['payment_method'],
+            'transaction_id' => $subscription['transaction_id']
+        ]);
+    } else {
+        wp_send_json_error(['message' => 'Subscription not found']);
+    }
+}
+
+add_action('wp_ajax_enigma_add_subscription', 'enigma_add_subscription');
+function enigma_add_subscription() {
+    check_ajax_referer('enigma_subscriptions_nonce', 'nonce');
+    global $wpdb;
+
+    $new_center = sanitize_text_field($_POST['new_center']) === 'yes';
+    $educational_center_id = sanitize_text_field($_POST['educational_center_id'] ?? '');
+
+    if ($new_center) {
+        $educational_center_id = get_unique_id_for_role('educational-center');
+        $center_id = wp_insert_post([
+            'post_title' => sanitize_text_field($_POST['educational_center_name'] ?? 'New Center'),
+            'post_type' => 'educational-center',
+            'post_status' => 'publish'
+        ]);
+        if (is_wp_error($center_id)) {
+            wp_send_json_error(['message' => 'Failed to create center: ' . $center_id->get_error_message()]);
+            exit;
+        }
+        if (!empty($_FILES['institute_logo']['name'])) {
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+            $uploaded = wp_handle_upload($_FILES['institute_logo'], ['test_form' => false]);
+            if ($uploaded && !isset($uploaded['error'])) {
+                update_post_meta($center_id, 'institute_logo', $uploaded['url']);
+            }
+        }
+        update_post_meta($center_id, 'location', sanitize_text_field($_POST['location'] ?? ''));
+        update_post_meta($center_id, 'educational_center_id', $educational_center_id);
+        update_post_meta($center_id, 'admin_id', sanitize_text_field($_POST['admin_id'] ?? ''));
+        update_post_meta($center_id, 'mobile_number', sanitize_text_field($_POST['mobile_number'] ?? ''));
+        update_post_meta($center_id, 'email_id', sanitize_email($_POST['email_id'] ?? ''));
+        update_post_meta($center_id, 'educational_center_name', sanitize_text_field($_POST['educational_center_name'] ?? ''));
+    }
+
+    $data = [
+        'educational_center_id' => $educational_center_id,
+        'plan_type' => sanitize_text_field($_POST['plan_type'] ?? ''),
+        'payment_method' => sanitize_text_field($_POST['payment_method'] ?? ''),
+        'transaction_id' => sanitize_text_field($_POST['transaction_id'] ?? '')
+    ];
+
+    if (empty($data['educational_center_id']) || empty($data['plan_type']) || empty($data['payment_method']) || empty($data['transaction_id'])) {
+        wp_send_json_error(['message' => 'All fields are required']);
+        exit;
+    }
+
+    $center_exists = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = 'educational_center_id' AND meta_value = %s",
+        $educational_center_id
+    ));
+    if (!$center_exists) {
+        wp_send_json_error(['message' => 'Invalid Educational Center ID']);
+        exit;
+    }
+    if (is_center_subscribed($educational_center_id)) {
+        wp_send_json_error(['message' => 'This center already has an active subscription']);
+        exit;
+    }
+
+    $start_date = current_time('mysql');
+    $duration = get_subscription_duration($data['plan_type']);
+    $end_date = date('Y-m-d H:i:s', strtotime($duration, strtotime($start_date)));
+    $status = in_array($data['payment_method'], ['WooCommerce', 'Razorpay']) ? 'pending' : 'active';
+    $data['subscription_status'] = $status;
+    $data['subscription_start'] = $status === 'active' ? $start_date : null;
+    $data['subscription_end'] = $status === 'active' ? $end_date : null;
+
+    $result = $wpdb->insert($wpdb->prefix . 'edu_subscriptions', $data);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to add subscription: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Subscription added successfully');
+    }
+}
+
+add_action('wp_ajax_enigma_edit_subscription', 'enigma_edit_subscription');
+function enigma_edit_subscription() {
+    check_ajax_referer('enigma_subscriptions_nonce', 'nonce');
+    global $wpdb;
+    $subscription_id = intval($_POST['subscription_id']);
+    $data = [
+        'plan_type' => sanitize_text_field($_POST['plan_type'] ?? ''),
+        'payment_method' => sanitize_text_field($_POST['payment_method'] ?? ''),
+        'transaction_id' => sanitize_text_field($_POST['transaction_id'] ?? ''),
+        'subscription_status' => sanitize_text_field($_POST['subscription_status'] ?? '')
+    ];
+
+    if (empty($subscription_id) || empty($data['plan_type']) || empty($data['payment_method']) || empty($data['transaction_id'])) {
+        wp_send_json_error(['message' => 'All fields are required']);
+        exit;
+    }
+
+    if ($data['subscription_status'] === 'active') {
+        $start_date = current_time('mysql');
+        $duration = get_subscription_duration($data['plan_type']);
+        $data['subscription_start'] = $start_date;
+        $data['subscription_end'] = date('Y-m-d H:i:s', strtotime($duration, strtotime($start_date)));
+    } elseif ($data['subscription_status'] === 'expired') {
+        $data['subscription_end'] = current_time('mysql');
+    }
+
+    $result = $wpdb->update($wpdb->prefix . 'edu_subscriptions', $data, ['id' => $subscription_id]);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to update subscription: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Subscription updated successfully');
+    }
+}
+
+add_action('wp_ajax_enigma_delete_subscription', 'enigma_delete_subscription');
+function enigma_delete_subscription() {
+    check_ajax_referer('enigma_subscriptions_nonce', 'nonce');
+    global $wpdb;
+    $subscription_id = intval($_POST['subscription_id']);
+    if (empty($subscription_id)) {
+        wp_send_json_error(['message' => 'Invalid subscription ID']);
+        exit;
+    }
+
+    $result = $wpdb->delete($wpdb->prefix . 'edu_subscriptions', ['id' => $subscription_id]);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to delete subscription: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Subscription deleted successfully');
+    }
+}
+
+// Standalone Functions for Subscriptions
+function render_enigma_add_subscription_form() {
+    global $wpdb;
+    $centers = get_posts(['post_type' => 'educational-center', 'posts_per_page' => -1]);
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Add New Subscription</h2>
+        <div id="add-subscription-message" class="message"></div>
+        <form id="standalone-add-subscription-form">
+            <table class="form-table">
+                <tr>
+                    <th><label for="add-new-center">Add New Center?</label></th>
+                    <td>
+                        <select id="add-new-center" name="new_center" class="regular-text" onchange="toggleCenterFields(this.value)">
+                            <option value="no">No, select existing</option>
+                            <option value="yes">Yes, create new</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr id="existing_center_row">
+                    <th><label for="add-center-id">Educational Center</label></th>
+                    <td>
+                        <select id="add-center-id" name="educational_center_id" class="regular-text" required>
+                            <option value="">Select Center</option>
+                            <?php
+                            foreach ($centers as $center) {
+                                $center_id = get_post_meta($center->ID, 'educational_center_id', true);
+                                echo "<option value='$center_id'>" . esc_html($center->post_title) . " ($center_id)</option>";
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr class="new_center_field" style="display:none;">
+                    <th><label for="add-institute-logo">Institute Logo</label></th>
+                    <td><input type="file" id="add-institute-logo" name="institute_logo" class="regular-text"></td>
+                </tr>
+                <tr class="new_center_field" style="display:none;">
+                    <th><label for="add-location">Location</label></th>
+                    <td><input type="text" id="add-location" name="location" class="regular-text"></td>
+                </tr>
+                <tr class="new_center_field" style="display:none;">
+                    <th><label for="add-admin-id">Admin ID</label></th>
+                    <td><input type="text" id="add-admin-id" name="admin_id" class="regular-text"></td>
+                </tr>
+                <tr class="new_center_field" style="display:none;">
+                    <th><label for="add-mobile-number">Mobile Number</label></th>
+                    <td><input type="tel" id="add-mobile-number" name="mobile_number" class="regular-text"></td>
+                </tr>
+                <tr class="new_center_field" style="display:none;">
+                    <th><label for="add-email-id">Email ID</label></th>
+                    <td><input type="email" id="add-email-id" name="email_id" class="regular-text"></td>
+                </tr>
+                <tr class="new_center_field" style="display:none;">
+                    <th><label for="add-center-name">Center Name</label></th>
+                    <td><input type="text" id="add-center-name" name="educational_center_name" class="regular-text"></td>
+                </tr>
+                <tr>
+                    <th><label for="add-plan-type">Plan Type</label></th>
+                    <td>
+                        <select id="add-plan-type" name="plan_type" class="regular-text" required>
+                            <option value="">Select Plan</option>
+                            <?php foreach (get_subscription_plans() as $plan) : ?>
+                                <option value="<?php echo esc_attr($plan->plan_name); ?>">
+                                    <?php echo esc_html("{$plan->plan_name} ({$plan->plan_duration}, \${$plan->plan_price})"); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="add-payment-method">Payment Method</label></th>
+                    <td>
+                        <select id="add-payment-method" name="payment_method" class="regular-text" required>
+                            <option value="">Select Method</option>
+                            <?php foreach (get_payment_methods() as $method) : ?>
+                                <option value="<?php echo esc_attr($method->method_name); ?>"><?php echo esc_html($method->method_name); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="add-transaction-id">Transaction ID</label></th>
+                    <td><input type="text" id="add-transaction-id" name="transaction_id" value="MANUAL-" class="regular-text" required></td>
+                </tr>
+            </table>
+            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>">
+            <p class="submit"><button type="button" id="save-subscription" class="button-primary">Add Subscription</button></p>
+        </form>
+        <h3>Existing Subscriptions</h3>
+        <table class="wp-list-table widefat fixed striped" id="add-subscription-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Center ID</th>
+                    <th>Plan Type</th>
+                    <th>Status</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Payment Method</th>
+                    <th>Transaction ID</th>
+                </tr>
+            </thead>
+            <tbody id="add-subscription-table-body"></tbody>
+        </table>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+    function toggleCenterFields(value) {
+        const existingRow = document.getElementById('existing_center_row');
+        const newFields = document.querySelectorAll('.new_center_field');
+        existingRow.style.display = value === 'no' ? '' : 'none';
+        newFields.forEach(el => el.style.display = value === 'yes' ? '' : 'none');
+        document.getElementById('add-center-id').required = value === 'no';
+        newFields.forEach(el => el.querySelector('input').required = value === 'yes');
+    }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>';
+
+        function loadSubscriptions() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_subscriptions',
+                    page: 1,
+                    per_page: 1000,
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#add-subscription-table-body').html(response.data.subscriptions.replace(/<td>.*?(Edit|Delete).*?<\/td>/g, ''));
+                    } else {
+                        $('#add-subscription-table-body').html('<tr><td colspan="8">No subscriptions found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#add-subscription-table-body').html('<tr><td colspan="8">Error loading subscriptions.</td></tr>');
+                }
+            });
+        }
+
+        loadSubscriptions();
+
+        $('#save-subscription').on('click', function() {
+            const formData = new FormData($('#standalone-add-subscription-form')[0]);
+            formData.append('action', 'enigma_add_subscription');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#add-subscription-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#standalone-add-subscription-form')[0].reset();
+                        loadSubscriptions();
+                        setTimeout(() => $message.text(''), 4000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => $message.text(''), 4000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    // wp_enqueue_style('enigma-subscriptions-style', plugin_dir_url(__FILE__) . 'subscriptions.css');
+    return ob_get_clean();
+}
+
+function render_enigma_edit_subscription_form() {
+    global $wpdb;
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Edit Subscriptions</h2>
+        <div id="edit-subscription-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="edit-subscription-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Center ID</th>
+                    <th>Plan Type</th>
+                    <th>Status</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Payment Method</th>
+                    <th>Transaction ID</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody id="edit-subscription-table-body"></tbody>
+        </table>
+        <div id="edit-form-container" style="display: none; margin-top: 20px;">
+            <h3>Edit Subscription</h3>
+            <form id="standalone-edit-subscription-form">
+                <input type="hidden" id="edit-subscription-id" name="subscription_id">
+                <table class="form-table">
+                    <tr>
+                        <th><label for="edit-center-id">Educational Center</label></th>
+                        <td><input type="text" id="edit-center-id" name="educational_center_id" class="regular-text" readonly></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-plan-type">Plan Type</label></th>
+                        <td>
+                            <select id="edit-plan-type" name="plan_type" class="regular-text" required>
+                                <option value="">Select Plan</option>
+                                <?php foreach (get_subscription_plans() as $plan) : ?>
+                                    <option value="<?php echo esc_attr($plan->plan_name); ?>">
+                                        <?php echo esc_html("{$plan->plan_name} ({$plan->plan_duration}, \${$plan->plan_price})"); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-payment-method">Payment Method</label></th>
+                        <td>
+                            <select id="edit-payment-method" name="payment_method" class="regular-text" required>
+                                <option value="">Select Method</option>
+                                <?php foreach (get_payment_methods() as $method) : ?>
+                                    <option value="<?php echo esc_attr($method->method_name); ?>"><?php echo esc_html($method->method_name); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-transaction-id">Transaction ID</label></th>
+                        <td><input type="text" id="edit-transaction-id" name="transaction_id" class="regular-text" required></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-status">Status</label></th>
+                        <td>
+                            <select id="edit-status" name="subscription_status" class="regular-text" required>
+                                <option value="pending">Pending</option>
+                                <option value="active">Active</option>
+                                <option value="expired">Expired</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>">
+                <p class="submit">
+                    <button type="button" id="update-subscription" class="button-primary">Update Subscription</button>
+                    <button type="button" class="button" onclick="jQuery('#edit-form-container').hide()">Cancel</button>
+                </p>
+            </form>
+        </div>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>';
+
+        function loadSubscriptions() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_subscriptions',
+                    page: 1,
+                    per_page: 1000,
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#edit-subscription-table-body').html(response.data.subscriptions);
+                    } else {
+                        $('#edit-subscription-table-body').html('<tr><td colspan="9">No subscriptions found.</td></tr>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    $('#edit-subscription-table-body').html('<tr><td colspan="9">Error loading subscriptions: ' + error + '</td></tr>');
+                }
+            });
+        }
+
+        loadSubscriptions();
+
+        $('#edit-subscription-table-body').on('click', '.edit-subscription', function() {
+            const subscriptionId = $(this).data('subscription-id');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_subscription', subscription_id: subscriptionId, nonce: ajaxNonce },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#edit-subscription-id').val(response.data.id);
+                        $('#edit-center-id').val(response.data.educational_center_id);
+                        $('#edit-plan-type').val(response.data.plan_type);
+                        $('#edit-payment-method').val(response.data.payment_method);
+                        $('#edit-transaction-id').val(response.data.transaction_id);
+                        $('#edit-status').val(response.data.subscription_status);
+                        $('#edit-form-container').show();
+                    } else {
+                        alert('Error fetching subscription: ' + (response.data?.message || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    alert('Error fetching subscription data: ' + error);
+                }
+            });
+        });
+
+        $('#update-subscription').on('click', function() {
+            const formData = new FormData($('#standalone-edit-subscription-form')[0]);
+            formData.append('action', 'enigma_edit_subscription');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#edit-subscription-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#edit-form-container').hide();
+                        loadSubscriptions();
+                        setTimeout(() => $message.text(''), 4000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => $message.text(''), 4000);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed - ' + error);
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    // wp_enqueue_style('enigma-subscriptions-style', plugin_dir_url(__FILE__) . 'subscriptions.css');
+    return ob_get_clean();
+}
+
+function render_enigma_delete_subscription_form() {
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Delete Subscriptions</h2>
+        <div id="delete-subscription-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="delete-subscription-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Center ID</th>
+                    <th>Plan Type</th>
+                    <th>Status</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Payment Method</th>
+                    <th>Transaction ID</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="delete-subscription-table-body"></tbody>
+        </table>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>';
+
+        function loadSubscriptions() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'enigma_fetch_subscriptions',
+                    page: 1,
+                    per_page: 1000,
+                    nonce: ajaxNonce
+                },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#delete-subscription-table-body').html(response.data.subscriptions);
+                    } else {
+                        $('#delete-subscription-table-body').html('<tr><td colspan="9">No subscriptions found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#delete-subscription-table-body').html('<tr><td colspan="9">Error loading subscriptions.</td></tr>');
+                }
+            });
+        }
+
+        loadSubscriptions();
+
+        $('#delete-subscription-table-body').on('click', '.delete-subscription', function() {
+            if (confirm('Are you sure you want to delete this subscription?')) {
+                const subscriptionId = $(this).data('subscription-id');
+                showLoader();
+                $.ajax({
+                    url: ajaxUrl,
+                    method: 'POST',
+                    data: { action: 'enigma_delete_subscription', subscription_id: subscriptionId, nonce: ajaxNonce },
+                    success: function(response) {
+                        hideLoader();
+                        const $message = $('#delete-subscription-message');
+                        if (response.success) {
+                            $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                            loadSubscriptions();
+                            setTimeout(() => $message.text(''), 4000);
+                        } else {
+                            $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                            setTimeout(() => $message.text(''), 4000);
+                        }
+                    },
+                    error: function() {
+                        hideLoader();
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                    }
+                });
+            }
+        });
+    });
+    </script>
+    <?php
+    // wp_enqueue_style('enigma-subscriptions-style', plugin_dir_url(__FILE__) . 'subscriptions.css');
+    return ob_get_clean();
+}
+//
+function render_payment_methods_page() {
+    if (!current_user_can('manage_options')) {
+        wp_die('You do not have permission to access this page.');
+    }
+    global $wpdb;
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <!-- Loader SVG -->
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Payment Methods Management</h2>
+                <div class="actions">
+                    <button id="add-payment-method-btn">Add Payment Method</button>
+                    <button id="refresh-payment-methods">Refresh</button>
+                </div>
+                <div class="management-table-wrapper">
+                    <table id="payment-methods-table" class="wp-list-table widefat fixed striped">
+                        <thead id="payment-methods-table-head"></thead>
+                        <tbody id="payment-methods-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Payment Method Modal -->
+    <div class="edu-modal" id="add-payment-method-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="add-payment-method-modal">×</span>
+            <h3>Add New Payment Method</h3>
+            <form id="add-payment-method-form">
+                <div class="search-filters">
+                    <label for="add-method-name">Method Name</label>
+                    <input type="text" id="add-method-name" name="method_name" required>
+                </div>
+                <div class="search-filters">
+                    <label for="add-method-status">Status</label>
+                    <select id="add-method-status" name="is_active" required>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </select>
+                </div>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>">
+                <button type="button" id="save-payment-method">Add Payment Method</button>
+            </form>
+            <div id="add-payment-method-message" class="message"></div>
+        </div>
+    </div>
+
+    <!-- Edit Payment Method Modal -->
+    <div class="edu-modal" id="edit-payment-method-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="edit-payment-method-modal">×</span>
+            <h3>Edit Payment Method</h3>
+            <form id="edit-payment-method-form">
+                <input type="hidden" id="edit-method-id" name="method_id">
+                <div class="search-filters">
+                    <label for="edit-method-name">Method Name</label>
+                    <input type="text" id="edit-method-name" name="method_name" required>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-method-status">Status</label>
+                    <select id="edit-method-status" name="is_active" required>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </select>
+                </div>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>">
+                <button type="button" id="update-payment-method">Update Payment Method</button>
+            </form>
+            <div id="edit-payment-method-message" class="message"></div>
+        </div>
+    </div>
+
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+    function openModal(modalId) { 
+        showLoader(); 
+        jQuery(modalId).css('display', 'flex'); 
+        setTimeout(hideLoader, 300); 
+        clearMessages(modalId);
+    }
+    function closeModal(modalId) { 
+        jQuery(modalId).css('display', 'none'); 
+        clearMessages(modalId); 
+        hideLoader(); 
+    }
+    function clearMessages(modalId) {
+        jQuery(modalId + ' .message').css({'background': '', 'color': ''}).text('');
+    }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>';
+
+        function loadPaymentMethods(showLoading = true) {
+            if (showLoading) showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_payment_methods', nonce: ajaxNonce },
+                success: function(response) {
+                    if (showLoading) hideLoader();
+                    if (response.success) {
+                        $('#payment-methods-table-head').html('<tr><th>ID</th><th>Method Name</th><th>Status</th><th>Actions</th></tr>');
+                        $('#payment-methods-table-body').html(response.data.methods);
+                    } else {
+                        $('#payment-methods-table-body').html('<tr><td colspan="4">No payment methods found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#payment-methods-table-body').html('<tr><td colspan="4">Error loading payment methods.</td></tr>');
+                }
+            });
+        }
+
+        loadPaymentMethods();
+
+        $('.edu-modal-close').on('click', function() { closeModal('#' + $(this).data('modal')); });
+        $(document).on('click', function(event) { if ($(event.target).hasClass('edu-modal')) closeModal('#' + event.target.id); });
+
+        $('#add-payment-method-btn').on('click', function() {
+            openModal('#add-payment-method-modal');
+        });
+
+        $('#save-payment-method').on('click', function() {
+            const formData = new FormData($('#add-payment-method-form')[0]);
+            formData.append('action', 'enigma_add_payment_method');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#add-payment-method-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#add-payment-method-form')[0].reset();
+                        setTimeout(() => {
+                            closeModal('#add-payment-method-modal');
+                            loadPaymentMethods(false);
+                        }, 2000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => clearMessages('#add-payment-method-modal'), 3000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+
+        $('#payment-methods-table-body').on('click', '.edit-payment-method', function() {
+            const methodId = $(this).data('method-id');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_payment_method', method_id: methodId, nonce: ajaxNonce },
+                success: function(response) {
+                    if (response.success) {
+                        $('#edit-method-id').val(response.data.id);
+                        $('#edit-method-name').val(response.data.method_name);
+                        $('#edit-method-status').val(response.data.is_active);
+                        openModal('#edit-payment-method-modal');
+                    } else {
+                        hideLoader();
+                        alert('Error fetching payment method: ' + (response.data?.message || 'Unknown error'));
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    alert('Error fetching payment method data.');
+                }
+            });
+        });
+
+        $('#update-payment-method').on('click', function() {
+            const formData = new FormData($('#edit-payment-method-form')[0]);
+            formData.append('action', 'enigma_edit_payment_method');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#edit-payment-method-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        setTimeout(() => {
+                            closeModal('#edit-payment-method-modal');
+                            loadPaymentMethods(false);
+                        }, 2000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => clearMessages('#edit-payment-method-modal'), 3000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+
+        $('#payment-methods-table-body').on('click', '.delete-payment-method', function() {
+            if (confirm('Are you sure you want to delete this payment method?')) {
+                const methodId = $(this).data('method-id');
+                showLoader();
+                $.ajax({
+                    url: ajaxUrl,
+                    method: 'POST',
+                    data: { action: 'enigma_delete_payment_method', method_id: methodId, nonce: ajaxNonce },
+                    success: function(response) {
+                        hideLoader();
+                        if (response.success) {
+                            loadPaymentMethods(false);
+                        } else {
+                            alert('Error deleting payment method: ' + (response.data?.message || 'Unknown error'));
+                        }
+                    },
+                    error: function() {
+                        hideLoader();
+                        alert('Error: AJAX request failed.');
+                    }
+                });
+            }
+        });
+
+        $('#refresh-payment-methods').on('click', function() {
+            loadPaymentMethods();
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-subscriptions-style', plugin_dir_url(__FILE__) . 'subscriptions.css');
+    return ob_get_clean();
+}
+
+// Standalone Functions for Payment Methods
+function render_enigma_add_payment_method_form() {
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Add New Payment Method</h2>
+        <div id="add-payment-method-message" class="message"></div>
+        <form id="standalone-add-payment-method-form">
+            <table class="form-table">
+                <tr>
+                    <th><label for="add-method-name">Method Name</label></th>
+                    <td><input type="text" id="add-method-name" name="method_name" class="regular-text" required></td>
+                </tr>
+                <tr>
+                    <th><label for="add-method-status">Status</label></th>
+                    <td>
+                        <select id="add-method-status" name="is_active" class="regular-text" required>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>">
+            <p class="submit"><button type="button" id="save-payment-method" class="button-primary">Add Payment Method</button></p>
+        </form>
+        <h3>Existing Payment Methods</h3>
+        <table class="wp-list-table widefat fixed striped" id="add-payment-methods-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Method Name</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="add-payment-methods-table-body"></tbody>
+        </table>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>';
+
+        function loadPaymentMethods() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_payment_methods', nonce: ajaxNonce },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#add-payment-methods-table-body').html(response.data.methods.replace(/<td>.*?(Edit|Delete).*?<\/td>/g, ''));
+                    } else {
+                        $('#add-payment-methods-table-body').html('<tr><td colspan="3">No payment methods found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#add-payment-methods-table-body').html('<tr><td colspan="3">Error loading payment methods.</td></tr>');
+                }
+            });
+        }
+
+        loadPaymentMethods();
+
+        $('#save-payment-method').on('click', function() {
+            const formData = new FormData($('#standalone-add-payment-method-form')[0]);
+            formData.append('action', 'enigma_add_payment_method');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#add-payment-method-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#standalone-add-payment-method-form')[0].reset();
+                        loadPaymentMethods();
+                        setTimeout(() => $message.text(''), 4000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => $message.text(''), 4000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-subscriptions-style', plugin_dir_url(__FILE__) . 'subscriptions.css');
+    return ob_get_clean();
+}
+
+function render_enigma_edit_payment_method_form() {
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Edit Payment Methods</h2>
+        <div id="edit-payment-method-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="edit-payment-methods-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Method Name</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody id="edit-payment-methods-table-body"></tbody>
+        </table>
+        <div id="edit-form-container" style="display: none; margin-top: 20px;">
+            <h3>Edit Payment Method</h3>
+            <form id="standalone-edit-payment-method-form">
+                <input type="hidden" id="edit-method-id" name="method_id">
+                <table class="form-table">
+                    <tr>
+                        <th><label for="edit-method-name">Method Name</label></th>
+                        <td><input type="text" id="edit-method-name" name="method_name" class="regular-text" required></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-method-status">Status</label></th>
+                        <td>
+                            <select id="edit-method-status" name="is_active" class="regular-text" required>
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>">
+                <p class="submit">
+                    <button type="button" id="update-payment-method" class="button-primary">Update Payment Method</button>
+                    <button type="button" class="button" onclick="jQuery('#edit-form-container').hide()">Cancel</button>
+                </p>
+            </form>
+        </div>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>';
+
+        function loadPaymentMethods() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_payment_methods', nonce: ajaxNonce },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#edit-payment-methods-table-body').html(response.data.methods);
+                    } else {
+                        $('#edit-payment-methods-table-body').html('<tr><td colspan="4">No payment methods found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#edit-payment-methods-table-body').html('<tr><td colspan="4">Error loading payment methods.</td></tr>');
+                }
+            });
+        }
+
+        loadPaymentMethods();
+
+        $('#edit-payment-methods-table-body').on('click', '.edit-payment-method', function() {
+            const methodId = $(this).data('method-id');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_payment_method', method_id: methodId, nonce: ajaxNonce },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#edit-method-id').val(response.data.id);
+                        $('#edit-method-name').val(response.data.method_name);
+                        $('#edit-method-status').val(response.data.is_active);
+                        $('#edit-form-container').show();
+                    } else {
+                        alert('Error fetching payment method: ' + (response.data?.message || 'Unknown error'));
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    alert('Error fetching payment method data.');
+                }
+            });
+        });
+
+        $('#update-payment-method').on('click', function() {
+            const formData = new FormData($('#standalone-edit-payment-method-form')[0]);
+            formData.append('action', 'enigma_edit_payment_method');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#edit-payment-method-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#edit-form-container').hide();
+                        loadPaymentMethods();
+                        setTimeout(() => $message.text(''), 4000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => $message.text(''), 4000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-subscriptions-style', plugin_dir_url(__FILE__) . 'subscriptions.css');
+    return ob_get_clean();
+}
+
+function render_enigma_delete_payment_method_form() {
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Delete Payment Methods</h2>
+        <div id="delete-payment-method-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="delete-payment-methods-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Method Name</th>
+                    <th>Status</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="delete-payment-methods-table-body"></tbody>
+        </table>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>';
+
+        function loadPaymentMethods() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_payment_methods', nonce: ajaxNonce },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#delete-payment-methods-table-body').html(response.data.methods);
+                    } else {
+                        $('#delete-payment-methods-table-body').html('<tr><td colspan="4">No payment methods found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#delete-payment-methods-table-body').html('<tr><td colspan="4">Error loading payment methods.</td></tr>');
+                }
+            });
+        }
+
+        loadPaymentMethods();
+
+        $('#delete-payment-methods-table-body').on('click', '.delete-payment-method', function() {
+            if (confirm('Are you sure you want to delete this payment method?')) {
+                const methodId = $(this).data('method-id');
+                showLoader();
+                $.ajax({
+                    url: ajaxUrl,
+                    method: 'POST',
+                    data: { action: 'enigma_delete_payment_method', method_id: methodId, nonce: ajaxNonce },
+                    success: function(response) {
+                        hideLoader();
+                        const $message = $('#delete-payment-method-message');
+                        if (response.success) {
+                            $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                            loadPaymentMethods();
+                            setTimeout(() => $message.text(''), 4000);
+                        } else {
+                            $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                            setTimeout(() => $message.text(''), 4000);
+                        }
+                    },
+                    error: function() {
+                        hideLoader();
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                    }
+                });
+            }
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-subscriptions-style', plugin_dir_url(__FILE__) . 'subscriptions.css');
+    return ob_get_clean();
+}
+
+// AJAX Handlers for Payment Methods (unchanged from previous)
+add_action('wp_ajax_enigma_fetch_payment_methods', 'enigma_fetch_payment_methods');
+function enigma_fetch_payment_methods() {
+    check_ajax_referer('enigma_subscriptions_nonce', 'nonce');
+    global $wpdb;
+    $methods = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}edu_payment_methods ORDER BY id DESC", ARRAY_A);
+    $methods_html = '';
+    foreach ($methods as $method) {
+        $status = $method['is_active'] ? 'Active' : 'Inactive';
+        $methods_html .= "<tr>
+            <td>" . esc_html($method['id']) . "</td>
+            <td>" . esc_html($method['method_name']) . "</td>
+            <td>" . esc_html($status) . "</td>
+            <td>
+                <button class='edit-payment-method' data-method-id='" . esc_attr($method['id']) . "'>Edit</button>
+                <button class='delete-payment-method' data-method-id='" . esc_attr($method['id']) . "'>Delete</button>
+            </td>
+        </tr>";
+    }
+    if (!$methods) $methods_html = '<tr><td colspan="4">No payment methods found.</td></tr>';
+    wp_send_json_success(['methods' => $methods_html]);
+}
+
+add_action('wp_ajax_enigma_fetch_payment_method', 'enigma_fetch_payment_method');
+function enigma_fetch_payment_method() {
+    check_ajax_referer('enigma_subscriptions_nonce', 'nonce');
+    global $wpdb;
+    $method_id = intval($_POST['method_id']);
+    $method = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}edu_payment_methods WHERE id = %d",
+        $method_id
+    ), ARRAY_A);
+    if ($method) {
+        wp_send_json_success($method);
+    } else {
+        wp_send_json_error(['message' => 'Payment method not found']);
+    }
+}
+
+add_action('wp_ajax_enigma_add_payment_method', 'enigma_add_payment_method');
+function enigma_add_payment_method() {
+    check_ajax_referer('enigma_subscriptions_nonce', 'nonce');
+    global $wpdb;
+    $data = [
+        'method_name' => sanitize_text_field($_POST['method_name']),
+        'is_active' => intval($_POST['is_active'])
+    ];
+    if (empty($data['method_name'])) {
+        wp_send_json_error(['message' => 'Method name is required']);
+        exit;
+    }
+    $result = $wpdb->insert($wpdb->prefix . 'edu_payment_methods', $data);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to add payment method: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Payment method added successfully');
+    }
+}
+
+add_action('wp_ajax_enigma_edit_payment_method', 'enigma_edit_payment_method');
+function enigma_edit_payment_method() {
+    check_ajax_referer('enigma_subscriptions_nonce', 'nonce');
+    global $wpdb;
+    $method_id = intval($_POST['method_id']);
+    $data = [
+        'method_name' => sanitize_text_field($_POST['method_name']),
+        'is_active' => intval($_POST['is_active'])
+    ];
+    if (empty($method_id) || empty($data['method_name'])) {
+        wp_send_json_error(['message' => 'All fields are required']);
+        exit;
+    }
+    $result = $wpdb->update($wpdb->prefix . 'edu_payment_methods', $data, ['id' => $method_id]);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to update payment method: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Payment method updated successfully');
+    }
+}
+
+add_action('wp_ajax_enigma_delete_payment_method', 'enigma_delete_payment_method');
+function enigma_delete_payment_method() {
+    check_ajax_referer('enigma_subscriptions_nonce', 'nonce');
+    global $wpdb;
+    $method_id = intval($_POST['method_id']);
+    if (empty($method_id)) {
+        wp_send_json_error(['message' => 'Invalid payment method ID']);
+        exit;
+    }
+    $result = $wpdb->delete($wpdb->prefix . 'edu_payment_methods', ['id' => $method_id]);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to delete payment method: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Payment method deleted successfully');
+    }
+}
+//
+function render_subscription_plans_page() {
+    if (!current_user_can('manage_options')) {
+        wp_die('You do not have permission to access this page.');
+    }
+    global $wpdb;
+    ob_start();
+    ?>
+    <div class="management-main-wrapper">
+        <div class="management-content-wrapper">
+            <!-- Loader SVG -->
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="management-section">
+                <h2>Subscription Plans Management</h2>
+                <div class="actions">
+                    <button id="add-subscription-plan-btn">Add Subscription Plan</button>
+                    <button id="refresh-subscription-plans">Refresh</button>
+                </div>
+                <div class="management-table-wrapper">
+                    <table id="subscription-plans-table" class="wp-list-table widefat fixed striped">
+                        <thead id="subscription-plans-table-head"></thead>
+                        <tbody id="subscription-plans-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Subscription Plan Modal -->
+    <div class="edu-modal" id="add-subscription-plan-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="add-subscription-plan-modal">×</span>
+            <h3>Add New Subscription Plan</h3>
+            <form id="add-subscription-plan-form">
+                <div class="search-filters">
+                    <label for="add-plan-name">Plan Name</label>
+                    <input type="text" id="add-plan-name" name="plan_name" required>
+                </div>
+                <div class="search-filters">
+                    <label for="add-plan-duration">Duration</label>
+                    <input type="text" id="add-plan-duration" name="plan_duration" placeholder="e.g., +1 month" required>
+                </div>
+                <div class="search-filters">
+                    <label for="add-plan-price">Price ($)</label>
+                    <input type="number" id="add-plan-price" name="plan_price" step="0.01" required>
+                </div>
+                <div class="search-filters">
+                    <label for="add-plan-status">Status</label>
+                    <select id="add-plan-status" name="is_active" required>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </select>
+                </div>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>">
+                <button type="button" id="save-subscription-plan">Add Subscription Plan</button>
+            </form>
+            <div id="add-subscription-plan-message" class="message"></div>
+        </div>
+    </div>
+
+    <!-- Edit Subscription Plan Modal -->
+    <div class="edu-modal" id="edit-subscription-plan-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="edit-subscription-plan-modal">×</span>
+            <h3>Edit Subscription Plan</h3>
+            <form id="edit-subscription-plan-form">
+                <input type="hidden" id="edit-plan-id" name="plan_id">
+                <div class="search-filters">
+                    <label for="edit-plan-name">Plan Name</label>
+                    <input type="text" id="edit-plan-name" name="plan_name" required>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-plan-duration">Duration</label>
+                    <input type="text" id="edit-plan-duration" name="plan_duration" placeholder="e.g., +1 month" required>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-plan-price">Price ($)</label>
+                    <input type="number" id="edit-plan-price" name="plan_price" step="0.01" required>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-plan-status">Status</label>
+                    <select id="edit-plan-status" name="is_active" required>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </select>
+                </div>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>">
+                <button type="button" id="update-subscription-plan">Update Subscription Plan</button>
+            </form>
+            <div id="edit-subscription-plan-message" class="message"></div>
+        </div>
+    </div>
+
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+    function openModal(modalId) { 
+        showLoader(); 
+        jQuery(modalId).css('display', 'flex'); 
+        setTimeout(hideLoader, 300); 
+        clearMessages(modalId);
+    }
+    function closeModal(modalId) { 
+        jQuery(modalId).css('display', 'none'); 
+        clearMessages(modalId); 
+        hideLoader(); 
+    }
+    function clearMessages(modalId) {
+        jQuery(modalId + ' .message').css({'background': '', 'color': ''}).text('');
+    }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>';
+
+        function loadSubscriptionPlans(showLoading = true) {
+            if (showLoading) showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_subscription_plans', nonce: ajaxNonce },
+                success: function(response) {
+                    if (showLoading) hideLoader();
+                    if (response.success) {
+                        $('#subscription-plans-table-head').html('<tr><th>ID</th><th>Plan Name</th><th>Duration</th><th>Price</th><th>Status</th><th>Actions</th></tr>');
+                        $('#subscription-plans-table-body').html(response.data.plans);
+                    } else {
+                        $('#subscription-plans-table-body').html('<tr><td colspan="6">No subscription plans found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#subscription-plans-table-body').html('<tr><td colspan="6">Error loading subscription plans.</td></tr>');
+                }
+            });
+        }
+
+        loadSubscriptionPlans();
+
+        $('.edu-modal-close').on('click', function() { closeModal('#' + $(this).data('modal')); });
+        $(document).on('click', function(event) { if ($(event.target).hasClass('edu-modal')) closeModal('#' + event.target.id); });
+
+        $('#add-subscription-plan-btn').on('click', function() {
+            openModal('#add-subscription-plan-modal');
+        });
+
+        $('#save-subscription-plan').on('click', function() {
+            const formData = new FormData($('#add-subscription-plan-form')[0]);
+            formData.append('action', 'enigma_add_subscription_plan');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#add-subscription-plan-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#add-subscription-plan-form')[0].reset();
+                        setTimeout(() => {
+                            closeModal('#add-subscription-plan-modal');
+                            loadSubscriptionPlans(false);
+                        }, 2000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => clearMessages('#add-subscription-plan-modal'), 3000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+
+        $('#subscription-plans-table-body').on('click', '.edit-subscription-plan', function() {
+            const planId = $(this).data('plan-id');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_subscription_plan', plan_id: planId, nonce: ajaxNonce },
+                success: function(response) {
+                    if (response.success) {
+                        $('#edit-plan-id').val(response.data.id);
+                        $('#edit-plan-name').val(response.data.plan_name);
+                        $('#edit-plan-duration').val(response.data.plan_duration);
+                        $('#edit-plan-price').val(response.data.plan_price);
+                        $('#edit-plan-status').val(response.data.is_active);
+                        openModal('#edit-subscription-plan-modal');
+                    } else {
+                        hideLoader();
+                        alert('Error fetching subscription plan: ' + (response.data?.message || 'Unknown error'));
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    alert('Error fetching subscription plan data.');
+                }
+            });
+        });
+
+        $('#update-subscription-plan').on('click', function() {
+            const formData = new FormData($('#edit-subscription-plan-form')[0]);
+            formData.append('action', 'enigma_edit_subscription_plan');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#edit-subscription-plan-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        setTimeout(() => {
+                            closeModal('#edit-subscription-plan-modal');
+                            loadSubscriptionPlans(false);
+                        }, 2000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => clearMessages('#edit-subscription-plan-modal'), 3000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+
+        $('#subscription-plans-table-body').on('click', '.delete-subscription-plan', function() {
+            if (confirm('Are you sure you want to delete this subscription plan?')) {
+                const planId = $(this).data('plan-id');
+                showLoader();
+                $.ajax({
+                    url: ajaxUrl,
+                    method: 'POST',
+                    data: { action: 'enigma_delete_subscription_plan', plan_id: planId, nonce: ajaxNonce },
+                    success: function(response) {
+                        hideLoader();
+                        if (response.success) {
+                            loadSubscriptionPlans(false);
+                        } else {
+                            alert('Error deleting subscription plan: ' + (response.data?.message || 'Unknown error'));
+                        }
+                    },
+                    error: function() {
+                        hideLoader();
+                        alert('Error: AJAX request failed.');
+                    }
+                });
+            }
+        });
+
+        $('#refresh-subscription-plans').on('click', function() {
+            loadSubscriptionPlans();
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-subscriptions-style', plugin_dir_url(__FILE__) . 'subscriptions.css');
+    return ob_get_clean();
+}
+
+// Standalone Functions for Subscription Plans
+function render_enigma_add_subscription_plan_form() {
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Add New Subscription Plan</h2>
+        <div id="add-subscription-plan-message" class="message"></div>
+        <form id="standalone-add-subscription-plan-form">
+            <table class="form-table">
+                <tr>
+                    <th><label for="add-plan-name">Plan Name</label></th>
+                    <td><input type="text" id="add-plan-name" name="plan_name" class="regular-text" required></td>
+                </tr>
+                <tr>
+                    <th><label for="add-plan-duration">Duration</label></th>
+                    <td><input type="text" id="add-plan-duration" name="plan_duration" class="regular-text" placeholder="e.g., +1 month" required></td>
+                </tr>
+                <tr>
+                    <th><label for="add-plan-price">Price ($)</label></th>
+                    <td><input type="number" id="add-plan-price" name="plan_price" class="regular-text" step="0.01" required></td>
+                </tr>
+                <tr>
+                    <th><label for="add-plan-status">Status</label></th>
+                    <td>
+                        <select id="add-plan-status" name="is_active" class="regular-text" required>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>">
+            <p class="submit"><button type="button" id="save-subscription-plan" class="button-primary">Add Subscription Plan</button></p>
+        </form>
+        <h3>Existing Subscription Plans</h3>
+        <table class="wp-list-table widefat fixed striped" id="add-subscription-plans-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Plan Name</th>
+                    <th>Duration</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="add-subscription-plans-table-body"></tbody>
+        </table>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>';
+
+        function loadSubscriptionPlans() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_subscription_plans', nonce: ajaxNonce },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#add-subscription-plans-table-body').html(response.data.plans.replace(/<td>.*?(Edit|Delete).*?<\/td>/g, ''));
+                    } else {
+                        $('#add-subscription-plans-table-body').html('<tr><td colspan="5">No subscription plans found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#add-subscription-plans-table-body').html('<tr><td colspan="5">Error loading subscription plans.</td></tr>');
+                }
+            });
+        }
+
+        loadSubscriptionPlans();
+
+        $('#save-subscription-plan').on('click', function() {
+            const formData = new FormData($('#standalone-add-subscription-plan-form')[0]);
+            formData.append('action', 'enigma_add_subscription_plan');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#add-subscription-plan-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#standalone-add-subscription-plan-form')[0].reset();
+                        loadSubscriptionPlans();
+                        setTimeout(() => $message.text(''), 4000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => $message.text(''), 4000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-subscriptions-style', plugin_dir_url(__FILE__) . 'subscriptions.css');
+    return ob_get_clean();
+}
+
+function render_enigma_edit_subscription_plan_form() {
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Edit Subscription Plans</h2>
+        <div id="edit-subscription-plan-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="edit-subscription-plans-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Plan Name</th>
+                    <th>Duration</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody id="edit-subscription-plans-table-body"></tbody>
+        </table>
+        <div id="edit-form-container" style="display: none; margin-top: 20px;">
+            <h3>Edit Subscription Plan</h3>
+            <form id="standalone-edit-subscription-plan-form">
+                <input type="hidden" id="edit-plan-id" name="plan_id">
+                <table class="form-table">
+                    <tr>
+                        <th><label for="edit-plan-name">Plan Name</label></th>
+                        <td><input type="text" id="edit-plan-name" name="plan_name" class="regular-text" required></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-plan-duration">Duration</label></th>
+                        <td><input type="text" id="edit-plan-duration" name="plan_duration" class="regular-text" placeholder="e.g., +1 month" required></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-plan-price">Price ($)</label></th>
+                        <td><input type="number" id="edit-plan-price" name="plan_price" class="regular-text" step="0.01" required></td>
+                    </tr>
+                    <tr>
+                        <th><label for="edit-plan-status">Status</label></th>
+                        <td>
+                            <select id="edit-plan-status" name="is_active" class="regular-text" required>
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>">
+                <p class="submit">
+                    <button type="button" id="update-subscription-plan" class="button-primary">Update Subscription Plan</button>
+                    <button type="button" class="button" onclick="jQuery('#edit-form-container').hide()">Cancel</button>
+                </p>
+            </form>
+        </div>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>';
+
+        function loadSubscriptionPlans() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_subscription_plans', nonce: ajaxNonce },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#edit-subscription-plans-table-body').html(response.data.plans);
+                    } else {
+                        $('#edit-subscription-plans-table-body').html('<tr><td colspan="6">No subscription plans found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#edit-subscription-plans-table-body').html('<tr><td colspan="6">Error loading subscription plans.</td></tr>');
+                }
+            });
+        }
+
+        loadSubscriptionPlans();
+
+        $('#edit-subscription-plans-table-body').on('click', '.edit-subscription-plan', function() {
+            const planId = $(this).data('plan-id');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_subscription_plan', plan_id: planId, nonce: ajaxNonce },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#edit-plan-id').val(response.data.id);
+                        $('#edit-plan-name').val(response.data.plan_name);
+                        $('#edit-plan-duration').val(response.data.plan_duration);
+                        $('#edit-plan-price').val(response.data.plan_price);
+                        $('#edit-plan-status').val(response.data.is_active);
+                        $('#edit-form-container').show();
+                    } else {
+                        alert('Error fetching subscription plan: ' + (response.data?.message || 'Unknown error'));
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    alert('Error fetching subscription plan data.');
+                }
+            });
+        });
+
+        $('#update-subscription-plan').on('click', function() {
+            const formData = new FormData($('#standalone-edit-subscription-plan-form')[0]);
+            formData.append('action', 'enigma_edit_subscription_plan');
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    hideLoader();
+                    const $message = $('#edit-subscription-plan-message');
+                    if (response.success) {
+                        $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                        $('#edit-form-container').hide();
+                        loadSubscriptionPlans();
+                        setTimeout(() => $message.text(''), 4000);
+                    } else {
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                        setTimeout(() => $message.text(''), 4000);
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-subscriptions-style', plugin_dir_url(__FILE__) . 'subscriptions.css');
+    return ob_get_clean();
+}
+
+function render_enigma_delete_subscription_plan_form() {
+    ob_start();
+    ?>
+    <div class="wrap">
+        <!-- Loader SVG -->
+        <div id="edu-loader" class="edu-loader" style="display: none;">
+            <div class="edu-loader-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+            </div>
+        </div>
+        <h2>Delete Subscription Plans</h2>
+        <div id="delete-subscription-plan-message" class="message"></div>
+        <table class="wp-list-table widefat fixed striped" id="delete-subscription-plans-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Plan Name</th>
+                    <th>Duration</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="delete-subscription-plans-table-body"></tbody>
+        </table>
+    </div>
+    <script>
+    function showLoader() { jQuery('#edu-loader').show(); }
+    function hideLoader() { jQuery('#edu-loader').hide(); }
+
+    jQuery(document).ready(function($) {
+        const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+        const ajaxNonce = '<?php echo wp_create_nonce('enigma_subscriptions_nonce'); ?>';
+
+        function loadSubscriptionPlans() {
+            showLoader();
+            $.ajax({
+                url: ajaxUrl,
+                method: 'POST',
+                data: { action: 'enigma_fetch_subscription_plans', nonce: ajaxNonce },
+                success: function(response) {
+                    hideLoader();
+                    if (response.success) {
+                        $('#delete-subscription-plans-table-body').html(response.data.plans);
+                    } else {
+                        $('#delete-subscription-plans-table-body').html('<tr><td colspan="6">No subscription plans found.</td></tr>');
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    $('#delete-subscription-plans-table-body').html('<tr><td colspan="6">Error loading subscription plans.</td></tr>');
+                }
+            });
+        }
+
+        loadSubscriptionPlans();
+
+        $('#delete-subscription-plans-table-body').on('click', '.delete-subscription-plan', function() {
+            if (confirm('Are you sure you want to delete this subscription plan?')) {
+                const planId = $(this).data('plan-id');
+                showLoader();
+                $.ajax({
+                    url: ajaxUrl,
+                    method: 'POST',
+                    data: { action: 'enigma_delete_subscription_plan', plan_id: planId, nonce: ajaxNonce },
+                    success: function(response) {
+                        hideLoader();
+                        const $message = $('#delete-subscription-plan-message');
+                        if (response.success) {
+                            $message.css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text(response.data);
+                            loadSubscriptionPlans();
+                            setTimeout(() => $message.text(''), 4000);
+                        } else {
+                            $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: ' + (response.data?.message || 'Unknown error'));
+                            setTimeout(() => $message.text(''), 4000);
+                        }
+                    },
+                    error: function() {
+                        hideLoader();
+                        $message.css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Error: AJAX request failed.');
+                    }
+                });
+            }
+        });
+    });
+    </script>
+    <?php
+    wp_enqueue_style('enigma-subscriptions-style', plugin_dir_url(__FILE__) . 'subscriptions.css');
+    return ob_get_clean();
+}
+
+// AJAX Handlers for Subscription Plans (unchanged from previous)
+add_action('wp_ajax_enigma_fetch_subscription_plans', 'enigma_fetch_subscription_plans');
+function enigma_fetch_subscription_plans() {
+    check_ajax_referer('enigma_subscriptions_nonce', 'nonce');
+    global $wpdb;
+    $plans = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}edu_subscription_plans ORDER BY id DESC", ARRAY_A);
+    $plans_html = '';
+    foreach ($plans as $plan) {
+        $status = $plan['is_active'] ? 'Active' : 'Inactive';
+        $plans_html .= "<tr>
+            <td>" . esc_html($plan['id']) . "</td>
+            <td>" . esc_html($plan['plan_name']) . "</td>
+            <td>" . esc_html($plan['plan_duration']) . "</td>
+            <td>" . esc_html($plan['plan_price']) . "</td>
+            <td>" . esc_html($status) . "</td>
+            <td>
+                <button class='edit-subscription-plan' data-plan-id='" . esc_attr($plan['id']) . "'>Edit</button>
+                <button class='delete-subscription-plan' data-plan-id='" . esc_attr($plan['id']) . "'>Delete</button>
+            </td>
+        </tr>";
+    }
+    if (!$plans) $plans_html = '<tr><td colspan="6">No subscription plans found.</td></tr>';
+    wp_send_json_success(['plans' => $plans_html]);
+}
+
+add_action('wp_ajax_enigma_fetch_subscription_plan', 'enigma_fetch_subscription_plan');
+function enigma_fetch_subscription_plan() {
+    check_ajax_referer('enigma_subscriptions_nonce', 'nonce');
+    global $wpdb;
+    $plan_id = intval($_POST['plan_id']);
+    $plan = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}edu_subscription_plans WHERE id = %d",
+        $plan_id
+    ), ARRAY_A);
+    if ($plan) {
+        wp_send_json_success($plan);
+    } else {
+        wp_send_json_error(['message' => 'Subscription plan not found']);
+    }
+}
+
+add_action('wp_ajax_enigma_add_subscription_plan', 'enigma_add_subscription_plan');
+function enigma_add_subscription_plan() {
+    check_ajax_referer('enigma_subscriptions_nonce', 'nonce');
+    global $wpdb;
+    $data = [
+        'plan_name' => sanitize_text_field($_POST['plan_name']),
+        'plan_duration' => sanitize_text_field($_POST['plan_duration']),
+        'plan_price' => floatval($_POST['plan_price']),
+        'is_active' => intval($_POST['is_active'])
+    ];
+    if (empty($data['plan_name']) || empty($data['plan_duration']) || empty($data['plan_price'])) {
+        wp_send_json_error(['message' => 'All fields are required']);
+        exit;
+    }
+    $result = $wpdb->insert($wpdb->prefix . 'edu_subscription_plans', $data);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to add subscription plan: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Subscription plan added successfully');
+    }
+}
+
+add_action('wp_ajax_enigma_edit_subscription_plan', 'enigma_edit_subscription_plan');
+function enigma_edit_subscription_plan() {
+    check_ajax_referer('enigma_subscriptions_nonce', 'nonce');
+    global $wpdb;
+    $plan_id = intval($_POST['plan_id']);
+    $data = [
+        'plan_name' => sanitize_text_field($_POST['plan_name']),
+        'plan_duration' => sanitize_text_field($_POST['plan_duration']),
+        'plan_price' => floatval($_POST['plan_price']),
+        'is_active' => intval($_POST['is_active'])
+    ];
+    if (empty($plan_id) || empty($data['plan_name']) || empty($data['plan_duration']) || empty($data['plan_price'])) {
+        wp_send_json_error(['message' => 'All fields are required']);
+        exit;
+    }
+    $result = $wpdb->update($wpdb->prefix . 'edu_subscription_plans', $data, ['id' => $plan_id]);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to update subscription plan: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Subscription plan updated successfully');
+    }
+}
+
+add_action('wp_ajax_enigma_delete_subscription_plan', 'enigma_delete_subscription_plan');
+function enigma_delete_subscription_plan() {
+    check_ajax_referer('enigma_subscriptions_nonce', 'nonce');
+    global $wpdb;
+    $plan_id = intval($_POST['plan_id']);
+    if (empty($plan_id)) {
+        wp_send_json_error(['message' => 'Invalid subscription plan ID']);
+        exit;
+    }
+    $result = $wpdb->delete($wpdb->prefix . 'edu_subscription_plans', ['id' => $plan_id]);
+    if ($result === false) {
+        wp_send_json_error(['message' => 'Failed to delete subscription plan: ' . $wpdb->last_error]);
+    } else {
+        wp_send_json_success('Subscription plan deleted successfully');
+    }
+}
 
 
 

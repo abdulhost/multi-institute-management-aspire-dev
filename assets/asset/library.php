@@ -17,8 +17,8 @@ function aspire_library_management_shortcode() {
         $current_teacher_id = get_current_teacher_id();
     }
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">No Educational Center found.</div>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'library-list';
 
     ob_start();
@@ -26,6 +26,10 @@ function aspire_library_management_shortcode() {
     <div class="container-fluid" style="background: linear-gradient(135deg, #e6f7ff, #cce5ff); min-height: 100vh;">
         <div class="row">
             <?php 
+              echo render_admin_header(wp_get_current_user());
+              if (!is_center_subscribed($education_center_id)) {
+                  return render_subscription_expired_message($education_center_id);
+              }
             $active_section = $section;
             include plugin_dir_path(__FILE__) . '../sidebar.php';
             ?>
@@ -75,7 +79,10 @@ function library_list_shortcode() {
         $education_center_id = get_educational_center_data();
         $current_teacher_id = get_current_teacher_id();
     }
-    
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $table_name = $wpdb->prefix . 'library';
     $books = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name WHERE education_center_id = %s", $education_center_id));
 
@@ -494,6 +501,10 @@ function library_add_shortcode() {
         $education_center_id = get_educational_center_data();
         $current_teacher_id = get_current_teacher_id();
     }
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $table_name = $wpdb->prefix . 'library';
     $new_book_id = generate_unique_id($wpdb, $table_name, 'BOOK-', $education_center_id);
     $message = is_wp_error($new_book_id) ? '<div class="alert alert-danger">' . esc_html($new_book_id->get_error_message()) . '</div>' : '';
@@ -580,7 +591,10 @@ function library_edit_shortcode() {
         $education_center_id = get_educational_center_data();
         $current_teacher_id = get_current_teacher_id();
     }
-    
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $table_name = $wpdb->prefix . 'library';
     $books = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name WHERE education_center_id = %s", $education_center_id));
 
@@ -809,7 +823,10 @@ function library_delete_shortcode() {
         $education_center_id = get_educational_center_data();
         $current_teacher_id = get_current_teacher_id();
     }
-    
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $table_name = $wpdb->prefix . 'library';
     $books = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name WHERE education_center_id = %s", $education_center_id));
 
@@ -1399,6 +1416,10 @@ function library_overdue_shortcode() {
         $education_center_id = get_educational_center_data();
         $current_teacher_id = get_current_teacher_id();
     }
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $trans_table = $wpdb->prefix . 'library_transactions';
     $library_table = $wpdb->prefix . 'library';
     $overdue = $wpdb->get_results($wpdb->prepare(
@@ -1537,6 +1558,10 @@ function load_library_edit_form() {
         $education_center_id = get_educational_center_data();
         $current_teacher_id = get_current_teacher_id();
     }
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $book = $wpdb->get_row($wpdb->prepare(
         "SELECT * FROM {$wpdb->prefix}library WHERE book_id = %s AND education_center_id = %s",
         $book_id, $education_center_id
@@ -1593,7 +1618,10 @@ function ajax_edit_library_book() {
         $education_center_id = get_educational_center_data();
         $current_teacher_id = get_current_teacher_id();
     }
-
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $book_id = sanitize_text_field($_POST['book_id']);
     $isbn = sanitize_text_field($_POST['isbn']);
     $title = sanitize_text_field($_POST['title']);
@@ -1641,6 +1669,10 @@ function load_library_delete_confirm() {
         $education_center_id = get_educational_center_data();
         $current_teacher_id = get_current_teacher_id();
     }
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $book = $wpdb->get_row($wpdb->prepare(
         "SELECT * FROM {$wpdb->prefix}library WHERE book_id = %s AND education_center_id = %s",
         $book_id, $education_center_id
@@ -1685,6 +1717,10 @@ function ajax_delete_library_book() {
         $education_center_id = get_educational_center_data();
         $current_teacher_id = get_current_teacher_id();
     }
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $deleted = $wpdb->delete(
         $wpdb->prefix . 'library',
         ['book_id' => $book_id, 'education_center_id' => $education_center_id],
@@ -1717,7 +1753,10 @@ function load_library_transaction_form() {
     } else {
         $education_center_id = get_educational_center_data();
     }
-
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     // Fetch book details
     $book = $wpdb->get_row($wpdb->prepare(
         "SELECT * FROM {$wpdb->prefix}library WHERE book_id = %s AND education_center_id = %s",
@@ -1851,7 +1890,10 @@ function ajax_process_library_transaction() {
     } else {
         $education_center_id = get_educational_center_data();
     }
-
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     // Sanitize input data
     $book_id = sanitize_text_field($_POST['book_id']);
     $user_id = sanitize_text_field($_POST['user_id']);

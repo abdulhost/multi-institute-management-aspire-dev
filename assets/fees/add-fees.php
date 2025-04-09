@@ -63,7 +63,8 @@ function add_fees_institute_dashboard_shortcode() {
     $education_center_id = get_educational_center_data();
     
     if (empty($education_center_id)) {
-        return '<p>No Educational Center found.</p>';
+        wp_redirect(home_url('/login'));
+            exit();
     }
 
     // Handle form submission

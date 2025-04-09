@@ -8,7 +8,11 @@ function add_transport_enrollments_shortcode() {
     $enrollments_table = $wpdb->prefix . 'transport_enrollments';
     $education_center_id = get_educational_center_data();
     $message = '';
-
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    
+    }
     if (isset($_POST['add_enrollment']) && check_admin_referer('add_enrollment_nonce')) {
         $data = [
             'student_id' => sanitize_text_field($_POST['student_id']),

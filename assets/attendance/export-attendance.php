@@ -8,8 +8,9 @@ if (!defined('ABSPATH')) {
 add_shortcode('export_attendance', 'export_attendance_shortcode');
 function export_attendance_shortcode($atts) {
     if (!is_user_logged_in()) {
-        return '<p>Please log in to access this feature.</p>';
-    }
+        // wp_redirect(home_url('/login'));
+        // exit();   
+          }
 
     // $current_teacher_id = function_exists('get_current_teacher_id') ? get_current_teacher_id() : get_current_user_id();
     // if (!$current_teacher_id) {
@@ -24,8 +25,8 @@ function export_attendance_shortcode($atts) {
     }
     // $educational_center_id = get_educational_center_data();
     if (!$educational_center_id) {
-        return '<p>Unable to retrieve educational center information.</p>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();     }
 
     global $wpdb;
     $table_name = $wpdb->prefix . 'student_attendance';
@@ -220,7 +221,10 @@ function export_attendance_shortcode($atts) {
         <!-- <div class="institute-dashboard-wrapper"> -->
             <?php
               if (is_teacher($atts)) { 
-            } else {
+            } else {  echo render_admin_header(wp_get_current_user());
+                if (!is_center_subscribed($educational_center_id)) {
+                    return render_subscription_expired_message($educational_center_id);
+                }
             $active_section = 'export-attendance';
             $main_section = 'student';
             include(plugin_dir_path(__FILE__) . '../sidebar.php');}

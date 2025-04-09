@@ -4082,7 +4082,7 @@ form .button:hover {
 }
 
 /* Loader */
-.edu-loader {
+/* .edu-loader {
     position: fixed;
     top: 0;
     left: 0;
@@ -4098,7 +4098,7 @@ form .button:hover {
 .edu-loader-png {
     width: 50px;
     height: 50px;
-}
+} */
 
 /* Header */
 .dashboard-header {
@@ -4290,3 +4290,6 @@ form .button:hover {
         font-size: 1.5rem;
     }
 }
+
+
+/*  */

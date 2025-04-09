@@ -20,7 +20,8 @@ function handle_subject_actions($atts) {
     }
 
     if (!$educational_center_id) {
-        return '<div class="notice notice-error is-dismissible"><p>Unable to retrieve educational center information.</p></div>';
+            wp_redirect(home_url('/login'));
+            exit();
     }
 
     // Edit Subject
@@ -130,7 +131,10 @@ function subjects_manager_page($atts) {
     }
 
     if (!$educational_center_id) {
-        return '<p>Unable to retrieve educational center information.</p>';
+
+            wp_redirect(home_url('/login'));
+            exit();
+      
     }
 
     $message = handle_subject_actions($atts);
@@ -141,6 +145,10 @@ function subjects_manager_page($atts) {
         <?php
           if (is_teacher($atts)) { 
         } else {
+            echo render_admin_header(wp_get_current_user());
+          if (!is_center_subscribed($educational_center_id)) {
+              return render_subscription_expired_message($educational_center_id);
+          }
         $active_section = 'update-subject';
         include(plugin_dir_path(__FILE__) . '../sidebar.php');}
         ?>

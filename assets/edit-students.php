@@ -33,11 +33,15 @@ $educational_center = get_posts(array(
 
 // Check if there is an Educational Center for this admin
 if (empty($educational_center)) {
-    return '<p>No Educational Center found for this Admin ID.</p>';
+    wp_redirect(home_url('/login')); // Redirect to login page
+    exit();
 }
 
 $educational_center_id = get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
-
+if (empty($educational_center_id)) {
+    wp_redirect(home_url('/login')); // Redirect to login page
+    exit();
+}
 // Fetch all classes and sections
 $class_sections = $wpdb->get_results(
     $wpdb->prepare("SELECT * FROM $table_name WHERE education_center_id = %s", $educational_center_id),
@@ -50,6 +54,10 @@ require_once(ABSPATH . 'wp-admin/includes/image.php');
     <div class="attendance-main-wrapper" style="display: flex;">
         <!-- <div class="institute-dashboard-wrapper"> -->
             <?php
+            echo render_admin_header(wp_get_current_user());
+            if (!is_center_subscribed($educational_center_id)) {
+                return render_subscription_expired_message($educational_center_id);
+            }
         $active_section = 'edit-students';
         include(plugin_dir_path(__FILE__) . 'sidebar.php');
             ?>

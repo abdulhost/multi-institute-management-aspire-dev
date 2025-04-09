@@ -7,7 +7,8 @@ if (!defined('ABSPATH')) {
 
 function edit_parents_institute_dashboard_shortcode($atts) {
     if (!is_user_logged_in()) {
-        return '<p>Please log in to access this feature.</p>';
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     // Get current user
@@ -24,7 +25,8 @@ function edit_parents_institute_dashboard_shortcode($atts) {
     }
 
     if (empty($educational_center_id)) {
-        return '<p>No Educational Center found for this user.</p>';
+        wp_redirect(home_url('/login'));
+            exit();
     }
 
     // Handle parent deletion

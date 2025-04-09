@@ -6,7 +6,8 @@ if (!defined('ABSPATH')) {
 function aspire_multiple_exams_dashboard_shortcode() {
     $education_center_id = get_educational_center_data();
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">No Educational Center found.</div>';
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'exams';
@@ -21,6 +22,10 @@ function aspire_multiple_exams_dashboard_shortcode() {
         <div class="row">
 
             <?php 
+            echo render_admin_header(wp_get_current_user());
+            if (!is_center_subscribed($education_center_id)) {
+                return render_subscription_expired_message($education_center_id);
+            }
                     $active_section = str_replace('-', '-', $section); // e.g., "add-fee" -> "add_fee"
 
             include plugin_dir_path(__FILE__) . '../sidebar.php'; ?>
@@ -61,6 +66,11 @@ add_shortcode('aspire_multiple_exams_dashboard', 'aspire_multiple_exams_dashboar
 function exams_institute_dashboard_shortcode() {
     global $wpdb;
     $education_center_id = get_educational_center_data();
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    
+    }
     $exams = $wpdb->get_results($wpdb->prepare(
         "SELECT * FROM {$wpdb->prefix}exams WHERE education_center_id = %d",
         $education_center_id

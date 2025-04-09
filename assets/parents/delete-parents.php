@@ -11,7 +11,8 @@ function delete_parents_institute_dashboard_shortcode($atts) {
     }
     
     if (!$educational_center_id) {
-        return '<p>Unable to retrieve educational center information.</p>';
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     // $educational_center_id = get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
@@ -23,6 +24,10 @@ function delete_parents_institute_dashboard_shortcode($atts) {
         <?php
         if (is_teacher($atts)) { 
         } else {
+            echo render_admin_header(wp_get_current_user());
+          if (!is_center_subscribed($educational_center_id)) {
+              return render_subscription_expired_message($educational_center_id);
+          }
         $active_section = 'delete-parent';
         include(plugin_dir_path(__FILE__) . '../sidebar.php');}
         ?>

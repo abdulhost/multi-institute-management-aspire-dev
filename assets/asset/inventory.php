@@ -9,7 +9,8 @@ function aspire_inventory_management_shortcode() {
     global $wpdb;
     $education_center_id = get_educational_center_data();
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">No Educational Center found.</div>';
+        wp_redirect(home_url('/login'));
+        exit();
     }
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'inventory-list';
     $current_user = wp_get_current_user();
@@ -20,7 +21,10 @@ function aspire_inventory_management_shortcode() {
     ?>
     <div class="container-fluid" style="background: linear-gradient(135deg, #e6ffe6, #ccffcc); min-height: 100vh;">
         <div class="row">
-            <?php 
+            <?php   echo render_admin_header(wp_get_current_user());
+              if (!is_center_subscribed($education_center_id)) {
+                  return render_subscription_expired_message($education_center_id);
+              }
                         $active_section = $section;
 
             $active_section = $section;
@@ -81,8 +85,9 @@ function inventory_list_shortcode() {
     }
 
     $education_center_id = is_teacher($current_user->ID) ? educational_center_teacher_id() : get_educational_center_data();
-    if (!$education_center_id) {
-        return '<div class="alert alert-warning">Educational center not found.</div>';
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     $table_name = $wpdb->prefix . 'inventory';
@@ -436,8 +441,9 @@ function inventory_add_shortcode() {
     }
 
     $education_center_id = is_teacher($current_user->ID) ? educational_center_teacher_id() : get_educational_center_data();
-    if (!$education_center_id) {
-        return '<div class="alert alert-warning">Educational center not found.</div>';
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     $new_item_id = get_unique_id_for_role('inventory', $education_center_id);
@@ -563,8 +569,9 @@ function inventory_transaction_shortcode() {
     }
 
     $education_center_id = is_teacher($current_user->ID) ? educational_center_teacher_id() : get_educational_center_data();
-    if (!$education_center_id) {
-        return '<div class="alert alert-warning">Educational center not found.</div>';
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     $trans_table = $wpdb->prefix . 'inventory_transactions';
@@ -781,9 +788,9 @@ function mark_inventory_transaction_complete() {
     }
 
     $education_center_id = is_teacher($current_user->ID) ? educational_center_teacher_id() : get_educational_center_data();
-    if (!$education_center_id) {
-        wp_send_json_error(['message' => 'Educational center not found']);
-        return;
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     $trans_table = $wpdb->prefix . 'inventory_transactions';
@@ -839,8 +846,9 @@ function inventory_issued_shortcode() {
     }
 
     $education_center_id = is_teacher($current_user->ID) ? educational_center_teacher_id() : get_educational_center_data();
-    if (!$education_center_id) {
-        return '<div class="alert alert-warning">Educational center not found.</div>';
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     $trans_table = $wpdb->prefix . 'inventory_transactions';
@@ -950,8 +958,9 @@ function ajax_add_inventory_item() {
     }
 
     $education_center_id = is_teacher($current_user->ID) ? educational_center_teacher_id() : get_educational_center_data();
-    if (!$education_center_id) {
-        wp_send_json_error(['message' => 'Educational center not found']);
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     $table_name = $wpdb->prefix . 'inventory';
@@ -1010,9 +1019,9 @@ function load_inventory_edit_form() {
     }
 
     $education_center_id = is_teacher($current_user->ID) ? educational_center_teacher_id() : get_educational_center_data();
-    if (!$education_center_id) {
-        wp_send_json_error(['message' => 'Educational center not found']);
-        return;
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     $item = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}inventory WHERE item_id = %s AND education_center_id = %s", $item_id, $education_center_id));
@@ -1084,9 +1093,9 @@ function ajax_edit_inventory_item() {
     }
 
     $education_center_id = is_teacher($current_user->ID) ? educational_center_teacher_id() : get_educational_center_data();
-    if (!$education_center_id) {
-        wp_send_json_error(['message' => 'Educational center not found']);
-        return;
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     $table_name = $wpdb->prefix . 'inventory';
@@ -1144,6 +1153,10 @@ function load_inventory_delete_confirm() {
 
     $current_user = wp_get_current_user();
     $education_center_id = is_teacher($current_user->ID) ? educational_center_teacher_id() : get_educational_center_data();
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $item = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}inventory WHERE item_id = %s AND education_center_id = %s", $item_id, $education_center_id));
 
     if (!$item) {
@@ -1176,6 +1189,10 @@ function ajax_delete_inventory_item() {
 
     $current_user = wp_get_current_user();
     $education_center_id = is_teacher($current_user->ID) ? educational_center_teacher_id() : get_educational_center_data();
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $deleted = $wpdb->delete($wpdb->prefix . 'inventory', ['item_id' => $item_id, 'education_center_id' => $education_center_id], ['%s', '%s']);
 
     if ($deleted === false) {
@@ -1205,9 +1222,9 @@ function load_inventory_transaction_form() {
     }
 
     $education_center_id = is_teacher($current_user->ID) ? educational_center_teacher_id() : get_educational_center_data();
-    if (!$education_center_id) {
-        wp_send_json_error(['message' => 'Educational center not found']);
-        return;
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     $item = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}inventory WHERE item_id = %s AND education_center_id = %s", $item_id, $education_center_id));
@@ -1343,9 +1360,9 @@ function ajax_process_inventory_transaction() {
     }
 
     $education_center_id = is_teacher($current_user->ID) ? educational_center_teacher_id() : get_educational_center_data();
-    if (!$education_center_id) {
-        wp_send_json_error(['message' => 'Educational center not found']);
-        return;
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     $inventory_table = $wpdb->prefix . 'inventory';

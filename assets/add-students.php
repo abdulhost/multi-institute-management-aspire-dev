@@ -23,7 +23,10 @@ function add_students_institute_dashboard_shortcode() {
 
     // Fetch educational center ID (assuming this function exists)
     $educational_center_id = get_educational_center_data();
-
+    if (empty($educational_center_id)) {
+        wp_redirect(home_url('/login')); // Redirect to login page
+        exit();
+    }
     if (is_string($educational_center_id) && strpos($educational_center_id, '<p>') === 0) {
         return $educational_center_id;
     }
@@ -41,6 +44,10 @@ function add_students_institute_dashboard_shortcode() {
  <div class="attendance-main-wrapper" style="display: flex;">
         <!-- <div class="institute-dashboard-wrapper"> -->
             <?php
+            echo render_admin_header(wp_get_current_user());
+            if (!is_center_subscribed($educational_center_id)) {
+                return render_subscription_expired_message($educational_center_id);
+            }
         $active_section = 'add-students';
         include(plugin_dir_path(__FILE__) . 'sidebar.php');
             ?>

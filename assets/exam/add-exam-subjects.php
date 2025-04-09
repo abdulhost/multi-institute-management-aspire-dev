@@ -6,7 +6,11 @@ if (!defined('ABSPATH')) {
 function add_exam_subjects_institute_dashboard_shortcode() {
     global $wpdb;
     $education_center_id = get_educational_center_data();
-
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    
+    }
     if (isset($_POST['add_subjects']) && wp_verify_nonce($_POST['nonce'], 'add_subjects_nonce')) {
         $exam_id = intval($_POST['exam_id']);
         $subjects = array_map('sanitize_text_field', $_POST['subjects']);

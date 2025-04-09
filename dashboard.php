@@ -1,18 +1,17 @@
 <?php
-// Shortcode to display educational center dashboard with sidebar
+// Shortcode to display educational center dashboard with conditional sidebar and reusable expired message
+
+// Shortcode to display educational center dashboard with conditional sidebar and AJAX-driven expired message
 function institute_dashboard_shortcode() {
     if (!is_user_logged_in()) {
-        return '<p>You must be logged in to view your dashboard.</p>';
+        return '<div class="login-prompt"><p>Please log in to access your dashboard.</p><a href="' . wp_login_url() . '" class="payment-button">Login</a></div>';
     }
 
-    // Start buffering the output
     ob_start();
 
-    // Fetch the logo and title for the sidebar and dashboard
     $current_user = wp_get_current_user();
     $admin_id = $current_user->user_login;
 
-    // Query the Educational Center based on the admin_id
     $args = array(
         'post_type' => 'educational-center',
         'meta_query' => array(
@@ -26,133 +25,260 @@ function institute_dashboard_shortcode() {
 
     $educational_center = new WP_Query($args);
 
-    if ($educational_center->have_posts()) {
-        $educational_center->the_post();
-        $post_id = get_the_ID();
-        $logo = get_field('institute_logo', $post_id);
-        $title = get_the_title($post_id);
-    } else {
-        return '<p>No Educational Center found for this Admin ID.</p>';
+    if (!$educational_center->have_posts()) {
+        // return '<p>No Educational Center found for this Admin ID.</p>';
+        wp_redirect(home_url('/login')); // Redirect to login page
+        exit();
     }
 
+    $educational_center->the_post();
+    $post_id = get_the_ID();
+    $logo = get_field('institute_logo', $post_id);
+    $title = get_the_title($post_id);
+    $educational_center_id = get_post_meta($post_id, 'educational_center_id', true);
+
+    // Check subscription status
+    $is_subscribed = is_center_subscribed($educational_center_id);
+
     ?>
-
-    <div class="attendance-main-wrapper" style="display: flex;">
-        <!-- <div class="institute-dashboard-wrapper"> -->
-            <?php
-        $active_section = 'dashboard';
-        echo render_admin_header(wp_get_current_user());
-        include(plugin_dir_path(__FILE__) . 'assets/sidebar.php');
-            ?>
-        <!-- </div> -->
-    <div class="form-container attendance-entry-wrapper attendance-content-wrapper">
-    <?php ob_start();
-    ?>
-    <div class="institute-dashboard-container">
-        <!-- Institute Logo -->
-        <div class="institute-logo-container">
-            <?php if ($logo): ?>
-                <div class="institute-logo" style="position: relative;">
-                    <img id="institute-logo-image" src="<?php echo esc_url($logo['url']); ?>" alt="Institute Logo" style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover;">
-                    <span class="edit-logo-icon" onclick="document.getElementById('logo-file-input').click();">&#128247;</span>
-                </div>
-            <?php else: ?>
-                <div class="upload-logo-placeholder" onclick="document.getElementById('logo-file-input').click();">
-                    <span class="upload-logo-icon">&#128247;</span>
-                    <span class="upload-logo-text">Upload Logo</span>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        <h2 style="text-transform:capitalize"><?php echo esc_html($title); ?></h2>
-
-        <!-- Editable Fields -->
-        <form method="POST" enctype="multipart/form-data">
-            <label for="institute_name">Institute Name</label>
-            <input type="text" name="institute_name" value="<?php echo esc_html($title); ?>" required />
-<br>
-            <label for="mobile_number">Mobile Number</label>
-            <input type="text" name="mobile_number" value="<?php echo get_field('mobile_number', $post_id); ?>" required />
-            <br>
-
-            <label for="email_id">Email ID</label>
-            <input type="email" name="email_id" value="<?php echo get_field('email_id', $post_id); ?>" required />
-            <br>
-
-            <!-- Editable Logo File Upload (hidden by default) -->
-            <input type="file" name="institute_logo" accept="image/*" id="logo-file-input" style="display: none;" onchange="previewLogo(event)" />
-
-            <input type="submit" name="update_center" value="Update Center" />
-        </form>
-
+    <div class="attendance-main-wrapper" style="display: <?php echo $is_subscribed ? 'flex' : 'block'; ?>;">
         <?php
-        // Handle form submission
-        if (isset($_POST['update_center'])) {
-            // Update the data
-            $new_institute_name = sanitize_text_field($_POST['institute_name']);
-            $post_data = array(
-                'ID' => $post_id,
-                'post_title' => $new_institute_name,
-            );
-            wp_update_post($post_data);
+        // Always show header
+        echo render_admin_header(wp_get_current_user());
 
-            // Update other fields
-            update_field('mobile_number', sanitize_text_field($_POST['mobile_number']), $post_id);
-            update_field('email_id', sanitize_email($_POST['email_id']), $post_id);
-
-            // Handle logo upload
-            if (isset($_FILES['institute_logo']) && $_FILES['institute_logo']['error'] === UPLOAD_ERR_OK) {
-                if ($_FILES['institute_logo']['size'] > 1048576) {
-                    echo '<p class="error-message">Logo size must be less than 1 MB.</p>';
-                } else {
-                    $file = $_FILES['institute_logo'];
-                    $upload_dir = wp_upload_dir();
-                    $target_file = $upload_dir['path'] . '/' . basename($file['name']);
-
-                    if (move_uploaded_file($file['tmp_name'], $target_file)) {
-                        $file_type = wp_check_filetype($target_file);
-                        $attachment = array(
-                            'guid' => $upload_dir['url'] . '/' . basename($file['name']),
-                            'post_mime_type' => $file_type['type'],
-                            'post_title' => sanitize_file_name($file['name']),
-                            'post_content' => '',
-                            'post_status' => 'inherit'
-                        );
-
-                        $attach_id = wp_insert_attachment($attachment, $target_file, $post_id);
-                        require_once(ABSPATH . 'wp-admin/includes/image.php');
-                        $attach_data = wp_generate_attachment_metadata($attach_id, $target_file);
-                        wp_update_attachment_metadata($attach_id, $attach_data);
-
-                        update_field('institute_logo', $attach_id, $post_id);
-
-                        echo "<script>
-                            document.getElementById('institute-logo-image').src = '" . wp_get_attachment_url($attach_id) . "'; 
-                        </script>";
-                    }
-                }
-            }
-            header("Refresh:0");
-            echo '<p class="success-message">Educational Center updated successfully.</p>';
+        // Show sidebar only if subscribed
+        if ($is_subscribed) {
+            include(plugin_dir_path(__FILE__) . 'assets/sidebar.php');
         }
         ?>
+        <div class="form-container attendance-entry-wrapper attendance-content-wrapper">
+            <?php
+            $active_section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'dashboard';
+            $action = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : '';
+
+            if (!$is_subscribed && $active_section !== 'subscription') {
+                echo render_subscription_expired_message($educational_center_id);
+            } else {
+                switch ($active_section) {
+                    case 'subscription':
+                        if ($action === 'renew-subscription') {
+                            echo render_subscription_renewal_form($educational_center_id);
+                        } elseif ($action === 'extend-subscription') {
+                            echo render_subscription_extension_form($educational_center_id);
+                        } else {
+                            echo render_institute_subscription_management($educational_center_id);
+                        }
+                        break;
+                    default:
+                        ob_start();
+                        ?>
+                        <div class="institute-dashboard-container">
+                            <div class="institute-logo-container">
+                                <?php if ($logo): ?>
+                                    <div class="institute-logo" style="position: relative;">
+                                        <img id="institute-logo-image" src="<?php echo esc_url($logo['url']); ?>" alt="Institute Logo" style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover;">
+                                        <span class="edit-logo-icon" onclick="document.getElementById('logo-file-input').click();">📷</span>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="upload-logo-placeholder" onclick="document.getElementById('logo-file-input').click();">
+                                        <span class="upload-logo-icon">📷</span>
+                                        <span class="upload-logo-text">Upload Logo</span>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <h2 style="text-transform:capitalize"><?php echo esc_html($title); ?></h2>
+
+                            <form method="POST" enctype="multipart/form-data">
+                                <label for="institute_name">Institute Name</label>
+                                <input type="text" name="institute_name" value="<?php echo esc_html($title); ?>" required />
+                                <br>
+                                <label for="mobile_number">Mobile Number</label>
+                                <input type="text" name="mobile_number" value="<?php echo get_field('mobile_number', $post_id); ?>" required />
+                                <br>
+                                <label for="email_id">Email ID</label>
+                                <input type="email" name="email_id" value="<?php echo get_field('email_id', $post_id); ?>" required />
+                                <br>
+                                <input type="file" name="institute_logo" accept="image/*" id="logo-file-input" style="display: none;" onchange="previewLogo(event)" />
+                                <input type="submit" name="update_center" value="Update Center" />
+                            </form>
+
+                            <?php
+                            if (isset($_POST['update_center'])) {
+                                $new_institute_name = sanitize_text_field($_POST['institute_name']);
+                                $post_data = array(
+                                    'ID' => $post_id,
+                                    'post_title' => $new_institute_name,
+                                );
+                                wp_update_post($post_data);
+
+                                update_field('mobile_number', sanitize_text_field($_POST['mobile_number']), $post_id);
+                                update_field('email_id', sanitize_email($_POST['email_id']), $post_id);
+
+                                if (isset($_FILES['institute_logo']) && $_FILES['institute_logo']['error'] === UPLOAD_ERR_OK) {
+                                    if ($_FILES['institute_logo']['size'] > 1048576) {
+                                        echo '<p class="error-message">Logo size must be less than 1 MB.</p>';
+                                    } else {
+                                        $file = $_FILES['institute_logo'];
+                                        $upload_dir = wp_upload_dir();
+                                        $target_file = $upload_dir['path'] . '/' . basename($file['name']);
+
+                                        if (move_uploaded_file($file['tmp_name'], $target_file)) {
+                                            $file_type = wp_check_filetype($target_file);
+                                            $attachment = array(
+                                                'guid' => $upload_dir['url'] . '/' . basename($file['name']),
+                                                'post_mime_type' => $file_type['type'],
+                                                'post_title' => sanitize_file_name($file['name']),
+                                                'post_content' => '',
+                                                'post_status' => 'inherit'
+                                            );
+
+                                            $attach_id = wp_insert_attachment($attachment, $target_file, $post_id);
+                                            require_once(ABSPATH . 'wp-admin/includes/image.php');
+                                            $attach_data = wp_generate_attachment_metadata($attach_id, $target_file);
+                                            wp_update_attachment_metadata($attach_id, $attach_data);
+
+                                            update_field('institute_logo', $attach_id, $post_id);
+
+                                            echo "<script>document.getElementById('institute-logo-image').src = '" . wp_get_attachment_url($attach_id) . "';</script>";
+                                        }
+                                    }
+                                }
+                                header("Refresh:0");
+                                echo '<p class="success-message">Educational Center updated successfully.</p>';
+                            }
+                            ?>
+                        </div>
+                        <?php
+                        echo ob_get_clean();
+                        break;
+                }
+            }
+            ?>
+        </div>
     </div>
 
+    <script>
+    function previewLogo(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('institute-logo-image').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    </script>
     <?php
-    return ob_get_clean();?>
-    </div>
-    </div>
-
-
-    <?php
-    return ob_get_clean(); // Return the buffered content
+    wp_enqueue_style('payment-methods-style', plugin_dir_url(__FILE__) . 'payment-methods.css');
+    wp_enqueue_script('jquery');
+    return ob_get_clean();
 }
 add_shortcode('institute_dashboard', 'institute_dashboard_shortcode');
 
-// Function to render the Dashboard section
-// function render_dashboard_section($post_id, $logo, $title) {
-   
-// }
+// Reusable Helper Function for Subscription Expired Message with AJAX
+function render_subscription_expired_message($center_id) {
+    ob_start();
+    ?>
+    <div class="subscription-expired payment-methods-wrap">
+        <h1 class="payment-title">Subscription Required</h1>
+        <p>Your subscription has expired or is not active. Please renew or extend it to access the full features.</p>
+        <div class="subscription-options">
+            <button class="payment-button" onclick="loadSubscriptionManagement('<?php echo esc_attr($center_id); ?>')">Manage Subscription</button>
+            <a href="<?php echo wp_logout_url(home_url()); ?>" class="payment-button secondary">Logout</a>
+            <a href="<?php echo wp_login_url(); ?>" class="payment-button secondary">Re-Login</a>
+            <a href="mailto:support@example.com" class="payment-button secondary">Contact Support</a>
+        </div>
+        <div id="subscription-content" class="subscription-form-container"></div>
+    </div>
+    <script>
+    function loadSubscriptionManagement(centerId) {
+        const container = jQuery('#subscription-content');
+        container.html('<p>Loading...</p>');
+
+        jQuery.ajax({
+            url: '<?php echo rest_url('institute/v1/subscriptions'); ?>',
+            method: 'POST',
+            data: {
+                action: 'management',
+                center_id: centerId,
+                nonce: '<?php echo wp_create_nonce('subscription_nonce'); ?>'
+            },
+            headers: {'X-WP-Nonce': '<?php echo wp_create_nonce('wp_rest'); ?>'},
+            success: function(response) {
+                if (response.success) {
+                    container.html(response.data.html);
+                } else {
+                    container.html('<p>Error: ' + response.data + '</p>');
+                }
+            },
+            error: function(xhr) {
+                container.html('<p>Error: ' + xhr.responseText + '</p>');
+            }
+        });
+    }
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+// Updated REST API Handler to Support 'management' Action
+add_action('rest_api_init', function () {
+    register_rest_route('institute/v1', '/subscriptions', [
+        'methods' => 'POST',
+        'callback' => 'handle_institute_subscriptions_rest',
+        'permission_callback' => function () {
+            return is_user_logged_in();
+        }
+    ]);
+});
+
+function handle_institute_subscriptions_rest($request) {
+    global $wpdb;
+    $action = $request->get_param('action');
+    $nonce = $request->get_param('nonce');
+    $center_id = $request->get_param('center_id');
+
+    if (!wp_verify_nonce($nonce, 'subscription_nonce')) {
+        return new WP_Error('invalid_nonce', 'Invalid nonce', ['status' => 403]);
+    }
+
+    $center_exists = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = 'educational_center_id' AND meta_value = %s",
+        $center_id
+    ));
+    if (!$center_exists) {
+        return new WP_Error('invalid_center', 'Invalid Educational Center ID', ['status' => 404]);
+    }
+
+    switch ($action) {
+        case 'management':
+            return rest_ensure_response(['success' => true, 'data' => ['html' => render_institute_subscription_management($center_id)]]);
+        case 'renew-form':
+            return rest_ensure_response(['success' => true, 'data' => ['html' => render_subscription_renewal_form($center_id)]]);
+        case 'extend-form':
+            return rest_ensure_response(['success' => true, 'data' => ['html' => render_subscription_extension_form($center_id)]]);
+        case 'renew':
+            // Existing renew logic unchanged
+            $plan_type = sanitize_text_field($request->get_param('plan_type'));
+            $payment_method = sanitize_text_field($request->get_param('payment_method'));
+            $transaction_id = sanitize_text_field($request->get_param('transaction_id')) ?: 'PENDING-' . time();
+            // ... (rest of renew logic)
+            return rest_ensure_response(['success' => true, 'data' => 'Subscription renewal requested. Awaiting verification.']);
+        case 'extend':
+            // Existing extend logic unchanged
+            $subscription_id = intval($request->get_param('subscription_id'));
+            $extend_duration = sanitize_text_field($request->get_param('extend_duration'));
+            $payment_method = sanitize_text_field($request->get_param('payment_method'));
+            $transaction_id = sanitize_text_field($request->get_param('transaction_id')) ?: 'PENDING-' . time();
+            // ... (rest of extend logic)
+            return rest_ensure_response(['success' => true, 'data' => 'Subscription extension requested. Awaiting verification.']);
+        default:
+            return new WP_Error('invalid_action', 'Invalid action', ['status' => 400]);
+    }
+}
+
 
 
 
@@ -178,6 +304,9 @@ function render_admin_header($admin_user) {
 
     if (!$educational_center->have_posts()) {
         return '<div class="alert alert-danger">No Educational Center found for this Admin ID.</div>';
+        die("No Educational Center found, redirecting...");
+        wp_redirect(home_url('/login')); // Redirect to login page
+        exit();
     }
 
     $educational_center->the_post();

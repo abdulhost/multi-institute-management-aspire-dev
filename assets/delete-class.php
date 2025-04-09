@@ -24,7 +24,10 @@ function display_delete_class_section_manager() {
     if (is_string($educational_center_id) && strpos($educational_center_id, '<p>') === 0) {
         return $educational_center_id;
     }
-
+    if (empty($educational_center_id)) {
+        wp_redirect(home_url('/login')); // Redirect to login page
+        exit();
+    }
     $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name WHERE education_center_id = %s", $educational_center_id));
     
     // Clean any prior output and start buffering
@@ -37,6 +40,10 @@ function display_delete_class_section_manager() {
         <!-- Sidebar (Left Side) -->
         <!-- <div class="institute-dashboard-wrapper"> -->
         <?php
+        echo render_admin_header(wp_get_current_user());
+        if (!is_center_subscribed($educational_center_id)) {
+            return render_subscription_expired_message($educational_center_id);
+        }
 // Set the active section for the sidebar
 $active_section = 'delete-class';
 

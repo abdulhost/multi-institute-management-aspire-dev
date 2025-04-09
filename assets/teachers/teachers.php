@@ -5,7 +5,9 @@ function teachers_institute_dashboard_shortcode() {
 
     $educational_center_id = get_educational_center_data();
     if (empty($educational_center_id)) {
-        return '<p>No Educational Center found for this Admin ID.</p>';
+        wp_redirect(home_url('/login'));
+        exit();
+    
     }
 
     // Handle teacher deletion
@@ -24,6 +26,10 @@ function teachers_institute_dashboard_shortcode() {
     ?>
     <div class="attendance-main-wrapper" style="display: flex;">
         <?php
+          echo render_admin_header(wp_get_current_user());
+          if (!is_center_subscribed($educational_center_id)) {
+              return render_subscription_expired_message($educational_center_id);
+          }
         $active_section = 'view-teachers';
         include plugin_dir_path(__FILE__) . '../sidebar.php'; // Adjust path as needed
         ?>

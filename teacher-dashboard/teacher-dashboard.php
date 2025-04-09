@@ -37,11 +37,15 @@ function aspire_teacher_dashboard_enqueue() {
 function educational_center_teacher_id() {
     if (!is_user_logged_in()) {
         return false;
+        // wp_redirect(home_url('/login'));
+        // exit();  
     }
 
     $current_user = wp_get_current_user();
     if (!in_array('teacher', (array) $current_user->roles)) {
-        return false;
+        // return false;
+        wp_redirect(home_url('/login'));
+        exit();  
     }
 
     return get_user_meta($current_user->ID, 'educational_center_id', true) ?: false;
@@ -53,14 +57,18 @@ function aspire_get_current_teacher_id() {
 
     // Check if user is logged in and exists
     if (!$user || !$user->exists()) {
-        error_log("No current user found or user not logged in.");
-        return null;
+        // error_log("No current user found or user not logged in.");
+        // return null;
+        wp_redirect(home_url('/login'));
+        exit();  
     }
 
     // Check if the user has the 'teacher' role
     if (!in_array('teacher', $user->roles)) {
-        error_log("Current user {$user->user_login} is not a teacher.");
-        return null;
+        // error_log("Current user {$user->user_login} is not a teacher.");
+        // return null;
+        wp_redirect(home_url('/login'));
+        exit();  
     }
 
     // The teacher ID is the username (user_login)
@@ -89,19 +97,23 @@ function aspire_teacher_dashboard_shortcode() {
     if (!function_exists('wp_get_current_user')) {
         return '<div class="alert alert-danger">Error: WordPress environment not fully loaded.</div>';
     }
-
+    if (!is_user_logged_in()) {
+        // return false;
+        wp_redirect(home_url('/login'));
+        exit();  
+    }
     $current_user = wp_get_current_user();
     $user_id = $current_user->ID;
     $username = $current_user->user_login;
 
     if (!$user_id || !in_array('teacher', $current_user->roles)) {
-        return '<div class="alert alert-danger">Access denied. Please log in as a teacher.</div>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     $education_center_id = educational_center_teacher_id();
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">No Educational Center found.</div>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     $teacher_posts = $wpdb->get_results(
         $wpdb->prepare(
@@ -119,8 +131,8 @@ function aspire_teacher_dashboard_shortcode() {
     );
 
     if (empty($teacher_posts)) {
-        return '<div class="alert alert-warning">Teacher profile not found for user ID ' . esc_html($user_id) . ' or username "' . esc_html($username) . '". Please contact administration.</div>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     $teacher = get_post($teacher_posts[0]->ID);
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'overview';
@@ -132,6 +144,10 @@ function aspire_teacher_dashboard_shortcode() {
     <div class="container-fluid" style="background: linear-gradient(135deg, #e6ffe6, #ccffcc); min-height: 100vh;">
         <div class="row">
             <?php 
+             echo render_teacher_header($current_user,$teacher);
+              if (!is_center_subscribed($education_center_id)) {
+                  return render_subscription_expired_message($education_center_id);
+              }
             $active_section = $section;
             $active_action = $action; // Pass action to sidebar
             include plugin_dir_path(__FILE__) . 'teacher-sidebar.php';
@@ -345,6 +361,451 @@ function aspire_teacher_dashboard_shortcode() {
 }
 add_shortcode('aspire_teacher_dashboard', 'aspire_teacher_dashboard_shortcode');
 
+//header
+// Function to render the header for a teacher's dashboard using teacher post data
+function render_teacher_header($teacher_user, $teacher) {
+    global $wpdb;
+    
+    // Use teacher post data for name and profile photo
+    $user_name =  get_field('teacher_id', $teacher->ID) ?:"Teacher";  // Teacher name from post_title
+    $user_email = $teacher_user->user_email; // Email still from WP_User
+    // Get the teacher profile photo (assuming it’s a URL string)
+    $avatar_url = get_field('teacher_profile_photo', $teacher->ID);
+    if ($avatar_url) {
+        // If it’s already a string URL, just use it with esc_url
+        $avatar_url = esc_url($avatar_url);
+    } else {
+        // Fallback to a placeholder if no photo is set
+        $avatar_url = 'https://via.placeholder.com/150';
+    }
+    $dashboard_link = esc_url(home_url('/teacher-dashboard'));
+    $notifications_link = esc_url(home_url('/teacher-dashboard?section=notifications'));
+    $settings_link = esc_url(home_url('/teacher-dashboard?section=settings'));
+    $logout_link = get_secure_logout_url_by_role();
+    $communication_link = esc_url(home_url('/teacher-dashboard?section=communication'));
+
+    $seven_days_ago = date('Y-m-d H:i:s', strtotime('-7 days'));
+    $notifications_table = $wpdb->prefix . 'aspire_announcements';
+    $teacher_id = $teacher_user->ID; // Still use user ID for notifications/messages
+
+    // Count notifications specific to this teacher or broadcast to 'teachers'
+    $notifications_count = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM $notifications_table 
+         WHERE (receiver_id = %d OR receiver_id = 'teachers') 
+         AND timestamp > %s",
+        $teacher_id,
+        $seven_days_ago
+    ));
+
+    $unread_notifications = $wpdb->get_results($wpdb->prepare(
+        "SELECT sender_id, message, timestamp FROM $notifications_table 
+         WHERE (receiver_id = %d OR receiver_id = 'teachers') 
+         AND timestamp > %s 
+         ORDER BY timestamp DESC 
+         LIMIT 5",
+        $teacher_id,
+        $seven_days_ago
+    ));
+
+    // Messages count and data for teachers
+    $messages_table = $wpdb->prefix . 'aspire_messages';
+    $messages_count = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) 
+         FROM $messages_table 
+         WHERE (receiver_id = %d OR receiver_id = 'teachers') 
+         AND status = 'sent' 
+         AND timestamp > %s",
+        $teacher_id,
+        $seven_days_ago
+    ));
+
+    $unread_messages = $wpdb->get_results($wpdb->prepare(
+        "SELECT sender_id, message, timestamp 
+         FROM $messages_table 
+         WHERE (receiver_id = %d OR receiver_id = 'teachers') 
+         AND status = 'sent' 
+         AND timestamp > %s 
+         ORDER BY timestamp DESC 
+         LIMIT 5",
+        $teacher_id,
+        $seven_days_ago
+    ));
+
+    ob_start();
+    ?>
+    <header class="su_p-header">
+        <div class="header-container">
+            <div class="header-left">
+                <a href="<?php echo $dashboard_link; ?>" class="header-logo">
+                    <img decoding="async" class="logo-image" src="<?php echo esc_url($avatar_url); ?>" alt="Teacher Logo">
+                    <span class="logo-text">Teacher Dashboard</span>
+                </a>
+                <div class="header-search">
+                    <input type="text" placeholder="Search" class="search-input" id="header-search-input" aria-label="Search">
+                    <div class="search-dropdown" id="search-results">
+                        <ul class="results-list" id="search-results-list"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <nav class="header-nav">
+                    <a href="<?php echo $dashboard_link; ?>" class="nav-item active">Dashboard</a>
+                    <a href="<?php echo esc_url(home_url('/teacher-dashboard?section=classes')); ?>" class="nav-item">Classes</a>
+                    <a href="<?php echo esc_url(home_url('/teacher-dashboard?section=students')); ?>" class="nav-item">Students</a>
+                    <a href="<?php echo $communication_link; ?>" class="nav-item">Messages</a>
+                </nav>
+                <div class="header-actions">
+                    <!-- Quick Links Dropdown -->
+                    <div class="header-quick-links">
+                        <a href="#" class="action-btn" id="quick-links-toggle">
+                            <i class="fas fa-link fa-lg"></i>
+                        </a>
+                        <div class="dropdown quick-links-dropdown" id="quick-links-dropdown">
+                            <div class="dropdown-header">
+                                <span>Quick Links</span>
+                            </div>
+                            <ul class="dropdown-list">
+                                <li><a href="<?php echo esc_url(home_url('/teacher-dashboard?section=attendance')); ?>" class="dropdown-link">Attendance</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/teacher-dashboard?section=assignments')); ?>" class="dropdown-link">Assignments</a></li>
+                                <li><a href="https://support.instituto.edu" target="_blank" class="dropdown-link">Support</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Messages Dropdown -->
+                    <div class="header-messages">
+                        <a href="<?php echo $communication_link; ?>" class="action-btn" id="messages-toggle">
+                            <i class="fas fa-envelope fa-lg"></i>
+                            <span class="action-badge <?php echo $messages_count ? '' : 'd-none'; ?>" id="messages-count">
+                                <?php echo esc_html($messages_count ?: 0); ?>
+                            </span>
+                        </a>
+                        <div class="dropdown messages-dropdown" id="messages-dropdown">
+                            <div class="dropdown-header">
+                                <span>Messages (Last 7 Days)</span>
+                            </div>
+                            <ul class="dropdown-list">
+                                <?php if (!empty($unread_messages)): ?>
+                                    <?php foreach ($unread_messages as $msg): ?>
+                                        <li>
+                                            <span class="msg-content">
+                                                <span class="msg-sender"><?php echo esc_html($msg->sender_id); ?></span>:
+                                                <span class="msg-preview"><?php echo esc_html(wp_trim_words($msg->message, 5, '...')); ?></span>
+                                            </span>
+                                            <span class="msg-time"><?php echo esc_html(date('M d, Y', strtotime($msg->timestamp))); ?></span>
+                                        </li>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <li><span class="msg-preview">No new messages</span></li>
+                                <?php endif; ?>
+                            </ul>
+                            <?php if (!empty($unread_messages)): ?>
+                                <a href="<?php echo $communication_link; ?>" class="dropdown-footer">View All Messages</a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- Notifications Dropdown -->
+                    <div class="header-notifications">
+                        <a href="<?php echo $notifications_link; ?>" class="action-btn" id="notifications-toggle">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="action-badge <?php echo $notifications_count ? '' : 'd-none'; ?>" id="notifications-count">
+                                <?php echo esc_html($notifications_count ?: 0); ?>
+                            </span>
+                        </a>
+                        <div class="dropdown notifications-dropdown" id="notifications-dropdown">
+                            <div class="dropdown-header">
+                                <span>Notifications (Last 7 Days)</span>
+                            </div>
+                            <ul class="dropdown-list">
+                                <?php if (!empty($unread_notifications)): ?>
+                                    <?php foreach ($unread_notifications as $ann): ?>
+                                        <li>
+                                            <span class="msg-content">
+                                                <span class="msg-sender"><?php echo esc_html($ann->sender_id); ?></span>:
+                                                <span class="notif-text"><?php echo esc_html(wp_trim_words($ann->message, 5, '...')); ?></span>
+                                            </span>
+                                            <span class="notif-time"><?php echo esc_html(date('M d, Y', strtotime($ann->timestamp))); ?></span>
+                                        </li>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <li><span class="notif-text">No new notifications</span></li>
+                                <?php endif; ?>
+                            </ul>
+                            <?php if (!empty($unread_notifications)): ?>
+                                <a href="<?php echo $notifications_link; ?>" class="dropdown-footer">View All</a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- Settings -->
+                    <div class="header-settings">
+                        <a href="<?php echo $settings_link; ?>" class="action-btn" id="settings-toggle">
+                            <i class="fas fa-cog fa-lg"></i>
+                        </a>
+                    </div>
+
+                    <!-- Help/Support -->
+                    <div class="header-help">
+                        <a href="https://support.instituto.edu" target="_blank" class="action-btn" id="help-toggle">
+                            <i class="fas fa-question-circle fa-lg"></i>
+                        </a>
+                    </div>
+
+                    <!-- Dark Mode Toggle -->
+                    <div class="header-dark-mode">
+                        <button class="action-btn" id="dark-mode-toggle">
+                            <i class="fas fa-moon fa-lg"></i>
+                        </button>
+                    </div>
+
+                    <!-- Profile Dropdown -->
+                    <div class="header-profile">
+                        <div class="profile-toggle" id="profile-toggle">
+                            <img decoding="async" src="<?php echo esc_url($avatar_url); ?>" alt="Profile" class="profile-img">
+                            <i class="fas fa-caret-down profile-arrow"></i>
+                        </div>
+                        <div class="action-dropdown profile-dropdown" id="profile-dropdown">
+                            <div class="profile-info">
+                                <img decoding="async" src="<?php echo esc_url($avatar_url); ?>" alt="Profile" class="profile-img-large">
+                                <div>
+                                    <span class="profile-name"><?php echo esc_html($user_name); ?></span><br>
+                                    <span class="profile-email"><?php echo esc_html($user_email); ?></span>
+                                </div>
+                            </div>
+                            <ul class="dropdown-list">
+                                <li><a href="<?php echo $settings_link; ?>" class="profile-link">Settings</a></li>
+                                <li><a href="<?php echo $logout_link; ?>" class="profile-link logout">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle Navigation">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Rest of the script remains unchanged -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const fontAwesomeLink = document.createElement('link');
+        fontAwesomeLink.rel = 'stylesheet';
+        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';
+        fontAwesomeLink.crossOrigin = 'anonymous';
+        fontAwesomeLink.onload = () => console.log('Font Awesome loaded');
+        fontAwesomeLink.onerror = () => console.error('Failed to load Font Awesome');
+        document.head.appendChild(fontAwesomeLink);
+
+        const searchInput = document.getElementById('header-search-input');
+        const searchResults = document.getElementById('search-results');
+        const navToggle = document.getElementById('nav-toggle');
+        const headerNav = document.querySelector('.header-nav');
+        const messagesToggle = document.getElementById('messages-toggle');
+        const messagesDropdown = document.getElementById('messages-dropdown');
+        const notificationsToggle = document.getElementById('notifications-toggle');
+        const notificationsDropdown = document.getElementById('notifications-dropdown');
+        const quickLinksToggle = document.getElementById('quick-links-toggle');
+        const quickLinksDropdown = document.getElementById('quick-links-dropdown');
+        const settingsToggle = document.getElementById('settings-toggle');
+        const helpToggle = document.getElementById('help-toggle');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const profileToggle = document.getElementById('profile-toggle');
+        const profileDropdown = document.getElementById('profile-dropdown');
+
+        let activeDropdown = null;
+
+        function toggleDropdown(toggle, dropdown, isLink = false) {
+            toggle.addEventListener('mouseenter', () => {
+                closeAllDropdowns();
+                dropdown.classList.add('visible');
+                activeDropdown = dropdown;
+            });
+
+            dropdown.addEventListener('mouseenter', () => {
+                dropdown.classList.add('visible');
+                activeDropdown = dropdown;
+            });
+
+            toggle.addEventListener('mouseleave', () => {
+                dropdown.addEventListener('mouseleave', () => {
+                    dropdown.classList.remove('visible');
+                    activeDropdown = null;
+                });
+            });
+
+            if (!isLink) {
+                toggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (dropdown.classList.contains('visible')) {
+                        dropdown.classList.remove('visible');
+                        activeDropdown = null;
+                    } else {
+                        closeAllDropdowns();
+                        dropdown.classList.add('visible');
+                        activeDropdown = dropdown;
+                    }
+                });
+            }
+        }
+
+        function closeAllDropdowns() {
+            [messagesDropdown, notificationsDropdown, quickLinksDropdown, profileDropdown, searchResults].forEach(dropdown => {
+                if (dropdown) dropdown.classList.remove('visible');
+            });
+            activeDropdown = null;
+        }
+
+        if (searchInput && searchResults) {
+            let debounceTimer;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    const query = this.value.trim();
+                    if (query.length < 2) {
+                        searchResults.classList.remove('visible');
+                        return;
+                    }
+
+                    searchResults.querySelector('.results-list').innerHTML = '<li>Loading...</li>';
+                    searchResults.classList.add('visible');
+
+                    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({
+                            action: 'search_teacher_sections',
+                            query: query
+                        }).toString()
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const resultsList = searchResults.querySelector('.results-list');
+                        resultsList.innerHTML = '';
+                        if (data.success && data.data.length > 0) {
+                            data.data.forEach(item => {
+                                resultsList.innerHTML += `<li><a href="${item.url}">${item.title}</a></li>`;
+                            });
+                        } else {
+                            resultsList.innerHTML = '<li>No results found</li>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Search error:', error);
+                        searchResults.querySelector('.results-list').innerHTML = '<li>Error fetching results</li>';
+                    });
+                }, 150);
+            });
+        }
+
+        if (navToggle && headerNav) {
+            navToggle.addEventListener('click', () => {
+                headerNav.classList.toggle('visible');
+            });
+        }
+
+        if (messagesToggle && messagesDropdown) {
+            toggleDropdown(messagesToggle, messagesDropdown, true);
+        }
+
+        if (notificationsToggle && notificationsDropdown) {
+            toggleDropdown(notificationsToggle, notificationsDropdown, true);
+        }
+
+        if (quickLinksToggle && quickLinksDropdown) {
+            toggleDropdown(quickLinksToggle, quickLinksDropdown);
+        }
+
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                darkModeToggle.querySelector('i').classList.toggle('fa-moon', !isDark);
+                darkModeToggle.querySelector('i').classList.toggle('fa-sun', isDark);
+            });
+        }
+
+        if (profileToggle && profileDropdown) {
+            toggleDropdown(profileToggle, profileDropdown);
+        }
+
+        document.addEventListener('click', (e) => {
+            if (searchInput && searchResults && !searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.remove('visible');
+            }
+            if (activeDropdown && !activeDropdown.contains(e.target) && !e.target.closest('.action-btn, .profile-toggle')) {
+                activeDropdown.classList.remove('visible');
+                activeDropdown = null;
+            }
+        });
+    });
+
+    jQuery(document).ready(function($) {
+        $('a[href*="section=communication"]').on('click', function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                method: 'POST',
+                data: {
+                    action: 'aspire_teacher_mark_messages_read',
+                    nonce: '<?php echo wp_create_nonce('aspire_teacher_header_nonce'); ?>'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#messages-count').text('0').addClass('d-none');
+                        $('#messages-dropdown .dropdown-list').html('<li><span class="msg-preview">No new messages</span></li>');
+                        $('#messages-dropdown .dropdown-footer').remove();
+                        window.location.href = '<?php echo $communication_link; ?>';
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error marking messages as read:', error);
+                }
+            });
+        });
+
+        $('a[href*="section=notifications"]').on('click', function(e) {
+            e.preventDefault();
+            $('#notifications-count').text('0').addClass('d-none');
+            $('#notifications-dropdown .dropdown-list').html('<li><span class="notif-text">No new notifications</span></li>');
+            $('#notifications-dropdown .dropdown-footer').remove();
+            window.location.href = '<?php echo $notifications_link; ?>';
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+add_action('wp_ajax_search_teacher_sections', 'search_teacher_sections_callback');
+function search_teacher_sections_callback() {
+    $query = sanitize_text_field($_POST['query']);
+    $results = [
+        ['title' => 'Classes', 'url' => home_url('/teacher-dashboard?section=classes')],
+        ['title' => 'Students', 'url' => home_url('/teacher-dashboard?section=students')],
+        ['title' => 'Attendance', 'url' => home_url('/teacher-dashboard?section=attendance')],
+        ['title' => 'Assignments', 'url' => home_url('/teacher-dashboard?section=assignments')],
+    ];
+    wp_send_json_success(array_filter($results, function($item) use ($query) {
+        return stripos($item['title'], $query) !== false;
+    }));
+}
+
+add_action('wp_ajax_aspire_teacher_mark_messages_read', 'aspire_teacher_mark_messages_read_callback');
+function aspire_teacher_mark_messages_read_callback() {
+    check_ajax_referer('aspire_teacher_header_nonce', 'nonce');
+    global $wpdb;
+    $wpdb->update(
+        $wpdb->prefix . 'aspire_messages',
+        ['status' => 'read'],
+        ['receiver_id' => get_current_user_id(), 'status' => 'sent'],
+        ['%s'],
+        ['%d', '%s']
+    );
+    wp_send_json_success();
+}
 // Feature 1: Dashboard Overview
 function render_teacher_overview($user_id, $teacher) {
     $teacher_name = get_post_meta($teacher->ID, 'teacher_name', true);
@@ -657,8 +1118,8 @@ function render_class_management($user_id, $teacher) {
     $education_center_id = educational_center_teacher_id();
 
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">Error: Could not fetch Education Center ID.</div>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     $classes = $wpdb->get_results(
         $wpdb->prepare("SELECT * FROM $table_name WHERE education_center_id = %s", $education_center_id)
@@ -710,7 +1171,10 @@ function render_class_add($user_id, $teacher) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'class_sections';
     $education_center_id = educational_center_teacher_id();
-
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     if (isset($_POST['add_class']) && wp_verify_nonce($_POST['class_nonce'], 'add_class')) {
         $class_name = sanitize_text_field($_POST['class_name']);
         $sections = sanitize_text_field($_POST['sections']);
@@ -765,8 +1229,8 @@ function render_class_edit($user_id, $teacher, $class_id = null) {
     $education_center_id = educational_center_teacher_id();
 
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">Error: Could not fetch Education Center ID.</div>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     // If no class_id is provided, show the class list
     if (!$class_id) {
@@ -828,8 +1292,8 @@ function handle_class_delete($user_id, $class_id = null) {
     $education_center_id = educational_center_teacher_id();
 
     if (empty($education_center_id)) {
-        return; // No output, handled by caller
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     if ($class_id) {
         $deleted = $wpdb->delete($table_name, [
@@ -851,8 +1315,8 @@ function render_student_management($user_id, $teacher) {
 
     $education_center_id = educational_center_teacher_id();
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">Error: Could not fetch Education Center ID.</div>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     $students = get_posts([
         'post_type' => 'students',
@@ -1108,8 +1572,8 @@ function render_student_add($user_id, $teacher) {
 
     $education_center_id = educational_center_teacher_id();
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">Error: Could not fetch Education Center ID.</div>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     $table_class_name = $wpdb->prefix . 'class_sections';
     $classes = $wpdb->get_results(
@@ -1430,8 +1894,8 @@ function render_student_edit($user_id, $teacher, $student_id = null) {
 
     $education_center_id = educational_center_teacher_id();
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">Error: Could not fetch Education Center ID.</div>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     if (!$student_id) {
         return render_student_management($user_id, $teacher);
@@ -1439,8 +1903,8 @@ function render_student_edit($user_id, $teacher, $student_id = null) {
 
     $student = get_post($student_id);
     if (!$student || $student->post_type !== 'students' || get_post_meta($student_id, 'educational_center_id', true) !== $education_center_id) {
-        return '<div class="alert alert-danger">Student not found or permission denied.</div>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     $table_class_name = $wpdb->prefix . 'class_sections';
     $classes = $wpdb->get_results(
@@ -1761,8 +2225,8 @@ function render_homework_assignments($user_id, $teacher) {
     }
 
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">Error: Could not fetch Education Center ID.</div>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     $homework_table = $wpdb->prefix . 'homework';
     $subjects_table = $wpdb->prefix . 'subjects';
@@ -1879,8 +2343,8 @@ function render_homework_add($user_id, $teacher) {
     }
 
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">Error: Could not fetch Education Center ID.</div>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     $class_sections_table = $wpdb->prefix . 'class_sections';
     $subjects_table = $wpdb->prefix . 'subjects';
@@ -2045,8 +2509,8 @@ function render_homework_edit($user_id, $teacher, $homework_id = null) {
     }
 
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">Error: Could not fetch Education Center ID.</div>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     if (!$homework_id) {
         return render_homework_assignments($user_id, $teacher);
@@ -2248,8 +2712,8 @@ function handle_homework_delete($user_id, $homework_id) {
     }
     
     if (empty($education_center_id)) {
-        return;
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     $homework_table = $wpdb->prefix . 'homework';
     $where = $teacher_or_not != FALSE ?
@@ -2280,7 +2744,10 @@ function mark_homework_complete_callback() {
         $education_center_id = get_educational_center_data();
         $current_teacher_id = null;
     }
-
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     if ($homework_id && $education_center_id) {
         $homework_table = $wpdb->prefix . 'homework';
         $where = $teacher_or_not != FALSE ?
@@ -2384,6 +2851,10 @@ function aspire_teacher_get_unread_count($username) {
     global $wpdb;
     $table = $wpdb->prefix . 'aspire_messages';
     $edu_center_id = educational_center_teacher_id();
+    if (empty($edu_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $user = wp_get_current_user();
     $is_teacher = aspire_is_teacher($user);
     $is_admin = aspire_is_institute_admin($username, $edu_center_id);
@@ -2457,7 +2928,10 @@ function aspire_teacher_ajax_fetch_messages() {
     global $wpdb;
     $table = $wpdb->prefix . 'aspire_messages';
     $edu_center_id = educational_center_teacher_id();
-    
+    if (empty($edu_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $group_types = ['all', 'teachers', 'institute_admins'];
     $group_names = [
         'all' => 'Everyone in Center',
@@ -2556,6 +3030,10 @@ function aspire_teacher_ajax_fetch_conversations() {
     $user = wp_get_current_user();
     $username = $user->user_login;
     $edu_center_id = educational_center_teacher_id();
+    if (empty($edu_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $is_teacher = aspire_is_teacher($user);
     $is_admin = aspire_is_institute_admin($username, $edu_center_id);
 
@@ -2663,6 +3141,10 @@ function aspire_teacher_prochat_shortcode() {
     
     $username = $user->user_login;
     $edu_center_id = educational_center_teacher_id();
+    if (empty($edu_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $unread_count = aspire_teacher_get_unread_count($username);
     $contacts = get_posts([
         'post_type' => ['teacher', 'students', 'parent'],
@@ -3128,7 +3610,10 @@ function render_teacher_attendance_reports($user_id, $teacher, $table_name = 'st
     if (is_string($educational_center_id) && strpos($educational_center_id, '<p>') === 0) {
         return $educational_center_id;
     }
-
+    if (empty($educational_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $classes = $wpdb->get_col($wpdb->prepare("SELECT DISTINCT class FROM $full_table_name WHERE education_center_id = %s", $educational_center_id));
     $sections = $wpdb->get_col($wpdb->prepare("SELECT DISTINCT section FROM $full_table_name WHERE education_center_id = %s", $educational_center_id));
     $dates = $wpdb->get_results($wpdb->prepare("SELECT DISTINCT YEAR(date) AS year, MONTH(date) AS month FROM $full_table_name WHERE education_center_id = %s ORDER BY year DESC, month DESC", $educational_center_id));
@@ -3290,7 +3775,8 @@ function render_teacher_attendance_reports($user_id, $teacher, $table_name = 'st
 
 function render_attendance_edit($user_id, $teacher, $attendance_id) {
     if (!$attendance_id || get_post_meta($attendance_id, 'teacher_id', true) != $user_id) {
-        return '<div class="alert alert-danger">Invalid attendance ID or permission denied.</div>';
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     $attendance = get_post($attendance_id);

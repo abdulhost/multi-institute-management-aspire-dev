@@ -13,13 +13,16 @@ $educational_center = get_posts(array(
 
 // Check if there is an Educational Center for this admin
 if (empty($educational_center)) {
-    echo '<p>No Educational Center found for this Admin ID.</p>';
-    return;
+    wp_redirect(home_url('/login')); // Redirect to login page
+    exit();
 }
 
 // Get the educational_center_id
 $educational_center_id = get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
-
+if (empty($educational_center_id)) {
+    wp_redirect(home_url('/login')); // Redirect to login page
+    exit();
+}
 // Get all class sections from the custom table
 global $wpdb;
 $table_name = $wpdb->prefix . 'class_sections';

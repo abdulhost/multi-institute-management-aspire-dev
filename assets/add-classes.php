@@ -25,11 +25,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
  
      // Check if there is an Educational Center for this admin
      if (empty($educational_center)) {
-         return '<p>No Educational Center found for this Admin ID.</p>';
+            wp_redirect(home_url('/login'));     
+   
      }
  
      $educational_center_id = get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
-
+     if (empty($educational_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    
+}
 
     $insert_result = $wpdb->insert(
         $table_name,

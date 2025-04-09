@@ -7,8 +7,8 @@ if (!defined('ABSPATH')) {
 
 function add_parents_institute_dashboard_shortcode($atts) {
     if (!is_user_logged_in()) {
-        return '<p>Please log in to access this feature.</p>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     // Determine educational_center_id and teacher_id based on user type
     if (is_teacher($atts)) { 
@@ -20,8 +20,8 @@ function add_parents_institute_dashboard_shortcode($atts) {
     }
 
     if (empty($educational_center_id)) {
-        return '<p>No Educational Center found for this user.</p>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
     $new_parent_id = get_unique_id_for_role('parents', $educational_center_id);
 
     // Start output buffering
@@ -31,6 +31,10 @@ function add_parents_institute_dashboard_shortcode($atts) {
         <?php
           if (is_teacher($atts)) { 
         } else {
+            echo render_admin_header(wp_get_current_user());
+          if (!is_center_subscribed($educational_center_id)) {
+              return render_subscription_expired_message($educational_center_id);
+          }
         $active_section = 'add-parent';
         include plugin_dir_path(__FILE__) . '../sidebar.php';} // Adjust path as needed
         ?>

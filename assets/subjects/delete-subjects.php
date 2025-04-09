@@ -19,8 +19,8 @@ function ajax_delete_subject() {
     // Get educational_center_id from the AJAX request instead of determining it anew
     $educational_center_id = sanitize_text_field($_POST['educational_center_id'] ?? '');
     if (!$educational_center_id) {
-        wp_send_json_error('Educational center ID is missing.');
-        return;
+        wp_redirect(home_url('/login'));
+            exit();
     }
 
     $subject_id = intval($_POST['subject_id'] ?? 0);
@@ -125,7 +125,8 @@ function delete_subjects_manager_page($atts) {
     }
 
     if (!$educational_center_id) {
-        return '<p>Unable to retrieve educational center information.</p>';
+        wp_redirect(home_url('/login'));
+            exit();
     }
 
     ob_start();
@@ -134,6 +135,10 @@ function delete_subjects_manager_page($atts) {
         <?php
           if (is_teacher($atts)) { 
         } else {
+            echo render_admin_header(wp_get_current_user());
+          if (!is_center_subscribed($educational_center_id)) {
+              return render_subscription_expired_message($educational_center_id);
+          }
         $active_section = 'delete-subject';
         include(plugin_dir_path(__FILE__) . '../sidebar.php');}
         ?>

@@ -216,8 +216,8 @@ function fetch_teacher_attendance_data($request) {
 function aspire_teacher_attendance_dashboard_shortcode() {
     $education_center_id = get_educational_center_data();
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">No Educational Center found.</div>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'teachers-attendance';
 
@@ -227,6 +227,10 @@ function aspire_teacher_attendance_dashboard_shortcode() {
         <div class="row">
             <div class="col-md-3 col-12 mb-3">
                 <?php 
+                 echo render_admin_header(wp_get_current_user());
+                 if (!is_center_subscribed($education_center_id)) {
+                     return render_subscription_expired_message($education_center_id);
+                 }
                 $active_section = str_replace('-', '-', $section);
                 include plugin_dir_path(__FILE__) . '../sidebar.php';
                 ?>
@@ -375,7 +379,10 @@ function display_add_teacher_attendance_section() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'teacher_attendance';
     $center_id = get_educational_center_data();
-
+    if (empty($center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $teachers = get_teachers_by_center($center_id);
 
     if (isset($_POST['add_teacher_attendance']) && check_admin_referer('add_teacher_attendance_action')) {
@@ -463,7 +470,8 @@ function display_edit_teacher_attendance_section() {
     $table_name = $wpdb->prefix . 'teacher_attendance';
     $center_id = get_educational_center_data();
     if (!$center_id) {
-        return '<p>Unable to retrieve educational center information.</p>';
+        wp_redirect(home_url('/login'));
+        exit(); 
     }
 
     $teachers = get_teachers_by_center($center_id);
@@ -647,7 +655,10 @@ function update_edit_form_callback() {
     $teacher_id = sanitize_text_field($_POST['teacher_id']);
     $month = isset($_POST['month']) ? sanitize_text_field($_POST['month']) : '';
     $center_id = get_educational_center_data();
-
+    if (empty($center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $months_html = '<option value="">-- All Months --</option>';
     $months = $wpdb->get_results($wpdb->prepare(
         "SELECT DISTINCT DATE_FORMAT(date, '%Y-%m') as month 
@@ -688,7 +699,8 @@ function display_bulk_import_teacher_attendance_section() {
 
     $center_id = get_educational_center_data();
     if (!$center_id) {
-        return '<p>Unable to retrieve educational center information.</p>';
+        wp_redirect(home_url('/login'));
+        exit(); 
     }
 
     global $wpdb;
@@ -1067,7 +1079,8 @@ function export_teacher_attendance_shortcode($atts) {
 
     $educational_center_id = get_educational_center_data();
     if (!$educational_center_id) {
-        return '<p>Unable to retrieve educational center information.</p>';
+        wp_redirect(home_url('/login'));
+        exit(); 
     }
 
     global $wpdb;

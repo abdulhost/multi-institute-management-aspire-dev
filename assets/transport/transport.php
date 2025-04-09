@@ -11,6 +11,10 @@ function transport_education_dashboard_shortcode() {
     ?>
     <div class="erp-dashboard d-flex">
         <?php
+        echo render_admin_header(wp_get_current_user());
+        if (!is_center_subscribed($education_center_id)) {
+            return render_subscription_expired_message($education_center_id);
+        }
         $active_section = str_replace('-', '-', $section);
         include plugin_dir_path(__FILE__) . '../sidebar.php'; // Adjust path as needed
         ?>
@@ -399,6 +403,11 @@ function view_transport_fees_shortcode() {
      $educational_center_id = get_educational_center_data();
      $current_teacher_id = get_current_teacher_id();
  }
+ if (empty($educational_center_id)) {
+    wp_redirect(home_url('/login'));
+    exit();
+
+}
     $years = $wpdb->get_col($wpdb->prepare(
         "SELECT DISTINCT SUBSTRING(month_year, 1, 4) AS year FROM {$wpdb->prefix}transport_fees WHERE education_center_id = %s ORDER BY year DESC",
         $educational_center_id

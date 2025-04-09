@@ -6,6 +6,11 @@ if (!defined('ABSPATH')) {
 function delete_exams_institute_dashboard_shortcode() {
     global $wpdb;
     $education_center_id = get_educational_center_data();
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    
+    }
     $exams = $wpdb->get_results($wpdb->prepare(
         "SELECT * FROM {$wpdb->prefix}exams WHERE education_center_id = %d",
         $education_center_id

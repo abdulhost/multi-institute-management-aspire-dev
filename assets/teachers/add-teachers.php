@@ -1,11 +1,23 @@
 <?php
 // addteachers.php
 function add_teachers_institute_dashboard_shortcode() {
-    // Start output buffering
+    $educational_center_id = get_educational_center_data();
+
+    if (is_string($educational_center_id) && strpos($educational_center_id, '<p>') === 0) {
+        return $educational_center_id;
+    }
+    if (empty($educational_center_id)) {
+        wp_redirect(home_url('/login')); // Redirect to login page
+        exit();
+    }  // Start output buffering
     ob_start();
     ?>
        <div class="attendance-main-wrapper" style="display: flex;">
         <?php
+        echo render_admin_header(wp_get_current_user());
+        if (!is_center_subscribed($educational_center_id)) {
+            return render_subscription_expired_message($educational_center_id);
+        }
         $active_section = 'add-teacher';
         include plugin_dir_path(__FILE__) . '../sidebar.php'; // Adjust path as needed
         ?>

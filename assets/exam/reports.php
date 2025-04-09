@@ -22,6 +22,11 @@ function get_educational_center_data2() {
         $educational_center_id = get_educational_center_data();
         $current_teacher_id = get_current_teacher_id();
     }
+    if (empty($educational_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    
+    }
     $args = array(
         'post_type' => 'educational-center',
         'meta_query' => array(
@@ -57,12 +62,14 @@ function aspire_reports_dashboard_shortcode($atts) {
     $current_user = wp_get_current_user();
 
     if (!is_user_logged_in()) {
-        return '<p>You must be logged in to view this dashboard.</p>';
+        // wp_redirect(home_url('/login'));
+        // exit();
     }
 
     $center_data = get_educational_center_data2();
     if (empty($center_data)) {
-        return '<div class="alert alert-danger">No Educational Center found.</div>';
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     $education_center_id = $center_data['id'];
@@ -78,6 +85,10 @@ function aspire_reports_dashboard_shortcode($atts) {
         <div class="row">
             <?php 
             if (!is_teacher($current_user->ID)) {
+                echo render_admin_header(wp_get_current_user());
+          if (!is_center_subscribed($education_center_id)) {
+              return render_subscription_expired_message($education_center_id);
+          }
                 $active_section = $section;
                 include plugin_dir_path(__FILE__) . '../sidebar.php';
             }
@@ -753,7 +764,8 @@ function ajax_generate_report_preview() {
     $exam_id = intval($_POST['exam_id']);
     $center_data = get_educational_center_data2();
     if (!$center_data) {
-        wp_send_json_error('No educational center found.');
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     global $wpdb;
@@ -789,7 +801,8 @@ function ajax_download_report_pdf() {
     $exam_id = intval($_GET['exam_id']);
     $center_data = get_educational_center_data2();
     if (!$center_data) {
-        wp_die('No educational center found.');
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     global $wpdb;
@@ -836,7 +849,8 @@ function ajax_view_report_details() {
     $exam_id = intval($_POST['exam_id']);
     $center_data = get_educational_center_data2();
     if (!$center_data) {
-        wp_send_json_error('No educational center found.');
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     global $wpdb;

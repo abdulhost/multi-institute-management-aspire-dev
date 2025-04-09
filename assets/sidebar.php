@@ -319,6 +319,20 @@ $active_section = isset($active_section) ? $active_section : 'dashboard';
       </a>
     </li>
     <li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'subscription' || $active_section == 'add-department' || $active_section == 'edit-department' || $active_section == 'delete-department' ? 'rotate' : ''; ?>">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q66 0 113-47t47-113q0-66-47-113t-113-47q-66 0-113 47t-47 113q0 66 47 113t113 47Zm0-160q-33 0-56.5-23.5T400-640q0-33 23.5-56.5T480-720q33 0 56.5 23.5T560-640q0 33-23.5 56.5T480-560Zm240 360q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm0-160q-33 0-56.5-23.5T640-200q0-33 23.5-56.5T720-280q33 0 56.5 23.5T800-200q0 33-23.5 56.5T720-120Z"/></svg>
+    <span>Subscription</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'subscription' || $active_section == 'add-department' || $active_section == 'edit-department' || $active_section == 'delete-department' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'subscription' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard?section=subscription'); ?>">Subscription</a></li>
+      <li class="<?php echo $active_section == 'renew-subscription' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard?section=subscription&action=renew-subscription'); ?>">Renew Subscription</a></li>
+      <li class="<?php echo $active_section == 'extend-subscription' ? 'active' : ''; ?>"><a href="<?php echo home_url('/institute-dashboard?section=subscription&action=extend-subscription'); ?>">Extend Subscription</a></li>
+    </div>
+  </ul>
+</li>
+    <li>
       <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'add-students' || $active_section == 'edit-students' ? 'rotate' : ''; ?>">
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-80q0-33 23.5-56.5T240-320h480q33 0 56.5 23.5T800-240v80H160Zm80-160h480q0-17-11.5-28.5T680-360H280q-17 0-28.5 11.5T240-320Zm240-240q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg>
         <span>Students</span>

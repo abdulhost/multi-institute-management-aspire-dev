@@ -24,7 +24,10 @@ global $wpdb;
 
 // Fetch all classes and sections
 $educational_center_id = get_educational_center_data();
-
+if (empty($educational_center_id)) {
+    wp_redirect(home_url('/login')); // Redirect to login page
+    exit();
+}
 if (is_string($educational_center_id) && strpos($educational_center_id, '<p>') === 0) {
     return $educational_center_id;
 }

@@ -4,12 +4,15 @@ if (!defined('ABSPATH')) {
 }
 
 function fee_templates_institute_dashboard_shortcode() {
+    if (!is_user_logged_in()) {
+        wp_redirect(home_url('/login'));
+        exit();    }
     global $wpdb;
 
     $education_center_id = get_educational_center_data();
     if (empty($education_center_id)) {
-        return '<p>No Educational Center found.</p>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
 
     // Handle fee template deletion
     // if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['template_id'])) {

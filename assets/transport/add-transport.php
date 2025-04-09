@@ -9,7 +9,11 @@ function add_transport_fees_shortcode() {
     $templates_table = $wpdb->prefix . 'fee_templates';
     $education_center_id = get_educational_center_data();
     $message = '';
-
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    
+    }
     if (isset($_POST['add_transport_fee']) && check_admin_referer('add_transport_fee_nonce')) {
         $data = [
             'student_id' => sanitize_text_field($_POST['student_id']),

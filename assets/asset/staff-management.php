@@ -16,7 +16,10 @@ function handle_add_new_staff_submission() {
     // Log the submission attempt
     error_log("handle_add_new_staff_submission() called at " . current_time('mysql'));
     error_log("POST data: " . print_r($_POST, true));
-
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'add_new_staff_nonce')) {
         error_log("Nonce verification failed");
@@ -78,7 +81,8 @@ function aspire_staff_management_shortcode() {
     $attendance_table = $wpdb->prefix . 'staff_attendance';
 
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">No Educational Center found.</div>';
+        wp_redirect(home_url('/login'));
+        exit(); 
     }
 
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'staff-list';
@@ -255,6 +259,10 @@ function aspire_staff_management_shortcode() {
     <div class="container-fluid">
         <div class="row">
             <?php 
+              echo render_admin_header(wp_get_current_user());
+              if (!is_center_subscribed($education_center_id)) {
+                  return render_subscription_expired_message($education_center_id);
+              }
             $active_section = str_replace('-', '-', $section);
             include plugin_dir_path(__FILE__) . '../sidebar.php';
             ?>
@@ -290,6 +298,10 @@ add_shortcode('aspire_staff_management', 'aspire_staff_management_shortcode');
 function staff_list_shortcode() {
     global $wpdb;
     $education_center_id = get_educational_center_data();
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $month = date('Y-m');
     $staff_table = $wpdb->prefix . 'staff';
     $attendance_table = $wpdb->prefix . 'staff_attendance';
@@ -380,7 +392,10 @@ function staff_add_shortcode() {
     global $wpdb;
     $education_center_id = get_educational_center_data();
     $staff_table = $wpdb->prefix . 'staff';
-
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     // Generate a unique staff ID
     $new_staff_id = generate_unique_staff_id($wpdb, $staff_table, $education_center_id);
     if (is_wp_error($new_staff_id)) {
@@ -441,7 +456,10 @@ function staff_edit_shortcode() {
     global $wpdb;
     $education_center_id = get_educational_center_data();
     $staff_id = isset($_GET['staff_id']) ? sanitize_text_field($_GET['staff_id']) : '';
-
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     if (empty($staff_id)) {
         // Display list of staff to edit if no staff_id is provided
         $staff = $wpdb->get_results($wpdb->prepare(
@@ -561,7 +579,10 @@ function handle_edit_staff_submission() {
     global $wpdb;
     $staff_table = $wpdb->prefix . 'staff';
     $education_center_id = get_educational_center_data();
-
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'edit_staff_nonce')) {
         error_log("Nonce verification failed");
@@ -625,7 +646,10 @@ function staff_delete_shortcode() {
     global $wpdb;
     $education_center_id = get_educational_center_data();
     $staff_id = isset($_GET['staff_id']) ? sanitize_text_field($_GET['staff_id']) : '';
-
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     if (!empty($staff_id) && isset($_GET['action']) && $_GET['action'] === 'delete') {
         $result = $wpdb->delete($wpdb->prefix . 'staff', ['staff_id' => $staff_id, 'education_center_id' => $education_center_id], ['%s', '%s']);
         if ($result === false) {
@@ -702,7 +726,10 @@ function staff_portal_shortcode() {
     global $wpdb;
     $education_center_id = get_educational_center_data();
     $staff_id = isset($_GET['staff_id']) ? sanitize_text_field($_GET['staff_id']) : '';
-
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     if (empty($staff_id)) {
         $staff = $wpdb->get_results($wpdb->prepare(
             "SELECT * FROM {$wpdb->prefix}staff WHERE education_center_id = %s",

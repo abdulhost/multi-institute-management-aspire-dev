@@ -16,7 +16,9 @@ function aspire_timetable_management_shortcode() {
         get_educational_center_data();
 
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">No Educational Center found...</div>';
+            wp_redirect(home_url('/login'));
+            exit();
+        
     }
 
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'timetable-list';
@@ -30,6 +32,12 @@ function aspire_timetable_management_shortcode() {
         <div class="row">
             <?php 
             if (!is_teacher($current_user->ID)) {
+
+
+                echo render_admin_header(wp_get_current_user());
+            if (!is_center_subscribed($education_center_id)) {
+                return render_subscription_expired_message($education_center_id);
+            }
                 $active_section = str_replace('-', '-', $section);
                 include plugin_dir_path(__FILE__) . 'sidebar.php';
             }
@@ -72,7 +80,11 @@ function fetch_timetable_data_callback() {
     $education_center_id = is_teacher($current_user->ID) ? 
         educational_center_teacher_id() : 
         get_educational_center_data();
-    
+    if (empty($education_center_id)) {
+            wp_redirect(home_url('/login'));
+            exit();
+        
+    }
     $class_id = isset($_POST['class_id']) ? intval($_POST['class_id']) : 0;
     $filter_section = isset($_POST['filter_section']) ? sanitize_text_field($_POST['filter_section']) : '';
 
@@ -180,7 +192,11 @@ function timetable_list_shortcode() {
     $education_center_id = is_teacher($current_user->ID) ? 
         educational_center_teacher_id() : 
         get_educational_center_data();
-    
+    if (empty($education_center_id)) {
+            wp_redirect(home_url('/login'));
+            exit();
+        
+    }
     $class_id = isset($_GET['class_id']) ? intval($_GET['class_id']) : 0;
     $filter_section = isset($_GET['filter_section']) ? sanitize_text_field($_GET['filter_section']) : '';
 
@@ -370,7 +386,11 @@ function generate_timetable_pdf_callback() {
     $education_center_id = is_teacher($current_user->ID) ? 
         educational_center_teacher_id() : 
         get_educational_center_data();
-    
+        if (empty($education_center_id)) {
+            wp_redirect(home_url('/login'));
+            exit();
+        
+    }
     $class_id = isset($_POST['class_id']) ? intval($_POST['class_id']) : 0;
     $filter_section = isset($_POST['filter_section']) ? sanitize_text_field($_POST['filter_section']) : '';
 
@@ -499,7 +519,11 @@ function timetable_add_shortcode() {
     $education_center_id = is_teacher($current_user->ID) ? 
         educational_center_teacher_id() : 
         get_educational_center_data();
-    
+        if (empty($education_center_id)) {
+            wp_redirect(home_url('/login'));
+            exit();
+        
+    }
     $timetable_table = $wpdb->prefix . 'timetables';
 
     if (isset($_POST['submit_timetable']) && wp_verify_nonce($_POST['nonce'], 'timetable_nonce')) {
@@ -653,7 +677,11 @@ function timetable_edit_shortcode() {
     $education_center_id = is_teacher($current_user->ID) ? 
         educational_center_teacher_id() : 
         get_educational_center_data();
-    
+        if (empty($education_center_id)) {
+            wp_redirect(home_url('/login'));
+            exit();
+        
+    }
     $timetable_table = $wpdb->prefix . 'timetables';
     $class_id_filter = isset($_GET['class_id']) ? intval($_GET['class_id']) : 0;
     $section_filter = isset($_GET['filter_section']) ? sanitize_text_field($_GET['filter_section']) : '';
@@ -880,7 +908,11 @@ function load_timetable_edit_form_callback() {
     $education_center_id = is_teacher($current_user->ID) ? 
         educational_center_teacher_id() : 
         get_educational_center_data();
-
+        if (empty($education_center_id)) {
+            wp_redirect(home_url('/login'));
+            exit();
+        
+    }
     $timetable_table = $wpdb->prefix . 'timetables';
     $slot = $wpdb->get_row($wpdb->prepare(
         "SELECT * FROM $timetable_table WHERE timetable_id = %d AND education_center_id = %s",
@@ -998,7 +1030,11 @@ function update_timetable_slot_callback() {
     $education_center_id = is_teacher($current_user->ID) ? 
         educational_center_teacher_id() : 
         get_educational_center_data();
-    
+        if (empty($education_center_id)) {
+            wp_redirect(home_url('/login'));
+            exit();
+        
+    }
     $timetable_id = isset($_POST['timetable_id']) ? intval($_POST['timetable_id']) : 0;
     $class_id = isset($_POST['class_id']) ? intval($_POST['class_id']) : 0;
     $section = isset($_POST['section']) ? sanitize_text_field($_POST['section']) : '';
@@ -1062,7 +1098,11 @@ function timetable_delete_shortcode() {
     $education_center_id = is_teacher($current_user->ID) ? 
         educational_center_teacher_id() : 
         get_educational_center_data();
-    
+        if (empty($education_center_id)) {
+            wp_redirect(home_url('/login'));
+            exit();
+        
+    }
     $timetable_table = $wpdb->prefix . 'timetables';
     $class_id_filter = isset($_GET['class_id']) ? intval($_GET['class_id']) : 0;
     $section_filter = isset($_GET['filter_section']) ? sanitize_text_field($_GET['filter_section']) : '';
@@ -1281,7 +1321,11 @@ function load_timetable_delete_confirm_callback() {
     $education_center_id = is_teacher($current_user->ID) ? 
         educational_center_teacher_id() : 
         get_educational_center_data();
-
+        if (empty($education_center_id)) {
+            wp_redirect(home_url('/login'));
+            exit();
+        
+    }
     $timetable_table = $wpdb->prefix . 'timetables';
     $slot = $wpdb->get_row($wpdb->prepare(
         "SELECT t.*, c.class_name, s.subject_name 
@@ -1331,7 +1375,11 @@ function delete_timetable_slot_callback() {
     $education_center_id = is_teacher($current_user->ID) ? 
         educational_center_teacher_id() : 
         get_educational_center_data();
-
+        if (empty($education_center_id)) {
+            wp_redirect(home_url('/login'));
+            exit();
+        
+    }
     $deleted = $wpdb->delete(
         $wpdb->prefix . 'timetables',
         ['timetable_id' => $timetable_id, 'education_center_id' => $education_center_id],

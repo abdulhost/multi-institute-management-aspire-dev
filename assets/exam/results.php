@@ -17,7 +17,8 @@ function results_institute_dashboard_shortcode() {
     global $wpdb;
 
     if (!is_user_logged_in()) {
-        return '<p>You must be logged in to view your dashboard.</p>';
+        // wp_redirect(home_url('/login'));
+        //     exit();
     }
 
     // Fetch educational center data
@@ -48,7 +49,8 @@ function results_institute_dashboard_shortcode() {
         $logo_url = is_array($logo) && isset($logo['url']) ? esc_url($logo['url']) : ($logo ? wp_get_attachment_url($logo) : '');
     } else {
         wp_reset_postdata();
-        return '<p>No Educational Center found for this Admin ID.</p>';
+        wp_redirect(home_url('/login'));
+        exit();
     }
     wp_reset_postdata();
 

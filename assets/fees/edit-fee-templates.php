@@ -6,7 +6,11 @@ if (!defined('ABSPATH')) {
 function edit_fee_templates_institute_dashboard_shortcode() {
     global $wpdb;
     $education_center_id = get_educational_center_data();
-
+    if (empty($education_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    
+    }
     if (isset($_POST['edit_fee_template']) && wp_verify_nonce($_POST['nonce'], 'edit_fee_template_nonce')) {
         $template_id = intval($_POST['template_id']);
         $name = sanitize_text_field($_POST['template_name']);

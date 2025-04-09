@@ -12,7 +12,8 @@ function edit_fees_frontend_shortcode() {
     
     // Check if user is logged in (optional, remove if not needed)
     if (!is_user_logged_in()) {
-        return '<p>Please log in to manage student fees.</p>';
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     // Tables

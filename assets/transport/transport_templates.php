@@ -38,6 +38,11 @@ function fetch_transport_enrollments_data($request) {
      $educational_center_id = get_educational_center_data();
      $current_teacher_id = get_current_teacher_id();
  }
+ if (empty($educational_center_id)) {
+    wp_redirect(home_url('/login'));
+    exit();
+
+}
     $student_id = sanitize_text_field($params['student_id'] ?? '');
     $student_name = sanitize_text_field($params['student_name'] ?? '');
     $year = !empty($params['year']) ? intval($params['year']) : '';
@@ -229,6 +234,11 @@ function view_transport_enrollments_shortcode() {
      $educational_center_id = get_educational_center_data();
      $current_teacher_id = get_current_teacher_id();
  }
+ if (empty($educational_center_id)) {
+    wp_redirect(home_url('/login'));
+    exit();
+
+}
     $years = $wpdb->get_col($wpdb->prepare(
         "SELECT DISTINCT YEAR(enrollment_date) AS year FROM {$wpdb->prefix}transport_enrollments WHERE education_center_id = %s ORDER BY year DESC",
         $educational_center_id

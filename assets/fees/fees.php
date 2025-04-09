@@ -4,6 +4,9 @@ if (!defined('ABSPATH')) {
 }
 
 function my_education_erp_dashboard_shortcode() {
+    if (!is_user_logged_in()) {
+        wp_redirect(home_url('/login'));
+        exit();    }
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'view-fees';
     $education_center_id = get_educational_center_data();
 
@@ -12,6 +15,10 @@ function my_education_erp_dashboard_shortcode() {
     <div class="erp-dashboard" style="display: flex;">
         <?php
         // Dynamically set active section for sidebar
+        echo render_admin_header(wp_get_current_user());
+          if (!is_center_subscribed($educational_center_id)) {
+              return render_subscription_expired_message($educational_center_id);
+          }
         $active_section = str_replace('-', '-', $section); // e.g., "add-fee" -> "add_fee"
         include plugin_dir_path(__FILE__) . '../sidebar.php'; // Adjust path
         ?>
@@ -83,8 +90,8 @@ function fetch_fees_data($request) {
      }
      
      if (!$educational_center_id) {
-         return '<p>Unable to retrieve educational center information.</p>';
-     }
+        wp_redirect(home_url('/login'));
+        exit();     }
     // if (!$educational_center_id) {
     //     return array(
     //         'success' => false,
@@ -397,8 +404,8 @@ function fees_institute_dashboard_shortcode() {
     }
     
     if (!$educational_center_id) {
-        return '<p>Unable to retrieve educational center information.</p>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();    }
     $years = $wpdb->get_col($wpdb->prepare(
         "SELECT DISTINCT SUBSTRING(month_year, 1, 4) AS year FROM {$wpdb->prefix}student_fees WHERE education_center_id = %s ORDER BY year DESC",
         $educational_center_id

@@ -11,6 +11,10 @@ function enqueue_attendance_entry_scripts() {
     // Pass class_sections data to JavaScript
     global $wpdb;
     $educational_center_id = get_educational_center_data();
+    if (empty($educational_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $class_sections_table = $wpdb->prefix . 'class_sections';
     $class_sections = $wpdb->get_results(
         $wpdb->prepare(
@@ -50,7 +54,10 @@ function fetch_students_for_attendance() {
     $class = sanitize_text_field($_POST['class'] ?? '');
     $section = sanitize_text_field($_POST['section'] ?? '');
     $educational_center_id = get_educational_center_data();
-
+    if (empty($educational_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     if (empty($class) || empty($section) || !$educational_center_id) {
         wp_send_json_error('Missing required fields.');
         return;
@@ -105,6 +112,10 @@ function submit_attendance() {
     $table_name = $wpdb->prefix . 'student_attendance';
 
     $educational_center_id = get_educational_center_data();
+    if (empty($educational_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $teacher_id = get_current_teacher_id();
     $class = sanitize_text_field($_POST['class'] ?? '');
     $section = sanitize_text_field($_POST['section'] ?? '');
@@ -171,7 +182,8 @@ function display_attendance_entry_form() {
     $educational_center_id = get_educational_center_data();
 
     if (!$educational_center_id) {
-        return '<p class="form-message form-error">Educational center ID not found.</p>';
+        wp_redirect(home_url('/login'));
+        exit(); 
     }
 
     $class_sections = $wpdb->get_results(
@@ -193,6 +205,10 @@ function display_attendance_entry_form() {
     ?>
     <div class="attendance-main-wrapper" style="display: flex;">
         <?php
+         echo render_admin_header(wp_get_current_user());
+         if (!is_center_subscribed($educational_center_id)) {
+             return render_subscription_expired_message($educational_center_id);
+         }
         $active_section = 'record-attendance';
         include(plugin_dir_path(__FILE__) . '../sidebar.php');
         ?>

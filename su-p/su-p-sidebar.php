@@ -1,5 +1,5 @@
 <?php
-// student-sidebar.php
+// sidebar.php
 if (!defined('ABSPATH')) {
     exit; // Prevent direct access
 }
@@ -9,24 +9,7 @@ if (!function_exists('wp_get_current_user')) {
 }
 
 $current_user = wp_get_current_user();
-$parent_id = $current_user->user_login;
 
-$args = [
-    'post_type' => 'parent',
-    'meta_query' => [['key' => 'parent_id', 'value' => $parent_id, 'compare' => '=']]
-];
-$parents = new WP_Query($args);
-
-if ($parents->have_posts()) {
-    $parents->the_post();
-    $post_id = get_the_ID();
-    $name = get_field('parent_name', $post_id);
-    $title = get_the_title($post_id);
-} else {
-    $post_id = '';
-    $title = 'Parent';
-}
-$avatar = wp_get_attachment_url(get_post_meta($post_id, 'parent_profile_photo', true)) ?: 'https://via.placeholder.com/150';
 $active_section = isset($active_section) ? $active_section : 'overview';
 ?>
 
@@ -34,13 +17,12 @@ $active_section = isset($active_section) ? $active_section : 'overview';
     <ul>
         <li>
             <div class="logo-title-section">
-                <?php if ($avatar): ?>
-                    <div class="institute-logo">
-                        <img src="<?php echo esc_url($avatar); ?>" alt="Avatar" style="border-radius: 50%; width: 60px; height: 60px; object-fit: cover;" class="profile-avatar mb-3">
-                    </div>
-                <?php endif; ?>
-                <h4 class="institute-title" style="margin-bottom:0; margin-left:4px; color: var(--text-clr);"><?php echo esc_html($name); ?></h4>
-            </div>
+    <div class="institute-logo">
+        <img src="<?php echo plugin_dir_url(__FILE__) . '../logo instituto.jpg'; ?>" alt="Avatar" style="border-radius: 50%; width: 60px; height: 60px; object-fit: cover;" class="profile-avatar mb-3">
+    </div>
+    <h4 class="institute-title" style="margin-bottom:0; margin-left:4px; color: var(--text-clr);">Super Admin</h4>
+</div>
+
             <button onclick="toggleSidebar()" id="toggle-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m313-480 155 156q11 11 11.5 27.5T468-268q-11 11-28 11t-28-11L228-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T468-692q11 11 11 28t-11 28L313-480Zm264 0 155 156q11 11 11.5 27.5T732-268q-11 11-28 11t-28-11L492-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T732-692q11 11 11 28t-11 28L577-480Z"/></svg>
             </button>
@@ -58,7 +40,51 @@ $active_section = isset($active_section) ? $active_section : 'overview';
                 <span>Educational Centers</span>
             </a>
         </li>
-      
+        <li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'subscription' ? 'rotate' : ''; ?>">
+  <i class="fas fa-calendar-alt" style="color: #e8eaed;"></i>    <span>Subscriptions</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'subscription' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'subscription' && empty($active_action) ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=subscription'); ?>">Subscription</a></li>
+      <li class="<?php echo $active_action == 'add-subscription' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=subscription&action=add-subscription'); ?>">Add Subscription</a></li>
+      <li class="<?php echo $active_action == 'edit-subscription' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=subscription&action=edit-subscription'); ?>">Edit Subscription</a></li>
+      <li class="<?php echo $active_action == 'delete-subscription' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=subscription&action=delete-subscription'); ?>">Delete Subscription</a></li>
+    </div>
+  </ul>
+</li>
+        <li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'payment_methods' ? 'rotate' : ''; ?>">
+  <i class="fas fa-calendar-alt" style="color: #e8eaed;"></i>    <span>Payment Methods</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'payment_methods' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'payment_methods' && empty($active_action) ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=payment_methods'); ?>">Payment Methods</a></li>
+      <li class="<?php echo $active_action == 'add-payment_methods' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=payment_methods&action=add-payment_methods'); ?>">Add Payment Methods</a></li>
+      <li class="<?php echo $active_action == 'edit-payment_methods' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=payment_methods&action=edit-payment_methods'); ?>">Edit Payment Methods</a></li>
+      <li class="<?php echo $active_action == 'delete-payment_methods' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=payment_methods&action=delete-payment_methods'); ?>">Delete Payment Methods</a></li>
+    </div>
+  </ul>
+</li>
+        <li>
+  <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'subscription_plans' ? 'rotate' : ''; ?>">
+  <i class="fas fa-calendar-alt" style="color: #e8eaed;"></i>    <span>Subscription Plans</span>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/></svg>
+  </button>
+  <ul class="sub-menu <?php echo $active_section == 'subscription_plans' ? 'show' : ''; ?>">
+    <div>
+      <li class="<?php echo $active_section == 'subscription_plans' && empty($active_action) ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=subscription_plans'); ?>">Subscription Plans</a></li>
+      <li class="<?php echo $active_action == 'add-subscription_plans' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=subscription_plans&action=add-subscription_plans'); ?>">Add Subscription Plans</a></li>
+      <li class="<?php echo $active_action == 'edit-subscription_plans' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=subscription_plans&action=edit-subscription_plans'); ?>">Edit Subscription Plans</a></li>
+      <li class="<?php echo $active_action == 'delete-subscription_plans' ? 'active' : ''; ?>"><a href="<?php echo home_url('su_p-dashboard?section=subscription_plans&action=delete-subscription_plans'); ?>">Delete Subscription Plans</a></li>
+    </div>
+  </ul>
+</li>
+
+
+
         <li>
   <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section == 'teacher' ? 'rotate' : ''; ?>">
   <i class="fas fa-calendar-alt" style="color: #e8eaed;"></i>    <span>Teacher</span>

@@ -77,9 +77,11 @@ function display_subjects_view($atts) {
         $educational_center_id = get_educational_center_data();
         $current_teacher_id = get_current_teacher_id();
     }
-    
+  
     if (!$educational_center_id) {
-        return '<p>Unable to retrieve educational center information.</p>';
+        wp_redirect(home_url('/login')); // Redirect to login page
+        exit();
+        // return '<p>Unable to retrieve educational center information.</p>';
     }
 
     ob_start();
@@ -88,8 +90,14 @@ function display_subjects_view($atts) {
         <?php
           if (is_teacher($atts)) { 
         } else {
+         
+            echo render_admin_header(wp_get_current_user());
+            if (!is_center_subscribed($educational_center_id)) {
+                return render_subscription_expired_message($educational_center_id);
+            }
         $active_section = 'view-subjects';
         $main_section = 'student';
+
         include(plugin_dir_path(__FILE__) . '../sidebar.php');}
         ?>
         <div class="subjects-wrapper">

@@ -32,13 +32,15 @@ function aspire_communication_shortcode() {
     global $wpdb;
     $user_id = get_current_user_id();
     if (!$user_id) {
-        return '<div class="alert alert-danger">Please log in to access the communication system.</div>';
+        wp_redirect(home_url('/login'));
+        exit();
     }
 
     $education_center_id = get_educational_center_data();
     if (empty($education_center_id)) {
-        return '<div class="alert alert-danger">No Educational Center found.</div>';
-    }
+        wp_redirect(home_url('/login'));
+        exit();  
+      }
 
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'inbox';
     $search_query = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '';
@@ -55,6 +57,10 @@ function aspire_communication_shortcode() {
     <div class="container-fluid" style="background: linear-gradient(135deg, #fff3e6, #ffe6cc); min-height: 100vh;">
         <div class="row">
             <?php 
+              echo render_admin_header(wp_get_current_user());
+              if (!is_center_subscribed($education_center_id)) {
+                  return render_subscription_expired_message($education_center_id);
+              }
             $active_section = $section;
             include plugin_dir_path(__FILE__) . '../sidebar.php';
             ?>
@@ -115,12 +121,6 @@ function aspire_admin_get_admins($education_center_id) {
     return $admins ?: [];
 }
 
-// Helper: Get Educational Center ID (assuming this matches previous versions)
-if (!function_exists('get_educational_center_data')) {
-    function get_educational_center_data() {
-        return 'AFC46B9CEE17'; // Adjust as needed
-    }
-}
 
 // Admin: Send Message
 function aspire_admin_send_message($sender_id, $receiver_id, $message, $education_center_id) {
@@ -431,7 +431,8 @@ function aspire_admin_prochat_shortcode() {
     $edu_center_id = get_educational_center_data();
     
     if (!aspire_admin_is_institute_admin($username, $edu_center_id)) {
-        return '<p>You do not have the required permissions to use this chat.</p>';
+        wp_redirect(home_url('/login'));
+        exit();
     }
     
     $unread_count = aspire_admin_get_unread_count($username);

@@ -12,7 +12,8 @@ function delete_fees_institute_dashboard_shortcode() {
 
     // Check if user is logged in (optional, adjust based on your needs)
     if (!is_user_logged_in()) {
-        return '<p>Please log in to manage student fees.</p>';
+        wp_redirect(home_url('/login'));
+            exit();
     }
 
     // Tables

@@ -33,10 +33,8 @@ function fetch_attendance_data($request) {
     $params = $request->get_params();
     $educational_center_id = get_educational_center_data();
     if (!$educational_center_id) {
-        return array(
-            'success' => false,
-            'data' => array('html' => '<p>Educational center ID not found</p>')
-        );
+        wp_redirect(home_url('/login'));
+        exit(); 
     }
 
     $class = sanitize_text_field($params['class'] ?? '');
@@ -204,7 +202,10 @@ function display_attendance_management() {
     if (is_string($educational_center_id) && strpos($educational_center_id, '<p>') === 0) {
         return $educational_center_id;
     }
-
+    if (empty($educational_center_id)) {
+        wp_redirect(home_url('/login'));
+        exit();
+    }
     $classes = $wpdb->get_col("SELECT DISTINCT class FROM $table_name WHERE education_center_id = '$educational_center_id'");
     $sections = $wpdb->get_col("SELECT DISTINCT section FROM $table_name WHERE education_center_id = '$educational_center_id'");
     $dates = $wpdb->get_results("SELECT DISTINCT YEAR(date) AS year, MONTH(date) AS month FROM $table_name WHERE education_center_id = '$educational_center_id' ORDER BY year DESC, month DESC");
