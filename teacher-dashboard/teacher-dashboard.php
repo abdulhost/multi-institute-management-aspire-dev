@@ -3215,31 +3215,6 @@ function aspire_teacher_prochat_shortcode() {
         </div>
     </div>
 
-    <style>
-        .chat-loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-        .chat-loading.active {
-            display: block;
-        }
-        .spinner {
-            width: 30px;
-            height: 30px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script>
     jQuery(document).ready(function($) {
@@ -3658,27 +3633,7 @@ function render_teacher_attendance_reports($user_id, $teacher, $table_name = 'st
         </div>
     </div>
 
-    <style>
-        .attendance-table-wrapper .loading-message .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #ccc;
-            border-top: 2px solid #333;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 5px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        #teacher-attendance-table th.weekend {
-            background-color: #f8f9fa;
-            color: #6c757d;
-        }
-    </style>
-
+  
     <script>
     jQuery(document).ready(function($) {
         // Debounce function to prevent excessive AJAX calls

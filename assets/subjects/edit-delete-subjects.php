@@ -164,25 +164,7 @@ function subjects_manager_page($atts) {
         </div>
     </div>
 
-    <style>
-        .subjects-manager { padding: 20px; }
-        .subjects-card { max-width: 900px; margin-bottom: 20px; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .subjects-card .title { margin: 0 0 15px; font-size: 1.25em; color: #23282d; }
-        .subjects-form .form-field { margin-bottom: 20px; }
-        .subjects-form label { display: block; font-weight: 600; margin-bottom: 5px; }
-        .subjects-form .regular-text { width: 100%; max-width: 400px; padding: 8px; border-radius: 4px; border: 1px solid #8c8f94; }
-        .subjects-table { margin-top: 15px; }
-        .subjects-table th { font-weight: 600; background: #f9f9f9; }
-        .subjects-table td { vertical-align: middle; }
-        .inline-form { display: inline-block; margin-right: 10px; }
-        .inline-input { width: 200px; padding: 6px; border-radius: 4px; border: 1px solid #8c8f94; margin-right: 5px; }
-        .button.large { padding: 10px 20px; font-size: 14px; }
-        .button-primary { background: #007cba; border-color: #006ba1; }
-        .button-primary:hover { background: #006ba1; border-color: #005177; }
-        .button-secondary { background: #d63638; border-color: #b32d2e; color: #fff; }
-        .button-secondary:hover { background: #b32d2e; border-color: #921c1e; }
-        .no-subjects { color: #666; font-style: italic; }
-    </style>
+
     <?php
     return ob_get_clean();
 }

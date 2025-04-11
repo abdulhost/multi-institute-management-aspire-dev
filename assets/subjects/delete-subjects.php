@@ -154,23 +154,7 @@ function delete_subjects_manager_page($atts) {
         </div>
     </div>
 
-    <style>
-        .subjects-manager { padding: 20px; }
-        .subjects-card { max-width: 900px; margin-bottom: 20px; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .subjects-card .title { margin: 0 0 15px; font-size: 1.25em; color: #23282d; }
-        .subjects-table { margin-top: 15px; }
-        .subjects-table th { font-weight: 600; background: #f9f9f9; }
-        .subjects-table td { vertical-align: middle; }
-        .button-secondary { background: #d63638; border-color: #b32d2e; color: #fff; }
-        .button-secondary:hover { background: #b32d2e; border-color: #921c1e; }
-        .no-subjects { color: #666; font-style: italic; }
-        .notice { margin: 20px 0; padding: 10px; border-radius: 4px; }
-        .notice-success { background: #dff0d8; border: 1px solid #d6e9c6; color: #3c763d; }
-        .notice-error { background: #f2dede; border: 1px solid #ebccd1; color: #a94442; }
-        .delete-message.success { color: #3c763d; }
-        .delete-message.error { color: #a94442; }
-    </style>
-
+   
     <script>
     jQuery(document).ready(function($) {
         $('.delete-subject-btn').on('click', function(e) {

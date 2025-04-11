@@ -1137,23 +1137,7 @@ function library_transaction_shortcode() {
             </div>
         </div>
     </div>
-<style>
-    .sortable {
-    cursor: pointer;
-    position: relative;
-    padding-right: 20px;
-}
-.sortable.asc::after {
-    content: '↑';
-    position: absolute;
-    right: 5px;
-}
-.sortable.desc::after {
-    content: '↓';
-    position: absolute;
-    right: 5px;
-}
-</style>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';

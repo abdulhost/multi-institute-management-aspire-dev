@@ -210,7 +210,7 @@ function render_student_header($student_user, $student) {
     $seven_days_ago = date('Y-m-d H:i:s', strtotime('-7 days'));
     $notifications_table = $wpdb->prefix . 'aspire_announcements';
     $student_id = $student_user->ID; // Use user ID for notifications/messages
-    error_log("stdduent id chat =: $user_name");
+    // error_log("stdduent id chat =: $user_name");
 
     // Count notifications specific to this student or broadcast to 'students'
     $notifications_count = $wpdb->get_var($wpdb->prepare(
@@ -1093,82 +1093,6 @@ function render_student_homework($user_id, $student) {
         </div>
     </div>
 
-    <style>
-        .bg-gradient-primary {
-            background: linear-gradient(90deg, #007bff, #00b4ff);
-        }
-        .homework-card {
-            border-radius: 12px;
-            overflow: hidden;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        .homework-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .homework-item {
-            border-radius: 8px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .homework-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .homework-item .card-header {
-            cursor: pointer;
-            background: none;
-            border-bottom: 1px solid #e5e5e5;
-        }
-        .homework-item .card-title {
-            color: #343a40;
-            font-size: 1.25rem;
-        }
-        .description {
-            font-size: 0.95rem;
-            color: #6c757d;
-        }
-        .homework-item .badge {
-            font-size: 0.9rem;
-            padding: 6px 12px;
-        }
-        .toggle-icon {
-            transition: transform 0.3s;
-        }
-        .homework-item .collapsed .toggle-icon {
-            transform: rotate(-180deg);
-        }
-        .bg-danger-subtle { background-color: #f8d7da; }
-        .bg-success-subtle { background-color: #d4edda; }
-        .bg-warning-subtle { background-color: #fff3cd; }
-        .form-select-sm {
-            padding: 5px 10px;
-            font-size: 0.875rem;
-            min-width: 120px;
-        }
-        @media (max-width: 768px) {
-            .card-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .card-header .badge {
-                margin-top: 5px;
-            }
-            .homework-item .card-body {
-                padding: 10px;
-            }
-            .d-flex.gap-2 {
-                flex-direction: column;
-                width: 100%;
-            }
-            .form-select-sm {
-                width: 100%;
-                margin-bottom: 5px;
-            }
-        }
-    </style>
-
     <script>
     jQuery(document).ready(function($) {
         function filterHomework() {
@@ -1247,39 +1171,7 @@ function render_student_exams($user_id, $student) {
         </div>
     </div>
 
-    <style>
-        .loading-message .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #ccc;
-            border-top: 2px solid #333;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 5px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .exams-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .exams-table th, .exams-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        .exams-table th {
-            background-color: #dc3545; /* Matches bg-danger */
-            color: white;
-        }
-        .exams-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-    </style>
-
+  
     <script>
     jQuery(document).ready(function($) {
         function loadExamsTable() {
@@ -1513,11 +1405,11 @@ function render_student_attendance($user_id, $student) {
             text-align: center;
             border: 1px solid #e5e5e5;
         }
-        .attendance-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            vertical-align: middle;
-        }
+        // .attendance-table th {
+        //     background: #f8f9fa;
+        //     font-weight: 600;
+        //     vertical-align: middle;
+        // }
         .attendance-table th small {
             font-weight: normal;
             font-size: 0.8em;
@@ -2093,28 +1985,7 @@ function render_student_result($user_id, $student) {
         </div>
     </div>
 
-    <style>
-        .results-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .results-table th, .results-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        .results-table th {
-            background-color: #28a745; /* Matches bg-success */
-            color: white;
-        }
-        .results-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .results-table tfoot {
-            font-weight: bold;
-        }
-    </style>
-
+ 
     <script>
     jQuery(document).ready(function($) {
         function loadResultsTable() {
@@ -2390,52 +2261,6 @@ function render_student_report($user_id, $student) {
             </div>
         </div>
     </div>
-
-    <style>
-        .loading-message .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #ccc;
-            border-top: 2px solid #333;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 5px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        .report-table th, .report-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        .report-table th {
-            background-color: #17a2b8;
-            color: white;
-        }
-        .report-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .report-section {
-            margin-bottom: 30px;
-        }
-        .report-section h4 {
-            color: #17a2b8;
-            margin-bottom: 10px;
-        }
-        .present { color: #28a745; font-weight: bold; }
-        .late { color: #ffc107; font-weight: bold; }
-        .absent { color: #dc3545; font-weight: bold; }
-        .full-day { color: #17a2b8; font-weight: bold; }
-        .holiday { color: #6c757d; font-weight: bold; }
-    </style>
 
     <script>
     jQuery(document).ready(function($) {
@@ -2785,30 +2610,7 @@ function aspire_student_communication_shortcode() {
             </div>
         </div>
     </div>
-    <style>
-        .chat-loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-        .chat-loading.active {
-            display: block;
-        }
-        .spinner {
-            width: 30px;
-            height: 30px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+   
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script>
     jQuery(document).ready(function($) {

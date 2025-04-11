@@ -103,13 +103,7 @@ exit;
             </div>
         </div>
     </div>
-    <style>
-        .subjects-wrapper { padding: 20px; }
-        .subjects-content { background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-top: 20px; }
-        .form-table { margin: 20px 0; }
-        .regular-text { width: 25em; }
-        input[readonly] { background: #f5f5f5; cursor: not-allowed; }
-    </style>
+
     <?php
     return ob_get_clean();
 }

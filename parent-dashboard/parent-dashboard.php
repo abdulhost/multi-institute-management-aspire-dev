@@ -812,182 +812,7 @@ function render_parent_header($parent_user) {
         </div>
     </header>
 
-    <!-- Refined CSS Enhancements (Unchanged from your version) -->
-    <style>
-        /* Enhance existing action-btn for icons */
-        .action-btn {
-            display: flex;
-            align-items: center;
-            gap: 5px; /* Space between icon and badge */
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: var(--accent-color);
-            font-size: 1.3rem;
-            padding: 8px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .action-btn i {
-            font-size: 1.2rem; /* Ensure icons are visible */
-        }
-
-        .action-btn:hover {
-            background: var(--hover-color);
-            color: var(--accent-color);
-        }
-
-        /* Refine action-badge (Messages & Notifications count) */
-        .action-badge {
-            background: var(--primary-color); /* Sky Blue */
-            color: var(--text-color);
-            padding: 2px 6px;
-            font-size: 0.75rem;
-            border-radius: 50%;
-            position: relative;
-            top: -5px;
-            left: -5px;
-        }
-
-        .action-badge.d-none {
-            display: none; /* Hide when no count */
-        }
-
-        /* Dropdown visibility */
-        .dropdown {
-    display: block; /* Change to block but hide with opacity/visibility */
-    position: absolute;
-    top: 100%; /* Position below the toggle */
-    left: 50%; /* Start at the center of the parent */
-    transform: translateX(-50%); /* Center it */
-    background: #fff;
-    border-radius: 15px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-    width: 300px;
-    padding: 15px;
-    z-index: 1001;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.2s ease; /* Only transition opacity */
-    }
-
-    .dropdown.visible {
-    opacity: 1;
-    visibility: visible;
-    }
-    .header-messages,
-    .header-notifications,
-    .header-quick-links,
-    .header-profile {
-    position: relative;
-    }.header-profile .dropdown {
-    left: auto;
-    right: 0;
-    transform: none; /* Remove centering for right-aligned dropdowns */
-    }
-       
-
-        /* Dropdown list items */
-        .dropdown-list li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            font-size: 0.9rem;
-            border-bottom: 1px solid #f7f7f7;
-        }
-
-        .dropdown-list li:hover {
-            background: var(--hover-color);
-        }
-
-        .dropdown-list li:last-child {
-            border-bottom: none;
-        }
-
-        .msg-content, .notif-text {
-            flex: 1;
-            color: var(--text-color);
-        }
-
-        .msg-sender {
-            font-weight: 600;
-            color: var(--accent-color);
-        }
-
-        .msg-time, .notif-time {
-            color: #888;
-            font-size: 0.85rem;
-            min-width: 60px;
-            text-align: right;
-        }
-
-        /* Dropdown footer */
-        .dropdown-footer {
-            display: block;
-            text-align: center;
-            color: #fff;
-            font-size: 0.9rem;
-            padding: 10px;
-            background: var(--accent-color);
-            border-radius: 0 0 15px 15px;
-            text-decoration: none;
-            transition: background 0.3s;
-        }
-
-        .dropdown-footer:hover {
-            background: var(--hover-color);
-        }
-
-        /* Added styles for new features */
-        .quick-links-dropdown .dropdown-list li a {
-            color: var(--text-color);
-            text-decoration: none;
-            display: block;
-            padding: 6px 0;
-        }
-
-        .quick-links-dropdown .dropdown-list li a:hover {
-            color: var(--accent-color);
-        }
-
-        /* Dark Mode (Optional) */
-        .dark-mode .parent-header {
-            background: #333;
-            color: #fff;
-        }
-
-        .dark-mode .header-logo,
-        .dark-mode .nav-item,
-        .dark-mode .action-btn {
-            color: #fff;
-        }
-
-        .dark-mode .dropdown {
-            background: #444;
-            color: #fff;
-        }
-
-        .dark-mode .dropdown-list li {
-            border-bottom: 1px solid #555;
-        }
-
-        .dark-mode .dropdown-footer {
-            background: var(--primary-color);
-        }.dropdown {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
-    }
-
-    .dropdown.visible {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.2s ease;
-    }
-    </style>
-
+   
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', () => {
@@ -2764,22 +2589,6 @@ function render_child_attendance($parent_user, $parent_post_id) {
         </div>
     </div>
 
-    <style>
-        .attendance-table-wrapper { overflow-x: auto; border: 1px solid #e5e5e5; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .attendance-table { width: 100%; border-collapse: collapse; background: #fff; }
-        .attendance-table th, .attendance-table td { padding: 10px; text-align: center; border: 1px solid #e5e5e5; }
-        .attendance-table th { background: #28a745; color: #fff; }
-        .attendance-table tr:nth-child(even) { background: #f9f9f9; }
-        .attendance-table .present { color: #28a745; font-weight: bold; }
-        .attendance-table .late { color: #ffc107; font-weight: bold; }
-        .attendance-table .absent { color: #dc3545; font-weight: bold; }
-        .summary-row { background: #e6ffe6; font-weight: bold; }
-        .export-tools { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 10px; }
-        .export-btn { background: none; border: none; color: #4682B4; font-size: 1.2em; cursor: pointer; padding: 5px; transition: color 0.3s, transform 0.2s; }
-        .export-btn:hover { color: #B0E0E6; transform: scale(1.1); }
-        .export-btn .tooltip { visibility: hidden; background: #4682B4; color: #fff; border-radius: 4px; padding: 4px 8px; position: absolute; z-index: 1; bottom: 125%; right: 50%; transform: translateX(50%); font-size: 0.8em; opacity: 0; transition: opacity 0.3s; }
-        .export-btn:hover .tooltip { visibility: visible; opacity: 1; }
-    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -5738,11 +5547,6 @@ function render_parent_calendar($parent_user, $parent_post_id) {
         });
     </script>
 
-    <style>
-        .fc-event { cursor: pointer; }
-        .fc-daygrid-event { padding: 2px 5px; font-size: 0.9em; }
-        .export-tools button { margin-right: 5px; }
-    </style>
     <?php
     return ob_get_clean();
 }

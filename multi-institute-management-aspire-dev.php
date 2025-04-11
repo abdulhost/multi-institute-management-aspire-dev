@@ -1546,6 +1546,7 @@ include_files_from_directory('teacher-dashboard');
 include_files_from_directory('student-dashboard');
 include_files_from_directory('parent-dashboard');
 include_files_from_directory('su-p');
+include_files_from_directory('demo-dashboard');
 
 // Include all other necessary files
 include plugin_dir_path(__FILE__) . 'assets/edit-classes.php';
@@ -1868,133 +1869,7 @@ function render_change_password($current_user, $post_id = null) {
         });
     </script>
 
-    <style>
-        /* Reusing existing classes and aligning with your color scheme */
-        .card {
-            background: #fff;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .shadow-lg {
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-        .card-header {
-            padding: 10px 15px;
-            font-weight: bold;
-        }
-        .bg-dark {
-            background: #343a40; /* Consistent with your dark headers */
-        }
-        .text-white {
-            color: #fff;
-        }
-        .card-title {
-            font-size: 1.25em;
-        }
-        .m-0 {
-            margin: 0;
-        }
-        .me-2 {
-            margin-right: 8px;
-        }
-        .card-body {
-            padding: 20px;
-        }
-        .p-4 {
-            padding: 20px !important;
-        }
-        .alert {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-        .alert-success {
-            background: #d4edda; /* Light green from your success alerts */
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .alert-danger {
-            background: #f8d7da; /* Light red from your danger alerts */
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        /* Custom form styling with your color scheme */
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #333; /* Dark gray from your text */
-        }
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            border: 1px solid #ccc; /* Light gray border */
-            border-radius: 4px;
-            background: #fff;
-        }
-        .input-icon {
-            padding: 8px;
-            background: #f5f5f5; /* Light gray background from your inputs */
-            border-right: 1px solid #ccc;
-            color: #666; /* Medium gray */
-        }
-        .input-wrapper input {
-            flex: 1;
-            padding: 8px;
-            border: none;
-            outline: none;
-            font-size: 1em;
-            color: #333;
-        }
-        .input-wrapper input:focus {
-            box-shadow: 0 0 5px rgba(220, 53, 69, 0.5); /* Red shadow from your danger theme */
-        }
-        .toggle-password {
-            padding: 8px 12px;
-            border: none;
-            background: #f5f5f5;
-            cursor: pointer;
-            color: #666;
-        }
-        .toggle-password:hover {
-            background: #e5e5e5; /* Slightly darker gray */
-        }
-        .form-hint {
-            display: block;
-            font-size: 0.85em;
-            color: #666; /* Muted gray from your hints */
-            margin-top: 5px;
-        }
-        .submit-btn {
-            padding: 10px 15px;
-            background: #007bff; /* Blue from your primary buttons */
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        .submit-btn:hover {
-            background: #0056b3; /* Darker blue on hover */
-        }
-        .forgot-link {
-            margin-top: 10px;
-            font-size: 0.9em;
-        }
-        .forgot-link a {
-            color: #dc3545; /* Red from your danger theme for links */
-            text-decoration: none;
-        }
-        .forgot-link a:hover {
-            color: #a71d2a; /* Darker red on hover */
-            text-decoration: underline;
-        }
-    </style>
+   
     <?php
     return ob_get_clean();
 }

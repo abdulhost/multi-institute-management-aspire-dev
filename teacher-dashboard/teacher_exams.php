@@ -855,12 +855,6 @@ function render_teacher_results($user_id, $teacher) {
         </div>
     </div>
 
-    <style>
-        .loading-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; z-index: 10; }
-        .table-responsive { max-height: 400px; overflow-y: auto; }
-        .btn-sm { margin: 0 2px; }
-        .alert-dismissible { position: sticky; top: 0; z-index: 5; }
-    </style>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {

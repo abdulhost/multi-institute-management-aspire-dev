@@ -1246,11 +1246,6 @@ if ($center_id) {
 }
 
 
-
-
-
-
-
 // Educational Centers Management
 function render_su_p_centers() {
     global $wpdb;
@@ -11348,12 +11343,7 @@ function render_su_p_exam_results() {
         });
     });
     </script>
-    <style>
-        .loading { text-align: center; padding: 20px; }
-        .export-btn { margin-right: 10px; padding: 5px 10px; }
-        .form-control { width: 300px; display: inline-block; }
-        .input-group-addon { padding: 6px 12px; background: #f5f5f5; border: 1px solid #ccc; border-right: none; }
-    </style>
+
     <?php
     return ob_get_clean();
 }
@@ -12026,28 +12016,6 @@ function su_p_reports_dashboard_shortcode() {
             </div>
         </div>
     </div>
-
-    <style>
-        .edu-loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .edu-loader-container {
-            text-align: center;
-        }
-        .edu-loader-png {
-            width: 100px; /* Adjust size as needed */
-            height: auto;
-        }
-    </style>
 
     <script>
     jQuery(document).ready(function($) {
@@ -13241,20 +13209,6 @@ function su_p_library_management_dashboard_shortcode() {
             </div>
         </div>
     </div>
-
-    <style>
-        .edu-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-        .edu-loader-container { text-align: center; }
-        .edu-loader-png { width: 100px; height: auto; }
-        .modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background: rgba(0,0,0,0.5); }
-        .modal-content { background: #fff; margin: 10% auto; padding: 20px; border-radius: 10px; width: 90%; max-width: 600px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .modal-close { float: right; font-size: 24px; cursor: pointer; }
-        .table { width: 100%; border-collapse: collapse; }
-        .table th, .table td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
-        .alert { padding: 15px; margin-bottom: 20px; border-radius: 5px; }
-        .alert-danger { background-color: #f8d7da; color: #721c24; }
-        .alert-success { background-color: #d4edda; color: #155724; }
-    </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -14685,10 +14639,7 @@ function render_su_p_library_add_form() {
             </tbody>
         </table>
     </div>
-    <style>
-        .message.alert-danger { background-color: #f8d7da; color: #721c24; }
-        .message.alert-success { background-color: #d4edda; color: #155724; }
-    </style>
+
     <script>
     jQuery(document).ready(function($) {
         const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
@@ -14930,10 +14881,7 @@ function render_su_p_library_edit_form() {
             </div>
         </div>
     </div>
-    <style>
-        .message.alert-danger { background-color: #f8d7da; color: #721c24; }
-        .message.alert-success { background-color: #d4edda; color: #155724; }
-    </style>
+ 
     <script>
     jQuery(document).ready(function($) {
         const $modal = $('#editBookModal');
@@ -15081,10 +15029,7 @@ function render_su_p_library_delete_form() {
             </div>
         </div>
     </div>
-    <style>
-        .message.alert-danger { background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; }
-        .message.alert-success { background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; }
-    </style>
+  
     <script>
     jQuery(document).ready(function($) {
         const $modal = $('#deleteBookModal');
@@ -15281,10 +15226,7 @@ function render_su_p_library_transaction_form() {
             </div>
         </div>
     </div>
-    <style>
-        .message.alert-danger { background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; }
-        .message.alert-success { background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; }
-    </style>
+
     <script>
     jQuery(document).ready(function($) {
         const ajaxUrl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
@@ -23784,12 +23726,6 @@ function render_eo_chat() {
         </div>
     </div>
 
-    <style>
-        .chat-loading { display: none; text-align: center; padding: 20px; color: #666; }
-        .chat-loading.active { display: block; }
-        .spinner { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
 
     <script>
     jQuery(document).ready(function($) {
