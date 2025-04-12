@@ -11,18 +11,7 @@ function aspire_demo_enqueue_scripts() {
     wp_enqueue_script('aspire-demo-script', plugin_dir_url(__FILE__) . 'demo.js', [], '1.0.11', true);
 }
 add_action('wp_enqueue_scripts', 'aspire_demo_enqueue_scripts');
-$demoData = [
-    'student_attendance' => [
-        ['student_id' => 'ST1001', 'student_name' => 'John Doe', 'class' => '10A', 'section' => 'A', 'date' => '2025-04-01', 'status' => 'Present'],
-        ['student_id' => 'ST1001', 'student_name' => 'John Doe', 'class' => '10A', 'section' => 'A', 'date' => '2025-04-02', 'status' => 'Late'],
-        ['student_id' => 'ST1002', 'student_name' => 'Jane Smith', 'class' => '10A', 'section' => 'A', 'date' => '2025-04-01', 'status' => 'Absent'],
-    ],
-    'teacher_attendance' => [
-        ['teacher_id' => 'TR1001', 'teacher_name' => 'Alice Brown', 'department' => 'Math', 'date' => '2025-04-01', 'status' => 'Present'],
-        ['teacher_id' => 'TR1001', 'teacher_name' => 'Alice Brown', 'department' => 'Math', 'date' => '2025-04-02', 'status' => 'Late'],
-        ['teacher_id' => 'TR1002', 'teacher_name' => 'Bob Wilson', 'department' => 'Science', 'date' => '2025-04-01', 'status' => 'Absent'],
-    ]
-];
+
 /**
  * Dashboard Shortcode
  */
@@ -433,30 +422,35 @@ add_shortcode('demo-dashboard', 'aspire_demo_dashboard_shortcode');
 function demoRenderSidebar($role, $active_section) {
     $active_action = isset($_GET['demo-action']) ? sanitize_text_field($_GET['demo-action']) : '';
     $links = [
-        'teacher' => [
-            ['section' => 'overview', 'label' => 'Overview', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'overview']), 'icon' => 'tachometer-alt'],
-            ['section' => 'exams', 'label' => 'Exams', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exams']), 'icon' => 'list'],
-            ['section' => 'attendance-reports', 'label' => 'Attendance Reports', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance-reports']), 'icon' => 'calendar'],
-            ['section' => 'students', 'label' => 'Students', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'students']), 'icon' => 'users', 'submenu' => [
-                ['action' => 'manage-students', 'label' => 'Manage Students', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'students', 'demo-action' => 'manage-students'])],
-                ['action' => 'add-student', 'label' => 'Add Student', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'students', 'demo-action' => 'add-student'])],
-                ['action' => 'edit-student', 'label' => 'Edit Student', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'students', 'demo-action' => 'edit-student'])],
-                ['action' => 'delete-student', 'label' => 'Delete Student', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'students', 'demo-action' => 'delete-student'])]
-            ]],
-            ['section' => 'profile', 'label' => 'View Profile', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'profile']), 'icon' => 'user'],
-            ['section' => 'exam-management', 'label' => 'Exam Management', 'icon' => 'book', 'submenu' => [
-                ['action' => 'view-exams', 'label' => 'View Exams', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exam-management', 'demo-action' => 'view-exams'])],
-                ['action' => 'add-exam', 'label' => 'Add Exam', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exam-management', 'demo-action' => 'add-exam'])],
-                ['action' => 'edit-exam', 'label' => 'Edit Exam', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exam-management', 'demo-action' => 'edit-exam'])],
-                ['action' => 'delete-exam', 'label' => 'Delete Exam', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exam-management', 'demo-action' => 'delete-exam'])]
-            ]],
-            ['section' => 'student-attendance', 'label' => 'Student Attendance', 'icon' => 'calendar-check', 'submenu' => [
-                ['action' => 'manage-student-attendance', 'label' => 'Manage Attendance', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'student-attendance', 'demo-action' => 'manage-student-attendance'])],
-                ['action' => 'add-student-attendance', 'label' => 'Add Attendance', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'student-attendance', 'demo-action' => 'add-student-attendance'])],
-                ['action' => 'edit-student-attendance', 'label' => 'Edit Attendance', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'student-attendance', 'demo-action' => 'edit-student-attendance'])],
-                ['action' => 'delete-student-attendance', 'label' => 'Delete Attendance', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'student-attendance', 'demo-action' => 'delete-student-attendance'])]
-            ]]
-        ],
+       'teacher' => [
+    ['section' => 'overview', 'label' => 'Overview', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'overview']), 'icon' => 'tachometer-alt'],
+    ['section' => 'exams', 'label' => 'Exams', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exams']), 'icon' => 'list'],
+    ['section' => 'attendance-reports', 'label' => 'Attendance Reports', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance-reports']), 'icon' => 'calendar'],
+    ['section' => 'students', 'label' => 'Students', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'students']), 'icon' => 'users', 'submenu' => [
+        ['action' => 'manage-students', 'label' => 'Manage Students', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'students', 'demo-action' => 'manage-students'])],
+        ['action' => 'add-student', 'label' => 'Add Student', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'students', 'demo-action' => 'add-student'])],
+        ['action' => 'edit-student', 'label' => 'Edit Student', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'students', 'demo-action' => 'edit-student'])],
+        ['action' => 'delete-student', 'label' => 'Delete Student', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'students', 'demo-action' => 'delete-student'])],
+    ]],
+    ['section' => 'profile', 'label' => 'View Profile', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'profile']), 'icon' => 'user'],
+    ['section' => 'exam-management', 'label' => 'Exam Management', 'icon' => 'book', 'submenu' => [
+        ['action' => 'view-exams', 'label' => 'View Exams', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exam-management', 'demo-action' => 'view-exams'])],
+        ['action' => 'add-exam', 'label' => 'Add Exam', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exam-management', 'demo-action' => 'add-exam'])],
+        ['action' => 'edit-exam', 'label' => 'Edit Exam', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exam-management', 'demo-action' => 'edit-exam'])],
+        ['action' => 'delete-exam', 'label' => 'Delete Exam', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exam-management', 'demo-action' => 'delete-exam'])],
+    ]],
+    ['section' => 'attendance', 'label' => 'Attendance', 'icon' => 'fa-calendar-check', 'submenu' => [
+        ['action' => 'student-attendance', 'label' => 'Student Attendance', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance', 'demo-action' => 'student-attendance']), 'submenu' => [
+            ['action' => 'manage-student-attendance', 'label' => 'Manage Attendance', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])],
+            ['action' => 'add-student-attendance', 'label' => 'Add Attendance', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance', 'demo-action' => 'add-student-attendance'])],
+            ['action' => 'edit-student-attendance', 'label' => 'Edit Attendance', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance', 'demo-action' => 'edit-student-attendance'])],
+            ['action' => 'delete-student-attendance', 'label' => 'Delete Attendance', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance', 'demo-action' => 'delete-student-attendance'])],
+            ['action' => 'import-student-attendance', 'label' => 'Import Attendance', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance', 'demo-action' => 'import-student-attendance'])],
+            ['action' => 'export-student-attendance', 'label' => 'Export Attendance', 'url' => add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance', 'demo-action' => 'export-student-attendance'])],
+        ]],
+    ]],
+    ],
+
         'student' => [
             ['section' => 'overview', 'label' => 'Overview', 'url' => add_query_arg(['demo-role' => 'student', 'demo-section' => 'overview']), 'icon' => 'tachometer-alt'],
             ['section' => 'exams', 'label' => 'Exams', 'url' => add_query_arg(['demo-role' => 'student', 'demo-section' => 'exams']), 'icon' => 'list'],
@@ -468,44 +462,86 @@ function demoRenderSidebar($role, $active_section) {
             ['section' => 'exams', 'label' => 'Child Exams', 'url' => add_query_arg(['demo-role' => 'parent', 'demo-section' => 'exams']), 'icon' => 'list'],
             ['section' => 'attendance', 'label' => 'Child Attendance', 'url' => add_query_arg(['demo-role' => 'parent', 'demo-section' => 'attendance']), 'icon' => 'calendar']
         ],
-        'superadmin' => [
-            ['section' => 'overview', 'label' => 'Overview', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'overview']), 'icon' => 'tachometer-alt'],
-            ['section' => 'centers', 'label' => 'Centers', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers']), 'icon' => 'school'],
-            ['section' => 'students', 'label' => 'Students Management', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'students']), 'icon' => 'users', 'submenu' => [
-                ['action' => 'manage-students', 'label' => 'Manage Students', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'students', 'demo-action' => 'manage-students'])],
-                ['action' => 'add-student', 'label' => 'Add Student', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'students', 'demo-action' => 'add-student'])],
-                ['action' => 'edit-student', 'label' => 'Edit Student', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'students', 'demo-action' => 'edit-student'])],
-                ['action' => 'delete-student', 'label' => 'Delete Student', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'students', 'demo-action' => 'delete-student'])]
-            ]],
-            ['section' => 'teachers', 'label' => 'Teachers Management', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'teachers']), 'icon' => 'chalkboard-teacher', 'submenu' => [
-                ['action' => 'manage-teachers', 'label' => 'Manage Teachers', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'teachers', 'demo-action' => 'manage-teachers'])],
-                ['action' => 'add-teacher', 'label' => 'Add Teacher', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'teachers', 'demo-action' => 'add-teacher'])],
-                ['action' => 'edit-teacher', 'label' => 'Edit Teacher', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'teachers', 'demo-action' => 'edit-teacher'])],
-                ['action' => 'delete-teacher', 'label' => 'Delete Teacher', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'teachers', 'demo-action' => 'delete-teacher'])]
-            ]],
-            ['section' => 'staff', 'label' => 'Staff Management', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'staff']), 'icon' => 'user-tie', 'submenu' => [
-                ['action' => 'manage-staff', 'label' => 'Manage Staff', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'staff', 'demo-action' => 'manage-staff'])],
-                ['action' => 'add-staff', 'label' => 'Add Staff', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'staff', 'demo-action' => 'add-staff'])],
-                ['action' => 'edit-staff', 'label' => 'Edit Staff', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'staff', 'demo-action' => 'edit-staff'])],
-                ['action' => 'delete-staff', 'label' => 'Delete Staff', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'staff', 'demo-action' => 'delete-staff'])]
-            ]],
-            ['section' => 'attendance', 'label' => 'Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance']), 'icon' => 'calendar-check', 'submenu' => [
-                ['action' => 'student-attendance', 'label' => 'Student Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'student-attendance']), 'submenu' => [
-                    ['action' => 'manage-student-attendance', 'label' => 'Manage Student Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])],
-                    ['action' => 'add-student-attendance', 'label' => 'Add Student Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'add-student-attendance'])],
-                    ['action' => 'edit-student-attendance', 'label' => 'Edit Student Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'edit-student-attendance'])],
-                    ['action' => 'delete-student-attendance', 'label' => 'Delete Student Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'delete-student-attendance'])]
-                ]],
-                ['action' => 'teacher-attendance', 'label' => 'Teacher Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'teacher-attendance']), 'submenu' => [
-                    ['action' => 'manage-teacher-attendance', 'label' => 'Manage Teacher Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])],
-                    ['action' => 'add-teacher-attendance', 'label' => 'Add Teacher Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'add-teacher-attendance'])],
-                    ['action' => 'edit-teacher-attendance', 'label' => 'Edit Teacher Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'edit-teacher-attendance'])],
-                    ['action' => 'delete-teacher-attendance', 'label' => 'Delete Teacher Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'delete-teacher-attendance'])]
-                ]]
-            ]],
-            ['section' => 'subscription', 'label' => 'Subscription', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription']), 'icon' => 'credit-card'],
-            ['section' => 'payment_methods', 'label' => 'Payment Methods', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'payment_methods']), 'icon' => 'money-bill']
-        ]
+   'superadmin' => [
+    ['section' => 'overview', 'label' => 'Overview', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'overview']), 'icon' => 'tachometer-alt'],
+    ['section' => 'centers', 'label' => 'Centers', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers']), 'icon' => 'school'],
+    ['section' => 'students', 'label' => 'Students Management', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'students']), 'icon' => 'users', 'submenu' => [
+        ['action' => 'manage-students', 'label' => 'Manage Students', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'students', 'demo-action' => 'manage-students'])],
+        ['action' => 'add-student', 'label' => 'Add Student', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'students', 'demo-action' => 'add-student'])],
+        ['action' => 'edit-student', 'label' => 'Edit Student', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'students', 'demo-action' => 'edit-student'])],
+        ['action' => 'delete-student', 'label' => 'Delete Student', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'students', 'demo-action' => 'delete-student'])],
+    ]],
+    ['section' => 'teachers', 'label' => 'Teachers Management', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'teachers']), 'icon' => 'chalkboard-teacher', 'submenu' => [
+        ['action' => 'manage-teachers', 'label' => 'Manage Teachers', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'teachers', 'demo-action' => 'manage-teachers'])],
+        ['action' => 'add-teacher', 'label' => 'Add Teacher', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'teachers', 'demo-action' => 'add-teacher'])],
+        ['action' => 'edit-teacher', 'label' => 'Edit Teacher', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'teachers', 'demo-action' => 'edit-teacher'])],
+        ['action' => 'delete-teacher', 'label' => 'Delete Teacher', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'teachers', 'demo-action' => 'delete-teacher'])],
+    ]],
+    ['section' => 'staff', 'label' => 'Staff Management', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'staff']), 'icon' => 'user-tie', 'submenu' => [
+        ['action' => 'manage-staff', 'label' => 'Manage Staff', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'staff', 'demo-action' => 'manage-staff'])],
+        ['action' => 'add-staff', 'label' => 'Add Staff', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'staff', 'demo-action' => 'add-staff'])],
+        ['action' => 'edit-staff', 'label' => 'Edit Staff', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'staff', 'demo-action' => 'edit-staff'])],
+        ['action' => 'delete-staff', 'label' => 'Delete Staff', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'staff', 'demo-action' => 'delete-staff'])],
+    ]],
+    ['section' => 'attendance', 'label' => 'Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance']), 'icon' => 'fa-calendar-check', 'submenu' => [
+        ['action' => 'student-attendance', 'label' => 'Student Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'student-attendance']), 'submenu' => [
+            ['action' => 'manage-student-attendance', 'label' => 'Manage Student Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])],
+            ['action' => 'add-student-attendance', 'label' => 'Add Student Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'add-student-attendance'])],
+            ['action' => 'edit-student-attendance', 'label' => 'Edit Student Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'edit-student-attendance'])],
+            ['action' => 'delete-student-attendance', 'label' => 'Delete Student Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'delete-student-attendance'])],
+            ['action' => 'import-student-attendance', 'label' => 'Import Student Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'import-student-attendance'])],
+            ['action' => 'export-student-attendance', 'label' => 'Export Student Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'export-student-attendance'])],
+        ]],
+        ['action' => 'teacher-attendance', 'label' => 'Teacher Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'teacher-attendance']), 'submenu' => [
+            ['action' => 'manage-teacher-attendance', 'label' => 'Manage Teacher Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])],
+            ['action' => 'add-teacher-attendance', 'label' => 'Add Teacher Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'add-teacher-attendance'])],
+            ['action' => 'edit-teacher-attendance', 'label' => 'Edit Teacher Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'edit-teacher-attendance'])],
+            ['action' => 'delete-teacher-attendance', 'label' => 'Delete Teacher Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'delete-teacher-attendance'])],
+            ['action' => 'import-teacher-attendance', 'label' => 'Import Teacher Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'import-teacher-attendance'])],
+            ['action' => 'export-teacher-attendance', 'label' => 'Export Teacher Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'export-teacher-attendance'])],
+        ]],
+        ['action' => 'staff-attendance', 'label' => 'Staff Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'staff-attendance']), 'submenu' => [
+            ['action' => 'manage-staff-attendance', 'label' => 'Manage Staff Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-staff-attendance'])],
+            ['action' => 'add-staff-attendance', 'label' => 'Add Staff Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'add-staff-attendance'])],
+            ['action' => 'edit-staff-attendance', 'label' => 'Edit Staff Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'edit-staff-attendance'])],
+            ['action' => 'delete-staff-attendance', 'label' => 'Delete Staff Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'delete-staff-attendance'])],
+            ['action' => 'import-staff-attendance', 'label' => 'Import Staff Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'import-staff-attendance'])],
+            ['action' => 'export-staff-attendance', 'label' => 'Export Staff Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'export-staff-attendance'])],
+        ]],
+    ]],
+    ['section' => 'subscription', 'label' => 'Subscriptions', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription']), 'icon' => 'fa-money-check-alt', 'submenu' => [
+        ['action' => 'manage-subscription', 'label' => 'Manage Subscriptions', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription', 'demo-action' => 'manage-subscription'])],
+        ['action' => 'add-subscription', 'label' => 'Add Subscription', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription', 'demo-action' => 'add-subscription'])],
+        ['action' => 'edit-subscription', 'label' => 'Edit Subscription', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription', 'demo-action' => 'edit-subscription'])],
+        ['action' => 'delete-subscription', 'label' => 'Delete Subscription', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription', 'demo-action' => 'delete-subscription'])],
+    ]],
+    ['section' => 'payment_methods', 'label' => 'Payment Methods', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'payment_methods']), 'icon' => 'fa-credit-card', 'submenu' => [
+        ['action' => 'manage-payment-methods', 'label' => 'Manage Payment Methods', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'payment_methods', 'demo-action' => 'manage-payment-methods'])],
+        ['action' => 'add-payment-method', 'label' => 'Add Payment Method', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'payment_methods', 'demo-action' => 'add-payment-method'])],
+        ['action' => 'edit-payment-method', 'label' => 'Edit Payment Method', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'payment_methods', 'demo-action' => 'edit-payment-method'])],
+        ['action' => 'delete-payment-method', 'label' => 'Delete Payment Method', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'payment_methods', 'demo-action' => 'delete-payment-method'])],
+    ]],
+    ['section' => 'fees', 'label' => 'Fees Management', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees']), 'icon' => 'money-bill', 'submenu' => [
+        ['action' => 'fees', 'label' => 'Fees', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'fees']), 'submenu' => [
+            ['action' => 'manage-fees', 'label' => 'Manage Fees', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'manage-fees'])],
+            ['action' => 'add-fee', 'label' => 'Add Fee', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'add-fee'])],
+            ['action' => 'edit-fee', 'label' => 'Edit Fee', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'edit-fee'])],
+            ['action' => 'delete-fee', 'label' => 'Delete Fee', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'delete-fee'])],
+            ['action' => 'import-fees', 'label' => 'Import Fees', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'import-fees'])],
+            ['action' => 'export-fees', 'label' => 'Export Fees', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'export-fees'])],
+        ]],
+        ['action' => 'fee-templates', 'label' => 'Fee Templates', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'fee-templates']), 'submenu' => [
+            ['action' => 'manage-fee-templates', 'label' => 'Manage Fee Templates', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'manage-fee-templates'])],
+            ['action' => 'add-fee-template', 'label' => 'Add Fee Template', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'add-fee-template'])],
+            ['action' => 'edit-fee-template', 'label' => 'Edit Fee Template', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'edit-fee-template'])],
+            ['action' => 'delete-fee-template', 'label' => 'Delete Fee Template', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'delete-fee-template'])],
+            ['action' => 'import-fee-templates', 'label' => 'Import Fee Templates', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'import-fee-templates'])],
+            ['action' => 'export-fee-templates', 'label' => 'Export Fee Templates', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'export-fee-templates'])],
+        ]],
+    ]],
+    ]
+
+
     ];
 
     $title = ucfirst($role) === 'Superadmin' ? 'Super Admin' : ucfirst($role);
@@ -736,6 +772,12 @@ function demoRenderTeacherContent($section, $action, $data = []) {
             case 'delete-student-attendance':
                 echo demoRenderTeacherDeleteStudentAttendance($data);
                 break;
+                case 'import-student-attendance':
+                    echo demoRenderTeacherImportStudentAttendance($data);
+                    break;
+                case 'export-student-attendance':
+                    echo demoRenderTeacherExportStudentAttendance($data);
+                    break;
             default:
                 echo demoRenderTeacherManageStudentAttendance($data);
         }
@@ -799,7 +841,7 @@ function demoRenderTeacherManageStudentAttendance($data = []) {
         <!-- Add Student Attendance Modal -->
         <div id="add-student-attendance-modal" class="edu-modal" style="display: none;">
             <div class="edu-modal-content">
-                <span class="edu-modal-close" id="add-student-attendance-close">&times;</span>
+                <span class="edu-modal-close" id="add-student-attendance-close">×</span>
                 <h2>Add Student Attendance</h2>
                 <form id="add-student-attendance-form" class="edu-form">
                     <div class="edu-form-group">
@@ -839,7 +881,7 @@ function demoRenderTeacherManageStudentAttendance($data = []) {
         <!-- Edit Student Attendance Modal -->
         <div id="edit-student-attendance-modal" class="edu-modal" style="display: none;">
             <div class="edu-modal-content">
-                <span class="edu-modal-close" id="edit-student-attendance-close">&times;</span>
+                <span class="edu-modal-close" id="edit-student-attendance-close">×</span>
                 <h2>Edit Student Attendance</h2>
                 <form id="edit-student-attendance-form" class="edu-form">
                     <input type="hidden" id="edit-attendance-id">
@@ -880,7 +922,7 @@ function demoRenderTeacherManageStudentAttendance($data = []) {
         <!-- Delete Student Attendance Modal -->
         <div id="delete-student-attendance-modal" class="edu-modal" style="display: none;">
             <div class="edu-modal-content">
-                <span class="edu-modal-close" id="delete-student-attendance-close">&times;</span>
+                <span class="edu-modal-close" id="delete-student-attendance-close">×</span>
                 <h2>Delete Student Attendance</h2>
                 <p>Are you sure you want to delete attendance for <span id="delete-student-name"></span> on <span id="delete-attendance-date"></span>?</p>
                 <input type="hidden" id="delete-attendance-id">
@@ -891,43 +933,43 @@ function demoRenderTeacherManageStudentAttendance($data = []) {
         </div>
 
         <script>
-    jQuery(document).ready(function($) {
-        let currentPage = 1;
-        let perPage = 10;
-        let searchQuery = '';
-        let studentAttendanceData = <?php echo json_encode($data['student_attendance'] ?? []); ?>;
+        jQuery(document).ready(function($) {
+            let currentPage = 1;
+            let perPage = 10;
+            let searchQuery = '';
+            let studentAttendanceData = <?php echo json_encode($data['student_attendance'] ?? []); ?>;
 
-        function loadStudentAttendance(page, limit, query) {
-            const filtered = studentAttendanceData.filter(a => 
-                !query || a.student_name.toLowerCase().includes(query.toLowerCase())
-            );
-            const total = filtered.length;
-            const start = (page - 1) * limit;
-            const end = start + limit;
-            const paginated = filtered.slice(start, end);
-            let html = '';
-            paginated.forEach((record, index) => {
-                html += `
-                    <tr data-attendance-id="${start + index}">
-                        <td>${record.student_id}</td>
-                        <td>${record.student_name}</td>
-                        <td>${record.class}</td>
-                        <td>${record.section}</td>
-                        <td>${record.date}</td>
-                        <td>${record.status}</td>
-                        <td>
-                            <button class="edu-button edu-button-edit edit-student-attendance" data-attendance-id="${start + index}">Edit</button>
-                            <button class="edu-button edu-button-delete delete-student-attendance" data-attendance-id="${start + index}">Delete</button>
-                        </td>
-                    </tr>
-                `;
-            });
-            $('#student-attendance-table-body').html(html || '<tr><td colspan="7">No attendance records found.</td></tr>');
-            const totalPages = Math.ceil(total / limit);
-            $('#page-info').text(`Page ${page} of ${totalPages}`);
-            $('#prev-page').prop('disabled', page === 1);
-            $('#next-page').prop('disabled', page === totalPages || total === 0);
-        }
+            function loadStudentAttendance(page, limit, query) {
+                const filtered = studentAttendanceData.filter(a => 
+                    !query || a.student_name.toLowerCase().includes(query.toLowerCase())
+                );
+                const total = filtered.length;
+                const start = (page - 1) * limit;
+                const end = start + limit;
+                const paginated = filtered.slice(start, end);
+                let html = '';
+                paginated.forEach((record, index) => {
+                    html += `
+                        <tr data-attendance-id="${start + index}">
+                            <td>${record.student_id}</td>
+                            <td>${record.student_name}</td>
+                            <td>${record.class}</td>
+                            <td>${record.section}</td>
+                            <td>${record.date}</td>
+                            <td>${record.status}</td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-student-attendance" data-attendance-id="${start + index}">Edit</button>
+                                <button class="edu-button edu-button-delete delete-student-attendance" data-attendance-id="${start + index}">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                $('#student-attendance-table-body').html(html || '<tr><td colspan="7">No attendance records found.</td></tr>');
+                const totalPages = Math.ceil(total / limit);
+                $('#page-info').text(`Page ${page} of ${totalPages}`);
+                $('#prev-page').prop('disabled', page === 1);
+                $('#next-page').prop('disabled', page === totalPages || total === 0);
+            }
 
             loadStudentAttendance(currentPage, perPage, searchQuery);
 
@@ -1065,7 +1107,6 @@ function demoRenderTeacherManageStudentAttendance($data = []) {
     <?php
     return ob_get_clean();
 }
-
 // Add new profile function
 function demoRenderTeacherProfile($data) {
     ob_start();
@@ -1602,6 +1643,12 @@ function demoRenderSuperadminContent($section, $action, $data = []) {
             case 'delete-student-attendance':
                 echo demoRenderSuperadminDeleteStudentAttendance($data);
                 break;
+            case 'import-student-attendance':
+                echo demoRenderSuperadminImportStudentAttendance($data);
+                break;
+            case 'export-student-attendance':
+                echo demoRenderSuperadminExportStudentAttendance($data);
+                break;
             case 'teacher-attendance':
                 echo demoRenderSuperadminTeacherAttendance($data);
                 break;
@@ -1617,9 +1664,37 @@ function demoRenderSuperadminContent($section, $action, $data = []) {
             case 'delete-teacher-attendance':
                 echo demoRenderSuperadminDeleteTeacherAttendance($data);
                 break;
+            case 'import-teacher-attendance':
+                echo demoRenderSuperadminImportTeacherAttendance($data);
+                break;
+            case 'export-teacher-attendance':
+                echo demoRenderSuperadminExportTeacherAttendance($data);
+                break;
+           
+            case 'staff-attendance':
+            case 'manage-staff-attendance':
+                echo demoRenderSuperadminStaffAttendance($data);
+                break;
+            case 'add-staff-attendance':
+                echo demoRenderSuperadminAddStaffAttendance($data);
+                break;
+            case 'edit-staff-attendance':
+                echo demoRenderSuperadminEditStaffAttendance($data);
+                break;
+            case 'delete-staff-attendance':
+                echo demoRenderSuperadminDeleteStaffAttendance($data);
+                break;
+            case 'import-staff-attendance':
+                echo demoRenderSuperadminImportStaffAttendance($data);
+                break;
+            case 'export-staff-attendance':
+                echo demoRenderSuperadminExportStaffAttendance($data);
+                break;
             default:
                 echo demoRenderSuperadminStudentAttendance($data);
         }
+        
+        
     } elseif ($section === 'subscription') {
         switch ($action) {
             case 'add-subscription':
@@ -1648,7 +1723,52 @@ function demoRenderSuperadminContent($section, $action, $data = []) {
             default:
                 echo demoRenderSuperadminPaymentMethods($data);
         }
-    } else {
+    } elseif ($section === 'fees') {
+        switch ($action) {
+           
+            case 'manage-fees':
+                echo demoRenderSuperadminFees($data);
+                break;
+            case 'add-fee':
+                echo demoRenderSuperadminAddFee($data);
+                break;
+            case 'edit-fee':
+                echo demoRenderSuperadminEditFee($data);
+                break;
+            case 'delete-fee':
+                echo demoRenderSuperadminDeleteFee($data);
+                break;
+            case 'import-fees':
+                echo demoRenderSuperadminImportFees($data);
+                break;
+            case 'export-fees':
+                echo demoRenderSuperadminExportFees($data);
+                break;
+            case 'fee-templates':
+            case 'manage-fee-templates':
+                echo demoRenderSuperadminFeeTemplates($data);
+                break;
+            case 'add-fee-template':
+                echo demoRenderSuperadminAddFeeTemplate($data);
+                break;
+            case 'edit-fee-template':
+                echo demoRenderSuperadminEditFeeTemplate($data);
+                break;
+            case 'delete-fee-template':
+                echo demoRenderSuperadminDeleteFeeTemplate($data);
+                break;
+            case 'import-fee-templates':
+                echo demoRenderSuperadminImportFeeTemplates($data);
+                break;
+            case 'export-fee-templates':
+                echo demoRenderSuperadminExportFeeTemplates($data);
+                break;
+            default:
+                echo demoRenderSuperadminFees($data);
+                break;
+        }}
+       
+    else {
         switch ($section) {
             case 'exams':
                 echo demoRenderSuperadminExams($data);
@@ -1668,142 +1788,103 @@ function demoRenderSuperadminContent($section, $action, $data = []) {
     }
     return ob_get_clean();
 }
+/**
+ * Superadmin Teacher Attendance (continued)
+ */
 function demoRenderSuperadminManageTeacherAttendance($data = []) {
     ob_start();
     ?>
-    <div class="edu-attendance-container" style="margin-top: 80px;">
-        <h2 class="edu-attendance-title">Manage Teacher Attendance</h2>
-        <div class="edu-attendance-actions">
-            <input type="text" id="teacher-attendance-search" class="edu-search-input" placeholder="Search Teachers..." style="margin-right: 20px; padding: 8px; width: 300px;">
-            <button class="edu-button edu-button-primary" id="add-teacher-attendance-btn">Add Attendance</button>
-            <button class="edu-button edu-button-secondary" id="export-teacher-attendance">Export CSV</button>
-            <input type="file" id="import-teacher-attendance" accept=".csv" style="display: none;">
-            <button class="edu-button edu-button-secondary" id="import-teacher-attendance-btn">Import CSV</button>
-        </div>
-        <div class="edu-pagination" style="margin: 20px 0;">
-            <label for="attendance-per-page">Show:</label>
-            <select id="attendance-per-page" class="edu-select" style="margin-right: 20px;">
-                <option value="10">10</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-            </select>
-            <button class="edu-button edu-button-nav" id="prev-page" disabled>Previous</button>
-            <span id="page-info" style="margin: 0 10px;"></span>
-            <button class="edu-button edu-button-nav" id="next-page">Next</button>
+    <div class="dashboard-section">
+        <h2>Manage Teacher Attendance</h2>
+        <div class="edu-actions">
+            <input type="text" id="attendance-search" class="edu-search-input" placeholder="Search Attendance...">
+            <button class="edu-button edu-button-primary" onclick="window.location.href='<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'add-teacher-attendance'])); ?>'">Add Attendance</button>
+            <button class="edu-button edu-button-secondary" onclick="window.location.href='<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'import-teacher-attendance'])); ?>'">Import CSV</button>
+            <button class="edu-button edu-button-secondary" id="export-attendance">Export CSV</button>
         </div>
         <div class="edu-table-wrapper">
-            <table class="edu-table" id="teacher-attendance-table">
+            <table class="edu-table" id="attendance-table">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Teacher ID</th>
                         <th>Name</th>
-                        <th>Department</th>
+                        <th>Center</th>
                         <th>Date</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody id="teacher-attendance-table-body">
-                    <!-- Populated via JS -->
+                <tbody id="attendance-table-body">
+                    <?php foreach ($data['teacher_attendance'] as $att): ?>
+                        <tr data-attendance-id="<?php echo esc_attr($att['id']); ?>">
+                            <td><?php echo esc_html($att['id']); ?></td>
+                            <td><?php echo esc_html($att['teacher_id']); ?></td>
+                            <td><?php echo esc_html($att['teacher_name']); ?></td>
+                            <td><?php echo esc_html($att['center']); ?></td>
+                            <td><?php echo esc_html($att['date']); ?></td>
+                            <td><?php echo esc_html($att['status']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-attendance" data-attendance-id="<?php echo esc_attr($att['id']); ?>">Edit</button>
+                                <button class="edu-button edu-button-delete delete-attendance" data-attendance-id="<?php echo esc_attr($att['id']); ?>">Delete</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
-
-        <!-- Add Teacher Attendance Modal -->
-        <div id="add-teacher-attendance-modal" class="edu-modal" style="display: none;">
-            <div class="edu-modal-content">
-                <span class="edu-modal-close" id="add-teacher-attendance-close">&times;</span>
-                <h2>Add Teacher Attendance</h2>
-                <form id="add-teacher-attendance-form" class="edu-form">
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-teacher-id">Teacher ID</label>
-                        <input type="text" class="edu-form-input" id="add-teacher-id" name="teacher_id" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-teacher-name">Teacher Name</label>
-                        <input type="text" class="edu-form-input" id="add-teacher-name" name="teacher_name" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-department">Department</label>
-                        <input type="text" class="edu-form-input" id="add-department" name="department" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-attendance-date">Date</label>
-                        <input type="date" class="edu-form-input" id="add-attendance-date" name="date" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-attendance-status">Status</label>
-                        <select class="edu-form-input" id="add-attendance-status" name="status" required>
-                            <option value="Present">Present</option>
-                            <option value="Absent">Absent</option>
-                            <option value="Late">Late</option>
-                        </select>
-                    </div>
-                    <button type="button" class="edu-button edu-button-primary" id="save-teacher-attendance">Add Attendance</button>
-                </form>
-                <div class="edu-form-message" id="add-teacher-attendance-message"></div>
-            </div>
+        <div class="edu-pagination">
+            <button class="edu-button edu-button-nav" id="prev-page" disabled>Previous</button>
+            <span id="page-info"></span>
+            <button class="edu-button edu-button-nav" id="next-page">Next</button>
         </div>
 
-        <!-- Edit Teacher Attendance Modal -->
-        <div id="edit-teacher-attendance-modal" class="edu-modal" style="display: none;">
+        <!-- Edit Attendance Modal -->
+        <div id="edit-attendance-modal" class="edu-modal" style="display: none;">
             <div class="edu-modal-content">
-                <span class="edu-modal-close" id="edit-teacher-attendance-close">&times;</span>
+                <span class="edu-modal-close" data-modal="edit-attendance-modal">×</span>
                 <h2>Edit Teacher Attendance</h2>
-                <form id="edit-teacher-attendance-form" class="edu-form">
+                <form id="edit-attendance-form" class="edu-form">
                     <input type="hidden" id="edit-attendance-id">
                     <div class="edu-form-group">
                         <label class="edu-form-label" for="edit-teacher-id">Teacher ID</label>
-                        <input type="text" class="edu-form-input" id="edit-teacher-id" name="teacher_id" readonly>
+                        <input type="text" class="edu-form-input" id="edit-teacher-id" readonly>
                     </div>
                     <div class="edu-form-group">
                         <label class="edu-form-label" for="edit-teacher-name">Teacher Name</label>
-                        <input type="text" class="edu-form-input" id="edit-teacher-name" name="teacher_name" readonly>
+                        <input type="text" class="edu-form-input" id="edit-teacher-name" readonly>
                     </div>
                     <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-department">Department</label>
-                        <input type="text" class="edu-form-input" id="edit-department" name="department" readonly>
+                        <label class="edu-form-label" for="edit-center">Center</label>
+                        <input type="text" class="edu-form-input" id="edit-center" readonly>
                     </div>
                     <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-attendance-date">Date</label>
-                        <input type="date" class="edu-form-input" id="edit-attendance-date" name="date" required>
+                        <label class="edu-form-label" for="edit-date">Date</label>
+                        <input type="date" class="edu-form-input" id="edit-date" required>
                     </div>
                     <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-attendance-status">Status</label>
-                        <select class="edu-form-input" id="edit-attendance-status" name="status" required>
+                        <label class="edu-form-label" for="edit-status">Status</label>
+                        <select class="edu-form-input" id="edit-status" required>
                             <option value="Present">Present</option>
                             <option value="Absent">Absent</option>
                             <option value="Late">Late</option>
                         </select>
                     </div>
-                    <button type="button" class="edu-button edu-button-primary" id="update-teacher-attendance">Update Attendance</button>
+                    <button type="button" class="edu-button edu-button-primary" id="update-attendance">Update Attendance</button>
                 </form>
-                <div class="edu-form-message" id="edit-teacher-attendance-message"></div>
-            </div>
-        </div>
-
-        <!-- Delete Teacher Attendance Modal -->
-        <div id="delete-teacher-attendance-modal" class="edu-modal" style="display: none;">
-            <div class="edu-modal-content">
-                <span class="edu-modal-close" id="delete-teacher-attendance-close">&times;</span>
-                <h2>Delete Teacher Attendance</h2>
-                <p>Are you sure you want to delete attendance for <span id="delete-teacher-name"></span> on <span id="delete-attendance-date"></span>?</p>
-                <input type="hidden" id="delete-attendance-id">
-                <button type="button" class="edu-button edu-button-delete" id="confirm-delete-teacher-attendance">Delete</button>
-                <button type="button" class="edu-button edu-button-secondary" id="cancel-delete-teacher-attendance">Cancel</button>
-                <div class="edu-form-message" id="delete-teacher-attendance-message"></div>
+                <div class="edu-form-message" id="edit-attendance-message"></div>
             </div>
         </div>
 
         <script>
         jQuery(document).ready(function($) {
+            let attendanceData = <?php echo json_encode($data['teacher_attendance']); ?>;
             let currentPage = 1;
             let perPage = 10;
             let searchQuery = '';
-            let teacherAttendanceData = <?php echo json_encode($data['teacher_attendance']); ?>;
 
-            function loadTeacherAttendance(page, limit, query) {
-                const filtered = teacherAttendanceData.filter(a => 
+            function loadAttendance(page, limit, query) {
+                const filtered = attendanceData.filter(a => 
                     !query || a.teacher_name.toLowerCase().includes(query.toLowerCase())
                 );
                 const total = filtered.length;
@@ -1811,121 +1892,87 @@ function demoRenderSuperadminManageTeacherAttendance($data = []) {
                 const end = start + limit;
                 const paginated = filtered.slice(start, end);
                 let html = '';
-                paginated.forEach((record, index) => {
+                paginated.forEach(att => {
                     html += `
-                        <tr data-attendance-id="${start + index}">
-                            <td>${record.teacher_id}</td>
-                            <td>${record.teacher_name}</td>
-                            <td>${record.department}</td>
-                            <td>${record.date}</td>
-                            <td>${record.status}</td>
+                        <tr data-attendance-id="${att.id}">
+                            <td>${att.id}</td>
+                            <td>${att.teacher_id}</td>
+                            <td>${att.teacher_name}</td>
+                            <td>${att.center}</td>
+                            <td>${att.date}</td>
+                            <td>${att.status}</td>
                             <td>
-                                <button class="edu-button edu-button-edit edit-teacher-attendance" data-attendance-id="${start + index}">Edit</button>
-                                <button class="edu-button edu-button-delete delete-teacher-attendance" data-attendance-id="${start + index}">Delete</button>
+                                <button class="edu-button edu-button-edit edit-attendance" data-attendance-id="${att.id}">Edit</button>
+                                <button class="edu-button edu-button-delete delete-attendance" data-attendance-id="${att.id}">Delete</button>
                             </td>
                         </tr>
                     `;
                 });
-                $('#teacher-attendance-table-body').html(html || '<tr><td colspan="6">No attendance records found.</td></tr>');
+                $('#attendance-table-body').html(html || '<tr><td colspan="7">No attendance records found.</td></tr>');
                 const totalPages = Math.ceil(total / limit);
                 $('#page-info').text(`Page ${page} of ${totalPages}`);
                 $('#prev-page').prop('disabled', page === 1);
                 $('#next-page').prop('disabled', page === totalPages || total === 0);
             }
 
-            loadTeacherAttendance(currentPage, perPage, searchQuery);
+            loadAttendance(currentPage, perPage, searchQuery);
 
-            $('#teacher-attendance-search').on('input', function() {
+            $('#attendance-search').on('input', function() {
                 searchQuery = $(this).val();
                 currentPage = 1;
-                loadTeacherAttendance(currentPage, perPage, searchQuery);
+                loadAttendance(currentPage, perPage, searchQuery);
             });
 
-            $('#attendance-per-page').on('change', function() {
-                perPage = parseInt($(this).val());
-                currentPage = 1;
-                loadTeacherAttendance(currentPage, perPage, searchQuery);
-            });
+            $('#prev-page').on('click', function() { currentPage--; loadAttendance(currentPage, perPage, searchQuery); });
+            $('#next-page').on('click', function() { currentPage++; loadAttendance(currentPage, perPage, searchQuery); });
 
-            $('#next-page').on('click', function() { currentPage++; loadTeacherAttendance(currentPage, perPage, searchQuery); });
-            $('#prev-page').on('click', function() { currentPage--; loadTeacherAttendance(currentPage, perPage, searchQuery); });
-
-            $('#add-teacher-attendance-btn').on('click', function() { $('#add-teacher-attendance-modal').show(); });
-            $('#add-teacher-attendance-close').on('click', function() { $('#add-teacher-attendance-modal').hide(); });
-            $('#save-teacher-attendance').on('click', function() {
-                const record = {
-                    teacher_id: $('#add-teacher-id').val(),
-                    teacher_name: $('#add-teacher-name').val(),
-                    department: $('#add-department').val(),
-                    date: $('#add-attendance-date').val(),
-                    status: $('#add-attendance-status').val()
-                };
-                if (record.teacher_id && record.teacher_name && record.department && record.date && record.status) {
-                    teacherAttendanceData.push(record);
-                    $('#add-teacher-attendance-message').addClass('edu-success').text('Attendance added successfully!');
-                    setTimeout(() => {
-                        $('#add-teacher-attendance-modal').hide();
-                        $('#add-teacher-attendance-message').removeClass('edu-success').text('');
-                        $('#add-teacher-attendance-form')[0].reset();
-                        loadTeacherAttendance(currentPage, perPage, searchQuery);
-                    }, 1000);
+            $(document).on('click', '.edit-attendance', function() {
+                const attId = $(this).data('attendance-id');
+                const att = attendanceData.find(a => a.id == attId);
+                if (att) {
+                    $('#edit-attendance-id').val(att.id);
+                    $('#edit-teacher-id').val(att.teacher_id);
+                    $('#edit-teacher-name').val(att.teacher_name);
+                    $('#edit-center').val(att.center);
+                    $('#edit-date').val(att.date);
+                    $('#edit-status').val(att.status);
+                    $('#edit-attendance-modal').show();
                 } else {
-                    $('#add-teacher-attendance-message').addClass('edu-error').text('Please fill all required fields.');
+                    alert('Attendance record not found.');
                 }
             });
 
-            $(document).on('click', '.edit-teacher-attendance', function() {
-                const attendanceId = $(this).data('attendance-id');
-                const record = teacherAttendanceData[attendanceId];
-                $('#edit-attendance-id').val(attendanceId);
-                $('#edit-teacher-id').val(record.teacher_id);
-                $('#edit-teacher-name').val(record.teacher_name);
-                $('#edit-department').val(record.department);
-                $('#edit-attendance-date').val(record.date);
-                $('#edit-attendance-status').val(record.status);
-                $('#edit-teacher-attendance-modal').show();
-            });
-            $('#edit-teacher-attendance-close').on('click', function() { $('#edit-teacher-attendance-modal').hide(); });
-            $('#update-teacher-attendance').on('click', function() {
-                const attendanceId = $('#edit-attendance-id').val();
-                const record = teacherAttendanceData[attendanceId];
-                record.date = $('#edit-attendance-date').val();
-                record.status = $('#edit-attendance-status').val();
-                if (record.date && record.status) {
-                    $('#edit-teacher-attendance-message').addClass('edu-success').text('Attendance updated successfully!');
-                    setTimeout(() => {
-                        $('#edit-teacher-attendance-modal').hide();
-                        $('#edit-teacher-attendance-message').removeClass('edu-success').text('');
-                        loadTeacherAttendance(currentPage, perPage, searchQuery);
-                    }, 1000);
+            $('#update-attendance').on('click', function() {
+                const id = $('#edit-attendance-id').val();
+                const date = $('#edit-date').val();
+                const status = $('#edit-status').val();
+                if (date && status) {
+                    const att = attendanceData.find(a => a.id == id);
+                    if (att) {
+                        att.date = date;
+                        att.status = status;
+                        $('#edit-attendance-message').addClass('edu-success').text('Attendance updated successfully!');
+                        setTimeout(() => {
+                            $('#edit-attendance-modal').hide();
+                            $('#edit-attendance-message').removeClass('edu-success').text('');
+                            loadAttendance(currentPage, perPage, searchQuery);
+                        }, 1000);
+                    }
                 } else {
-                    $('#edit-teacher-attendance-message').addClass('edu-error').text('Please fill all required fields.');
+                    $('#edit-attendance-message').addClass('edu-error').text('Please fill all required fields.');
                 }
             });
 
-            $(document).on('click', '.delete-teacher-attendance', function() {
-                const attendanceId = $(this).data('attendance-id');
-                const record = teacherAttendanceData[attendanceId];
-                $('#delete-attendance-id').val(attendanceId);
-                $('#delete-teacher-name').text(record.teacher_name);
-                $('#delete-attendance-date').text(record.date);
-                $('#delete-teacher-attendance-modal').show();
-            });
-            $('#delete-teacher-attendance-close, #cancel-delete-teacher-attendance').on('click', function() { $('#delete-teacher-attendance-modal').hide(); });
-            $('#confirm-delete-teacher-attendance').on('click', function() {
-                const attendanceId = $('#delete-attendance-id').val();
-                teacherAttendanceData.splice(attendanceId, 1);
-                $('#delete-teacher-attendance-message').addClass('edu-success').text('Attendance deleted successfully!');
-                setTimeout(() => {
-                    $('#delete-teacher-attendance-modal').hide();
-                    $('#delete-teacher-attendance-message').removeClass('edu-success').text('');
-                    loadTeacherAttendance(currentPage, perPage, searchQuery);
-                }, 1000);
+            $(document).on('click', '.delete-attendance', function() {
+                if (!confirm('Are you sure you want to delete this attendance record?')) return;
+                const attId = $(this).data('attendance-id');
+                attendanceData = attendanceData.filter(a => a.id != attId);
+                loadAttendance(currentPage, perPage, searchQuery);
             });
 
-            $('#export-teacher-attendance').on('click', function() {
-                const csv = teacherAttendanceData.map(row => `${row.teacher_id},${row.teacher_name},${row.department},${row.date},${row.status}`).join('\n');
-                const headers = 'Teacher ID,Teacher Name,Department,Date,Status\n';
+            $('#export-attendance').on('click', function() {
+                const csv = attendanceData.map(row => `${row.id},${row.teacher_id},${row.teacher_name},${row.center},${row.date},${row.status}`).join('\n');
+                const headers = 'ID,Teacher ID,Teacher Name,Center,Date,Status\n';
                 const blob = new Blob([headers + csv], { type: 'text/csv' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -1935,30 +1982,65 @@ function demoRenderSuperadminManageTeacherAttendance($data = []) {
                 window.URL.revokeObjectURL(url);
             });
 
-            $('#import-teacher-attendance-btn').on('click', function() {
-                $('#import-teacher-attendance').click();
-            });
+            $('.edu-modal-close').on('click', function() { $('#edit-attendance-modal').hide(); });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
 
-            $('#import-teacher-attendance').on('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const text = e.target.result;
-                        const rows = text.split('\n').slice(1).filter(row => row.trim());
-                        const newRecords = rows.map(row => {
-                            const [teacher_id, teacher_name, department, date, status] = row.split(',');
-                            return { teacher_id, teacher_name, department, date, status };
-                        });
-                        teacherAttendanceData.push(...newRecords);
-                        $('#add-teacher-attendance-message').addClass('edu-success').text('Attendance imported successfully!');
-                        setTimeout(() => {
-                            $('#add-teacher-attendance-message').removeClass('edu-success').text('');
-                            loadTeacherAttendance(currentPage, perPage, searchQuery);
-                        }, 1000);
-                    };
-                    reader.readAsText(file);
-                    e.target.value = '';
+function demoRenderSuperadminAddTeacherAttendance() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Teacher Attendance</h2>
+        <div class="card p-4 bg-light">
+            <form id="add-attendance-form" class="edu-form">
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="teacher-id">Teacher ID</label>
+                    <input type="text" class="edu-form-input" id="teacher-id" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="teacher-name">Teacher Name</label>
+                    <input type="text" class="edu-form-input" id="teacher-name" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="center">Center</label>
+                    <input type="text" class="edu-form-input" id="center" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="date">Date</label>
+                    <input type="date" class="edu-form-input" id="date" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="status">Status</label>
+                    <select class="edu-form-input" id="status" required>
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                        <option value="Late">Late</option>
+                    </select>
+                </div>
+                <button type="button" class="edu-button edu-button-primary" id="save-attendance">Add Attendance</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </form>
+            <div class="edu-form-message" id="add-attendance-message"></div>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#save-attendance').on('click', function() {
+                const teacher_id = $('#teacher-id').val();
+                const teacher_name = $('#teacher-name').val();
+                const center = $('#center').val();
+                const date = $('#date').val();
+                const status = $('#status').val();
+                if (teacher_id && teacher_name && center && date && status) {
+                    $('#add-attendance-message').addClass('edu-success').text('Attendance added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#add-attendance-message').addClass('edu-error').text('Please fill all required fields.');
                 }
             });
         });
@@ -1967,33 +2049,239 @@ function demoRenderSuperadminManageTeacherAttendance($data = []) {
     <?php
     return ob_get_clean();
 }
+
+function demoRenderSuperadminEditTeacherAttendance($data = []) {
+    ob_start();
+    $att_id = isset($_GET['att_id']) ? sanitize_text_field($_GET['att_id']) : '';
+    $att = null;
+    foreach ($data['teacher_attendance'] as $record) {
+        if ($record['id'] === $att_id) {
+            $att = $record;
+            break;
+        }
+    }
+    if (!$att) {
+        ?>
+        <div class="dashboard-section">
+            <h2>Edit Teacher Attendance</h2>
+            <div class="alert alert-warning">Attendance record not found.</div>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>" class="edu-button edu-button-secondary">Back</a>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Teacher Attendance</h2>
+        <div class="card p-4 bg-light">
+            <form id="edit-attendance-form" class="edu-form">
+                <input type="hidden" id="edit-attendance-id" value="<?php echo esc_attr($att['id']); ?>">
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-id">Teacher ID</label>
+                    <input type="text" class="edu-form-input" id="edit-teacher-id" value="<?php echo esc_attr($att['teacher_id']); ?>" readonly>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-teacher-name">Teacher Name</label>
+                    <input type="text" class="edu-form-input" id="edit-teacher-name" value="<?php echo esc_attr($att['teacher_name']); ?>" readonly>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-center">Center</label>
+                    <input type="text" class="edu-form-input" id="edit-center" value="<?php echo esc_attr($att['center']); ?>" readonly>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-date">Date</label>
+                    <input type="date" class="edu-form-input" id="edit-date" value="<?php echo esc_attr($att['date']); ?>" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-status">Status</label>
+                    <select class="edu-form-input" id="edit-status" required>
+                        <option value="Present" <?php echo $att['status'] === 'Present' ? 'selected' : ''; ?>>Present</option>
+                        <option value="Absent" <?php echo $att['status'] === 'Absent' ? 'selected' : ''; ?>>Absent</option>
+                        <option value="Late" <?php echo $att['status'] === 'Late' ? 'selected' : ''; ?>>Late</option>
+                    </select>
+                </div>
+                <button type="button" class="edu-button edu-button-primary" id="update-attendance">Update Attendance</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </form>
+            <div class="edu-form-message" id="edit-attendance-message"></div>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#update-attendance').on('click', function() {
+                const id = $('#edit-attendance-id').val();
+                const date = $('#edit-date').val();
+                const status = $('#edit-status').val();
+                if (date && status) {
+                    $('#edit-attendance-message').addClass('edu-success').text('Attendance updated successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#edit-attendance-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderSuperadminDeleteTeacherAttendance($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Teacher Attendance</h2>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="attendance-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Teacher ID</th>
+                        <th>Name</th>
+                        <th>Center</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="attendance-table-body">
+                    <?php foreach ($data['teacher_attendance'] as $att): ?>
+                        <tr data-attendance-id="<?php echo esc_attr($att['id']); ?>">
+                            <td><?php echo esc_html($att['id']); ?></td>
+                            <td><?php echo esc_html($att['teacher_id']); ?></td>
+                            <td><?php echo esc_html($att['teacher_name']); ?></td>
+                            <td><?php echo esc_html($att['center']); ?></td>
+                            <td><?php echo esc_html($att['date']); ?></td>
+                            <td><?php echo esc_html($att['status']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-delete delete-attendance" data-attendance-id="<?php echo esc_attr($att['id']); ?>">Delete</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            let attendanceData = <?php echo json_encode($data['teacher_attendance']); ?>;
+            $(document).on('click', '.delete-attendance', function() {
+                if (!confirm('Are you sure you want to delete this attendance record?')) return;
+                const attId = $(this).data('attendance-id');
+                attendanceData = attendanceData.filter(a => a.id != attId);
+                window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>';
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderSuperadminImportTeacherAttendance($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Import Teacher Attendance</h2>
+        <div class="edu-form-group">
+            <label class="edu-form-label" for="import-teacher-attendance">Upload CSV File</label>
+            <input type="file" class="edu-form-input" id="import-teacher-attendance" accept=".csv">
+        </div>
+        <button type="button" class="edu-button edu-button-primary" id="import-teacher-attendance-btn">Import</button>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+        <div class="edu-form-message" id="import-teacher-attendance-message"></div>
+        <p style="margin-top: 20px;">
+            <strong>CSV Format:</strong><br>
+            ID,Teacher ID,Teacher Name,Center,Date,Status<br>
+            Example: 1,T001,John Doe,Main Campus,2025-04-12,Present
+        </p>
+        <script>
+        jQuery(document).ready(function($) {
+            let teacherAttendanceData = <?php echo json_encode($data['teacher_attendance'] ?? []); ?>;
+            $('#import-teacher-attendance-btn').on('click', function() {
+                const fileInput = $('#import-teacher-attendance')[0];
+                const file = fileInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const text = e.target.result;
+                        const rows = text.split('\n').slice(1).filter(row => row.trim());
+                        const newRecords = rows.map(row => {
+                            const [id, teacher_id, teacher_name, center, date, status] = row.split(',');
+                            return { id, teacher_id, teacher_name, center, date, status };
+                        });
+                        teacherAttendanceData.push(...newRecords);
+                        $('#import-teacher-attendance-message').addClass('edu-success').text('Teacher attendance imported successfully!');
+                        setTimeout(() => {
+                            window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>';
+                        }, 1000);
+                    };
+                    reader.readAsText(file);
+                    fileInput.value = '';
+                } else {
+                    $('#import-teacher-attendance-message').addClass('edu-error').text('Please select a CSV file.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderSuperadminExportTeacherAttendance($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Export Teacher Attendance</h2>
+        <p>Click the button below to download a CSV file of all teacher attendance records.</p>
+        <button type="button" class="edu-button edu-button-primary" id="export-teacher-attendance">Export CSV</button>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+        <div class="edu-form-message" id="export-teacher-attendance-message"></div>
+        <script>
+        jQuery(document).ready(function($) {
+            const teacherAttendanceData = <?php echo json_encode($data['teacher_attendance'] ?? []); ?>;
+            $('#export-teacher-attendance').on('click', function() {
+                const csv = teacherAttendanceData.map(row => `${row.id},${row.teacher_id},${row.teacher_name},${row.center},${row.date},${row.status}`).join('\n');
+                const headers = 'ID,Teacher ID,Teacher Name,Center,Date,Status\n';
+                const blob = new Blob([headers + csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'teacher_attendance.csv';
+                a.click();
+                window.URL.revokeObjectURL(url);
+                $('#export-teacher-attendance-message').addClass('edu-success').text('Teacher attendance exported successfully!');
+                setTimeout(() => {
+                    $('#export-teacher-attendance-message').removeClass('edu-success').text('');
+                }, 1000);
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+/**
+ * Superadmin Student Attendance
+ */
 function demoRenderSuperadminManageStudentAttendance($data = []) {
     ob_start();
     ?>
-    <div class="edu-attendance-container" style="margin-top: 80px;">
-        <h2 class="edu-attendance-title">Manage Student Attendance</h2>
-        <div class="edu-attendance-actions">
-            <input type="text" id="student-attendance-search" class="edu-search-input" placeholder="Search Students..." style="margin-right: 20px; padding: 8px; width: 300px;">
-            <button class="edu-button edu-button-primary" id="add-student-attendance-btn">Add Attendance</button>
-            <button class="edu-button edu-button-secondary" id="export-student-attendance">Export CSV</button>
-            <input type="file" id="import-student-attendance" accept=".csv" style="display: none;">
-            <button class="edu-button edu-button-secondary" id="import-student-attendance-btn">Import CSV</button>
-        </div>
-        <div class="edu-pagination" style="margin: 20px 0;">
-            <label for="attendance-per-page">Show:</label>
-            <select id="attendance-per-page" class="edu-select" style="margin-right: 20px;">
-                <option value="10">10</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-            </select>
-            <button class="edu-button edu-button-nav" id="prev-page" disabled>Previous</button>
-            <span id="page-info" style="margin: 0 10px;"></span>
-            <button class="edu-button edu-button-nav" id="next-page">Next</button>
+    <div class="dashboard-section">
+        <h2>Manage Student Attendance</h2>
+        <div class="edu-actions">
+            <input type="text" id="attendance-search" class="edu-search-input" placeholder="Search Attendance...">
+            <button class="edu-button edu-button-primary" onclick="window.location.href='<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'add-student-attendance'])); ?>'">Add Attendance</button>
+            <button class="edu-button edu-button-secondary" onclick="window.location.href='<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'import-student-attendance'])); ?>'">Import CSV</button>
+            <button class="edu-button edu-button-secondary" id="export-attendance">Export CSV</button>
         </div>
         <div class="edu-table-wrapper">
-            <table class="edu-table" id="student-attendance-table">
+            <table class="edu-table" id="attendance-table">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Student ID</th>
                         <th>Name</th>
                         <th>Class</th>
@@ -2004,123 +2292,86 @@ function demoRenderSuperadminManageStudentAttendance($data = []) {
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody id="student-attendance-table-body">
-                    <!-- Populated via JS -->
+                <tbody id="attendance-table-body">
+                    <?php foreach ($data['student_attendance'] as $att): ?>
+                        <tr data-attendance-id="<?php echo esc_attr($att['id']); ?>">
+                            <td><?php echo esc_html($att['id']); ?></td>
+                            <td><?php echo esc_html($att['student_id']); ?></td>
+                            <td><?php echo esc_html($att['student_name']); ?></td>
+                            <td><?php echo esc_html($att['class']); ?></td>
+                            <td><?php echo esc_html($att['section']); ?></td>
+                            <td><?php echo esc_html($att['center']); ?></td>
+                            <td><?php echo esc_html($att['date']); ?></td>
+                            <td><?php echo esc_html($att['status']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-attendance" data-attendance-id="<?php echo esc_attr($att['id']); ?>">Edit</button>
+                                <button class="edu-button edu-button-delete delete-attendance" data-attendance-id="<?php echo esc_attr($att['id']); ?>">Delete</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
-
-        <!-- Add Student Attendance Modal -->
-        <div id="add-student-attendance-modal" class="edu-modal" style="display: none;">
-            <div class="edu-modal-content">
-                <span class="edu-modal-close" id="add-student-attendance-close">×</span>
-                <h2>Add Student Attendance</h2>
-                <form id="add-student-attendance-form" class="edu-form">
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-student-id">Student ID</label>
-                        <input type="text" class="edu-form-input" id="add-student-id" name="student_id" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-student-name">Student Name</label>
-                        <input type="text" class="edu-form-input" id="add-student-name" name="student_name" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-class">Class</label>
-                        <input type="text" class="edu-form-input" id="add-class" name="class" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-section">Section</label>
-                        <input type="text" class="edu-form-input" id="add-section" name="section" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-center">Center</label>
-                        <input type="text" class="edu-form-input" id="add-center" name="center" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-attendance-date">Date</label>
-                        <input type="date" class="edu-form-input" id="add-attendance-date" name="date" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-attendance-status">Status</label>
-                        <select class="edu-form-input" id="add-attendance-status" name="status" required>
-                            <option value="Present">Present</option>
-                            <option value="Absent">Absent</option>
-                            <option value="Late">Late</option>
-                        </select>
-                    </div>
-                    <button type="button" class="edu-button edu-button-primary" id="save-student-attendance">Add Attendance</button>
-                </form>
-                <div class="edu-form-message" id="add-student-attendance-message"></div>
-            </div>
+        <div class="edu-pagination">
+            <button class="edu-button edu-button-nav" id="prev-page" disabled>Previous</button>
+            <span id="page-info"></span>
+            <button class="edu-button edu-button-nav" id="next-page">Next</button>
         </div>
 
-        <!-- Edit Student Attendance Modal -->
-        <div id="edit-student-attendance-modal" class="edu-modal" style="display: none;">
+        <!-- Edit Attendance Modal -->
+        <div id="edit-attendance-modal" class="edu-modal" style="display: none;">
             <div class="edu-modal-content">
-                <span class="edu-modal-close" id="edit-student-attendance-close">×</span>
+                <span class="edu-modal-close" data-modal="edit-attendance-modal">×</span>
                 <h2>Edit Student Attendance</h2>
-                <form id="edit-student-attendance-form" class="edu-form">
+                <form id="edit-attendance-form" class="edu-form">
                     <input type="hidden" id="edit-attendance-id">
                     <div class="edu-form-group">
                         <label class="edu-form-label" for="edit-student-id">Student ID</label>
-                        <input type="text" class="edu-form-input" id="edit-student-id" name="student_id" readonly>
+                        <input type="text" class="edu-form-input" id="edit-student-id" readonly>
                     </div>
                     <div class="edu-form-group">
                         <label class="edu-form-label" for="edit-student-name">Student Name</label>
-                        <input type="text" class="edu-form-input" id="edit-student-name" name="student_name" readonly>
+                        <input type="text" class="edu-form-input" id="edit-student-name" readonly>
                     </div>
                     <div class="edu-form-group">
                         <label class="edu-form-label" for="edit-class">Class</label>
-                        <input type="text" class="edu-form-input" id="edit-class" name="class" readonly>
+                        <input type="text" class="edu-form-input" id="edit-class" readonly>
                     </div>
                     <div class="edu-form-group">
                         <label class="edu-form-label" for="edit-section">Section</label>
-                        <input type="text" class="edu-form-input" id="edit-section" name="section" readonly>
+                        <input type="text" class="edu-form-input" id="edit-section" readonly>
                     </div>
                     <div class="edu-form-group">
                         <label class="edu-form-label" for="edit-center">Center</label>
-                        <input type="text" class="edu-form-input" id="edit-center" name="center" readonly>
+                        <input type="text" class="edu-form-input" id="edit-center" readonly>
                     </div>
                     <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-attendance-date">Date</label>
-                        <input type="date" class="edu-form-input" id="edit-attendance-date" name="date" required>
+                        <label class="edu-form-label" for="edit-date">Date</label>
+                        <input type="date" class="edu-form-input" id="edit-date" required>
                     </div>
                     <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-attendance-status">Status</label>
-                        <select class="edu-form-input" id="edit-attendance-status" name="status" required>
+                        <label class="edu-form-label" for="edit-status">Status</label>
+                        <select class="edu-form-input" id="edit-status" required>
                             <option value="Present">Present</option>
                             <option value="Absent">Absent</option>
                             <option value="Late">Late</option>
                         </select>
                     </div>
-                    <button type="button" class="edu-button edu-button-primary" id="update-student-attendance">Update Attendance</button>
+                    <button type="button" class="edu-button edu-button-primary" id="update-attendance">Update Attendance</button>
                 </form>
-                <div class="edu-form-message" id="edit-student-attendance-message"></div>
-            </div>
-        </div>
-
-        <!-- Delete Student Attendance Modal -->
-        <div id="delete-student-attendance-modal" class="edu-modal" style="display: none;">
-            <div class="edu-modal-content">
-                <span class="edu-modal-close" id="delete-student-attendance-close">×</span>
-                <h2>Delete Student Attendance</h2>
-                <p>Are you sure you want to delete attendance for <span id="delete-student-name"></span> on <span id="delete-attendance-date"></span>?</p>
-                <input type="hidden" id="delete-attendance-id">
-                <button type="button" class="edu-button edu-button-delete" id="confirm-delete-student-attendance">Delete</button>
-                <button type="button" class="edu-button edu-button-secondary" id="cancel-delete-student-attendance">Cancel</button>
-                <div class="edu-form-message" id="delete-student-attendance-message"></div>
+                <div class="edu-form-message" id="edit-attendance-message"></div>
             </div>
         </div>
 
         <script>
         jQuery(document).ready(function($) {
+            let attendanceData = <?php echo json_encode($data['student_attendance']); ?>;
             let currentPage = 1;
             let perPage = 10;
             let searchQuery = '';
-            let studentAttendanceData = <?php echo json_encode($data['student_attendance'] ?? []); ?>;
 
-            function loadStudentAttendance(page, limit, query) {
-                const filtered = studentAttendanceData.filter(a => 
+            function loadAttendance(page, limit, query) {
+                const filtered = attendanceData.filter(a => 
                     !query || a.student_name.toLowerCase().includes(query.toLowerCase())
                 );
                 const total = filtered.length;
@@ -2128,127 +2379,91 @@ function demoRenderSuperadminManageStudentAttendance($data = []) {
                 const end = start + limit;
                 const paginated = filtered.slice(start, end);
                 let html = '';
-                paginated.forEach((record, index) => {
+                paginated.forEach(att => {
                     html += `
-                        <tr data-attendance-id="${start + index}">
-                            <td>${record.student_id}</td>
-                            <td>${record.student_name}</td>
-                            <td>${record.class}</td>
-                            <td>${record.section}</td>
-                            <td>${record.center}</td>
-                            <td>${record.date}</td>
-                            <td>${record.status}</td>
+                        <tr data-attendance-id="${att.id}">
+                            <td>${att.id}</td>
+                            <td>${att.student_id}</td>
+                            <td>${att.student_name}</td>
+                            <td>${att.class}</td>
+                            <td>${att.section}</td>
+                            <td>${att.center}</td>
+                            <td>${att.date}</td>
+                            <td>${att.status}</td>
                             <td>
-                                <button class="edu-button edu-button-edit edit-student-attendance" data-attendance-id="${start + index}">Edit</button>
-                                <button class="edu-button edu-button-delete delete-student-attendance" data-attendance-id="${start + index}">Delete</button>
+                                <button class="edu-button edu-button-edit edit-attendance" data-attendance-id="${att.id}">Edit</button>
+                                <button class="edu-button edu-button-delete delete-attendance" data-attendance-id="${att.id}">Delete</button>
                             </td>
                         </tr>
                     `;
                 });
-                $('#student-attendance-table-body').html(html || '<tr><td colspan="8">No attendance records found.</td></tr>');
+                $('#attendance-table-body').html(html || '<tr><td colspan="9">No attendance records found.</td></tr>');
                 const totalPages = Math.ceil(total / limit);
                 $('#page-info').text(`Page ${page} of ${totalPages}`);
                 $('#prev-page').prop('disabled', page === 1);
                 $('#next-page').prop('disabled', page === totalPages || total === 0);
             }
 
-            loadStudentAttendance(currentPage, perPage, searchQuery);
+            loadAttendance(currentPage, perPage, searchQuery);
 
-            $('#student-attendance-search').on('input', function() {
+            $('#attendance-search').on('input', function() {
                 searchQuery = $(this).val();
                 currentPage = 1;
-                loadStudentAttendance(currentPage, perPage, searchQuery);
+                loadAttendance(currentPage, perPage, searchQuery);
             });
 
-            $('#attendance-per-page').on('change', function() {
-                perPage = parseInt($(this).val());
-                currentPage = 1;
-                loadStudentAttendance(currentPage, perPage, searchQuery);
-            });
+            $('#prev-page').on('click', function() { currentPage--; loadAttendance(currentPage, perPage, searchQuery); });
+            $('#next-page').on('click', function() { currentPage++; loadAttendance(currentPage, perPage, searchQuery); });
 
-            $('#next-page').on('click', function() { currentPage++; loadStudentAttendance(currentPage, perPage, searchQuery); });
-            $('#prev-page').on('click', function() { currentPage--; loadStudentAttendance(currentPage, perPage, searchQuery); });
-
-            $('#add-student-attendance-btn').on('click', function() { $('#add-student-attendance-modal').show(); });
-            $('#add-student-attendance-close').on('click', function() { $('#add-student-attendance-modal').hide(); });
-            $('#save-student-attendance').on('click', function() {
-                const record = {
-                    student_id: $('#add-student-id').val(),
-                    student_name: $('#add-student-name').val(),
-                    class: $('#add-class').val(),
-                    section: $('#add-section').val(),
-                    center: $('#add-center').val(),
-                    date: $('#add-attendance-date').val(),
-                    status: $('#add-attendance-status').val()
-                };
-                if (record.student_id && record.student_name && record.class && record.section && record.center && record.date && record.status) {
-                    studentAttendanceData.push(record);
-                    $('#add-student-attendance-message').addClass('edu-success').text('Attendance added successfully!');
-                    setTimeout(() => {
-                        $('#add-student-attendance-modal').hide();
-                        $('#add-student-attendance-message').removeClass('edu-success').text('');
-                        $('#add-student-attendance-form')[0].reset();
-                        loadStudentAttendance(currentPage, perPage, searchQuery);
-                    }, 1000);
+            $(document).on('click', '.edit-attendance', function() {
+                const attId = $(this).data('attendance-id');
+                const att = attendanceData.find(a => a.id == attId);
+                if (att) {
+                    $('#edit-attendance-id').val(att.id);
+                    $('#edit-student-id').val(att.student_id);
+                    $('#edit-student-name').val(att.student_name);
+                    $('#edit-class').val(att.class);
+                    $('#edit-section').val(att.section);
+                    $('#edit-center').val(att.center);
+                    $('#edit-date').val(att.date);
+                    $('#edit-status').val(att.status);
+                    $('#edit-attendance-modal').show();
                 } else {
-                    $('#add-student-attendance-message').addClass('edu-error').text('Please fill all required fields.');
+                    alert('Attendance record not found.');
                 }
             });
 
-            $(document).on('click', '.edit-student-attendance', function() {
-                const attendanceId = $(this).data('attendance-id');
-                const record = studentAttendanceData[attendanceId];
-                $('#edit-attendance-id').val(attendanceId);
-                $('#edit-student-id').val(record.student_id);
-                $('#edit-student-name').val(record.student_name);
-                $('#edit-class').val(record.class);
-                $('#edit-section').val(record.section);
-                $('#edit-center').val(record.center);
-                $('#edit-attendance-date').val(record.date);
-                $('#edit-attendance-status').val(record.status);
-                $('#edit-student-attendance-modal').show();
-            });
-            $('#edit-student-attendance-close').on('click', function() { $('#edit-student-attendance-modal').hide(); });
-            $('#update-student-attendance').on('click', function() {
-                const attendanceId = $('#edit-attendance-id').val();
-                const record = studentAttendanceData[attendanceId];
-                record.date = $('#edit-attendance-date').val();
-                record.status = $('#edit-attendance-status').val();
-                if (record.date && record.status) {
-                    $('#edit-student-attendance-message').addClass('edu-success').text('Attendance updated successfully!');
-                    setTimeout(() => {
-                        $('#edit-student-attendance-modal').hide();
-                        $('#edit-student-attendance-message').removeClass('edu-success').text('');
-                        loadStudentAttendance(currentPage, perPage, searchQuery);
-                    }, 1000);
+            $('#update-attendance').on('click', function() {
+                const id = $('#edit-attendance-id').val();
+                const date = $('#edit-date').val();
+                const status = $('#edit-status').val();
+                if (date && status) {
+                    const att = attendanceData.find(a => a.id == id);
+                    if (att) {
+                        att.date = date;
+                        att.status = status;
+                        $('#edit-attendance-message').addClass('edu-success').text('Attendance updated successfully!');
+                        setTimeout(() => {
+                            $('#edit-attendance-modal').hide();
+                            $('#edit-attendance-message').removeClass('edu-success').text('');
+                            loadAttendance(currentPage, perPage, searchQuery);
+                        }, 1000);
+                    }
                 } else {
-                    $('#edit-student-attendance-message').addClass('edu-error').text('Please fill all required fields.');
+                    $('#edit-attendance-message').addClass('edu-error').text('Please fill all required fields.');
                 }
             });
 
-            $(document).on('click', '.delete-student-attendance', function() {
-                const attendanceId = $(this).data('attendance-id');
-                const record = studentAttendanceData[attendanceId];
-                $('#delete-attendance-id').val(attendanceId);
-                $('#delete-student-name').text(record.student_name);
-                $('#delete-attendance-date').text(record.date);
-                $('#delete-student-attendance-modal').show();
-            });
-            $('#delete-student-attendance-close, #cancel-delete-student-attendance').on('click', function() { $('#delete-student-attendance-modal').hide(); });
-            $('#confirm-delete-student-attendance').on('click', function() {
-                const attendanceId = $('#delete-attendance-id').val();
-                studentAttendanceData.splice(attendanceId, 1);
-                $('#delete-student-attendance-message').addClass('edu-success').text('Attendance deleted successfully!');
-                setTimeout(() => {
-                    $('#delete-student-attendance-modal').hide();
-                    $('#delete-student-attendance-message').removeClass('edu-success').text('');
-                    loadStudentAttendance(currentPage, perPage, searchQuery);
-                }, 1000);
+            $(document).on('click', '.delete-attendance', function() {
+                if (!confirm('Are you sure you want to delete this attendance record?')) return;
+                const attId = $(this).data('attendance-id');
+                attendanceData = attendanceData.filter(a => a.id != attId);
+                loadAttendance(currentPage, perPage, searchQuery);
             });
 
-            $('#export-student-attendance').on('click', function() {
-                const csv = studentAttendanceData.map(row => `${row.student_id},${row.student_name},${row.class},${row.section},${row.center},${row.date},${row.status}`).join('\n');
-                const headers = 'Student ID,Student Name,Class,Section,Center,Date,Status\n';
+            $('#export-attendance').on('click', function() {
+                const csv = attendanceData.map(row => `${row.id},${row.student_id},${row.student_name},${row.class},${row.section},${row.center},${row.date},${row.status}`).join('\n');
+                const headers = 'ID,Student ID,Student Name,Class,Section,Center,Date,Status\n';
                 const blob = new Blob([headers + csv], { type: 'text/csv' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -2258,30 +2473,75 @@ function demoRenderSuperadminManageStudentAttendance($data = []) {
                 window.URL.revokeObjectURL(url);
             });
 
-            $('#import-student-attendance-btn').on('click', function() {
-                $('#import-student-attendance').click();
-            });
+            $('.edu-modal-close').on('click', function() { $('#edit-attendance-modal').hide(); });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
 
-            $('#import-student-attendance').on('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const text = e.target.result;
-                        const rows = text.split('\n').slice(1).filter(row => row.trim());
-                        const newRecords = rows.map(row => {
-                            const [student_id, student_name, class_name, section, center, date, status] = row.split(',');
-                            return { student_id, student_name, class: class_name, section, center, date, status };
-                        });
-                        studentAttendanceData.push(...newRecords);
-                        $('#add-student-attendance-message').addClass('edu-success').text('Attendance imported successfully!');
-                        setTimeout(() => {
-                            $('#add-student-attendance-message').removeClass('edu-success').text('');
-                            loadStudentAttendance(currentPage, perPage, searchQuery);
-                        }, 1000);
-                    };
-                    reader.readAsText(file);
-                    e.target.value = '';
+function demoRenderSuperadminAddStudentAttendance() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Student Attendance</h2>
+        <div class="card p-4 bg-light">
+            <form id="add-attendance-form" class="edu-form">
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="student-id">Student ID</label>
+                    <input type="text" class="edu-form-input" id="student-id" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="student-name">Student Name</label>
+                    <input type="text" class="edu-form-input" id="student-name" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="class">Class</label>
+                    <input type="text" class="edu-form-input" id="class" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="section">Section</label>
+                    <input type="text" class="edu-form-input" id="section" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="center">Center</label>
+                    <input type="text" class="edu-form-input" id="center" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="date">Date</label>
+                    <input type="date" class="edu-form-input" id="date" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="status">Status</label>
+                    <select class="edu-form-input" id="status" required>
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                        <option value="Late">Late</option>
+                    </select>
+                </div>
+                <button type="button" class="edu-button edu-button-primary" id="save-attendance">Add Attendance</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </form>
+            <div class="edu-form-message" id="add-attendance-message"></div>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#save-attendance').on('click', function() {
+                const student_id = $('#student-id').val();
+                const student_name = $('#student-name').val();
+                const class_name = $('#class').val();
+                const section = $('#section').val();
+                const center = $('#center').val();
+                const date = $('#date').val();
+                const status = $('#status').val();
+                if (student_id && student_name && class_name && section && center && date && status) {
+                    $('#add-attendance-message').addClass('edu-success').text('Attendance added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#add-attendance-message').addClass('edu-error').text('Please fill all required fields.');
                 }
             });
         });
@@ -2290,6 +2550,283 @@ function demoRenderSuperadminManageStudentAttendance($data = []) {
     <?php
     return ob_get_clean();
 }
+
+function demoRenderSuperadminEditStudentAttendance($data = []) {
+    ob_start();
+    $att_id = isset($_GET['att_id']) ? sanitize_text_field($_GET['att_id']) : '';
+    $att = null;
+    foreach ($data['student_attendance'] as $record) {
+        if ($record['id'] === $att_id) {
+            $att = $record;
+            break;
+        }
+    }
+    if (!$att) {
+        ?>
+        <div class="dashboard-section">
+            <h2>Edit Student Attendance</h2>
+            <div class="alert alert-warning">Attendance record not found.</div>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>" class="edu-button edu-button-secondary">Back</a>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Student Attendance</h2>
+        <div class="card p-4 bg-light">
+            <form id="edit-attendance-form" class="edu-form">
+                <input type="hidden" id="edit-attendance-id" value="<?php echo esc_attr($att['id']); ?>">
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-student-id">Student ID</label>
+                    <input type="text" class="edu-form-input" id="edit-student-id" value="<?php echo esc_attr($att['student_id']); ?>" readonly>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-student-name">Student Name</label>
+                    <input type="text" class="edu-form-input" id="edit-student-name" value="<?php echo esc_attr($att['student_name']); ?>" readonly>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-class">Class</label>
+                    <input type="text" class="edu-form-input" id="edit-class" value="<?php echo esc_attr($att['class']); ?>" readonly>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-section">Section</label>
+                    <input type="text" class="edu-form-input" id="edit-section" value="<?php echo esc_attr($att['section']); ?>" readonly>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-center">Center</label>
+                    <input type="text" class="edu-form-input" id="edit-center" value="<?php echo esc_attr($att['center']); ?>" readonly>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-date">Date</label>
+                    <input type="date" class="edu-form-input" id="edit-date" value="<?php echo esc_attr($att['date']); ?>" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="edit-status">Status</label>
+                    <select class="edu-form-input" id="edit-status" required>
+                        <option value="Present" <?php echo $att['status'] === 'Present' ? 'selected' : ''; ?>>Present</option>
+                        <option value="Absent" <?php echo $att['status'] === 'Absent' ? 'selected' : ''; ?>>Absent</option>
+                        <option value="Late" <?php echo $att['status'] === 'Late' ? 'selected' : ''; ?>>Late</option>
+                    </select>
+                </div>
+                <button type="button" class="edu-button edu-button-primary" id="update-attendance">Update Attendance</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </form>
+            <div class="edu-form-message" id="edit-attendance-message"></div>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#update-attendance').on('click', function() {
+                const id = $('#edit-attendance-id').val();
+                const date = $('#edit-date').val();
+                const status = $('#edit-status').val();
+                if (date && status) {
+                    $('#edit-attendance-message').addClass('edu-success').text('Attendance updated successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#edit-attendance-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderSuperadminDeleteStudentAttendance($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Student Attendance</h2>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="attendance-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Class</th>
+                        <th>Section</th>
+                        <th>Center</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="attendance-table-body">
+                    <?php foreach ($data['student_attendance'] as $att): ?>
+                        <tr data-attendance-id="<?php echo esc_attr($att['id']); ?>">
+                            <td><?php echo esc_html($att['id']); ?></td>
+                            <td><?php echo esc_html($att['student_id']); ?></td>
+                            <td><?php echo esc_html($att['student_name']); ?></td>
+                            <td><?php echo esc_html($att['class']); ?></td>
+                            <td><?php echo esc_html($att['section']); ?></td>
+                            <td><?php echo esc_html($att['center']); ?></td>
+                            <td><?php echo esc_html($att['date']); ?></td>
+                            <td><?php echo esc_html($att['status']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-delete delete-attendance" data-attendance-id="<?php echo esc_attr($att['id']); ?>">Delete</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            let attendanceData = <?php echo json_encode($data['student_attendance']); ?>;
+            $(document).on('click', '.delete-attendance', function() {
+                if (!confirm('Are you sure you want to delete this attendance record?')) return;
+                const attId = $(this).data('attendance-id');
+                attendanceData = attendanceData.filter(a => a.id != attId);
+                window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>';
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderSuperadminImportStudentAttendance($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Import Student Attendance</h2>
+        <div class="edu-form-group">
+            <label class="edu-form-label" for="import-student-attendance">Upload CSV File</label>
+            <input type="file" class="edu-form-input" id="import-student-attendance" accept=".csv">
+        </div>
+        <button type="button" class="edu-button edu-button-primary" id="import-student-attendance-btn">Import</button>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+        <div class="edu-form-message" id="import-student-attendance-message"></div>
+        <p style="margin-top: 20px;">
+            <strong>CSV Format:</strong><br>
+            ID,Student ID,Student Name,Class,Section,Center,Date,Status<br>
+            Example: 1,S003,Alice Brown,11,A,Main Campus,2025-04-12,Present
+        </p>
+        <script>
+        jQuery(document).ready(function($) {
+            let studentAttendanceData = <?php echo json_encode($data['student_attendance'] ?? []); ?>;
+            $('#import-student-attendance-btn').on('click', function() {
+                const fileInput = $('#import-student-attendance')[0];
+                const file = fileInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const text = e.target.result;
+                        const rows = text.split('\n').slice(1).filter(row => row.trim());
+                        const newRecords = rows.map(row => {
+                            const [id, student_id, student_name, class_name, section, center, date, status] = row.split(',');
+                            return { id, student_id, student_name, class: class_name, section, center, date, status };
+                        });
+                        studentAttendanceData.push(...newRecords);
+                        $('#import-student-attendance-message').addClass('edu-success').text('Student attendance imported successfully!');
+                        setTimeout(() => {
+                            window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>';
+                        }, 1000);
+                    };
+                    reader.readAsText(file);
+                    fileInput.value = '';
+                } else {
+                    $('#import-student-attendance-message').addClass('edu-error').text('Please select a CSV file.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderSuperadminExportStudentAttendance($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Export Student Attendance</h2>
+        <p>Click the button below to download a CSV file of all student attendance records.</p>
+        <button type="button" class="edu-button edu-button-primary" id="export-student-attendance">Export CSV</button>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+        <div class="edu-form-message" id="export-student-attendance-message"></div>
+        <script>
+        jQuery(document).ready(function($) {
+            const studentAttendanceData = <?php echo json_encode($data['student_attendance'] ?? []); ?>;
+            $('#export-student-attendance').on('click', function() {
+                const csv = studentAttendanceData.map(row => `${row.id},${row.student_id},${row.student_name},${row.class},${row.section},${row.center},${row.date},${row.status}`).join('\n');
+                const headers = 'ID,Student ID,Student Name,Class,Section,Center,Date,Status\n';
+                const blob = new Blob([headers + csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'student_attendance.csv';
+                a.click();
+                window.URL.revokeObjectURL(url);
+                $('#export-student-attendance-message').addClass('edu-success').text('Student attendance exported successfully!');
+                setTimeout(() => {
+                    $('#export-student-attendance-message').removeClass('edu-success').text('');
+                }, 1000);
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+//
+function demoRenderSuperadminAddCenter() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Center</h2>
+        <div class="card p-4 bg-light">
+            <form id="add-center-form" class="edu-form">
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="center-name">Center Name</label>
+                    <input type="text" class="edu-form-input" id="center-name" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="center-location">Location</label>
+                    <input type="text" class="edu-form-input" id="center-location">
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="center-mobile">Mobile</label>
+                    <input type="text" class="edu-form-input" id="center-mobile" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="center-email">Email</label>
+                    <input type="email" class="edu-form-input" id="center-email" required>
+                </div>
+                <button type="button" class="edu-button edu-button-primary" id="save-center">Add Center</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </form>
+            <div class="edu-form-message" id="add-center-message"></div>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#save-center').on('click', function() {
+                const name = $('#center-name').val();
+                const location = $('#center-location').val();
+                const mobile = $('#center-mobile').val();
+                const email = $('#center-email').val();
+                if (name && mobile && email) {
+                    $('#add-center-message').addClass('edu-success').text('Center added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#add-center-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
 // Student Attendance CRUD Functions
 function demoRenderSuperadminStudentAttendance($data) {
     $action = isset($_GET['demo-action']) ? sanitize_text_field($_GET['demo-action']) : 'manage-student-attendance';
@@ -2689,161 +3226,7 @@ function demoDisplayStudentAttendanceBulkImport($data, $center_id) {
     return ob_get_clean();
 }
 
-function demoRenderSuperadminAddStudentAttendance() {
-    ob_start();
-    ?>
-    <div class="dashboard-section">
-        <h2>Add Student Attendance</h2>
-        <div class="card p-4">
-            <form action="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>" method="get">
-                <input type="hidden" name="demo-role" value="superadmin">
-                <input type="hidden" name="demo-section" value="attendance">
-                <input type="hidden" name="demo-action" value="manage-student-attendance">
-                <div class="mb-3">
-                    <label for="student-id">Student ID</label>
-                    <input type="text" id="student-id" name="student-id" value="ST<?php echo rand(1000, 9999); ?>" readonly>
-                </div>
-                <div class="mb-3">
-                    <label for="student-name">Student Name</label>
-                    <input type="text" id="student-name" name="student-name" required>
-                </div>
-                <div class="mb-3">
-                    <label for="center-id">Education Center ID</label>
-                    <input type="text" id="center-id" name="center-id" required>
-                </div>
-                <div class="mb-3">
-                    <label for="class">Class</label>
-                    <input type="text" id="class" name="class" required>
-                </div>
-                <div class="mb-3">
-                    <label for="section">Section</label>
-                    <input type="text" id="section" name="section" required>
-                </div>
-                <div class="mb-3">
-                    <label for="date">Date</label>
-                    <input type="date" id="date" name="date" value="<?php echo date('Y-m-d'); ?>" required>
-                </div>
-                <div class="mb-3">
-                    <label for="status">Status</label>
-                    <select id="status" name="status" required>
-                        <option value="Present">Present</option>
-                        <option value="Late">Late</option>
-                        <option value="Absent">Absent</option>
-                        <option value="Full Day">Full Day</option>
-                        <option value="Holiday">Holiday</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="subject">Subject</label>
-                    <input type="text" id="subject" name="subject" required>
-                </div>
-                <div class="mb-3">
-                    <label for="teacher-id">Teacher ID</label>
-                    <input type="text" id="teacher-id" name="teacher-id" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Add Attendance</button>
-                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>" class="btn btn-secondary">Cancel</a>
-            </form>
-        </div>
-    </div>
-    <?php
-    return ob_get_clean();
-}
 
-function demoRenderSuperadminEditStudentAttendance($data) {
-    ob_start();
-    ?>
-    <div class="dashboard-section">
-        <h2>Edit Student Attendance</h2>
-        <div class="alert alert-info">Select an attendance record to edit from the list below.</div>
-        <div class="attendance-table-wrapper">
-            <table class="table" id="superadmin-student-attendance">
-                <thead>
-                    <tr>
-                        <th>Student Name</th>
-                        <th>Student ID</th>
-                        <th>Edu Center ID</th>
-                        <th>Class</th>
-                        <th>Section</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Subject</th>
-                        <th>Teacher ID</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($data['student_attendance'] ?? [] as $attendance): ?>
-                        <tr>
-                            <td><?php echo esc_html($attendance['student_name']); ?></td>
-                            <td><?php echo esc_html($attendance['student_id']); ?></td>
-                            <td><?php echo esc_html($attendance['education_center_id']); ?></td>
-                            <td><?php echo esc_html($attendance['class']); ?></td>
-                            <td><?php echo esc_html($attendance['section']); ?></td>
-                            <td><?php echo esc_html($attendance['date']); ?></td>
-                            <td><?php echo esc_html($attendance['status']); ?></td>
-                            <td><?php echo esc_html($attendance['subject']); ?></td>
-                            <td><?php echo esc_html($attendance['teacher_id']); ?></td>
-                            <td>
-                                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'edit-student-attendance'])); ?>" class="btn btn-warning">Edit</a>
-                                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'delete-student-attendance'])); ?>" class="btn btn-danger">Delete</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <?php
-    return ob_get_clean();
-}
-
-function demoRenderSuperadminDeleteStudentAttendance($data) {
-    ob_start();
-    ?>
-    <div class="dashboard-section">
-        <h2>Delete Student Attendance</h2>
-        <div class="alert alert-warning">Click "Delete" to remove an attendance record.</div>
-        <div class="attendance-table-wrapper">
-            <table class="table" id="superadmin-student-attendance">
-                <thead>
-                    <tr>
-                        <th>Student Name</th>
-                        <th>Student ID</th>
-                        <th>Edu Center ID</th>
-                        <th>Class</th>
-                        <th>Section</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Subject</th>
-                        <th>Teacher ID</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($data['student_attendance'] ?? [] as $attendance): ?>
-                        <tr>
-                            <td><?php echo esc_html($attendance['student_name']); ?></td>
-                            <td><?php echo esc_html($attendance['student_id']); ?></td>
-                            <td><?php echo esc_html($attendance['education_center_id']); ?></td>
-                            <td><?php echo esc_html($attendance['class']); ?></td>
-                            <td><?php echo esc_html($attendance['section']); ?></td>
-                            <td><?php echo esc_html($attendance['date']); ?></td>
-                            <td><?php echo esc_html($attendance['status']); ?></td>
-                            <td><?php echo esc_html($attendance['subject']); ?></td>
-                            <td><?php echo esc_html($attendance['teacher_id']); ?></td>
-                            <td>
-                                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>" class="btn btn-danger">Delete</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <?php
-    return ob_get_clean();
-}
 
 function demoRenderTeacherSidebar($role, $section, $active_action = 'manage-student-attendance', $active_subaction = 'view') {
     ob_start();
@@ -2881,7 +3264,7 @@ function demoRenderTeacherSidebar($role, $section, $active_action = 'manage-stud
                         </ul>
                         <?php endif; ?>
                     </li>
-                    <!-- Add more sections like Grades, Schedule, etc., as needed -->
+       
                 </ul>
             </div>
         </div>
@@ -3278,136 +3661,9 @@ function demoDisplayTeacherAttendanceBulkImport($data, $center_id) {
     <?php
     return ob_get_clean();
 }
-function demoRenderSuperadminAddTeacherAttendance() {
-    ob_start();
-    ?>
-    <div class="dashboard-section">
-        <h2>Add Teacher Attendance</h2>
-        <div class="card p-4">
-            <form action="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>" method="get">
-                <input type="hidden" name="demo-role" value="superadmin">
-                <input type="hidden" name="demo-section" value="attendance">
-                <input type="hidden" name="demo-action" value="manage-teacher-attendance">
-                <div class="mb-3">
-                    <label for="teacher-id">Teacher ID</label>
-                    <input type="text" id="teacher-id" name="teacher-id" value="TR<?php echo rand(1000, 9999); ?>" readonly>
-                </div>
-                <div class="mb-3">
-                    <label for="teacher-name">Teacher Name</label>
-                    <input type="text" id="teacher-name" name="teacher-name" required>
-                </div>
-                <div class="mb-3">
-                    <label for="center-id">Education Center ID</label>
-                    <input type="text" id="center-id" name="center-id" required>
-                </div>
-                <div class="mb-3">
-                    <label for="department">Department</label>
-                    <input type="text" id="department" name="department" required>
-                </div>
-                <div class="mb-3">
-                    <label for="date">Date</label>
-                    <input type="date" id="date" name="date" value="<?php echo date('Y-m-d'); ?>" required>
-                </div>
-                <div class="mb-3">
-                    <label for="status">Status</label>
-                    <select id="status" name="status" required>
-                        <option value="Present">Present</option>
-                        <option value="Late">Late</option>
-                        <option value="Absent">Absent</option>
-                        <option value="On Leave">On Leave</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Add Attendance</button>
-                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>" class="btn btn-secondary">Cancel</a>
-            </form>
-        </div>
-    </div>
-    <?php
-    return ob_get_clean();
-}
 
-function demoRenderSuperadminEditTeacherAttendance($data) {
-    ob_start();
-    ?>
-    <div class="dashboard-section">
-        <h2>Edit Teacher Attendance</h2>
-        <div class="alert alert-info">Select an attendance record to edit from the list below.</div>
-        <div class="attendance-table-wrapper">
-            <table class="table" id="superadmin-teacher-attendance">
-                <thead>
-                    <tr>
-                        <th>Teacher Name</th>
-                        <th>Teacher ID</th>
-                        <th>Edu Center ID</th>
-                        <th>Department</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($data['teacher_attendance'] ?? [] as $attendance): ?>
-                        <tr>
-                            <td><?php echo esc_html($attendance['teacher_name']); ?></td>
-                            <td><?php echo esc_html($attendance['teacher_id']); ?></td>
-                            <td><?php echo esc_html($attendance['education_center_id']); ?></td>
-                            <td><?php echo esc_html($attendance['department']); ?></td>
-                            <td><?php echo esc_html($attendance['date']); ?></td>
-                            <td><?php echo esc_html($attendance['status']); ?></td>
-                            <td>
-                                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'edit-teacher-attendance'])); ?>" class="btn btn-warning">Edit</a>
-                                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'delete-teacher-attendance'])); ?>" class="btn btn-danger">Delete</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <?php
-    return ob_get_clean();
-}
 
-function demoRenderSuperadminDeleteTeacherAttendance($data) {
-    ob_start();
-    ?>
-    <div class="dashboard-section">
-        <h2>Delete Teacher Attendance</h2>
-        <div class="alert alert-warning">Click "Delete" to remove an attendance record.</div>
-        <div class="attendance-table-wrapper">
-            <table class="table" id="superadmin-teacher-attendance">
-                <thead>
-                    <tr>
-                        <th>Teacher Name</th>
-                        <th>Teacher ID</th>
-                        <th>Edu Center ID</th>
-                        <th>Department</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($data['teacher_attendance'] ?? [] as $attendance): ?>
-                        <tr>
-                            <td><?php echo esc_html($attendance['teacher_name']); ?></td>
-                            <td><?php echo esc_html($attendance['teacher_id']); ?></td>
-                            <td><?php echo esc_html($attendance['education_center_id']); ?></td>
-                            <td><?php echo esc_html($attendance['department']); ?></td>
-                            <td><?php echo esc_html($attendance['date']); ?></td>
-                            <td><?php echo esc_html($attendance['status']); ?></td>
-                            <td>
-                                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>" class="btn btn-danger">Delete</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <?php
-    return ob_get_clean();
-}
+
 
 // New Staff CRUD Functions
 function demoRenderSuperadminStaff($data) {
@@ -4280,706 +4536,138 @@ function demoRenderSuperadminDeleteTeacher($data) {
 }
 
 
-function demoRenderSuperadminCenters() {
-    $action = isset($_GET['demo-action']) ? sanitize_text_field($_GET['demo-action']) : 'manage-centers';
+function demoRenderSuperadminCenters($data = []) {
     ob_start();
     ?>
-    <div class="edu-centers-container" style="margin-top: 80px;">
-        <!-- Loader -->
-        <div id="edu-loader" class="edu-loader" style="display: none;">
-            <div class="edu-loader-container">
-                <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
-            </div>
+    <div class="dashboard-section">
+        <h2>Centers</h2>
+        <div class="edu-actions">
+            <input type="text" id="center-search" class="edu-search-input" placeholder="Search Centers...">
+            <button class="edu-button edu-button-primary" onclick="window.location.href='<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers', 'demo-action' => 'add-center'])); ?>'">Add Center</button>
+        </div>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="centers-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Mobile</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="centers-table-body">
+                    <?php foreach ($data['centers'] as $center): ?>
+                        <tr data-center-id="<?php echo esc_attr($center['id']); ?>">
+                            <td><?php echo esc_html($center['id']); ?></td>
+                            <td><?php echo esc_html($center['name']); ?></td>
+                            <td><?php echo esc_html($center['location'] ?? 'N/A'); ?></td>
+                            <td><?php echo esc_html($center['mobile'] ?? 'N/A'); ?></td>
+                            <td><?php echo esc_html($center['email'] ?? 'N/A'); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-center" data-center-id="<?php echo esc_attr($center['id']); ?>">Edit</button>
+                                <button class="edu-button edu-button-delete delete-center" data-center-id="<?php echo esc_attr($center['id']); ?>">Delete</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="edu-pagination">
+            <button class="edu-button edu-button-nav" id="prev-page" disabled>Previous</button>
+            <span id="page-info"></span>
+            <button class="edu-button edu-button-nav" id="next-page">Next</button>
         </div>
 
-        <?php if ($action === 'manage-centers'): ?>
-            <h2 class="edu-centers-title">Educational Centers Management</h2>
-            <div class="edu-centers-actions">
-                <button class="edu-button edu-button-primary" id="add-center-btn">Add New Center</button>
-                <input type="text" id="center-search" class="edu-search-input" placeholder="Search Centers..." style="margin-left: 20px; padding: 8px; width: 300px;">
-            </div>
-            <div class="edu-pagination" style="margin: 20px 0;">
-                <label for="centers-per-page">Show:</label>
-                <select id="centers-per-page" class="edu-select" style="margin-right: 20px;">
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                </select>
-                <button class="edu-button edu-button-nav" id="prev-page" disabled>Previous</button>
-                <span id="page-info" style="margin: 0 10px;"></span>
-                <button class="edu-button edu-button-nav" id="next-page">Next</button>
-            </div>
-            <div class="edu-table-wrapper">
-                <div class="export-tools" id="export-tools" style="margin-bottom: 10px;"></div>
-                <table class="edu-table" id="centers-table">
-                    <thead>
-                        <tr>
-                            <th>Educational Center ID</th>
-                            <th>Name</th>
-                            <th>Admin ID</th>
-                            <th>Logo</th>
-                            <th>Location</th>
-                            <th>Mobile</th>
-                            <th>Email</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="centers-table-body">
-                        <!-- Populated via JS -->
-                    </tbody>
-                </table>
-            </div>
-
-        <?php elseif ($action === 'add-center'): ?>
-            <h2 class="edu-centers-title">Add New Center</h2>
-            <div class="edu-form-container">
-                <form id="add-center-form" class="edu-form">
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="center-name">Center Name</label>
-                        <input type="text" class="edu-form-input" id="center-name" name="center_name" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="center-admin-id">Admin ID</label>
-                        <input type="text" class="edu-form-input" id="center-admin-id" name="admin_id" readonly placeholder="Assigned when adding new admin">
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="center-edu-id">Educational Center ID</label>
-                        <input type="text" class="edu-form-input" id="center-edu-id" name="educational_center_id" readonly placeholder="Generated on save">
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="center-logo">Institute Logo</label>
-                        <input type="file" class="edu-form-input" id="center-logo" name="institute_logo" accept="image/*">
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="center-location">Location</label>
-                        <input type="text" class="edu-form-input" id="center-location" name="location">
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="center-mobile">Mobile Number</label>
-                        <input type="number" class="edu-form-input" id="center-mobile" name="mobile_number" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="center-email">Email ID</label>
-                        <input type="email" class="edu-form-input" id="center-email" name="email_id" required>
-                    </div>
-                    <button type="button" class="edu-button edu-button-primary" id="save-center">Save Center</button>
-                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers', 'demo-action' => 'manage-centers'])); ?>" class="edu-button edu-button-secondary">Back to Manage Centers</a>
-                </form>
-                <div class="edu-form-message" id="add-center-message"></div>
-            </div>
-
-        <?php elseif ($action === 'edit-center'): ?>
-            <h2 class="edu-centers-title">Edit Center</h2>
-            <div class="edu-form-container">
-                <form id="edit-center-select-form" class="edu-form">
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-center-select">Select Center to Edit</label>
-                        <select id="edit-center-select" class="edu-form-input" required>
-                            <option value="">-- Select a Center --</option>
-                            <!-- Populated via JS -->
-                        </select>
-                    </div>
-                </form>
-                <form id="edit-center-form" class="edu-form" style="display: none;">
-                    <input type="hidden" id="edit-center-id" name="center_id">
+        <!-- Edit Center Modal -->
+        <div id="edit-center-modal" class="edu-modal" style="display: none;">
+            <div class="edu-modal-content">
+                <span class="edu-modal-close" data-modal="edit-center-modal">×</span>
+                <h2>Edit Center</h2>
+                <form id="edit-center-form" class="edu-form">
+                    <input type="hidden" id="edit-center-id">
                     <div class="edu-form-group">
                         <label class="edu-form-label" for="edit-center-name">Center Name</label>
-                        <input type="text" class="edu-form-input" id="edit-center-name" name="center_name" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-center-admin-id">Admin ID</label>
-                        <input type="text" class="edu-form-input" id="edit-center-admin-id" name="admin_id" readonly>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-center-edu-id">Educational Center ID</label>
-                        <input type="text" class="edu-form-input" id="edit-center-edu-id" name="educational_center_id" readonly>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-center-logo">Institute Logo</label>
-                        <input type="file" class="edu-form-input" id="edit-center-logo" name="institute_logo" accept="image/*">
-                        <img id="edit-center-logo-preview" src="" alt="Current Logo" class="edu-logo-preview" style="display: none;">
+                        <input type="text" class="edu-form-input" id="edit-center-name" required>
                     </div>
                     <div class="edu-form-group">
                         <label class="edu-form-label" for="edit-center-location">Location</label>
-                        <input type="text" class="edu-form-input" id="edit-center-location" name="location">
+                        <input type="text" class="edu-form-input" id="edit-center-location">
                     </div>
                     <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-center-mobile">Mobile Number</label>
-                        <input type="number" class="edu-form-input" id="edit-center-mobile" name="mobile_number" required>
+                        <label class="edu-form-label" for="edit-center-mobile">Mobile</label>
+                        <input type="text" class="edu-form-input" id="edit-center-mobile" required>
                     </div>
                     <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-center-email">Email ID</label>
-                        <input type="email" class="edu-form-input" id="edit-center-email" name="email_id" required>
+                        <label class="edu-form-label" for="edit-center-email">Email</label>
+                        <input type="email" class="edu-form-input" id="edit-center-email" required>
                     </div>
                     <button type="button" class="edu-button edu-button-primary" id="update-center">Update Center</button>
-                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers', 'demo-action' => 'manage-centers'])); ?>" class="edu-button edu-button-secondary">Back to Manage Centers</a>
                 </form>
                 <div class="edu-form-message" id="edit-center-message"></div>
             </div>
-
-        <?php elseif ($action === 'delete-center'): ?>
-            <h2 class="edu-centers-title">Delete Center</h2>
-            <div class="edu-form-container">
-                <form id="delete-center-form" class="edu-form">
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="delete-center-select">Select Center to Delete</label>
-                        <select id="delete-center-select" class="edu-form-input" required>
-                            <option value="">-- Select a Center --</option>
-                            <!-- Populated via JS -->
-                        </select>
-                    </div>
-                    <button type="button" class="edu-button edu-button-delete" id="delete-center-btn">Delete Center</button>
-                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers', 'demo-action' => 'manage-centers'])); ?>" class="edu-button edu-button-secondary">Back to Manage Centers</a>
-                </form>
-                <div class="edu-form-message" id="delete-center-message"></div>
-            </div>
-
-        <?php elseif ($action === 'reset-password'): ?>
-            <h2 class="edu-centers-title">Reset Admin Password</h2>
-            <div class="edu-form-container">
-                <form id="change-password-form" class="edu-form">
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="reset-center-select">Select Center</label>
-                        <select id="reset-center-select" class="edu-form-input" required>
-                            <option value="">-- Select a Center --</option>
-                            <!-- Populated via JS -->
-                        </select>
-                    </div>
-                    <p>Send a password reset email to the institute admin.</p>
-                    <button type="button" class="edu-button edu-button-primary" id="send-reset-link">Send Reset Link</button>
-                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers', 'demo-action' => 'manage-centers'])); ?>" class="edu-button edu-button-secondary">Back to Manage Centers</a>
-                </form>
-                <div class="edu-form-message" id="change-password-message"></div>
-            </div>
-
-        <?php elseif ($action === 'add-admin'): ?>
-            <h2 class="edu-centers-title">Add New Admin</h2>
-            <div class="edu-form-container">
-                <form id="add-new-admin-form" class="edu-form">
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="new-admin-center-select">Select Center</label>
-                        <select id="new-admin-center-select" class="edu-form-input" required>
-                            <option value="">-- Select a Center --</option>
-                            <!-- Populated via JS -->
-                        </select>
-                    </div>
-                    <input type="hidden" id="new-admin-center-id" name="center_id">
-                    <input type="hidden" id="new-admin-educational-center-id" name="educational_center_id">
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="new-admin-id">Admin ID</label>
-                        <input type="text" class="edu-form-input" id="new-admin-id" name="admin_id" readonly>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="new-admin-name">Admin Name</label>
-                        <input type="text" class="edu-form-input" id="new-admin-name" name="admin_name" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="new-admin-email">Email ID</label>
-                        <input type="email" class="edu-form-input" id="new-admin-email" name="email_id" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="new-admin-password">Password</label>
-                        <input type="password" class="edu-form-input" id="new-admin-password" name="password" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="new-admin-mobile">Mobile Number</label>
-                        <input type="number" class="edu-form-input" id="new-admin-mobile" name="mobile_number" required>
-                    </div>
-                    <button type="button" class="edu-button edu-button-primary" id="save-new-admin">Save New Admin</button>
-                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers', 'demo-action' => 'manage-centers'])); ?>" class="edu-button edu-button-secondary">Back to Manage Centers</a>
-                </form>
-                <div class="edu-form-message" id="add-new-admin-message"></div>
-            </div>
-        <?php endif; ?>
-
-        <!-- Modals for Manage Centers Actions -->
-        <?php if ($action === 'manage-centers'): ?>
-            <!-- Add Center Modal -->
-            <div class="edu-modal" id="add-center-modal" style="display: none;">
-                <div class="edu-modal-content">
-                    <span class="edu-modal-close" data-modal="add-center-modal">×</span>
-                    <h3>Add New Center</h3>
-                    <form id="add-center-modal-form" class="edu-form">
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="modal-center-name">Center Name</label>
-                            <input type="text" class="edu-form-input" id="modal-center-name" name="center_name" required>
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="modal-center-admin-id">Admin ID</label>
-                            <input type="text" class="edu-form-input" id="modal-center-admin-id" name="admin_id" readonly placeholder="Assigned when adding new admin">
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="modal-center-edu-id">Educational Center ID</label>
-                            <input type="text" class="edu-form-input" id="modal-center-edu-id" name="educational_center_id" readonly placeholder="Generated on save">
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="modal-center-logo">Institute Logo</label>
-                            <input type="file" class="edu-form-input" id="modal-center-logo" name="institute_logo" accept="image/*">
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="modal-center-location">Location</label>
-                            <input type="text" class="edu-form-input" id="modal-center-location" name="location">
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="modal-center-mobile">Mobile Number</label>
-                            <input type="number" class="edu-form-input" id="modal-center-mobile" name="mobile_number" required>
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="modal-center-email">Email ID</label>
-                            <input type="email" class="edu-form-input" id="modal-center-email" name="email_id" required>
-                        </div>
-                        <button type="button" class="edu-button edu-button-primary" id="save-modal-center">Save Center</button>
-                    </form>
-                    <div class="edu-form-message" id="add-center-modal-message"></div>
-                </div>
-            </div>
-
-            <!-- Edit Center Modal -->
-            <div class="edu-modal" id="edit-center-modal" style="display: none;">
-                <div class="edu-modal-content">
-                    <span class="edu-modal-close" data-modal="edit-center-modal">×</span>
-                    <h3>Edit Center</h3>
-                    <form id="edit-center-modal-form" class="edu-form">
-                        <input type="hidden" id="edit-modal-center-id" name="center_id">
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="edit-modal-center-name">Center Name</label>
-                            <input type="text" class="edu-form-input" id="edit-modal-center-name" name="center_name" required>
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="edit-modal-center-admin-id">Admin ID</label>
-                            <input type="text" class="edu-form-input" id="edit-modal-center-admin-id" name="admin_id" readonly>
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="edit-modal-center-edu-id">Educational Center ID</label>
-                            <input type="text" class="edu-form-input" id="edit-modal-center-edu-id" name="educational_center_id" readonly>
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="edit-modal-center-logo">Institute Logo</label>
-                            <input type="file" class="edu-form-input" id="edit-modal-center-logo" name="institute_logo" accept="image/*">
-                            <img id="edit-modal-center-logo-preview" src="" alt="Current Logo" class="edu-logo-preview" style="display: none;">
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="edit-modal-center-location">Location</label>
-                            <input type="text" class="edu-form-input" id="edit-modal-center-location" name="location">
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="edit-modal-center-mobile">Mobile Number</label>
-                            <input type="number" class="edu-form-input" id="edit-modal-center-mobile" name="mobile_number" required>
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="edit-modal-center-email">Email ID</label>
-                            <input type="email" class="edu-form-input" id="edit-modal-center-email" name="email_id" required>
-                        </div>
-                        <button type="button" class="edu-button edu-button-primary" id="update-modal-center">Update Center</button>
-                    </form>
-                    <div class="edu-form-message" id="edit-center-modal-message"></div>
-                </div>
-            </div>
-
-            <!-- Change Password Modal -->
-            <div class="edu-modal" id="change-password-modal" style="display: none;">
-                <div class="edu-modal-content">
-                    <span class="edu-modal-close" data-modal="change-password-modal">×</span>
-                    <h3>Change Institute Admin Password</h3>
-                    <form id="change-password-modal-form" class="edu-form">
-                        <input type="hidden" id="change-modal-center-id" name="center_id">
-                        <p>Send a password reset email to the institute admin.</p>
-                        <button type="button" class="edu-button edu-button-primary" id="send-modal-reset-link">Send Reset Link</button>
-                    </form>
-                    <div class="edu-form-message" id="change-password-modal-message"></div>
-                </div>
-            </div>
-
-            <!-- Add New Admin Modal -->
-            <div class="edu-modal" id="add-new-admin-modal" style="display: none;">
-                <div class="edu-modal-content">
-                    <span class="edu-modal-close" data-modal="add-new-admin-modal">×</span>
-                    <h3>Add New Institute Admin</h3>
-                    <form id="add-new-admin-modal-form" class="edu-form">
-                        <input type="hidden" id="new-admin-modal-center-id" name="center_id">
-                        <input type="hidden" id="new-admin-modal-educational-center-id" name="educational_center_id">
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="new-admin-modal-id">Admin ID</label>
-                            <input type="text" class="edu-form-input" id="new-admin-modal-id" name="admin_id" readonly>
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="new-admin-modal-name">Admin Name</label>
-                            <input type="text" class="edu-form-input" id="new-admin-modal-name" name="admin_name" required>
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="new-admin-modal-email">Email ID</label>
-                            <input type="email" class="edu-form-input" id="new-admin-modal-email" name="email_id" required>
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="new-admin-modal-password">Password</label>
-                            <input type="password" class="edu-form-input" id="new-admin-modal-password" name="password" required>
-                        </div>
-                        <div class="edu-form-group">
-                            <label class="edu-form-label" for="new-admin-modal-mobile">Mobile Number</label>
-                            <input type="number" class="edu-form-input" id="new-admin-modal-mobile" name="mobile_number" required>
-                        </div>
-                        <button type="button" class="edu-button edu-button-primary" id="save-new-admin-modal">Save New Admin</button>
-                    </form>
-                    <div class="edu-form-message" id="add-new-admin-modal-message"></div>
-                </div>
-            </div>
-        <?php endif; ?>
-
-        <!-- JavaScript -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        </div>
 
         <script>
         jQuery(document).ready(function($) {
+            let centersData = <?php echo json_encode($data['centers']); ?>;
             let currentPage = 1;
             let perPage = 10;
             let searchQuery = '';
-            let centersData = [
-                { ID: 1, educational_center_id: 'EC001', educational_center_name: 'Central Academy', admin_id: 'ADM001', institute_logo: '<?php echo esc_js(plugin_dir_url(__FILE__) . "../logo instituto.jpg"); ?>', location: 'New York', mobile_number: '123-456-7890', email_id: 'central@demo-pro.edu' },
-                { ID: 2, educational_center_id: 'EC002', educational_center_name: 'Southern Institute', admin_id: 'ADM002', institute_logo: '<?php echo esc_js(plugin_dir_url(__FILE__) . "../logo instituto.jpg"); ?>', location: 'Texas', mobile_number: '234-567-8901', email_id: 'southern@demo-pro.edu' },
-                { ID: 3, educational_center_id: 'EC003', educational_center_name: 'Northern School', admin_id: 'Unassigned', institute_logo: 'https://via.placeholder.com/50', location: 'Canada', mobile_number: '345-678-9012', email_id: 'northern@demo-pro.edu' }
-            ];
-
-            function showLoader() { $('#edu-loader').css('display', 'flex'); }
-            function hideLoader() { $('#edu-loader').css('display', 'none'); }
-            function openModal(modalId) { 
-                showLoader(); 
-                $(modalId).css({'display': 'block', 'z-index': '1000'}); 
-                setTimeout(hideLoader, 100); 
-            }
-            function closeModal(modalId) { 
-                $(modalId).css('display', 'none'); 
-                $(modalId + ' .edu-form-message').removeClass('edu-success edu-error').text(''); 
-                hideLoader(); 
-            }
-
-            function populateSelectOptions(selector) {
-                let options = '<option value="">-- Select a Center --</option>';
-                centersData.forEach(center => {
-                    options += `<option value="${center.ID}">${center.educational_center_name} (${center.educational_center_id})</option>`;
-                });
-                $(selector).html(options);
-            }
-
-            function getTableData() {
-                const table = $('#centers-table')[0];
-                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim()).slice(0, -1);
-                const rows = Array.from(table.querySelectorAll('tbody tr')).map(row => {
-                    const cells = Array.from(row.querySelectorAll('td')).slice(0, -1);
-                    return cells.map(td => td.textContent.trim());
-                });
-                return [headers, ...rows];
-            }
-
-            function exportToCSV() {
-                const data = getTableData();
-                const csv = data.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')).join('\n');
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `centers_${new Date().toISOString().slice(0,10)}.csv`;
-                link.click();
-            }
-
-            function exportToExcel() {
-                const data = getTableData();
-                const ws = XLSX.utils.aoa_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Centers');
-                XLSX.writeFile(wb, `centers_${new Date().toISOString().slice(0,10)}.xlsx`);
-            }
-
-            function generatePDF() {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-                const data = getTableData();
-                const instituteName = 'Demo Pro';
-                const instituteLogo = '<?php echo esc_js(plugin_dir_url(__FILE__) . '../logo instituto.jpg'); ?>';
-                const pageWidth = doc.internal.pageSize.width;
-                const pageHeight = doc.internal.pageSize.height;
-                const margin = 10;
-                const borderColor = [70, 131, 180];
-
-                doc.setDrawColor(...borderColor);
-                doc.setLineWidth(1);
-                doc.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin);
-                doc.addImage(instituteLogo, 'JPEG', (pageWidth - 24) / 2, 15, 24, 24);
-                doc.setFontSize(18);
-                doc.setTextColor(...borderColor);
-                doc.text(instituteName.toUpperCase(), pageWidth / 2, 45, { align: 'center' });
-                doc.setFontSize(12);
-                doc.setTextColor(102);
-                doc.text('Educational Centers List', pageWidth / 2, 55, { align: 'center' });
-                doc.setDrawColor(...borderColor);
-                doc.line(margin + 5, 60, pageWidth - margin - 5, 60);
-
-                const details = [
-                    ['Date', new Date().toLocaleDateString()],
-                    ['Total Centers', String(data.length - 1)]
-                ];
-                let y = 70;
-                details.forEach(([label, value]) => {
-                    doc.setFillColor(245, 245, 245);
-                    doc.rect(margin + 5, y, 50, 6, 'F');
-                    doc.setTextColor(...borderColor);
-                    doc.setFont('helvetica', 'bold');
-                    doc.text(label, margin + 7, y + 4);
-                    doc.setTextColor(51);
-                    doc.setFont('helvetica', 'normal');
-                    doc.text(String(value), margin + 60, y + 4);
-                    y += 6;
-                });
-
-                doc.autoTable({
-                    startY: y + 10,
-                    head: [data[0]],
-                    body: data.slice(1),
-                    theme: 'striped',
-                    styles: { fontSize: 11, cellPadding: 2, overflow: 'linebreak', halign: 'center', textColor: [51, 51, 51] },
-                    headStyles: { fillColor: borderColor, textColor: [255, 255, 255], fontStyle: 'bold' },
-                    alternateRowStyles: { fillColor: [249, 249, 249] }
-                });
-
-                const finalY = doc.lastAutoTable.finalY || y + 10;
-                doc.setFontSize(9);
-                doc.setTextColor(102);
-                doc.text(`This is an Online Generated Centers List issued by ${instituteName}`, pageWidth / 2, finalY + 20, { align: 'center' });
-                doc.text(`Generated on ${new Date().toISOString().slice(0, 10)}`, pageWidth / 2, finalY + 25, { align: 'center' });
-                doc.text('___________________________', pageWidth / 2, finalY + 35, { align: 'center' });
-                doc.text('Registrar / Authorized Signatory', pageWidth / 2, finalY + 40, { align: 'center' });
-                doc.text('Managed by Demo Pro Educational Center Management System', pageWidth / 2, finalY + 45, { align: 'center' });
-
-                doc.save(`centers_${new Date().toISOString().slice(0,10)}.pdf`);
-            }
-
-            function printCenters() {
-                const printWindow = window.open('', '_blank');
-                const data = getTableData();
-                const instituteName = 'Demo Pro';
-                const instituteLogo = '<?php echo esc_js(plugin_dir_url(__FILE__) . '../logo instituto.jpg'); ?>';
-
-                printWindow.document.write(`
-                    <html>
-                    <head>
-                        <title>Educational Centers List</title>
-                        <style>
-                            @media print {
-                                body { font-family: Helvetica, sans-serif; margin: 10mm; width: 190mm; }
-                                .page { border: 4px solid #4683b4; padding: 5mm; box-sizing: border-box; width: 100%; max-width: 190mm; }
-                                .header { text-align: center; border-bottom: 2px solid #4683b4; margin-bottom: 10mm; }
-                                .header img { width: 60px; height: 60px; margin-bottom: 5mm; }
-                                .header h1 { font-size: 18pt; color: #4683b4; margin: 0; text-transform: uppercase; }
-                                .header .subtitle { font-size: 12pt; color: #666; margin: 0; }
-                                table { width: 100%; max-width: 100%; border-collapse: collapse; margin: 10mm 0; table-layout: fixed; }
-                                th, td { border: 1px solid #e5e5e5; padding: 8px; text-align: center; word-wrap: break-word; font-size: 10pt; }
-                                th { background: #4683b4; color: white; font-weight: bold; }
-                                tr:nth-child(even) { background: #f9f9f9; }
-                                .footer { text-align: center; font-size: 9pt; color: #666; margin-top: 10mm; }
-                                @page { size: A4; margin: 10mm; }
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="page">
-                            <div class="header">
-                                <img src="${instituteLogo}" alt="Logo">
-                                <h1>${instituteName.toUpperCase()}</h1>
-                                <p class="subtitle">Educational Centers List</p>
-                            </div>
-                            <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-                            <p><strong>Total Centers:</strong> ${data.length - 1}</p>
-                            <table>
-                                <thead><tr>${data[0].map(header => `<th>${header}</th>`).join('')}</tr></thead>
-                                <tbody>${data.slice(1).map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>
-                            </table>
-                            <div class="footer">
-                                <p>This is an Online Generated Centers List issued by ${instituteName}</p>
-                                <p>Generated on ${new Date().toISOString().slice(0, 10)}</p>
-                                <p>___________________________</p>
-                                <p>Registrar / Authorized Signatory</p>
-                                <p>Managed by Demo Pro Educational Center Management System</p>
-                            </div>
-                        </div>
-                    </body>
-                    </html>
-                `);
-                printWindow.document.close();
-                printWindow.focus();
-                printWindow.print();
-            }
-
-            function copyToClipboard() {
-                const data = getTableData();
-                const text = data.map(row => row.join('\t')).join('\n');
-                navigator.clipboard.writeText(text).then(() => alert('Centers copied to clipboard!'));
-            }
-
-            function setupExportButtons() {
-                const tools = $('#export-tools');
-                tools.html(`
-                    <button class="export-btn export-csv" aria-label="Export to CSV"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
-                    <button class="export-btn export-pdf" aria-label="Export to PDF"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
-                    <button class="export-btn export-excel" aria-label="Export to Excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
-                    <button class="export-btn export-copy" aria-label="Copy to Clipboard"><i class="fas fa-copy"></i><span class="tooltip">Copy to Clipboard</span></button>
-                    <button class="export-btn export-print" aria-label="Print"><i class="fas fa-print"></i><span class="tooltip">Print</span></button>
-                `);
-                tools.find('.export-csv').on('click', exportToCSV);
-                tools.find('.export-pdf').on('click', generatePDF);
-                tools.find('.export-excel').on('click', exportToExcel);
-                tools.find('.export-copy').on('click', copyToClipboard);
-                tools.find('.export-print').on('click', printCenters);
-            }
 
             function loadCenters(page, limit, query) {
-                showLoader();
-                setTimeout(() => {
-                    const filtered = centersData.filter(c => !query || c.educational_center_name.toLowerCase().includes(query.toLowerCase()));
-                    const total = filtered.length;
-                    const start = (page - 1) * limit;
-                    const end = start + limit;
-                    const paginated = filtered.slice(start, end);
-                    let html = '';
-                    paginated.forEach(center => {
-                        html += `
-                            <tr data-center-id="${center.ID}">
-                                <td>${center.educational_center_id}</td>
-                                <td>${center.educational_center_name}</td>
-                                <td>${center.admin_id}</td>
-                                <td><img src="${center.institute_logo}" alt="Logo" class="edu-logo"></td>
-                                <td>${center.location || 'N/A'}</td>
-                                <td>${center.mobile_number}</td>
-                                <td>${center.email_id}</td>
-                                <td>
-                                    <button class="edu-button edu-button-edit edit-center" data-center-id="${center.ID}">Edit</button>
-                                    <button class="edu-button edu-button-delete delete-center" data-center-id="${center.ID}">Delete</button>
-                                    <button class="edu-button edu-button-password change-password" data-center-id="${center.ID}" data-admin-id="${center.admin_id}">Change Password</button>
-                                    <button class="edu-button edu-button-add-admin add-new-admin" data-center-id="${center.ID}">Add New Admin</button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    $('#centers-table-body').html(html || '<tr><td colspan="8">No centers found.</td></tr>');
-                    setupExportButtons();
-                    const totalPages = Math.ceil(total / limit);
-                    $('#page-info').text(`Page ${page} of ${totalPages}`);
-                    $('#prev-page').prop('disabled', page === 1);
-                    $('#next-page').prop('disabled', page === totalPages || total === 0);
-                    hideLoader();
-                }, 500);
+                const filtered = centersData.filter(c => 
+                    !query || c.name.toLowerCase().includes(query.toLowerCase())
+                );
+                const total = filtered.length;
+                const start = (page - 1) * limit;
+                const end = start + limit;
+                const paginated = filtered.slice(start, end);
+                let html = '';
+                paginated.forEach(center => {
+                    html += `
+                        <tr data-center-id="${center.id}">
+                            <td>${center.id}</td>
+                            <td>${center.name}</td>
+                            <td>${center.location || 'N/A'}</td>
+                            <td>${center.mobile || 'N/A'}</td>
+                            <td>${center.email || 'N/A'}</td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-center" data-center-id="${center.id}">Edit</button>
+                                <button class="edu-button edu-button-delete delete-center" data-center-id="${center.id}">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                $('#centers-table-body').html(html || '<tr><td colspan="6">No centers found.</td></tr>');
+                const totalPages = Math.ceil(total / limit);
+                $('#page-info').text(`Page ${page} of ${totalPages}`);
+                $('#prev-page').prop('disabled', page === 1);
+                $('#next-page').prop('disabled', page === totalPages || total === 0);
             }
 
-            // Load data based on action
-            if ('<?php echo $action; ?>' === 'manage-centers') {
-                loadCenters(currentPage, perPage, searchQuery);
-            } else if ('<?php echo $action; ?>' === 'edit-center' || '<?php echo $action; ?>' === 'delete-center' || '<?php echo $action; ?>' === 'reset-password' || '<?php echo $action; ?>' === 'add-admin') {
-                populateSelectOptions('#edit-center-select, #delete-center-select, #reset-center-select, #new-admin-center-select');
-            }
+            loadCenters(currentPage, perPage, searchQuery);
 
-            // Search
             $('#center-search').on('input', function() {
                 searchQuery = $(this).val();
                 currentPage = 1;
                 loadCenters(currentPage, perPage, searchQuery);
             });
 
-            // Pagination
-            $('#centers-per-page').on('change', function() {
-                perPage = parseInt($(this).val());
-                currentPage = 1;
-                loadCenters(currentPage, perPage, searchQuery);
-            });
-
-            $('#next-page').on('click', function() { currentPage++; loadCenters(currentPage, perPage, searchQuery); });
             $('#prev-page').on('click', function() { currentPage--; loadCenters(currentPage, perPage, searchQuery); });
+            $('#next-page').on('click', function() { currentPage++; loadCenters(currentPage, perPage, searchQuery); });
 
-            // Add Center (Sidebar)
-            $('#save-center').on('click', function() {
-                const name = $('#center-name').val();
-                const location = $('#center-location').val();
-                const mobile = $('#center-mobile').val();
-                const email = $('#center-email').val();
-                if (name && mobile && email) {
-                    showLoader();
-                    setTimeout(() => {
-                        const newId = centersData.length + 1;
-                        const newCenter = {
-                            ID: newId,
-                            educational_center_id: `EC00${newId}`,
-                            educational_center_name: name,
-                            admin_id: 'Unassigned',
-                            institute_logo: 'https://via.placeholder.com/50',
-                            location: location,
-                            mobile_number: mobile,
-                            email_id: email
-                        };
-                        centersData.push(newCenter);
-                        $('#add-center-message').addClass('edu-success').text('Center added successfully!');
-                        $('#center-edu-id').val(newCenter.educational_center_id);
-                        setTimeout(() => {
-                            window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers', 'demo-action' => 'manage-centers'])); ?>';
-                        }, 1000);
-                        hideLoader();
-                    }, 500);
-                } else {
-                    $('#add-center-message').addClass('edu-error').text('Please fill all required fields.');
-                }
-            });
-
-            // Add Center (Modal)
-            $('#add-center-btn').on('click', function() { openModal('#add-center-modal'); });
-            $('#save-modal-center').on('click', function() {
-                const name = $('#modal-center-name').val();
-                const location = $('#modal-center-location').val();
-                const mobile = $('#modal-center-mobile').val();
-                const email = $('#modal-center-email').val();
-                if (name && mobile && email) {
-                    showLoader();
-                    setTimeout(() => {
-                        const newId = centersData.length + 1;
-                        const newCenter = {
-                            ID: newId,
-                            educational_center_id: `EC00${newId}`,
-                            educational_center_name: name,
-                            admin_id: 'Unassigned',
-                            institute_logo: 'https://via.placeholder.com/50',
-                            location: location,
-                            mobile_number: mobile,
-                            email_id: email
-                        };
-                        centersData.push(newCenter);
-                        $('#add-center-modal-message').addClass('edu-success').text('Center added successfully!');
-                        $('#modal-center-edu-id').val(newCenter.educational_center_id);
-                        setTimeout(() => {
-                            closeModal('#add-center-modal');
-                            loadCenters(currentPage, perPage, searchQuery);
-                        }, 1000);
-                        hideLoader();
-                    }, 500);
-                } else {
-                    $('#add-center-modal-message').addClass('edu-error').text('Please fill all required fields.');
-                }
-            });
-
-            // Edit Center (Sidebar)
-            $('#edit-center-select').on('change', function() {
-                const centerId = $(this).val();
-                if (centerId) {
-                    const center = centersData.find(c => c.ID == centerId);
-                    $('#edit-center-id').val(center.ID);
-                    $('#edit-center-name').val(center.educational_center_name);
-                    $('#edit-center-admin-id').val(center.admin_id);
-                    $('#edit-center-edu-id').val(center.educational_center_id);
-                    $('#edit-center-location').val(center.location);
-                    $('#edit-center-mobile').val(center.mobile_number);
-                    $('#edit-center-email').val(center.email_id);
-                    if (center.institute_logo) $('#edit-center-logo-preview').attr('src', center.institute_logo).show();
-                    else $('#edit-center-logo-preview').hide();
-                    $('#edit-center-form').show();
-                } else {
-                    $('#edit-center-form').hide();
+            $(document).on('click', '.edit-center', function() {
+                const centerId = $(this).data('center-id');
+                const center = centersData.find(c => c.id == centerId);
+                if (center) {
+                    $('#edit-center-id').val(center.id);
+                    $('#edit-center-name').val(center.name);
+                    $('#edit-center-location').val(center.location || '');
+                    $('#edit-center-mobile').val(center.mobile || '');
+                    $('#edit-center-email').val(center.email || '');
+                    $('#edit-center-modal').show();
                 }
             });
 
@@ -4990,197 +4678,32 @@ function demoRenderSuperadminCenters() {
                 const mobile = $('#edit-center-mobile').val();
                 const email = $('#edit-center-email').val();
                 if (name && mobile && email) {
-                    showLoader();
-                    setTimeout(() => {
-                        const center = centersData.find(c => c.ID == id);
-                        center.educational_center_name = name;
+                    const center = centersData.find(c => c.id == id);
+                    if (center) {
+                        center.name = name;
                         center.location = location;
-                        center.mobile_number = mobile;
-                        center.email_id = email;
+                        center.mobile = mobile;
+                        center.email = email;
                         $('#edit-center-message').addClass('edu-success').text('Center updated successfully!');
                         setTimeout(() => {
-                            window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers', 'demo-action' => 'manage-centers'])); ?>';
+                            $('#edit-center-modal').hide();
+                            $('#edit-center-message').removeClass('edu-success').text('');
+                            loadCenters(currentPage, perPage, searchQuery);
                         }, 1000);
-                        hideLoader();
-                    }, 500);
+                    }
                 } else {
                     $('#edit-center-message').addClass('edu-error').text('Please fill all required fields.');
                 }
             });
 
-            // Edit Center (Modal)
-            $(document).on('click', '.edit-center', function() {
-                const centerId = $(this).data('center-id');
-                const center = centersData.find(c => c.ID == centerId);
-                $('#edit-modal-center-id').val(center.ID);
-                $('#edit-modal-center-name').val(center.educational_center_name);
-                $('#edit-modal-center-admin-id').val(center.admin_id);
-                $('#edit-modal-center-edu-id').val(center.educational_center_id);
-                $('#edit-modal-center-location').val(center.location);
-                $('#edit-modal-center-mobile').val(center.mobile_number);
-                $('#edit-modal-center-email').val(center.email_id);
-                if (center.institute_logo) $('#edit-modal-center-logo-preview').attr('src', center.institute_logo).show();
-                else $('#edit-modal-center-logo-preview').hide();
-                openModal('#edit-center-modal');
-            });
-
-            $('#update-modal-center').on('click', function() {
-                const id = $('#edit-modal-center-id').val();
-                const name = $('#edit-modal-center-name').val();
-                const location = $('#edit-modal-center-location').val();
-                const mobile = $('#edit-modal-center-mobile').val();
-                const email = $('#edit-modal-center-email').val();
-                if (name && mobile && email) {
-                    showLoader();
-                    setTimeout(() => {
-                        const center = centersData.find(c => c.ID == id);
-                        center.educational_center_name = name;
-                        center.location = location;
-                        center.mobile_number = mobile;
-                        center.email_id = email;
-                        $('#edit-center-modal-message').addClass('edu-success').text('Center updated successfully!');
-                        setTimeout(() => {
-                            closeModal('#edit-center-modal');
-                            loadCenters(currentPage, perPage, searchQuery);
-                        }, 1000);
-                        hideLoader();
-                    }, 500);
-                } else {
-                    $('#edit-center-modal-message').addClass('edu-error').text('Please fill all required fields.');
-                }
-            });
-
-            // Delete Center (Sidebar)
-            $('#delete-center-btn').on('click', function() {
-                const centerId = $('#delete-center-select').val();
-                if (centerId && confirm('Are you sure you want to delete this center?')) {
-                    showLoader();
-                    setTimeout(() => {
-                        centersData = centersData.filter(c => c.ID != centerId);
-                        $('#delete-center-message').addClass('edu-success').text('Center deleted successfully!');
-                        setTimeout(() => {
-                            window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers', 'demo-action' => 'manage-centers'])); ?>';
-                        }, 1000);
-                        hideLoader();
-                    }, 500);
-                } else if (!centerId) {
-                    $('#delete-center-message').addClass('edu-error').text('Please select a center.');
-                }
-            });
-
-            // Delete Center (Table)
             $(document).on('click', '.delete-center', function() {
                 if (!confirm('Are you sure you want to delete this center?')) return;
                 const centerId = $(this).data('center-id');
-                showLoader();
-                setTimeout(() => {
-                    centersData = centersData.filter(c => c.ID != centerId);
-                    loadCenters(currentPage, perPage, searchQuery);
-                    hideLoader();
-                }, 500);
+                centersData = centersData.filter(c => c.id != centerId);
+                loadCenters(currentPage, perPage, searchQuery);
             });
 
-            // Reset Password (Sidebar)
-            $('#send-reset-link').on('click', function() {
-                const centerId = $('#reset-center-select').val();
-                if (centerId) {
-                    showLoader();
-                    setTimeout(() => {
-                        $('#change-password-message').addClass('edu-success').text('Reset link sent successfully!');
-                        setTimeout(() => {
-                            window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers', 'demo-action' => 'manage-centers'])); ?>';
-                        }, 1000);
-                        hideLoader();
-                    }, 500);
-                } else {
-                    $('#change-password-message').addClass('edu-error').text('Please select a center.');
-                }
-            });
-
-            // Reset Password (Modal)
-            $(document).on('click', '.change-password', function() {
-                $('#change-modal-center-id').val($(this).data('center-id'));
-                openModal('#change-password-modal');
-            });
-
-            $('#send-modal-reset-link').on('click', function() {
-                showLoader();
-                setTimeout(() => {
-                    $('#change-password-modal-message').addClass('edu-success').text('Reset link sent successfully!');
-                    setTimeout(() => closeModal('#change-password-modal'), 1000);
-                    hideLoader();
-                }, 500);
-            });
-
-            // Add New Admin (Sidebar)
-            $('#new-admin-center-select').on('change', function() {
-                const centerId = $(this).val();
-                if (centerId) {
-                    const center = centersData.find(c => c.ID == centerId);
-                    $('#new-admin-center-id').val(centerId);
-                    $('#new-admin-educational-center-id').val(center.educational_center_id);
-                    $('#new-admin-id').val(`ADM00${centersData.length + 1}`);
-                }
-            });
-
-            $('#save-new-admin').on('click', function() {
-                const centerId = $('#new-admin-center-id').val();
-                const adminId = $('#new-admin-id').val();
-                const name = $('#new-admin-name').val();
-                const email = $('#new-admin-email').val();
-                const password = $('#new-admin-password').val();
-                const mobile = $('#new-admin-mobile').val();
-                if (centerId && name && email && password && mobile) {
-                    showLoader();
-                    setTimeout(() => {
-                        const center = centersData.find(c => c.ID == centerId);
-                        center.admin_id = adminId;
-                        $('#add-new-admin-message').addClass('edu-success').text('New admin added successfully!');
-                        setTimeout(() => {
-                            window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers', 'demo-action' => 'manage-centers'])); ?>';
-                        }, 1000);
-                        hideLoader();
-                    }, 500);
-                } else {
-                    $('#add-new-admin-message').addClass('edu-error').text('Please fill all required fields.');
-                }
-            });
-
-            // Add New Admin (Modal)
-            $(document).on('click', '.add-new-admin', function() {
-                const centerId = $(this).data('center-id');
-                const center = centersData.find(c => c.ID == centerId);
-                $('#new-admin-modal-center-id').val(centerId);
-                $('#new-admin-modal-educational-center-id').val(center.educational_center_id);
-                $('#new-admin-modal-id').val(`ADM00${centersData.length + 1}`);
-                openModal('#add-new-admin-modal');
-            });
-
-            $('#save-new-admin-modal').on('click', function() {
-                const centerId = $('#new-admin-modal-center-id').val();
-                const adminId = $('#new-admin-modal-id').val();
-                const name = $('#new-admin-modal-name').val();
-                const email = $('#new-admin-modal-email').val();
-                const password = $('#new-admin-modal-password').val();
-                const mobile = $('#new-admin-modal-mobile').val();
-                if (name && email && password && mobile) {
-                    showLoader();
-                    setTimeout(() => {
-                        const center = centersData.find(c => c.ID == centerId);
-                        center.admin_id = adminId;
-                        $('#add-new-admin-modal-message').addClass('edu-success').text('New admin added successfully!');
-                        setTimeout(() => {
-                            closeModal('#add-new-admin-modal');
-                            loadCenters(currentPage, perPage, searchQuery);
-                        }, 1000);
-                        hideLoader();
-                    }, 500);
-                } else {
-                    $('#add-new-admin-modal-message').addClass('edu-error').text('Please fill all required fields.');
-                }
-            });
-
-            $('.edu-modal-close').on('click', function() { closeModal(`#${$(this).data('modal')}`); });
+            $('.edu-modal-close').on('click', function() { $('#edit-center-modal').hide(); });
         });
         </script>
     </div>
@@ -5302,13 +4825,170 @@ function demoRenderSuperadminDeleteExam($data) {
     return ob_get_clean();
 }
 
-
-function demoRenderSuperadminSubscription($data) {
+function demoRenderSuperadminSubscription($data = []) {
     ob_start();
     ?>
     <div class="dashboard-section">
         <h2>Subscriptions</h2>
-        <p>Subscription management placeholder.</p>
+        <div class="edu-actions">
+            <input type="text" id="subscription-search" class="edu-search-input" placeholder="Search Subscriptions...">
+            <button class="edu-button edu-button-primary" onclick="window.location.href='<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription', 'demo-action' => 'add-subscription'])); ?>'">Add Subscription</button>
+        </div>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="subscriptions-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Center</th>
+                        <th>Plan</th>
+                        <th>Start Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="subscriptions-table-body">
+                    <?php foreach ($data['subscriptions'] as $sub): ?>
+                        <tr data-subscription-id="<?php echo esc_attr($sub['id']); ?>">
+                            <td><?php echo esc_html($sub['id']); ?></td>
+                            <td><?php echo esc_html($sub['center']); ?></td>
+                            <td><?php echo esc_html($sub['plan']); ?></td>
+                            <td><?php echo esc_html($sub['start_date']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-subscription" data-subscription-id="<?php echo esc_attr($sub['id']); ?>">Edit</button>
+                                <button class="edu-button edu-button-delete delete-subscription" data-subscription-id="<?php echo esc_attr($sub['id']); ?>">Delete</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="edu-pagination">
+            <button class="edu-button edu-button-nav" id="prev-page" disabled>Previous</button>
+            <span id="page-info"></span>
+            <button class="edu-button edu-button-nav" id="next-page">Next</button>
+        </div>
+
+        <!-- Edit Subscription Modal -->
+        <div id="edit-subscription-modal" class="edu-modal" style="display: none;">
+            <div class="edu-modal-content">
+                <span class="edu-modal-close" data-modal="edit-subscription-modal">×</span>
+                <h2>Edit Subscription</h2>
+                <form id="edit-subscription-form" class="edu-form">
+                    <input type="hidden" id="edit-subscription-id">
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-subscription-center">Center</label>
+                        <input type="text" class="edu-form-input" id="edit-subscription-center" required>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-subscription-plan">Plan</label>
+                        <select class="edu-form-input" id="edit-subscription-plan" required>
+                            <option value="Basic">Basic</option>
+                            <option value="Standard">Standard</option>
+                            <option value="Premium">Premium</option>
+                        </select>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-subscription-start-date">Start Date</label>
+                        <input type="date" class="edu-form-input" id="edit-subscription-start-date" required>
+                    </div>
+                    <button type="button" class="edu-button edu-button-primary" id="update-subscription">Update Subscription</button>
+                </form>
+                <div class="edu-form-message" id="edit-subscription-message"></div>
+            </div>
+        </div>
+
+        <script>
+        jQuery(document).ready(function($) {
+            let subscriptionsData = <?php echo json_encode($data['subscriptions']); ?>;
+            let currentPage = 1;
+            let perPage = 10;
+            let searchQuery = '';
+
+            function loadSubscriptions(page, limit, query) {
+                const filtered = subscriptionsData.filter(s => 
+                    !query || s.center.toLowerCase().includes(query.toLowerCase())
+                );
+                const total = filtered.length;
+                const start = (page - 1) * limit;
+                const end = start + limit;
+                const paginated = filtered.slice(start, end);
+                let html = '';
+                paginated.forEach(sub => {
+                    html += `
+                        <tr data-subscription-id="${sub.id}">
+                            <td>${sub.id}</td>
+                            <td>${sub.center}</td>
+                            <td>${sub.plan}</td>
+                            <td>${sub.start_date}</td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-subscription" data-subscription-id="${sub.id}">Edit</button>
+                                <button class="edu-button edu-button-delete delete-subscription" data-subscription-id="${sub.id}">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                $('#subscriptions-table-body').html(html || '<tr><td colspan="5">No subscriptions found.</td></tr>');
+                const totalPages = Math.ceil(total / limit);
+                $('#page-info').text(`Page ${page} of ${totalPages}`);
+                $('#prev-page').prop('disabled', page === 1);
+                $('#next-page').prop('disabled', page === totalPages || total === 0);
+            }
+
+            loadSubscriptions(currentPage, perPage, searchQuery);
+
+            $('#subscription-search').on('input', function() {
+                searchQuery = $(this).val();
+                currentPage = 1;
+                loadSubscriptions(currentPage, perPage, searchQuery);
+            });
+
+            $('#prev-page').on('click', function() { currentPage--; loadSubscriptions(currentPage, perPage, searchQuery); });
+            $('#next-page').on('click', function() { currentPage++; loadSubscriptions(currentPage, perPage, searchQuery); });
+
+            $(document).on('click', '.edit-subscription', function() {
+                const subId = $(this).data('subscription-id');
+                const sub = subscriptionsData.find(s => s.id == subId);
+                if (sub) {
+                    $('#edit-subscription-id').val(sub.id);
+                    $('#edit-subscription-center').val(sub.center);
+                    $('#edit-subscription-plan').val(sub.plan);
+                    $('#edit-subscription-start-date').val(sub.start_date);
+                    $('#edit-subscription-modal').show();
+                }
+            });
+
+            $('#update-subscription').on('click', function() {
+                const id = $('#edit-subscription-id').val();
+                const center = $('#edit-subscription-center').val();
+                const plan = $('#edit-subscription-plan').val();
+                const start_date = $('#edit-subscription-start-date').val();
+                if (center && plan && start_date) {
+                    const sub = subscriptionsData.find(s => s.id == id);
+                    if (sub) {
+                        sub.center = center;
+                        sub.plan = plan;
+                        sub.start_date = start_date;
+                        $('#edit-subscription-message').addClass('edu-success').text('Subscription updated successfully!');
+                        setTimeout(() => {
+                            $('#edit-subscription-modal').hide();
+                            $('#edit-subscription-message').removeClass('edu-success').text('');
+                            loadSubscriptions(currentPage, perPage, searchQuery);
+                        }, 1000);
+                    }
+                } else {
+                    $('#edit-subscription-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+
+            $(document).on('click', '.delete-subscription', function() {
+                if (!confirm('Are you sure you want to delete this subscription?')) return;
+                const subId = $(this).data('subscription-id');
+                subscriptionsData = subscriptionsData.filter(s => s.id != subId);
+                loadSubscriptions(currentPage, perPage, searchQuery);
+            });
+
+            $('.edu-modal-close').on('click', function() { $('#edit-subscription-modal').hide(); });
+        });
+        </script>
     </div>
     <?php
     return ob_get_clean();
@@ -5318,41 +4998,360 @@ function demoRenderSuperadminAddSubscription() {
     ob_start();
     ?>
     <div class="dashboard-section">
-        <h2>Add Subscription</h2>
-        <p>Add subscription form placeholder.</p>
+        <h2>Add New Subscription</h2>
+        <div class="card p-4 bg-light">
+            <form id="add-subscription-form" class="edu-form">
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="subscription-center">Center</label>
+                    <input type="text" class="edu-form-input" id="subscription-center" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="subscription-plan">Plan</label>
+                    <select class="edu-form-input" id="subscription-plan" required>
+                        <option value="Basic">Basic</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Premium">Premium</option>
+                    </select>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="subscription-start-date">Start Date</label>
+                    <input type="date" class="edu-form-input" id="subscription-start-date" required>
+                </div>
+                <button type="button" class="edu-button edu-button-primary" id="save-subscription">Add Subscription</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </form>
+            <div class="edu-form-message" id="add-subscription-message"></div>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#save-subscription').on('click', function() {
+                const center = $('#subscription-center').val();
+                const plan = $('#subscription-plan').val();
+                const start_date = $('#subscription-start-date').val();
+                if (center && plan && start_date) {
+                    $('#add-subscription-message').addClass('edu-success').text('Subscription added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#add-subscription-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+        });
+        </script>
     </div>
     <?php
     return ob_get_clean();
 }
 
-function demoRenderSuperadminEditSubscription($data) {
+function demoRenderSuperadminEditSubscription($data = []) {
     ob_start();
     ?>
     <div class="dashboard-section">
         <h2>Edit Subscription</h2>
-        <p>Edit subscription form placeholder.</p>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="subscriptions-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Center</th>
+                        <th>Plan</th>
+                        <th>Start Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="subscriptions-table-body">
+                    <?php foreach ($data['subscriptions'] as $sub): ?>
+                        <tr data-subscription-id="<?php echo esc_attr($sub['id']); ?>">
+                            <td><?php echo esc_html($sub['id']); ?></td>
+                            <td><?php echo esc_html($sub['center']); ?></td>
+                            <td><?php echo esc_html($sub['plan']); ?></td>
+                            <td><?php echo esc_html($sub['start_date']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-subscription" data-subscription-id="<?php echo esc_attr($sub['id']); ?>">Edit</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Edit Subscription Modal -->
+        <div id="edit-subscription-modal" class="edu-modal" style="display: none;">
+            <div class="edu-modal-content">
+                <span class="edu-modal-close" data-modal="edit-subscription-modal">×</span>
+                <h2>Edit Subscription</h2>
+                <form id="edit-subscription-form" class="edu-form">
+                    <input type="hidden" id="edit-subscription-id">
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-subscription-center">Center</label>
+                        <input type="text" class="edu-form-input" id="edit-subscription-center" required>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-subscription-plan">Plan</label>
+                        <select class="edu-form-input" id="edit-subscription-plan" required>
+                            <option value="Basic">Basic</option>
+                            <option value="Standard">Standard</option>
+                            <option value="Premium">Premium</option>
+                        </select>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-subscription-start-date">Start Date</label>
+                        <input type="date" class="edu-form-input" id="edit-subscription-start-date" required>
+                    </div>
+                    <button type="button" class="edu-button edu-button-primary" id="update-subscription">Update Subscription</button>
+                </form>
+                <div class="edu-form-message" id="edit-subscription-message"></div>
+            </div>
+        </div>
+
+        <script>
+        jQuery(document).ready(function($) {
+            let subscriptionsData = <?php echo json_encode($data['subscriptions']); ?>;
+
+            $(document).on('click', '.edit-subscription', function() {
+                const subId = $(this).data('subscription-id');
+                const sub = subscriptionsData.find(s => s.id == subId);
+                if (sub) {
+                    $('#edit-subscription-id').val(sub.id);
+                    $('#edit-subscription-center').val(sub.center);
+                    $('#edit-subscription-plan').val(sub.plan);
+                    $('#edit-subscription-start-date').val(sub.start_date);
+                    $('#edit-subscription-modal').show();
+                } else {
+                    alert('Subscription not found.');
+                }
+            });
+
+            $('#update-subscription').on('click', function() {
+                const id = $('#edit-subscription-id').val();
+                const center = $('#edit-subscription-center').val();
+                const plan = $('#edit-subscription-plan').val();
+                const start_date = $('#edit-subscription-start-date').val();
+                if (center && plan && start_date) {
+                    const sub = subscriptionsData.find(s => s.id == id);
+                    if (sub) {
+                        sub.center = center;
+                        sub.plan = plan;
+                        sub.start_date = start_date;
+                        $('#edit-subscription-message').addClass('edu-success').text('Subscription updated successfully!');
+                        setTimeout(() => {
+                            window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription'])); ?>';
+                        }, 1000);
+                    }
+                } else {
+                    $('#edit-subscription-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+
+            $('.edu-modal-close').on('click', function() { $('#edit-subscription-modal').hide(); });
+        });
+        </script>
     </div>
     <?php
     return ob_get_clean();
 }
 
-function demoRenderSuperadminDeleteSubscription($data) {
+function demoRenderSuperadminDeleteSubscription($data = []) {
     ob_start();
     ?>
     <div class="dashboard-section">
         <h2>Delete Subscription</h2>
-        <p>Delete subscription confirmation placeholder.</p>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="subscriptions-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Center</th>
+                        <th>Plan</th>
+                        <th>Start Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="subscriptions-table-body">
+                    <?php foreach ($data['subscriptions'] as $sub): ?>
+                        <tr data-subscription-id="<?php echo esc_attr($sub['id']); ?>">
+                            <td><?php echo esc_html($sub['id']); ?></td>
+                            <td><?php echo esc_html($sub['center']); ?></td>
+                            <td><?php echo esc_html($sub['plan']); ?></td>
+                            <td><?php echo esc_html($sub['start_date']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-delete delete-subscription" data-subscription-id="<?php echo esc_attr($sub['id']); ?>">Delete</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            let subscriptionsData = <?php echo json_encode($data['subscriptions']); ?>;
+            $(document).on('click', '.delete-subscription', function() {
+                if (!confirm('Are you sure you want to delete this subscription?')) return;
+                const subId = $(this).data('subscription-id');
+                subscriptionsData = subscriptionsData.filter(s => s.id != subId);
+                window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription'])); ?>';
+            });
+        });
+        </script>
     </div>
     <?php
     return ob_get_clean();
 }
 
-function demoRenderSuperadminPaymentMethods($data) {
+/**
+ * Superadmin Payment Methods
+ */
+function demoRenderSuperadminPaymentMethods($data = []) {
     ob_start();
     ?>
     <div class="dashboard-section">
         <h2>Payment Methods</h2>
-        <p>Payment methods management placeholder.</p>
+        <div class="edu-actions">
+            <input type="text" id="payment-search" class="edu-search-input" placeholder="Search Payment Methods...">
+            <button class="edu-button edu-button-primary" onclick="window.location.href='<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'payment_methods', 'demo-action' => 'add-payment-method'])); ?>'">Add Payment Method</button>
+        </div>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="payment-methods-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Method</th>
+                        <th>Center</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="payment-methods-table-body">
+                    <?php foreach ($data['payment_methods'] as $pm): ?>
+                        <tr data-payment-id="<?php echo esc_attr($pm['id']); ?>">
+                            <td><?php echo esc_html($pm['id']); ?></td>
+                            <td><?php echo esc_html($pm['method']); ?></td>
+                            <td><?php echo esc_html($pm['center']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-payment" data-payment-id="<?php echo esc_attr($pm['id']); ?>">Edit</button>
+                                <button class="edu-button edu-button-delete delete-payment" data-payment-id="<?php echo esc_attr($pm['id']); ?>">Delete</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="edu-pagination">
+            <button class="edu-button edu-button-nav" id="prev-page" disabled>Previous</button>
+            <span id="page-info"></span>
+            <button class="edu-button edu-button-nav" id="next-page">Next</button>
+        </div>
+
+        <!-- Edit Payment Method Modal -->
+        <div id="edit-payment-modal" class="edu-modal" style="display: none;">
+            <div class="edu-modal-content">
+                <span class="edu-modal-close" data-modal="edit-payment-modal">×</span>
+                <h2>Edit Payment Method</h2>
+                <form id="edit-payment-form" class="edu-form">
+                    <input type="hidden" id="edit-payment-id">
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-payment-method">Method</label>
+                        <input type="text" class="edu-form-input" id="edit-payment-method" required>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-payment-center">Center</label>
+                        <input type="text" class="edu-form-input" id="edit-payment-center" required>
+                    </div>
+                    <button type="button" class="edu-button edu-button-primary" id="update-payment">Update Payment Method</button>
+                </form>
+                <div class="edu-form-message" id="edit-payment-message"></div>
+            </div>
+        </div>
+
+        <script>
+        jQuery(document).ready(function($) {
+            let paymentMethodsData = <?php echo json_encode($data['payment_methods']); ?>;
+            let currentPage = 1;
+            let perPage = 10;
+            let searchQuery = '';
+
+            function loadPaymentMethods(page, limit, query) {
+                const filtered = paymentMethodsData.filter(p => 
+                    !query || p.method.toLowerCase().includes(query.toLowerCase())
+                );
+                const total = filtered.length;
+                const start = (page - 1) * limit;
+                const end = start + limit;
+                const paginated = filtered.slice(start, end);
+                let html = '';
+                paginated.forEach(pm => {
+                    html += `
+                        <tr data-payment-id="${pm.id}">
+                            <td>${pm.id}</td>
+                            <td>${pm.method}</td>
+                            <td>${pm.center}</td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-payment" data-payment-id="${pm.id}">Edit</button>
+                                <button class="edu-button edu-button-delete delete-payment" data-payment-id="${pm.id}">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                $('#payment-methods-table-body').html(html || '<tr><td colspan="4">No payment methods found.</td></tr>');
+                const totalPages = Math.ceil(total / limit);
+                $('#page-info').text(`Page ${page} of ${totalPages}`);
+                $('#prev-page').prop('disabled', page === 1);
+                $('#next-page').prop('disabled', page === totalPages || total === 0);
+            }
+
+            loadPaymentMethods(currentPage, perPage, searchQuery);
+
+            $('#payment-search').on('input', function() {
+                searchQuery = $(this).val();
+                currentPage = 1;
+                loadPaymentMethods(currentPage, perPage, searchQuery);
+            });
+
+            $('#prev-page').on('click', function() { currentPage--; loadPaymentMethods(currentPage, perPage, searchQuery); });
+            $('#next-page').on('click', function() { currentPage++; loadPaymentMethods(currentPage, perPage, searchQuery); });
+
+            $(document).on('click', '.edit-payment', function() {
+                const pmId = $(this).data('payment-id');
+                const pm = paymentMethodsData.find(p => p.id == pmId);
+                if (pm) {
+                    $('#edit-payment-id').val(pm.id);
+                    $('#edit-payment-method').val(pm.method);
+                    $('#edit-payment-center').val(pm.center);
+                    $('#edit-payment-modal').show();
+                }
+            });
+
+            $('#update-payment').on('click', function() {
+                const id = $('#edit-payment-id').val();
+                const method = $('#edit-payment-method').val();
+                const center = $('#edit-payment-center').val();
+                if (method && center) {
+                    const pm = paymentMethodsData.find(p => p.id == id);
+                    if (pm) {
+                        pm.method = method;
+                        pm.center = center;
+                        $('#edit-payment-message').addClass('edu-success').text('Payment method updated successfully!');
+                        setTimeout(() => {
+                            $('#edit-payment-modal').hide();
+                            $('#edit-payment-message').removeClass('edu-success').text('');
+                            loadPaymentMethods(currentPage, perPage, searchQuery);
+                        }, 1000);
+                    }
+                } else {
+                    $('#edit-payment-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+
+            $(document).on('click', '.delete-payment', function() {
+                if (!confirm('Are you sure you want to delete this payment method?')) return;
+                const pmId = $(this).data('payment-id');
+                paymentMethodsData = paymentMethodsData.filter(p => p.id != pmId);
+                loadPaymentMethods(currentPage, perPage, searchQuery);
+            });
+
+            $('.edu-modal-close').on('click', function() { $('#edit-payment-modal').hide(); });
+        });
+        </script>
     </div>
     <?php
     return ob_get_clean();
@@ -5362,30 +5361,178 @@ function demoRenderSuperadminAddPaymentMethods() {
     ob_start();
     ?>
     <div class="dashboard-section">
-        <h2>Add Payment Method</h2>
-        <p>Add payment method form placeholder.</p>
+        <h2>Add New Payment Method</h2>
+        <div class="card p-4 bg-light">
+            <form id="add-payment-form" class="edu-form">
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="payment-method">Method</label>
+                    <input type="text" class="edu-form-input" id="payment-method" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="payment-center">Center</label>
+                    <input type="text" class="edu-form-input" id="payment-center" required>
+                </div>
+                <button type="button" class="edu-button edu-button-primary" id="save-payment">Add Payment Method</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'payment_methods'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </form>
+            <div class="edu-form-message" id="add-payment-message"></div>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#save-payment').on('click', function() {
+                const method = $('#payment-method').val();
+                const center = $('#payment-center').val();
+                if (method && center) {
+                    $('#add-payment-message').addClass('edu-success').text('Payment method added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'payment_methods'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#add-payment-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+        });
+        </script>
     </div>
     <?php
     return ob_get_clean();
 }
 
-function demoRenderSuperadminEditPaymentMethods($data) {
+function demoRenderSuperadminEditPaymentMethods($data = []) {
     ob_start();
     ?>
     <div class="dashboard-section">
         <h2>Edit Payment Method</h2>
-        <p>Edit payment method form placeholder.</p>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="payment-methods-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Method</th>
+                        <th>Center</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="payment-methods-table-body">
+                    <?php foreach ($data['payment_methods'] as $pm): ?>
+                        <tr data-payment-id="<?php echo esc_attr($pm['id']); ?>">
+                            <td><?php echo esc_html($pm['id']); ?></td>
+                            <td><?php echo esc_html($pm['id']); ?></td>
+                            <td><?php echo esc_html($pm['center']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-payment" data-payment-id="<?php echo esc_attr($pm['id']); ?>">Edit</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Edit Payment Method Modal -->
+        <div id="edit-payment-modal" class="edu-modal" style="display: none;">
+            <div class="edu-modal-content">
+                <span class="edu-modal-close" data-modal="edit-payment-modal">×</span>
+                <h2>Edit Payment Method</h2>
+                <form id="edit-payment-form" class="edu-form">
+                    <input type="hidden" id="edit-payment-id">
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-payment-method">Method</label>
+                        <input type="text" class="edu-form-input" id="edit-payment-method" required>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-payment-center">Center</label>
+                        <input type="text" class="edu-form-input" id="edit-payment-center" required>
+                    </div>
+                    <button type="button" class="edu-button edu-button-primary" id="update-payment">Update Payment Method</button>
+                </form>
+                <div class="edu-form-message" id="edit-payment-message"></div>
+            </div>
+        </div>
+
+        <script>
+        jQuery(document).ready(function($) {
+            let paymentMethodsData = <?php echo json_encode($data['payment_methods']); ?>;
+
+            $(document).on('click', '.edit-payment', function() {
+                const pmId = $(this).data('payment-id');
+                const pm = paymentMethodsData.find(p => p.id == pmId);
+                if (pm) {
+                    $('#edit-payment-id').val(pm.id);
+                    $('#edit-payment-method').val(pm.method);
+                    $('#edit-payment-center').val(pm.center);
+                    $('#edit-payment-modal').show();
+                } else {
+                    alert('Payment method not found.');
+                }
+            });
+
+            $('#update-payment').on('click', function() {
+                const id = $('#edit-payment-id').val();
+                const method = $('#edit-payment-method').val();
+                const center = $('#edit-payment-center').val();
+                if (method && center) {
+                    const pm = paymentMethodsData.find(p => p.id == id);
+                    if (pm) {
+                        pm.method = method;
+                        pm.center = center;
+                        $('#edit-payment-message').addClass('edu-success').text('Payment method updated successfully!');
+                        setTimeout(() => {
+                            window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'payment_methods'])); ?>';
+                        }, 1000);
+                    }
+                } else {
+                    $('#edit-payment-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+
+            $('.edu-modal-close').on('click', function() { $('#edit-payment-modal').hide(); });
+        });
+        </script>
     </div>
     <?php
     return ob_get_clean();
 }
 
-function demoRenderSuperadminDeletePaymentMethods($data) {
+function demoRenderSuperadminDeletePaymentMethods($data = []) {
     ob_start();
     ?>
     <div class="dashboard-section">
         <h2>Delete Payment Method</h2>
-        <p>Delete payment method confirmation placeholder.</p>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="payment-methods-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Method</th>
+                        <th>Center</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="payment-methods-table-body">
+                    <?php foreach ($data['payment_methods'] as $pm): ?>
+                        <tr data-payment-id="<?php echo esc_attr($pm['id']); ?>">
+                            <td><?php echo esc_html($pm['id']); ?></td>
+                            <td><?php echo esc_html($pm['method']); ?></td>
+                            <td><?php echo esc_html($pm['center']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-delete delete-payment" data-payment-id="<?php echo esc_attr($pm['id']); ?>">Delete</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            let paymentMethodsData = <?php echo json_encode($data['payment_methods']); ?>;
+            $(document).on('click', '.delete-payment', function() {
+                if (!confirm('Are you sure you want to delete this payment method?')) return;
+                const pmId = $(this).data('payment-id');
+                paymentMethodsData = paymentMethodsData.filter(p => p.id != pmId);
+                window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'payment_methods'])); ?>';
+            });
+        });
+        </script>
     </div>
     <?php
     return ob_get_clean();
@@ -5683,6 +5830,1777 @@ function demoRenderTeacherStudents($data = []) {
     <?php
     return ob_get_clean();
 }
+
+
+/**
+ * Render Staff Attendance Section
+ */
+function demoRenderSuperadminStaffAttendance($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Staff Attendance</h2>
+        <div class="edu-actions">
+            <input type="text" id="staff-attendance-search" class="edu-search-input" placeholder="Search Staff Attendance...">
+            <button class="edu-button edu-button-primary" onclick="window.location.href='<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'add-staff-attendance'])); ?>'">Add Attendance</button>
+            <button class="edu-button edu-button-secondary" id="export-staff-attendance">Export CSV</button>
+            <input type="file" id="import-staff-attendance" accept=".csv" style="display: none;">
+            <button class="edu-button edu-button-secondary" id="import-staff-attendance-btn">Import CSV</button>
+        </div>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="staff-attendance-table">
+                <thead>
+                    <tr>
+                        <th>Staff ID</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Center</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="staff-attendance-table-body">
+                    <!-- Populated via JS -->
+                </tbody>
+            </table>
+        </div>
+        <div class="edu-pagination">
+            <button class="edu-button edu-button-nav" id="prev-page" disabled>Previous</button>
+            <span id="page-info"></span>
+            <button class="edu-button edu-button-nav" id="next-page">Next</button>
+        </div>
+
+        <!-- Edit Staff Attendance Modal -->
+        <div id="edit-staff-attendance-modal" class="edu-modal" style="display: none;">
+            <div class="edu-modal-content">
+                <span class="edu-modal-close" data-modal="edit-staff-attendance-modal">×</span>
+                <h2>Edit Staff Attendance</h2>
+                <form id="edit-staff-attendance-form" class="edu-form">
+                    <input type="hidden" id="edit-staff-attendance-index">
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-staff-id">Staff ID</label>
+                        <input type="text" class="edu-form-input" id="edit-staff-id" readonly>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-staff-name">Staff Name</label>
+                        <input type="text" class="edu-form-input" id="edit-staff-name" readonly>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-staff-role">Role</label>
+                        <input type="text" class="edu-form-input" id="edit-staff-role" readonly>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-staff-center">Center</label>
+                        <input type="text" class="edu-form-input" id="edit-staff-center" readonly>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-staff-date">Date</label>
+                        <input type="date" class="edu-form-input" id="edit-staff-date" required>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-staff-status">Status</label>
+                        <select class="edu-form-input" id="edit-staff-status" required>
+                            <option value="Present">Present</option>
+                            <option value="Absent">Absent</option>
+                            <option value="Late">Late</option>
+                        </select>
+                    </div>
+                    <button type="button" class="edu-button edu-button-primary" id="update-staff-attendance">Update Attendance</button>
+                </form>
+                <div class="edu-form-message" id="edit-staff-attendance-message"></div>
+            </div>
+        </div>
+
+        <script>
+        jQuery(document).ready(function($) {
+            let staffAttendanceData = <?php echo json_encode($data['staff_attendance']); ?>;
+            let currentPage = 1;
+            let perPage = 10;
+            let searchQuery = '';
+
+            function loadStaffAttendance(page, limit, query) {
+                const filtered = staffAttendanceData.filter(a => 
+                    !query || a.staff_name.toLowerCase().includes(query.toLowerCase())
+                );
+                const total = filtered.length;
+                const start = (page - 1) * limit;
+                const end = start + limit;
+                const paginated = filtered.slice(start, end);
+                let html = '';
+                paginated.forEach((record, index) => {
+                    html += `
+                        <tr data-attendance-index="${start + index}">
+                            <td>${record.staff_id}</td>
+                            <td>${record.staff_name}</td>
+                            <td>${record.role}</td>
+                            <td>${record.education_center_id}</td>
+                            <td>${record.date}</td>
+                            <td>${record.status}</td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-staff-attendance" data-attendance-index="${start + index}">Edit</button>
+                                <button class="edu-button edu-button-delete delete-staff-attendance" data-attendance-index="${start + index}">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                $('#staff-attendance-table-body').html(html || '<tr><td colspan="7">No attendance records found.</td></tr>');
+                const totalPages = Math.ceil(total / limit);
+                $('#page-info').text(`Page ${page} of ${totalPages}`);
+                $('#prev-page').prop('disabled', page === 1);
+                $('#next-page').prop('disabled', page === totalPages || total === 0);
+            }
+
+            loadStaffAttendance(currentPage, perPage, searchQuery);
+
+            $('#staff-attendance-search').on('input', function() {
+                searchQuery = $(this).val();
+                currentPage = 1;
+                loadStaffAttendance(currentPage, perPage, searchQuery);
+            });
+
+            $('#prev-page').on('click', function() { currentPage--; loadStaffAttendance(currentPage, perPage, searchQuery); });
+            $('#next-page').on('click', function() { currentPage++; loadStaffAttendance(currentPage, perPage, searchQuery); });
+
+            $(document).on('click', '.edit-staff-attendance', function() {
+                const index = $(this).data('attendance-index');
+                const record = staffAttendanceData[index];
+                $('#edit-staff-attendance-index').val(index);
+                $('#edit-staff-id').val(record.staff_id);
+                $('#edit-staff-name').val(record.staff_name);
+                $('#edit-staff-role').val(record.role);
+                $('#edit-staff-center').val(record.education_center_id);
+                $('#edit-staff-date').val(record.date);
+                $('#edit-staff-status').val(record.status);
+                $('#edit-staff-attendance-modal').show();
+            });
+
+            $('#update-staff-attendance').on('click', function() {
+                const index = $('#edit-staff-attendance-index').val();
+                const date = $('#edit-staff-date').val();
+                const status = $('#edit-staff-status').val();
+                if (date && status) {
+                    staffAttendanceData[index].date = date;
+                    staffAttendanceData[index].status = status;
+                    $('#edit-staff-attendance-message').addClass('edu-success').text('Attendance updated successfully!');
+                    setTimeout(() => {
+                        $('#edit-staff-attendance-modal').hide();
+                        $('#edit-staff-attendance-message').removeClass('edu-success').text('');
+                        loadStaffAttendance(currentPage, perPage, searchQuery);
+                    }, 1000);
+                } else {
+                    $('#edit-staff-attendance-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+
+            $(document).on('click', '.delete-staff-attendance', function() {
+                if (!confirm('Are you sure you want to delete this attendance record?')) return;
+                const index = $(this).data('attendance-index');
+                staffAttendanceData.splice(index, 1);
+                loadStaffAttendance(currentPage, perPage, searchQuery);
+            });
+
+            $('#export-staff-attendance').on('click', function() {
+                const csv = staffAttendanceData.map(row => `${row.staff_id},${row.staff_name},${row.role},${row.education_center_id},${row.date},${row.status}`).join('\n');
+                const headers = 'Staff ID,Staff Name,Role,Center,Date,Status\n';
+                const blob = new Blob([headers + csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'staff_attendance.csv';
+                a.click();
+                window.URL.revokeObjectURL(url);
+            });
+
+            $('#import-staff-attendance-btn').on('click', function() {
+                $('#import-staff-attendance').click();
+            });
+
+            $('#import-staff-attendance').on('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const text = e.target.result;
+                        const rows = text.split('\n').slice(1).filter(row => row.trim());
+                        const newRecords = rows.map(row => {
+                            const [staff_id, staff_name, role, education_center_id, date, status] = row.split(',');
+                            return { staff_id, staff_name, role, education_center_id, date, status };
+                        });
+                        staffAttendanceData.push(...newRecords);
+                        loadStaffAttendance(currentPage, perPage, searchQuery);
+                    };
+                    reader.readAsText(file);
+                    e.target.value = '';
+                }
+            });
+
+            $('.edu-modal-close').on('click', function() { $('#edit-staff-attendance-modal').hide(); });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+/**
+ * Add Staff Attendance
+ */
+function demoRenderSuperadminAddStaffAttendance($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Staff Attendance</h2>
+        <div class="card p-4 bg-light">
+            <form id="add-staff-attendance-form" class="edu-form">
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="staff-id">Staff ID</label>
+                    <input type="text" class="edu-form-input" id="staff-id" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="staff-name">Staff Name</label>
+                    <input type="text" class="edu-form-input" id="staff-name" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="staff-role">Role</label>
+                    <input type="text" class="edu-form-input" id="staff-role" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="staff-center">Center</label>
+                    <input type="text" class="edu-form-input" id="staff-center" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="staff-date">Date</label>
+                    <input type="date" class="edu-form-input" id="staff-date" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="staff-status">Status</label>
+                    <select class="edu-form-input" id="staff-status" required>
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                        <option value="Late">Late</option>
+                    </select>
+                </div>
+                <button type="button" class="edu-button edu-button-primary" id="save-staff-attendance">Add Attendance</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'staff-attendance'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </form>
+            <div class="edu-form-message" id="add-staff-attendance-message"></div>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#save-staff-attendance').on('click', function() {
+                const record = {
+                    staff_id: $('#staff-id').val(),
+                    staff_name: $('#staff-name').val(),
+                    role: $('#staff-role').val(),
+                    education_center_id: $('#staff-center').val(),
+                    date: $('#staff-date').val(),
+                    status: $('#staff-status').val()
+                };
+                if (record.staff_id && record.staff_name && record.role && record.education_center_id && record.date && record.status) {
+                    $('#add-staff-attendance-message').addClass('edu-success').text('Attendance added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'staff-attendance'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#add-staff-attendance-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+/**
+ * Edit Staff Attendance
+ */
+function demoRenderSuperadminEditStaffAttendance($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Staff Attendance</h2>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="staff-attendance-table">
+                <thead>
+                    <tr>
+                        <th>Staff ID</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Center</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="staff-attendance-table-body">
+                    <?php foreach ($data['staff_attendance'] as $index => $record): ?>
+                        <tr data-attendance-index="<?php echo esc_attr($index); ?>">
+                            <td><?php echo esc_html($record['staff_id']); ?></td>
+                            <td><?php echo esc_html($record['staff_name']); ?></td>
+                            <td><?php echo esc_html($record['role']); ?></td>
+                            <td><?php echo esc_html($record['education_center_id']); ?></td>
+                            <td><?php echo esc_html($record['date']); ?></td>
+                            <td><?php echo esc_html($record['status']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-staff-attendance" data-attendance-index="<?php echo esc_attr($index); ?>">Edit</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Edit Staff Attendance Modal -->
+        <div id="edit-staff-attendance-modal" class="edu-modal" style="display: none;">
+            <div class="edu-modal-content">
+                <span class="edu-modal-close" data-modal="edit-staff-attendance-modal">×</span>
+                <h2>Edit Staff Attendance</h2>
+                <form id="edit-staff-attendance-form" class="edu-form">
+                    <input type="hidden" id="edit-staff-attendance-index">
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-staff-id">Staff ID</label>
+                        <input type="text" class="edu-form-input" id="edit-staff-id" readonly>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-staff-name">Staff Name</label>
+                        <input type="text" class="edu-form-input" id="edit-staff-name" readonly>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-staff-role">Role</label>
+                        <input type="text" class="edu-form-input" id="edit-staff-role" readonly>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-staff-center">Center</label>
+                        <input type="text" class="edu-form-input" id="edit-staff-center" readonly>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-staff-date">Date</label>
+                        <input type="date" class="edu-form-input" id="edit-staff-date" required>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-staff-status">Status</label>
+                        <select class="edu-form-input" id="edit-staff-status" required>
+                            <option value="Present">Present</option>
+                            <option value="Absent">Absent</option>
+                            <option value="Late">Late</option>
+                        </select>
+                    </div>
+                    <button type="button" class="edu-button edu-button-primary" id="update-staff-attendance">Update Attendance</button>
+                </form>
+                <div class="edu-form-message" id="edit-staff-attendance-message"></div>
+            </div>
+        </div>
+
+        <script>
+        jQuery(document).ready(function($) {
+            let staffAttendanceData = <?php echo json_encode($data['staff_attendance']); ?>;
+
+            $(document).on('click', '.edit-staff-attendance', function() {
+                const index = $(this).data('attendance-index');
+                const record = staffAttendanceData[index];
+                $('#edit-staff-attendance-index').val(index);
+                $('#edit-staff-id').val(record.staff_id);
+                $('#edit-staff-name').val(record.staff_name);
+                $('#edit-staff-role').val(record.role);
+                $('#edit-staff-center').val(record.education_center_id);
+                $('#edit-staff-date').val(record.date);
+                $('#edit-staff-status').val(record.status);
+                $('#edit-staff-attendance-modal').show();
+            });
+
+            $('#update-staff-attendance').on('click', function() {
+                const index = $('#edit-staff-attendance-index').val();
+                const date = $('#edit-staff-date').val();
+                const status = $('#edit-staff-status').val();
+                if (date && status) {
+                    staffAttendanceData[index].date = date;
+                    staffAttendanceData[index].status = status;
+                    $('#edit-staff-attendance-message').addClass('edu-success').text('Attendance updated successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'staff-attendance'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#edit-staff-attendance-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+
+            $('.edu-modal-close').on('click', function() { $('#edit-staff-attendance-modal').hide(); });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+/**
+ * Delete Staff Attendance
+ */
+function demoRenderSuperadminDeleteStaffAttendance($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Staff Attendance</h2>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="staff-attendance-table">
+                <thead>
+                    <tr>
+                        <th>Staff ID</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Center</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="staff-attendance-table-body">
+                    <?php foreach ($data['staff_attendance'] as $index => $record): ?>
+                        <tr data-attendance-index="<?php echo esc_attr($index); ?>">
+                            <td><?php echo esc_html($record['staff_id']); ?></td>
+                            <td><?php echo esc_html($record['staff_name']); ?></td>
+                            <td><?php echo esc_html($record['role']); ?></td>
+                            <td><?php echo esc_html($record['education_center_id']); ?></td>
+                            <td><?php echo esc_html($record['date']); ?></td>
+                            <td><?php echo esc_html($record['status']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-delete delete-staff-attendance" data-attendance-index="<?php echo esc_attr($index); ?>">Delete</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            let staffAttendanceData = <?php echo json_encode($data['staff_attendance']); ?>;
+            $(document).on('click', '.delete-staff-attendance', function() {
+                if (!confirm('Are you sure you want to delete this attendance record?')) return;
+                const index = $(this).data('attendance-index');
+                staffAttendanceData.splice(index, 1);
+                window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'staff-attendance'])); ?>';
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+/**
+ * Render Fees Section
+ */
+
+function demoRenderSuperadminFees($data = []) {
+    ob_start();
+    $centers = isset($data['centers']) ? $data['centers'] : [];
+    $students = isset($data['students']) ? $data['students'] : [];
+    $fees = isset($data['fees']) ? $data['fees'] : [];
+    ?>
+    <div class="attendance-main-wrapper">
+        <div class="attendance-content-wrapper">
+            <div id="edu-loader" class="edu-loader" style="display: none;">
+                <div class="edu-loader-container">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+                </div>
+            </div>
+            <div class="attendance-management">
+                <h2>Fees</h2>
+                <div class="search-filters">
+                    <input type="text" id="student-id-search" placeholder="Search by Student ID...">
+                    <input type="text" id="student-name-search" placeholder="Search by Student Name...">
+                    <select id="center-filter">
+                        <option value="">All Educational Centers</option>
+                        <?php foreach ($centers as $center): ?>
+                            <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <select id="status-filter">
+                        <option value="">All Statuses</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Overdue">Overdue</option>
+                    </select>
+                    <select id="month-filter">
+                        <option value="">All Months</option>
+                        <?php
+                        $month_names = [1 => 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                        $dates = [];
+                        foreach ($fees as $fee) {
+                            $date = date_parse($fee['due_date']);
+                            $dates[$date['year'] . '-' . $date['month']] = ['year' => $date['year'], 'month' => $date['month']];
+                        }
+                        krsort($dates);
+                        foreach ($dates as $date) {
+                            echo "<option value='{$date['month']}' data-year='{$date['year']}'>" . esc_html($month_names[$date['month']] . ' ' . $date['year']) . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="actions">
+                    <button id="add-fee-btn">Add Fee</button>
+                    <label for="fees-per-page">Show:</label>
+                    <select id="fees-per-page">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                    <button id="prev-page" disabled>Previous</button>
+                    <span id="page-info"></span>
+                    <button id="next-page">Next</button>
+                    <button id="refresh-data">Refresh</button>
+                </div>
+                <div class="attendance-table-wrapper">
+                    <div class="actions" id="export-tools"></div>
+                    <table id="fees-table">
+                        <thead id="fees-table-head">
+                            <tr>
+                                <th>Fee ID</th>
+                                <th>Student ID</th>
+                                <th>Student Name</th>
+                                <th>Amount</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Center</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fees-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Fee Modal -->
+    <div class="edu-modal" id="add-fee-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="add-fee-modal">×</span>
+            <h3>Add Fee</h3>
+            <form id="add-fee-form">
+                <div class="search-filters">
+                    <label for="add-fee-id">Fee ID</label>
+                    <input type="text" id="add-fee-id" name="fee_id" required>
+                </div>
+                <div class="search-filters">
+                    <label for="add-center">Education Center</label>
+                    <select id="add-center" name="center" required>
+                        <option value="">Select Center</option>
+                        <?php foreach ($centers as $center): ?>
+                            <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="add-student-id">Student</label>
+                    <select id="add-student-id" name="student_id" required>
+                        <option value="">Select Student</option>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="add-student-name">Student Name</label>
+                    <input type="text" id="add-student-name" name="student_name" readonly required>
+                </div>
+                <div class="search-filters">
+                    <label for="add-amount">Amount</label>
+                    <input type="number" step="0.01" id="add-amount" name="amount" required>
+                </div>
+                <div class="search-filters">
+                    <label for="add-due-date">Due Date</label>
+                    <input type="date" id="add-due-date" name="due_date" value="<?php echo date('Y-m-d'); ?>" required>
+                </div>
+                <div class="search-filters">
+                    <label for="add-status">Status</label>
+                    <select id="add-status" name="status" required>
+                        <option value="Pending">Pending</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Overdue">Overdue</option>
+                    </select>
+                </div>
+                <button type="button" id="save-fee">Save Fee</button>
+            </form>
+            <div id="add-fee-message" class="message"></div>
+        </div>
+    </div>
+
+    <!-- Edit Fee Modal -->
+    <div class="edu-modal" id="edit-fee-modal" style="display: none;">
+        <div class="edu-modal-content">
+            <span class="edu-modal-close" data-modal="edit-fee-modal">×</span>
+            <h3>Edit Fee</h3>
+            <form id="edit-fee-form">
+                <div class="search-filters">
+                    <label for="edit-fee-id">Fee ID</label>
+                    <input type="text" id="edit-fee-id" name="fee_id" readonly required>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-student-id">Student ID</label>
+                    <input type="text" id="edit-student-id" name="student_id" readonly required>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-student-name">Student Name</label>
+                    <input type="text" id="edit-student-name" name="student_name" readonly required>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-amount">Amount</label>
+                    <input type="number" step="0.01" id="edit-amount" name="amount" required>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-due-date">Due Date</label>
+                    <input type="date" id="edit-due-date" name="due_date" required>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-status">Status</label>
+                    <select id="edit-status" name="status" required>
+                        <option value="Pending">Pending</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Overdue">Overdue</option>
+                    </select>
+                </div>
+                <div class="search-filters">
+                    <label for="edit-center">Center</label>
+                    <input type="text" id="edit-center" name="center" readonly required>
+                </div>
+                <input type="hidden" id="edit-fee-index">
+                <button type="button" id="update-fee">Update Fee</button>
+            </form>
+            <div id="edit-fee-message" class="message"></div>
+        </div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        let feesData = <?php echo json_encode($fees); ?>;
+        let studentsData = <?php echo json_encode($students); ?>;
+        let currentPage = 1;
+        let perPage = 10;
+        let studentIdSearch = '';
+        let studentNameSearch = '';
+        let centerFilter = '';
+        let statusFilter = '';
+        let monthFilter = '';
+        let yearFilter = '';
+
+        function showLoader() { $('#edu-loader').show(); }
+        function hideLoader() { $('#edu-loader').hide(); }
+        function openModal(modalId) { 
+            showLoader(); 
+            $(modalId).css('display', 'flex'); 
+            setTimeout(hideLoader, 100); 
+            clearMessages(modalId);
+        }
+        function closeModal(modalId) { 
+            $(modalId).css('display', 'none'); 
+            clearMessages(modalId); 
+            hideLoader(); 
+        }
+        function clearMessages(modalId) {
+            $(modalId + ' .message').css({'background': '', 'color': ''}).text('');
+        }
+
+        $('.edu-modal-close').on('click', function() {
+            closeModal('#' + $(this).data('modal'));
+        });
+
+        $(document).on('click', function(event) {
+            if ($(event.target).hasClass('edu-modal')) {
+                closeModal('#' + event.target.id);
+            }
+        });
+
+        function loadFees(page, limit, sid, sname, center, status, month, year, showLoading = true) {
+            if (showLoading) showLoader();
+            const filtered = feesData.filter(f => {
+                const dueDate = new Date(f.due_date);
+                return (!sid || f.student_id.toLowerCase().includes(sid.toLowerCase())) &&
+                       (!sname || f.student_name.toLowerCase().includes(sname.toLowerCase())) &&
+                       (!center || f.center === center) &&
+                       (!status || f.status === status) &&
+                       (!month || dueDate.getMonth() + 1 === parseInt(month)) &&
+                       (!year || dueDate.getFullYear() === parseInt(year));
+            });
+            const total = filtered.length;
+            const start = (page - 1) * limit;
+            const end = start + limit;
+            const paginated = filtered.slice(start, end);
+            let html = '';
+            paginated.forEach((record, index) => {
+                html += `
+                    <tr data-fee-index="${start + index}">
+                        <td>${record.fee_id}</td>
+                        <td>${record.student_id}</td>
+                        <td>${record.student_name}</td>
+                        <td>${record.amount.toFixed(2)}</td>
+                        <td>${record.due_date}</td>
+                        <td>${record.status}</td>
+                        <td>${record.center}</td>
+                        <td>
+                            <button class="edit-fee" data-fee-index="${start + index}">Edit</button>
+                            <button class="delete-fee" data-fee-index="${start + index}">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            $('#fees-table-body').html(html || '<tr><td colspan="8">No fee records found.</td></tr>');
+            const totalPages = Math.ceil(total / limit) || 1;
+            $('#page-info').text(`Page ${page} of ${totalPages} (Total Records: ${total})`);
+            $('#prev-page').prop('disabled', page === 1);
+            $('#next-page').prop('disabled', page === totalPages || total === 0);
+            setupExportButtons();
+            if (showLoading) hideLoader();
+        }
+
+        function setupExportButtons() {
+            const tools = $('#export-tools');
+            tools.html(`
+                <button class="export-btn export-csv" aria-label="Export to CSV"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
+                <button class="export-btn export-pdf" aria-label="Export to PDF"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
+                <button class="export-btn export-excel" aria-label="Export to Excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
+                <input type="file" id="import-fees" accept=".csv" style="display: none;">
+                <button class="export-btn import-csv" aria-label="Import CSV"><i class="fas fa-file-import"></i><span class="tooltip">Import CSV</span></button>
+            `);
+            tools.find('.export-csv').on('click', exportToCSV);
+            tools.find('.export-pdf').on('click', generatePDF);
+            tools.find('.export-excel').on('click', exportToExcel);
+            tools.find('.import-csv').on('click', () => $('#import-fees').click());
+        }
+
+        function exportToCSV() {
+            const filtered = feesData.filter(f => {
+                const dueDate = new Date(f.due_date);
+                return (!studentIdSearch || f.student_id.toLowerCase().includes(studentIdSearch.toLowerCase())) &&
+                       (!studentNameSearch || f.student_name.toLowerCase().includes(studentNameSearch.toLowerCase())) &&
+                       (!centerFilter || f.center === centerFilter) &&
+                       (!statusFilter || f.status === statusFilter) &&
+                       (!monthFilter || dueDate.getMonth() + 1 === parseInt(monthFilter)) &&
+                       (!yearFilter || dueDate.getFullYear() === parseInt(yearFilter));
+            });
+            const csv = filtered.map(row => `${row.fee_id},${row.student_id},${row.student_name},${row.amount.toFixed(2)},${row.due_date},${row.status},${row.center}`).join('\n');
+            const headers = 'Fee ID,Student ID,Student Name,Amount,Due Date,Status,Center\n';
+            const blob = new Blob([headers + csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'fees.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function exportToExcel() {
+            alert('Excel export is not fully implemented in this demo.');
+        }
+
+        function generatePDF() {
+            alert('PDF export is not fully implemented in this demo.');
+        }
+
+        loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
+
+        $('#student-id-search').on('input', debounce(function() {
+            studentIdSearch = $(this).val();
+            currentPage = 1;
+            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
+        }, 500));
+
+        $('#student-name-search').on('input', debounce(function() {
+            studentNameSearch = $(this).val();
+            currentPage = 1;
+            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
+        }, 500));
+
+        $('#center-filter').on('change', function() {
+            centerFilter = $(this).val();
+            currentPage = 1;
+            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
+        });
+
+        $('#status-filter').on('change', function() {
+            statusFilter = $(this).val();
+            currentPage = 1;
+            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
+        });
+
+        $('#month-filter').on('change', function() {
+            monthFilter = $(this).val();
+            yearFilter = $(this).find('option:selected').data('year') || '';
+            currentPage = 1;
+            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
+        });
+
+        $('#fees-per-page').on('change', function() {
+            perPage = parseInt($(this).val());
+            currentPage = 1;
+            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
+        });
+
+        $('#next-page').on('click', function() {
+            currentPage++;
+            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
+        });
+
+        $('#prev-page').on('click', function() {
+            currentPage--;
+            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
+        });
+
+        $('#refresh-data').on('click', function() {
+            studentIdSearch = '';
+            studentNameSearch = '';
+            centerFilter = '';
+            statusFilter = '';
+            monthFilter = '';
+            yearFilter = '';
+            $('#student-id-search').val('');
+            $('#student-name-search').val('');
+            $('#center-filter').val('');
+            $('#status-filter').val('');
+            $('#month-filter').val('');
+            currentPage = 1;
+            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
+        });
+
+        $('#add-fee-btn').on('click', function() {
+            $('#add-fee-id').val('');
+            $('#add-center').val('');
+            $('#add-student-id').html('<option value="">Select Student</option>');
+            $('#add-student-name').val('');
+            $('#add-amount').val('');
+            $('#add-due-date').val('<?php echo date('Y-m-d'); ?>');
+            $('#add-status').val('Pending');
+            openModal('#add-fee-modal');
+        });
+
+        $('#add-center').on('change', function() {
+            const center = $(this).val();
+            const $studentSelect = $('#add-student-id');
+            $studentSelect.html('<option value="">Select Student</option>');
+            if (center) {
+                studentsData.filter(s => s.center === center).forEach(student => {
+                    $studentSelect.append(`<option value="${student.student_id}" data-name="${student.student_name}">${student.student_id} - ${student.student_name}</option>`);
+                });
+            }
+            $('#add-student-name').val('');
+        });
+
+        $('#add-student-id').on('change', function() {
+            const $option = $(this).find('option:selected');
+            $('#add-student-name').val($option.data('name') || '');
+        });
+
+        $('#save-fee').on('click', function() {
+            const record = {
+                fee_id: $('#add-fee-id').val(),
+                student_id: $('#add-student-id').val(),
+                student_name: $('#add-student-name').val(),
+                amount: parseFloat($('#add-amount').val()),
+                due_date: $('#add-due-date').val(),
+                status: $('#add-status').val(),
+                center: $('#add-center').val()
+            };
+            if (record.fee_id && record.student_id && record.student_name && !isNaN(record.amount) && record.due_date && record.status && record.center) {
+                if (feesData.some(f => f.fee_id === record.fee_id)) {
+                    $('#add-fee-message').css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Fee ID already exists.');
+                    setTimeout(() => clearMessages('#add-fee-modal'), 3000);
+                    return;
+                }
+                showLoader();
+                feesData.push(record);
+                $('#add-fee-message').css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text('Fee added successfully!');
+                setTimeout(() => {
+                    closeModal('#add-fee-modal');
+                    loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter, false);
+                }, 2000);
+            } else {
+                $('#add-fee-message').css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Please fill all required fields correctly.');
+                setTimeout(() => clearMessages('#add-fee-modal'), 3000);
+            }
+        });
+
+        $(document).on('click', '.edit-fee', function() {
+            const index = $(this).data('fee-index');
+            const record = feesData[index];
+            $('#edit-fee-index').val(index);
+            $('#edit-fee-id').val(record.fee_id);
+            $('#edit-student-id').val(record.student_id);
+            $('#edit-student-name').val(record.student_name);
+            $('#edit-amount').val(record.amount);
+            $('#edit-due-date').val(record.due_date);
+            $('#edit-status').val(record.status);
+            $('#edit-center').val(record.center);
+            openModal('#edit-fee-modal');
+        });
+
+        $('#update-fee').on('click', function() {
+            const index = $('#edit-fee-index').val();
+            const amount = parseFloat($('#edit-amount').val());
+            const due_date = $('#edit-due-date').val();
+            const status = $('#edit-status').val();
+            if (!isNaN(amount) && due_date && status) {
+                showLoader();
+                feesData[index].amount = amount;
+                feesData[index].due_date = due_date;
+                feesData[index].status = status;
+                $('#edit-fee-message').css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text('Fee updated successfully!');
+                setTimeout(() => {
+                    closeModal('#edit-fee-modal');
+                    loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter, false);
+                }, 2000);
+            } else {
+                $('#edit-fee-message').css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Please fill all required fields correctly.');
+                setTimeout(() => clearMessages('#edit-fee-modal'), 3000);
+            }
+        });
+
+        $(document).on('click', '.delete-fee', function() {
+            if (!confirm('Are you sure you want to delete this fee record?')) return;
+            const index = $(this).data('fee-index');
+            showLoader();
+            feesData.splice(index, 1);
+            setTimeout(() => {
+                loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter, false);
+                hideLoader();
+            }, 100);
+        });
+
+        $('#import-fees').on('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                showLoader();
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const text = e.target.result;
+                    const rows = text.split('\n').slice(1).filter(row => row.trim());
+                    const newRecords = rows.map(row => {
+                        const [fee_id, student_id, student_name, amount, due_date, status, center] = row.split(',');
+                        return {
+                            fee_id,
+                            student_id,
+                            student_name,
+                            amount: parseFloat(amount),
+                            due_date,
+                            status,
+                            center
+                        };
+                    }).filter(record => record.fee_id && !feesData.some(f => f.fee_id === record.fee_id));
+                    feesData.push(...newRecords);
+                    loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter, false);
+                    hideLoader();
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+            }
+        });
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+/**
+ * Add Fee
+ */
+function demoRenderSuperadminAddFee($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Fee</h2>
+        <div class="card p-4 bg-light">
+            <form id="add-fee-form" class="edu-form">
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="fee-id">Fee ID</label>
+                    <input type="text" class="edu-form-input" id="fee-id" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="student-id">Student ID</label>
+                    <input type="text" class="edu-form-input" id="student-id" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="student-name">Student Name</label>
+                    <input type="text" class="edu-form-input" id="student-name" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="amount">Amount</label>
+                    <input type="number" step="0.01" class="edu-form-input" id="amount" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="due-date">Due Date</label>
+                    <input type="date" class="edu-form-input" id="due-date" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="status">Status</label>
+                    <select class="edu-form-input" id="status" required>
+                        <option value="Pending">Pending</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Overdue">Overdue</option>
+                    </select>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="center">Center</label>
+                    <input type="text" class="edu-form-input" id="center" required>
+                </div>
+                <button type="button" class="edu-button edu-button-primary" id="save-fee">Add Fee</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'fees'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </form>
+            <div class="edu-form-message" id="add-fee-message"></div>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#save-fee').on('click', function() {
+                const record = {
+                    fee_id: $('#fee-id').val(),
+                    student_id: $('#student-id').val(),
+                    student_name: $('#student-name').val(),
+                    amount: parseFloat($('#amount').val()),
+                    due_date: $('#due-date').val(),
+                    status: $('#status').val(),
+                    center: $('#center').val()
+                };
+                if (record.fee_id && record.student_id && record.student_name && record.amount && record.due_date && record.status && record.center) {
+                    $('#add-fee-message').addClass('edu-success').text('Fee added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'fees'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#add-fee-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+/**
+ * Edit Fee
+ */
+function demoRenderSuperadminEditFee($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Fee</h2>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="fees-table">
+                <thead>
+                    <tr>
+                        <th>Fee ID</th>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Amount</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Center</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="fees-table-body">
+                    <?php foreach ($data['fees'] as $index => $record): ?>
+                        <tr data-fee-index="<?php echo esc_attr($index); ?>">
+                            <td><?php echo esc_html($record['fee_id']); ?></td>
+                            <td><?php echo esc_html($record['student_id']); ?></td>
+                            <td><?php echo esc_html($record['student_name']); ?></td>
+                            <td><?php echo esc_html(number_format($record['amount'], 2)); ?></td>
+                            <td><?php echo esc_html($record['due_date']); ?></td>
+                            <td><?php echo esc_html($record['status']); ?></td>
+                            <td><?php echo esc_html($record['center']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-fee" data-fee-index="<?php echo esc_attr($index); ?>">Edit</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Edit Fee Modal -->
+        <div id="edit-fee-modal" class="edu-modal" style="display: none;">
+            <div class="edu-modal-content">
+                <span class="edu-modal-close" data-modal="edit-fee-modal">×</span>
+                <h2>Edit Fee</h2>
+                <form id="edit-fee-form" class="edu-form">
+                    <input type="hidden" id="edit-fee-index">
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-fee-id">Fee ID</label>
+                        <input type="text" class="edu-form-input" id="edit-fee-id" readonly>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-student-id">Student ID</label>
+                        <input type="text" class="edu-form-input" id="edit-student-id" readonly>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-student-name">Student Name</label>
+                        <input type="text" class="edu-form-input" id="edit-student-name" readonly>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-amount">Amount</label>
+                        <input type="number" step="0.01" class="edu-form-input" id="edit-amount" required>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-due-date">Due Date</label>
+                        <input type="date" class="edu-form-input" id="edit-due-date" required>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-status">Status</label>
+                        <select class="edu-form-input" id="edit-status" required>
+                            <option value="Pending">Pending</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Overdue">Overdue</option>
+                        </select>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-center">Center</label>
+                        <input type="text" class="edu-form-input" id="edit-center" readonly>
+                    </div>
+                    <button type="button" class="edu-button edu-button-primary" id="update-fee">Update Fee</button>
+                </form>
+                <div class="edu-form-message" id="edit-fee-message"></div>
+            </div>
+        </div>
+
+        <script>
+        jQuery(document).ready(function($) {
+            let feesData = <?php echo json_encode($data['fees']); ?>;
+
+            $(document).on('click', '.edit-fee', function() {
+                const index = $(this).data('fee-index');
+                const record = feesData[index];
+                $('#edit-fee-index').val(index);
+                $('#edit-fee-id').val(record.fee_id);
+                $('#edit-student-id').val(record.student_id);
+                $('#edit-student-name').val(record.student_name);
+                $('#edit-amount').val(record.amount);
+                $('#edit-due-date').val(record.due_date);
+                $('#edit-status').val(record.status);
+                $('#edit-center').val(record.center);
+                $('#edit-fee-modal').show();
+            });
+
+            $('#update-fee').on('click', function() {
+                const index = $('#edit-fee-index').val();
+                const amount = parseFloat($('#edit-amount').val());
+                const due_date = $('#edit-due-date').val();
+                const status = $('#edit-status').val();
+                if (amount && due_date && status) {
+                    feesData[index].amount = amount;
+                    feesData[index].due_date = due_date;
+                    feesData[index].status = status;
+                    $('#edit-fee-message').addClass('edu-success').text('Fee updated successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'fees'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#edit-fee-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+
+            $('.edu-modal-close').on('click', function() { $('#edit-fee-modal').hide(); });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+/**
+ * Delete Fee
+ */
+function demoRenderSuperadminDeleteFee($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Fee</h2>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="fees-table">
+                <thead>
+                    <tr>
+                        <th>Fee ID</th>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Amount</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Center</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="fees-table-body">
+                    <?php foreach ($data['fees'] as $index => $record): ?>
+                        <tr data-fee-index="<?php echo esc_attr($index); ?>">
+                            <td><?php echo esc_html($record['fee_id']); ?></td>
+                            <td><?php echo esc_html($record['student_id']); ?></td>
+                            <td><?php echo esc_html($record['student_name']); ?></td>
+                            <td><?php echo esc_html(number_format($record['amount'], 2)); ?></td>
+                            <td><?php echo esc_html($record['due_date']); ?></td>
+                            <td><?php echo esc_html($record['status']); ?></td>
+                            <td><?php echo esc_html($record['center']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-delete delete-fee" data-fee-index="<?php echo esc_attr($index); ?>">Delete</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            let feesData = <?php echo json_encode($data['fees']); ?>;
+            $(document).on('click', '.delete-fee', function() {
+                if (!confirm('Are you sure you want to delete this fee record?')) return;
+                const index = $(this).data('fee-index');
+                feesData.splice(index, 1);
+                window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'fees'])); ?>';
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+/**
+ * Render Fee Templates Section
+ */
+function demoRenderSuperadminFeeTemplates($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Fee Templates</h2>
+        <div class="edu-actions">
+            <input type="text" id="fee-templates-search" class="edu-search-input" placeholder="Search Fee Templates...">
+            <button class="edu-button edu-button-primary" onclick="window.location.href='<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'add-fee-template'])); ?>'">Add Template</button>
+            <button class="edu-button edu-button-secondary" id="export-fee-templates">Export CSV</button>
+            <input type="file" id="import-fee-templates" accept=".csv" style="display: none;">
+            <button class="edu-button edu-button-secondary" id="import-fee-templates-btn">Import CSV</button>
+        </div>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="fee-templates-table">
+                <thead>
+                    <tr>
+                        <th>Template ID</th>
+                        <th>Name</th>
+                        <th>Amount</th>
+                        <th>Frequency</th>
+                        <th>Center</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="fee-templates-table-body">
+                    <!-- Populated via JS -->
+                </tbody>
+            </table>
+        </div>
+        <div class="edu-pagination">
+            <button class="edu-button edu-button-nav" id="prev-page" disabled>Previous</button>
+            <span id="page-info"></span>
+            <button class="edu-button edu-button-nav" id="next-page">Next</button>
+        </div>
+
+        <!-- Edit Fee Template Modal -->
+        <div id="edit-fee-template-modal" class="edu-modal" style="display: none;">
+            <div class="edu-modal-content">
+                <span class="edu-modal-close" data-modal="edit-fee-template-modal">×</span>
+                <h2>Edit Fee Template</h2>
+                <form id="edit-fee-template-form" class="edu-form">
+                    <input type="hidden" id="edit-fee-template-index">
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-template-id">Template ID</label>
+                        <input type="text" class="edu-form-input" id="edit-template-id" readonly>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-template-name">Name</label>
+                        <input type="text" class="edu-form-input" id="edit-template-name" required>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-template-amount">Amount</label>
+                        <input type="number" step="0.01" class="edu-form-input" id="edit-template-amount" required>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-frequency">Frequency</label>
+                        <select class="edu-form-input" id="edit-frequency" required>
+                            <option value="Monthly">Monthly</option>
+                            <option value="Quarterly">Quarterly</option>
+                            <option value="Yearly">Yearly</option>
+                        </select>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-template-center">Center</label>
+                        <input type="text" class="edu-form-input" id="edit-template-center" required>
+                    </div>
+                    <button type="button" class="edu-button edu-button-primary" id="update-fee-template">Update Template</button>
+                </form>
+                <div class="edu-form-message" id="edit-fee-template-message"></div>
+            </div>
+        </div>
+
+        <script>
+        jQuery(document).ready(function($) {
+            let feeTemplatesData = <?php echo json_encode($data['fee_templates']); ?>;
+            let currentPage = 1;
+            let perPage = 10;
+            let searchQuery = '';
+
+            function loadFeeTemplates(page, limit, query) {
+                const filtered = feeTemplatesData.filter(t => 
+                    !query || t.name.toLowerCase().includes(query.toLowerCase()) || t.template_id.toLowerCase().includes(query.toLowerCase())
+                );
+                const total = filtered.length;
+                const start = (page - 1) * limit;
+                const end = start + limit;
+                const paginated = filtered.slice(start, end);
+                let html = '';
+                paginated.forEach((record, index) => {
+                    html += `
+                        <tr data-template-index="${start + index}">
+                            <td>${record.template_id}</td>
+                            <td>${record.name}</td>
+                            <td>${record.amount.toFixed(2)}</td>
+                            <td>${record.frequency}</td>
+                            <td>${record.center}</td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-fee-template" data-template-index="${start + index}">Edit</button>
+                                <button class="edu-button edu-button-delete delete-fee-template" data-template-index="${start + index}">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                $('#fee-templates-table-body').html(html || '<tr><td colspan="6">No fee templates found.</td></tr>');
+                const totalPages = Math.ceil(total / limit);
+                $('#page-info').text(`Page ${page} of ${totalPages}`);
+                $('#prev-page').prop('disabled', page === 1);
+                $('#next-page').prop('disabled', page === totalPages || total === 0);
+            }
+
+            loadFeeTemplates(currentPage, perPage, searchQuery);
+
+            $('#fee-templates-search').on('input', function() {
+                searchQuery = $(this).val();
+                currentPage = 1;
+                loadFeeTemplates(currentPage, perPage, searchQuery);
+            });
+
+            $('#prev-page').on('click', function() { currentPage--; loadFeeTemplates(currentPage, perPage, searchQuery); });
+            $('#next-page').on('click', function() { currentPage++; loadFeeTemplates(currentPage, perPage, searchQuery); });
+
+            $(document).on('click', '.edit-fee-template', function() {
+                const index = $(this).data('template-index');
+                const record = feeTemplatesData[index];
+                $('#edit-fee-template-index').val(index);
+                $('#edit-template-id').val(record.template_id);
+                $('#edit-template-name').val(record.name);
+                $('#edit-template-amount').val(record.amount);
+                $('#edit-frequency').val(record.frequency);
+                $('#edit-template-center').val(record.center);
+                $('#edit-fee-template-modal').show();
+            });
+
+            $('#update-fee-template').on('click', function() {
+                const index = $('#edit-fee-template-index').val();
+                const name = $('#edit-template-name').val();
+                const amount = parseFloat($('#edit-template-amount').val());
+                const frequency = $('#edit-frequency').val();
+                const center = $('#edit-template-center').val();
+                if (name && amount && frequency && center) {
+                    feeTemplatesData[index].name = name;
+                    feeTemplatesData[index].amount = amount;
+                    feeTemplatesData[index].frequency = frequency;
+                    feeTemplatesData[index].center = center;
+                    $('#edit-fee-template-message').addClass('edu-success').text('Fee template updated successfully!');
+                    setTimeout(() => {
+                        $('#edit-fee-template-modal').hide();
+                        $('#edit-fee-template-message').removeClass('edu-success').text('');
+                        loadFeeTemplates(currentPage, perPage, searchQuery);
+                    }, 1000);
+                } else {
+                    $('#edit-fee-template-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+
+            $(document).on('click', '.delete-fee-template', function() {
+                if (!confirm('Are you sure you want to delete this fee template?')) return;
+                const index = $(this).data('template-index');
+                feeTemplatesData.splice(index, 1);
+                loadFeeTemplates(currentPage, perPage, searchQuery);
+            });
+
+            $('#export-fee-templates').on('click', function() {
+                const csv = feeTemplatesData.map(row => `${row.template_id},${row.name},${row.amount},${row.frequency},${row.center}`).join('\n');
+                const headers = 'Template ID,Name,Amount,Frequency,Center\n';
+                const blob = new Blob([headers + csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'fee_templates.csv';
+                a.click();
+                window.URL.revokeObjectURL(url);
+            });
+
+            $('#import-fee-templates-btn').on('click', function() {
+                $('#import-fee-templates').click();
+            });
+
+            $('#import-fee-templates').on('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const text = e.target.result;
+                        const rows = text.split('\n').slice(1).filter(row => row.trim());
+                        const newRecords = rows.map(row => {
+                            const [template_id, name, amount, frequency, center] = row.split(',');
+                            return { template_id, name, amount: parseFloat(amount), frequency, center };
+                        });
+                        feeTemplatesData.push(...newRecords);
+                        loadFeeTemplates(currentPage, perPage, searchQuery);
+                    };
+                    reader.readAsText(file);
+                    e.target.value = '';
+                }
+            });
+
+            $('.edu-modal-close').on('click', function() { $('#edit-fee-template-modal').hide(); });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+/**
+ * Add Fee Template
+ */
+function demoRenderSuperadminAddFeeTemplate($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Fee Template</h2>
+        <div class="card p-4 bg-light">
+            <form id="add-fee-template-form" class="edu-form">
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="template-id">Template ID</label>
+                    <input type="text" class="edu-form-input" id="template-id" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="template-name">Name</label>
+                    <input type="text" class="edu-form-input" id="template-name" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="template-amount">Amount</label>
+                    <input type="number" step="0.01" class="edu-form-input" id="template-amount" required>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="frequency">Frequency</label>
+                    <select class="edu-form-input" id="frequency" required>
+                        <option value="Monthly">Monthly</option>
+                        <option value="Quarterly">Quarterly</option>
+                        <option value="Yearly">Yearly</option>
+                    </select>
+                </div>
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="template-center">Center</label>
+                    <input type="text" class="edu-form-input" id="template-center" required>
+                </div>
+                <button type="button" class="edu-button edu-button-primary" id="save-fee-template">Add Template</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'fee-templates'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </form>
+            <div class="edu-form-message" id="add-fee-template-message"></div>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#save-fee-template').on('click', function() {
+                const record = {
+                    template_id: $('#template-id').val(),
+                    name: $('#template-name').val(),
+                    amount: parseFloat($('#template-amount').val()),
+                    frequency: $('#frequency').val(),
+                    center: $('#template-center').val()
+                };
+                if (record.template_id && record.name && record.amount && record.frequency && record.center) {
+                    $('#add-fee-template-message').addClass('edu-success').text('Fee template added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'fee-templates'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#add-fee-template-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+/**
+ * Edit Fee Template
+ */
+function demoRenderSuperadminEditFeeTemplate($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Fee Template</h2>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="fee-templates-table">
+                <thead>
+                    <tr>
+                        <th>Template ID</th>
+                        <th>Name</th>
+                        <th>Amount</th>
+                        <th>Frequency</th>
+                        <th>Center</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="fee-templates-table-body">
+                    <?php foreach ($data['fee_templates'] as $index => $record): ?>
+                        <tr data-template-index="<?php echo esc_attr($index); ?>">
+                            <td><?php echo esc_html($record['template_id']); ?></td>
+                            <td><?php echo esc_html($record['name']); ?></td>
+                            <td><?php echo esc_html(number_format($record['amount'], 2)); ?></td>
+                            <td><?php echo esc_html($record['frequency']); ?></td>
+                            <td><?php echo esc_html($record['center']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-edit edit-fee-template" data-template-index="<?php echo esc_attr($index); ?>">Edit</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Edit Fee Template Modal -->
+        <div id="edit-fee-template-modal" class="edu-modal" style="display: none;">
+            <div class="edu-modal-content">
+                <span class="edu-modal-close" data-modal="edit-fee-template-modal">×</span>
+                <h2>Edit Fee Template</h2>
+                <form id="edit-fee-template-form" class="edu-form">
+                    <input type="hidden" id="edit-fee-template-index">
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-template-id">Template ID</label>
+                        <input type="text" class="edu-form-input" id="edit-template-id" readonly>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-template-name">Name</label>
+                        <input type="text" class="edu-form-input" id="edit-template-name" required>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-template-amount">Amount</label>
+                        <input type="number" step="0.01" class="edu-form-input" id="edit-template-amount" required>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-frequency">Frequency</label>
+                        <select class="edu-form-input" id="edit-frequency" required>
+                            <option value="Monthly">Monthly</option>
+                            <option value="Quarterly">Quarterly</option>
+                            <option value="Yearly">Yearly</option>
+                        </select>
+                    </div>
+                    <div class="edu-form-group">
+                        <label class="edu-form-label" for="edit-template-center">Center</label>
+                        <input type="text" class="edu-form-input" id="edit-template-center" required>
+                    </div>
+                    <button type="button" class="edu-button edu-button-primary" id="update-fee-template">Update Template</button>
+                </form>
+                <div class="edu-form-message" id="edit-fee-template-message"></div>
+            </div>
+        </div>
+
+        <script>
+        jQuery(document).ready(function($) {
+            let feeTemplatesData = <?php echo json_encode($data['fee_templates']); ?>;
+
+            $(document).on('click', '.edit-fee-template', function() {
+                const index = $(this).data('template-index');
+                const record = feeTemplatesData[index];
+                $('#edit-fee-template-index').val(index);
+                $('#edit-template-id').val(record.template_id);
+                $('#edit-template-name').val(record.name);
+                $('#edit-template-amount').val(record.amount);
+                $('#edit-frequency').val(record.frequency);
+                $('#edit-template-center').val(record.center);
+                $('#edit-fee-template-modal').show();
+            });
+
+            $('#update-fee-template').on('click', function() {
+                const index = $('#edit-fee-template-index').val();
+                const name = $('#edit-template-name').val();
+                const amount = parseFloat($('#edit-template-amount').val());
+                const frequency = $('#edit-frequency').val();
+                const center = $('#edit-template-center').val();
+                if (name && amount && frequency && center) {
+                    feeTemplatesData[index].name = name;
+                    feeTemplatesData[index].amount = amount;
+                    feeTemplatesData[index].frequency = frequency;
+                    feeTemplatesData[index].center = center;
+                    $('#edit-fee-template-message').addClass('edu-success').text('Fee template updated successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'fee-templates'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#edit-fee-template-message').addClass('edu-error').text('Please fill all required fields.');
+                }
+            });
+
+            $('.edu-modal-close').on('click', function() { $('#edit-fee-template-modal').hide(); });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+/**
+ * Delete Fee Template
+ */
+function demoRenderSuperadminDeleteFeeTemplate($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Fee Template</h2>
+        <div class="edu-table-wrapper">
+            <table class="edu-table" id="fee-templates-table">
+                <thead>
+                    <tr>
+                        <th>Template ID</th>
+                        <th>Name</th>
+                        <th>Amount</th>
+                        <th>Frequency</th>
+                        <th>Center</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="fee-templates-table-body">
+                    <?php foreach ($data['fee_templates'] as $index => $record): ?>
+                        <tr data-template-index="<?php echo esc_attr($index); ?>">
+                            <td><?php echo esc_html($record['template_id']); ?></td>
+                            <td><?php echo esc_html($record['name']); ?></td>
+                            <td><?php echo esc_html(number_format($record['amount'], 2)); ?></td>
+                            <td><?php echo esc_html($record['frequency']); ?></td>
+                            <td><?php echo esc_html($record['center']); ?></td>
+                            <td>
+                                <button class="edu-button edu-button-delete delete-fee-template" data-template-index="<?php echo esc_attr($index); ?>">Delete</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            let feeTemplatesData = <?php echo json_encode($data['fee_templates']); ?>;
+            $(document).on('click', '.delete-fee-template', function() {
+                if (!confirm('Are you sure you want to delete this fee template?')) return;
+                const index = $(this).data('template-index');
+                feeTemplatesData.splice(index, 1);
+                window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'fee-templates'])); ?>';
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+/**
+ * Import Fee Templates
+ */
+function demoRenderSuperadminImportFeeTemplates($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Import Fee Templates</h2>
+        <div class="card p-4 bg-light">
+            <form id="import-fee-templates-form" class="edu-form">
+                <div class="edu-form-group">
+                    <label class="edu-form-label" for="import-fee-templates-file">Upload CSV File</label>
+                    <input type="file" class="edu-form-input" id="import-fee-templates-file" accept=".csv" required>
+                </div>
+                <button type="button" class="edu-button edu-button-primary" id="import-fee-templates-submit">Import</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'fee-templates'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </form>
+            <div class="edu-form-message" id="import-fee-templates-message"></div>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            let feeTemplatesData = <?php echo json_encode($data['fee_templates']); ?>;
+            $('#import-fee-templates-submit').on('click', function() {
+                const file = $('#import-fee-templates-file').prop('files')[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const text = e.target.result;
+                        const rows = text.split('\n').slice(1).filter(row => row.trim());
+                        const newRecords = rows.map(row => {
+                            const [template_id, name, amount, frequency, center] = row.split(',');
+                            return { template_id, name, amount: parseFloat(amount), frequency, center };
+                        });
+                        feeTemplatesData.push(...newRecords);
+                        $('#import-fee-templates-message').addClass('edu-success').text('Fee templates imported successfully!');
+                        setTimeout(() => {
+                            window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'fee-templates'])); ?>';
+                        }, 1000);
+                    };
+                    reader.readAsText(file);
+                } else {
+                    $('#import-fee-templates-message').addClass('edu-error').text('Please upload a CSV file.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+/**
+ * Export Fee Templates
+ */
+function demoRenderSuperadminExportFeeTemplates($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Export Fee Templates</h2>
+        <div class="card p-4 bg-light">
+            <p>Click the button below to export fee templates as a CSV file.</p>
+            <button class="edu-button edu-button-primary" id="export-fee-templates-submit">Export Fee Templates</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'fee-templates'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            <div class="edu-form-message" id="export-fee-templates-message"></div>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            let feeTemplatesData = <?php echo json_encode($data['fee_templates']); ?>;
+            $('#export-fee-templates-submit').on('click', function() {
+                const csv = feeTemplatesData.map(row => `${row.template_id},${row.name},${row.amount},${row.frequency},${row.center}`).join('\n');
+                const headers = 'Template ID,Name,Amount,Frequency,Center\n';
+                const blob = new Blob([headers + csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'fee_templates.csv';
+                a.click();
+                window.URL.revokeObjectURL(url);
+                $('#export-fee-templates-message').addClass('edu-success').text('Fee templates exported successfully!');
+                setTimeout(() => {
+                    window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'fee-templates'])); ?>';
+                }, 1000);
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+
+
 /**
  * Data Functions
  */
@@ -5734,15 +7652,42 @@ function demoGetSuperadminData() {
             ['teacher_id' => 'T001', 'teacher_name' => 'Alice Johnson', 'department' => 'Math', 'email' => 'alice.j@example.com', 'center' => 'Main Campus'],
             ['teacher_id' => 'T002', 'teacher_name' => 'Bob Wilson', 'department' => 'Science', 'email' => 'bob.w@example.com', 'center' => 'West Campus'],
         ],
+        'staff' => [
+            ['staff_id' => 'ST001', 'staff_name' => 'Carol Lee', 'role' => 'Admin', 'center' => 'Main Campus'],
+            ['staff_id' => 'ST002', 'staff_name' => 'David Kim', 'role' => 'Clerk', 'center' => 'West Campus'],
+        ],
         'student_attendance' => [
-            ['student_id' => 'S001', 'student_name' => 'John Doe', 'class' => '10', 'section' => 'A', 'center' => 'Main Campus', 'date' => '2025-04-10', 'status' => 'Present'],
-            ['student_id' => 'S002', 'student_name' => 'Jane Smith', 'class' => '10', 'section' => 'B', 'center' => 'West Campus', 'date' => '2025-04-10', 'status' => 'Absent'],
-            ['student_id' => 'S001', 'student_name' => 'John Doe', 'class' => '10', 'section' => 'A', 'center' => 'Main Campus', 'date' => '2025-04-11', 'status' => 'Late'],
+            ['student_id' => 'ST1001', 'student_name' => 'John Doe', 'education_center_id' => 'CA001', 'class' => '10A', 'section' => 'A', 'date' => '2025-04-10', 'status' => 'Present', 'subject' => 'Math', 'teacher_id' => 'TR1001'],
+            ['student_id' => 'ST1002', 'student_name' => 'Jane Smith', 'education_center_id' => 'CB001', 'class' => '10B', 'section' => 'B', 'date' => '2025-04-10', 'status' => 'Absent', 'subject' => 'Science', 'teacher_id' => 'TR1002']
         ],
         'teacher_attendance' => [
-            ['teacher_id' => 'T001', 'teacher_name' => 'Alice Johnson', 'department' => 'Math', 'center' => 'Main Campus', 'date' => '2025-04-10', 'status' => 'Present'],
-            ['teacher_id' => 'T002', 'teacher_name' => 'Bob Wilson', 'department' => 'Science', 'center' => 'West Campus', 'date' => '2025-04-10', 'status' => 'Present'],
-            ['teacher_id' => 'T001', 'teacher_name' => 'Alice Johnson', 'department' => 'Math', 'center' => 'Main Campus', 'date' => '2025-04-11', 'status' => 'Absent'],
+            ['teacher_id' => 'TR1001', 'teacher_name' => 'Alice Brown', 'education_center_id' => 'CA001', 'department' => 'Math', 'date' => '2025-04-10', 'status' => 'Present'],
+            ['teacher_id' => 'TR1002', 'teacher_name' => 'Bob Wilson', 'education_center_id' => 'CB001', 'department' => 'Science', 'date' => '2025-04-10', 'status' => 'Late']
+        ],
+        'staff_attendance' => [
+            ['staff_id' => 'ST001', 'staff_name' => 'Carol Lee', 'education_center_id' => 'CA001', 'role' => 'Admin', 'date' => '2025-04-10', 'status' => 'Present'],
+            ['staff_id' => 'ST002', 'staff_name' => 'David Kim', 'education_center_id' => 'CB001', 'role' => 'Clerk', 'date' => '2025-04-10', 'status' => 'Absent'],
+            ['staff_id' => 'ST001', 'staff_name' => 'Carol Lee', 'education_center_id' => 'CA001', 'role' => 'Admin', 'date' => '2025-04-11', 'status' => 'Late'],
+        ],
+        'fees' => [
+            ['fee_id' => 'F001', 'student_id' => 'S001', 'student_name' => 'John Doe', 'amount' => 500.00, 'due_date' => '2025-05-01', 'status' => 'Pending', 'center' => 'Main Campus'],
+            ['fee_id' => 'F002', 'student_id' => 'S002', 'student_name' => 'Jane Smith', 'amount' => 600.00, 'due_date' => '2025-05-01', 'status' => 'Paid', 'center' => 'West Campus'],
+        ],
+        'fee_templates' => [
+            ['template_id' => 'FT001', 'name' => 'Annual Tuition', 'amount' => 5000.00, 'frequency' => 'Yearly', 'center' => 'Main Campus'],
+            ['template_id' => 'FT002', 'name' => 'Monthly Fee', 'amount' => 500.00, 'frequency' => 'Monthly', 'center' => 'West Campus'],
+        ],
+        'subscriptions' => [
+            ['id' => 1, 'center' => 'Main Campus', 'plan' => 'Premium', 'start_date' => '2025-01-01'],
+            ['id' => 2, 'center' => 'West Campus', 'plan' => 'Standard', 'start_date' => '2025-02-01'],
+        ],
+        'payment_methods' => [
+            ['id' => 1, 'method' => 'Credit Card', 'center' => 'Main Campus'],
+            ['id' => 2, 'method' => 'Bank Transfer', 'center' => 'West Campus'],
+        ],
+        'exams' => [
+            ['id' => 1, 'title' => 'Math Midterm', 'date' => '2025-05-01', 'center' => 'Main Campus'],
+            ['id' => 2, 'title' => 'Science Final', 'date' => '2025-06-01', 'center' => 'West Campus'],
         ],
     ];
 }
