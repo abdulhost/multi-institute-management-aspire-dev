@@ -18,8 +18,8 @@ function my_education_erp_dashboard_shortcode() {
         <?php
         // Dynamically set active section for sidebar
         echo render_admin_header(wp_get_current_user());
-          if (!is_center_subscribed($educational_center_id)) {
-              return render_subscription_expired_message($educational_center_id);
+          if (!is_center_subscribed($education_center_id)) {
+              return render_subscription_expired_message($education_center_id);
           }
         $active_section = str_replace('-', '-', $section); // e.g., "add-fee" -> "add_fee"
         include plugin_dir_path(__FILE__) . '../sidebar.php'; // Adjust path

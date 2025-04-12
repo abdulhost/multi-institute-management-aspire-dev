@@ -6295,513 +6295,269 @@ function demoRenderSuperadminFees($data = []) {
     ob_start();
     $centers = isset($data['centers']) ? $data['centers'] : [];
     $students = isset($data['students']) ? $data['students'] : [];
-    $fees = isset($data['fees']) ? $data['fees'] : [];
+    $fees = isset($data['fees']) ? $data['fees'] : [
+        ['fee_id' => 'F001', 'student_id' => 'S001', 'student_name' => 'John Doe', 'amount' => 500.00, 'due_date' => '2025-05-01', 'status' => 'Pending', 'center' => 'Main Campus'],
+        ['fee_id' => 'F002', 'student_id' => 'S002', 'student_name' => 'Jane Smith', 'amount' => 600.00, 'due_date' => '2025-05-01', 'status' => 'Paid', 'center' => 'West Campus'],
+    ];
+    $months = [1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May', 6 => 'Jun', 7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dec'];
     ?>
     <div class="attendance-main-wrapper">
-        <div class="attendance-content-wrapper">
-            <div id="edu-loader" class="edu-loader" style="display: none;">
-                <div class="edu-loader-container">
-                    <img src="<?php echo plugin_dir_url(__FILE__) . '../custom-loader.png'; ?>" alt="Loading..." class="edu-loader-png">
+        <div class="form-container attendance-content-wrapper">
+            <div class="fees-management">
+                <h2>Fees Management</h2>
+                <div class="filters-card">
+                    <div class="search-filters">
+                        <label for="search-year">Year:</label>
+                        <select id="search-year" class="filter-select">
+                            <option value="">All Years</option>
+                            <option value="2025">2025</option>
+                        </select>
+                        <label for="search-status">Status:</label>
+                        <select id="search-status" class="filter-select">
+                            <option value="">All Statuses</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Overdue">Overdue</option>
+                        </select>
+                        <button id="search-button" class="search-btn">Search</button>
+                    </div>
                 </div>
-            </div>
-            <div class="attendance-management">
-                <h2>Fees</h2>
-                <div class="search-filters">
-                    <input type="text" id="student-id-search" placeholder="Search by Student ID...">
-                    <input type="text" id="student-name-search" placeholder="Search by Student Name...">
-                    <select id="center-filter">
-                        <option value="">All Educational Centers</option>
-                        <?php foreach ($centers as $center): ?>
-                            <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <select id="status-filter">
-                        <option value="">All Statuses</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Paid">Paid</option>
-                        <option value="Overdue">Overdue</option>
-                    </select>
-                    <select id="month-filter">
-                        <option value="">All Months</option>
-                        <?php
-                        $month_names = [1 => 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                        $dates = [];
-                        foreach ($fees as $fee) {
-                            $date = date_parse($fee['due_date']);
-                            $dates[$date['year'] . '-' . $date['month']] = ['year' => $date['year'], 'month' => $date['month']];
-                        }
-                        krsort($dates);
-                        foreach ($dates as $date) {
-                            echo "<option value='{$date['month']}' data-year='{$date['year']}'>" . esc_html($month_names[$date['month']] . ' ' . $date['year']) . "</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-                <div class="actions">
-                    <button id="add-fee-btn">Add Fee</button>
-                    <label for="fees-per-page">Show:</label>
-                    <select id="fees-per-page">
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                    </select>
-                    <button id="prev-page" disabled>Previous</button>
-                    <span id="page-info"></span>
-                    <button id="next-page">Next</button>
-                    <button id="refresh-data">Refresh</button>
-                </div>
-                <div class="attendance-table-wrapper">
-                    <div class="actions" id="export-tools"></div>
-                    <table id="fees-table">
-                        <thead id="fees-table-head">
+                <div class="fees-table-wrapper" id="fees-table-container">
+                    <table id="fees-table" class="wp-list-table widefat fixed striped">
+                        <thead>
                             <tr>
-                                <th>Fee ID</th>
+                                <th>View</th>
+                                <th>Name</th>
                                 <th>Student ID</th>
-                                <th>Student Name</th>
-                                <th>Amount</th>
-                                <th>Due Date</th>
-                                <th>Status</th>
-                                <th>Center</th>
-                                <th>Actions</th>
+                                <th>Class</th>
+                                <th>Paid (P)</th>
+                                <th>Pending (L)</th>
+                                <th>Overdue (A)</th>
+                                <?php foreach ($months as $month_num => $month_name) : ?>
+                                    <th><?php echo esc_html($month_name); ?></th>
+                                <?php endforeach; ?>
                             </tr>
                         </thead>
-                        <tbody id="fees-table-body"></tbody>
+                        <tbody id="fees-table-body">
+                            <?php if (!empty($fees)) : ?>
+                                <?php foreach ($fees as $index => $fee) : ?>
+                                    <?php
+                                    $counts = ['Paid' => 0, 'Pending' => 0, 'Overdue' => 0];
+                                    $monthly = array_fill_keys(array_keys($months), '');
+                                    $month_num = (int)date('m', strtotime($fee['due_date']));
+                                    switch ($fee['status']) {
+                                        case 'Paid':
+                                            $counts['Paid'] = 1;
+                                            $monthly[$month_num] = 'P';
+                                            break;
+                                        case 'Pending':
+                                            $counts['Pending'] = 1;
+                                            $monthly[$month_num] = 'L';
+                                            break;
+                                        case 'Overdue':
+                                            $counts['Overdue'] = 1;
+                                            $monthly[$month_num] = 'A';
+                                            break;
+                                    }
+                                    ?>
+                                    <tr class="fee-row" data-fee-index="<?php echo esc_attr($index); ?>">
+                                        <td>
+                                            <button class="expand-details" data-fee-index="<?php echo esc_attr($index); ?>">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/></svg>
+                                            </button>
+                                        </td>
+                                        <td><?php echo esc_html($fee['student_name']); ?></td>
+                                        <td><?php echo esc_html($fee['student_id']); ?></td>
+                                        <td><?php echo esc_html('Class - V'); ?></td>
+                                        <td><?php echo esc_html($counts['Paid']); ?></td>
+                                        <td><?php echo esc_html($counts['Pending']); ?></td>
+                                        <td><?php echo esc_html($counts['Overdue']); ?></td>
+                                        <?php foreach ($months as $month_num => $month_name) : ?>
+                                            <td><?php echo esc_html($monthly[$month_num]); ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr class="fee-details" id="fee-details-<?php echo esc_attr($index); ?>" style="display: none;">
+                                        <td colspan="<?php echo 7 + count($months); ?>">
+                                            <div class="fee-details-content">
+                                                <div class="fee-detail-header">
+                                                    <h3>Fee Summary for <?php echo esc_html($fee['student_name']); ?></h3>
+                                                    <div class="summary-stats">
+                                                        <div class="stat-box">
+                                                            <span class="stat-label">Total Amount:</span>
+                                                            <span class="stat-value"><?php echo esc_html(number_format($fee['amount'], 2)); ?></span>
+                                                        </div>
+                                                        <div class="stat-box">
+                                                            <span class="stat-label">Total Paid:</span>
+                                                            <span class="stat-value"><?php echo esc_html($fee['status'] === 'Paid' ? number_format($fee['amount'], 2) : '0.00'); ?></span>
+                                                        </div>
+                                                        <div class="stat-box pending-months-box">
+                                                            <span class="stat-label">Pending Months:</span>
+                                                            <span class="stat-value">
+                                                                <?php echo esc_html($fee['status'] === 'Pending' ? 1 : 0); ?>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="toggle-details-section">
+                                                    <button class="toggle-details-btn" data-fee-index="<?php echo esc_attr($index); ?>">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
+                                                    </button>View Details
+                                                </div>
+                                                <div class="fee-detail-entries" id="fee-entries-<?php echo esc_attr($index); ?>" style="display: none;">
+                                                    <div class="fee-detail-entry">
+                                                        <div class="entry-grid">
+                                                            <div class="entry-item">
+                                                                <span class="entry-label">Month:</span>
+                                                                <span class="entry-value"><?php echo esc_html(date('F', strtotime($fee['due_date']))); ?></span>
+                                                            </div>
+                                                            <div class="entry-item">
+                                                                <span class="entry-label">Fee Type:</span>
+                                                                <span class="entry-value">Tuition</span>
+                                                            </div>
+                                                            <div class="entry-item">
+                                                                <span class="entry-label">Amount:</span>
+                                                                <span class="entry-value"><?php echo esc_html(number_format($fee['amount'], 2)); ?></span>
+                                                            </div>
+                                                            <div class="entry-item">
+                                                                <span class="entry-label">Status:</span>
+                                                                <span class="entry-value <?php echo esc_attr(strtolower($fee['status'])); ?>">
+                                                                    <?php echo esc_html($fee['status']); ?>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else : ?>
+                                <tr><td colspan="<?php echo 7 + count($months); ?>">No fees found</td></tr>
+                            <?php endif; ?>
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Add Fee Modal -->
-    <div class="edu-modal" id="add-fee-modal" style="display: none;">
-        <div class="edu-modal-content">
-            <span class="edu-modal-close" data-modal="add-fee-modal">×</span>
-            <h3>Add Fee</h3>
-            <form id="add-fee-form">
-                <div class="search-filters">
-                    <label for="add-fee-id">Fee ID</label>
-                    <input type="text" id="add-fee-id" name="fee_id" required>
-                </div>
-                <div class="search-filters">
-                    <label for="add-center">Education Center</label>
-                    <select id="add-center" name="center" required>
-                        <option value="">Select Center</option>
-                        <?php foreach ($centers as $center): ?>
-                            <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="search-filters">
-                    <label for="add-student-id">Student</label>
-                    <select id="add-student-id" name="student_id" required>
-                        <option value="">Select Student</option>
-                    </select>
-                </div>
-                <div class="search-filters">
-                    <label for="add-student-name">Student Name</label>
-                    <input type="text" id="add-student-name" name="student_name" readonly required>
-                </div>
-                <div class="search-filters">
-                    <label for="add-amount">Amount</label>
-                    <input type="number" step="0.01" id="add-amount" name="amount" required>
-                </div>
-                <div class="search-filters">
-                    <label for="add-due-date">Due Date</label>
-                    <input type="date" id="add-due-date" name="due_date" value="<?php echo date('Y-m-d'); ?>" required>
-                </div>
-                <div class="search-filters">
-                    <label for="add-status">Status</label>
-                    <select id="add-status" name="status" required>
-                        <option value="Pending">Pending</option>
-                        <option value="Paid">Paid</option>
-                        <option value="Overdue">Overdue</option>
-                    </select>
-                </div>
-                <button type="button" id="save-fee">Save Fee</button>
-            </form>
-            <div id="add-fee-message" class="message"></div>
-        </div>
-    </div>
-
-    <!-- Edit Fee Modal -->
-    <div class="edu-modal" id="edit-fee-modal" style="display: none;">
-        <div class="edu-modal-content">
-            <span class="edu-modal-close" data-modal="edit-fee-modal">×</span>
-            <h3>Edit Fee</h3>
-            <form id="edit-fee-form">
-                <div class="search-filters">
-                    <label for="edit-fee-id">Fee ID</label>
-                    <input type="text" id="edit-fee-id" name="fee_id" readonly required>
-                </div>
-                <div class="search-filters">
-                    <label for="edit-student-id">Student ID</label>
-                    <input type="text" id="edit-student-id" name="student_id" readonly required>
-                </div>
-                <div class="search-filters">
-                    <label for="edit-student-name">Student Name</label>
-                    <input type="text" id="edit-student-name" name="student_name" readonly required>
-                </div>
-                <div class="search-filters">
-                    <label for="edit-amount">Amount</label>
-                    <input type="number" step="0.01" id="edit-amount" name="amount" required>
-                </div>
-                <div class="search-filters">
-                    <label for="edit-due-date">Due Date</label>
-                    <input type="date" id="edit-due-date" name="due_date" required>
-                </div>
-                <div class="search-filters">
-                    <label for="edit-status">Status</label>
-                    <select id="edit-status" name="status" required>
-                        <option value="Pending">Pending</option>
-                        <option value="Paid">Paid</option>
-                        <option value="Overdue">Overdue</option>
-                    </select>
-                </div>
-                <div class="search-filters">
-                    <label for="edit-center">Center</label>
-                    <input type="text" id="edit-center" name="center" readonly required>
-                </div>
-                <input type="hidden" id="edit-fee-index">
-                <button type="button" id="update-fee">Update Fee</button>
-            </form>
-            <div id="edit-fee-message" class="message"></div>
+    <div id="fee-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">×</span>
+            <div id="modal-content-inner"></div>
         </div>
     </div>
 
     <script>
     jQuery(document).ready(function($) {
         let feesData = <?php echo json_encode($fees); ?>;
-        let studentsData = <?php echo json_encode($students); ?>;
-        let currentPage = 1;
-        let perPage = 10;
-        let studentIdSearch = '';
-        let studentNameSearch = '';
-        let centerFilter = '';
-        let statusFilter = '';
-        let monthFilter = '';
-        let yearFilter = '';
 
-        function showLoader() { $('#edu-loader').show(); }
-        function hideLoader() { $('#edu-loader').hide(); }
-        function openModal(modalId) { 
-            showLoader(); 
-            $(modalId).css('display', 'flex'); 
-            setTimeout(hideLoader, 100); 
-            clearMessages(modalId);
-        }
-        function closeModal(modalId) { 
-            $(modalId).css('display', 'none'); 
-            clearMessages(modalId); 
-            hideLoader(); 
-        }
-        function clearMessages(modalId) {
-            $(modalId + ' .message').css({'background': '', 'color': ''}).text('');
-        }
-
-        $('.edu-modal-close').on('click', function() {
-            closeModal('#' + $(this).data('modal'));
-        });
-
-        $(document).on('click', function(event) {
-            if ($(event.target).hasClass('edu-modal')) {
-                closeModal('#' + event.target.id);
-            }
-        });
-
-        function loadFees(page, limit, sid, sname, center, status, month, year, showLoading = true) {
-            if (showLoading) showLoader();
-            const filtered = feesData.filter(f => {
-                const dueDate = new Date(f.due_date);
-                return (!sid || f.student_id.toLowerCase().includes(sid.toLowerCase())) &&
-                       (!sname || f.student_name.toLowerCase().includes(sname.toLowerCase())) &&
-                       (!center || f.center === center) &&
-                       (!status || f.status === status) &&
-                       (!month || dueDate.getMonth() + 1 === parseInt(month)) &&
-                       (!year || dueDate.getFullYear() === parseInt(year));
+        function loadFeesData() {
+            let year = $('#search-year').val();
+            let status = $('#search-status').val();
+            let filtered = feesData.filter(f => {
+                let dueDate = new Date(f.due_date);
+                return (!year || dueDate.getFullYear() == year) &&
+                       (!status || f.status === status);
             });
-            const total = filtered.length;
-            const start = (page - 1) * limit;
-            const end = start + limit;
-            const paginated = filtered.slice(start, end);
             let html = '';
-            paginated.forEach((record, index) => {
-                html += `
-                    <tr data-fee-index="${start + index}">
-                        <td>${record.fee_id}</td>
-                        <td>${record.student_id}</td>
-                        <td>${record.student_name}</td>
-                        <td>${record.amount.toFixed(2)}</td>
-                        <td>${record.due_date}</td>
-                        <td>${record.status}</td>
-                        <td>${record.center}</td>
-                        <td>
-                            <button class="edit-fee" data-fee-index="${start + index}">Edit</button>
-                            <button class="delete-fee" data-fee-index="${start + index}">Delete</button>
-                        </td>
-                    </tr>
-                `;
-            });
-            $('#fees-table-body').html(html || '<tr><td colspan="8">No fee records found.</td></tr>');
-            const totalPages = Math.ceil(total / limit) || 1;
-            $('#page-info').text(`Page ${page} of ${totalPages} (Total Records: ${total})`);
-            $('#prev-page').prop('disabled', page === 1);
-            $('#next-page').prop('disabled', page === totalPages || total === 0);
-            setupExportButtons();
-            if (showLoading) hideLoader();
-        }
-
-        function setupExportButtons() {
-            const tools = $('#export-tools');
-            tools.html(`
-                <button class="export-btn export-csv" aria-label="Export to CSV"><i class="fas fa-file-csv"></i><span class="tooltip">Export to CSV</span></button>
-                <button class="export-btn export-pdf" aria-label="Export to PDF"><i class="fas fa-file-pdf"></i><span class="tooltip">Export to PDF</span></button>
-                <button class="export-btn export-excel" aria-label="Export to Excel"><i class="fas fa-file-excel"></i><span class="tooltip">Export to Excel</span></button>
-                <input type="file" id="import-fees" accept=".csv" style="display: none;">
-                <button class="export-btn import-csv" aria-label="Import CSV"><i class="fas fa-file-import"></i><span class="tooltip">Import CSV</span></button>
-            `);
-            tools.find('.export-csv').on('click', exportToCSV);
-            tools.find('.export-pdf').on('click', generatePDF);
-            tools.find('.export-excel').on('click', exportToExcel);
-            tools.find('.import-csv').on('click', () => $('#import-fees').click());
-        }
-
-        function exportToCSV() {
-            const filtered = feesData.filter(f => {
-                const dueDate = new Date(f.due_date);
-                return (!studentIdSearch || f.student_id.toLowerCase().includes(studentIdSearch.toLowerCase())) &&
-                       (!studentNameSearch || f.student_name.toLowerCase().includes(studentNameSearch.toLowerCase())) &&
-                       (!centerFilter || f.center === centerFilter) &&
-                       (!statusFilter || f.status === statusFilter) &&
-                       (!monthFilter || dueDate.getMonth() + 1 === parseInt(monthFilter)) &&
-                       (!yearFilter || dueDate.getFullYear() === parseInt(yearFilter));
-            });
-            const csv = filtered.map(row => `${row.fee_id},${row.student_id},${row.student_name},${row.amount.toFixed(2)},${row.due_date},${row.status},${row.center}`).join('\n');
-            const headers = 'Fee ID,Student ID,Student Name,Amount,Due Date,Status,Center\n';
-            const blob = new Blob([headers + csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'fees.csv';
-            a.click();
-            window.URL.revokeObjectURL(url);
-        }
-
-        function exportToExcel() {
-            alert('Excel export is not fully implemented in this demo.');
-        }
-
-        function generatePDF() {
-            alert('PDF export is not fully implemented in this demo.');
-        }
-
-        loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
-
-        $('#student-id-search').on('input', debounce(function() {
-            studentIdSearch = $(this).val();
-            currentPage = 1;
-            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
-        }, 500));
-
-        $('#student-name-search').on('input', debounce(function() {
-            studentNameSearch = $(this).val();
-            currentPage = 1;
-            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
-        }, 500));
-
-        $('#center-filter').on('change', function() {
-            centerFilter = $(this).val();
-            currentPage = 1;
-            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
-        });
-
-        $('#status-filter').on('change', function() {
-            statusFilter = $(this).val();
-            currentPage = 1;
-            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
-        });
-
-        $('#month-filter').on('change', function() {
-            monthFilter = $(this).val();
-            yearFilter = $(this).find('option:selected').data('year') || '';
-            currentPage = 1;
-            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
-        });
-
-        $('#fees-per-page').on('change', function() {
-            perPage = parseInt($(this).val());
-            currentPage = 1;
-            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
-        });
-
-        $('#next-page').on('click', function() {
-            currentPage++;
-            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
-        });
-
-        $('#prev-page').on('click', function() {
-            currentPage--;
-            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
-        });
-
-        $('#refresh-data').on('click', function() {
-            studentIdSearch = '';
-            studentNameSearch = '';
-            centerFilter = '';
-            statusFilter = '';
-            monthFilter = '';
-            yearFilter = '';
-            $('#student-id-search').val('');
-            $('#student-name-search').val('');
-            $('#center-filter').val('');
-            $('#status-filter').val('');
-            $('#month-filter').val('');
-            currentPage = 1;
-            loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter);
-        });
-
-        $('#add-fee-btn').on('click', function() {
-            $('#add-fee-id').val('');
-            $('#add-center').val('');
-            $('#add-student-id').html('<option value="">Select Student</option>');
-            $('#add-student-name').val('');
-            $('#add-amount').val('');
-            $('#add-due-date').val('<?php echo date('Y-m-d'); ?>');
-            $('#add-status').val('Pending');
-            openModal('#add-fee-modal');
-        });
-
-        $('#add-center').on('change', function() {
-            const center = $(this).val();
-            const $studentSelect = $('#add-student-id');
-            $studentSelect.html('<option value="">Select Student</option>');
-            if (center) {
-                studentsData.filter(s => s.center === center).forEach(student => {
-                    $studentSelect.append(`<option value="${student.student_id}" data-name="${student.student_name}">${student.student_id} - ${student.student_name}</option>`);
+            if (filtered.length > 0) {
+                filtered.forEach((fee, index) => {
+                    let counts = {'Paid': 0, 'Pending': 0, 'Overdue': 0};
+                    let monthly = {'1': '', '2': '', '3': '', '4': '', '5': '', '6': '', '7': '', '8': '', '9': '', '10': '', '11': '', '12': ''};
+                    let month_num = (new Date(fee.due_date)).getMonth() + 1;
+                    switch (fee.status) {
+                        case 'Paid': counts['Paid'] = 1; monthly[month_num] = 'P'; break;
+                        case 'Pending': counts['Pending'] = 1; monthly[month_num] = 'L'; break;
+                        case 'Overdue': counts['Overdue'] = 1; monthly[month_num] = 'A'; break;
+                    }
+                    html += `
+                        <tr class="fee-row" data-fee-index="${index}">
+                            <td><button class="expand-details" data-fee-index="${index}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/></svg></button></td>
+                            <td>${fee.student_name}</td>
+                            <td>${fee.student_id}</td>
+                            <td>Class - V</td>
+                            <td>${counts['Paid']}</td>
+                            <td>${counts['Pending']}</td>
+                            <td>${counts['Overdue']}</td>
+                            <td>${monthly['1']}</td><td>${monthly['2']}</td><td>${monthly['3']}</td><td>${monthly['4']}</td><td>${monthly['5']}</td>
+                            <td>${monthly['6']}</td><td>${monthly['7']}</td><td>${monthly['8']}</td><td>${monthly['9']}</td><td>${monthly['10']}</td>
+                            <td>${monthly['11']}</td><td>${monthly['12']}</td>
+                        </tr>
+                        <tr class="fee-details" id="fee-details-${index}" style="display: none;">
+                            <td colspan="19">
+                                <div class="fee-details-content">
+                                    <div class="fee-detail-header">
+                                        <h3>Fee Summary for ${fee.student_name}</h3>
+                                        <div class="summary-stats">
+                                            <div class="stat-box"><span class="stat-label">Total Amount:</span><span class="stat-value">${number_format(fee.amount, 2)}</span></div>
+                                            <div class="stat-box"><span class="stat-label">Total Paid:</span><span class="stat-value">${fee.status === 'Paid' ? number_format(fee.amount, 2) : '0.00'}</span></div>
+                                            <div class="stat-box pending-months-box"><span class="stat-label">Pending Months:</span><span class="stat-value">${fee.status === 'Pending' ? 1 : 0}</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="toggle-details-section"><button class="toggle-details-btn" data-fee-index="${index}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg></button>View Details</div>
+                                    <div class="fee-detail-entries" id="fee-entries-${index}" style="display: none;">
+                                        <div class="fee-detail-entry">
+                                            <div class="entry-grid">
+                                                <div class="entry-item"><span class="entry-label">Month:</span><span class="entry-value">${new Date(fee.due_date).toLocaleString('default', { month: 'long' })}</span></div>
+                                                <div class="entry-item"><span class="entry-label">Fee Type:</span><span class="entry-value">Tuition</span></div>
+                                                <div class="entry-item"><span class="entry-label">Amount:</span><span class="entry-value">${number_format(fee.amount, 2)}</span></div>
+                                                <div class="entry-item"><span class="entry-label">Status:</span><span class="entry-value ${fee.status.toLowerCase()}">${fee.status}</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>`;
                 });
-            }
-            $('#add-student-name').val('');
-        });
-
-        $('#add-student-id').on('change', function() {
-            const $option = $(this).find('option:selected');
-            $('#add-student-name').val($option.data('name') || '');
-        });
-
-        $('#save-fee').on('click', function() {
-            const record = {
-                fee_id: $('#add-fee-id').val(),
-                student_id: $('#add-student-id').val(),
-                student_name: $('#add-student-name').val(),
-                amount: parseFloat($('#add-amount').val()),
-                due_date: $('#add-due-date').val(),
-                status: $('#add-status').val(),
-                center: $('#add-center').val()
-            };
-            if (record.fee_id && record.student_id && record.student_name && !isNaN(record.amount) && record.due_date && record.status && record.center) {
-                if (feesData.some(f => f.fee_id === record.fee_id)) {
-                    $('#add-fee-message').css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Fee ID already exists.');
-                    setTimeout(() => clearMessages('#add-fee-modal'), 3000);
-                    return;
-                }
-                showLoader();
-                feesData.push(record);
-                $('#add-fee-message').css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text('Fee added successfully!');
-                setTimeout(() => {
-                    closeModal('#add-fee-modal');
-                    loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter, false);
-                }, 2000);
             } else {
-                $('#add-fee-message').css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Please fill all required fields correctly.');
-                setTimeout(() => clearMessages('#add-fee-modal'), 3000);
+                html = '<tr><td colspan="19">No fees found</td></tr>';
             }
-        });
-
-        $(document).on('click', '.edit-fee', function() {
-            const index = $(this).data('fee-index');
-            const record = feesData[index];
-            $('#edit-fee-index').val(index);
-            $('#edit-fee-id').val(record.fee_id);
-            $('#edit-student-id').val(record.student_id);
-            $('#edit-student-name').val(record.student_name);
-            $('#edit-amount').val(record.amount);
-            $('#edit-due-date').val(record.due_date);
-            $('#edit-status').val(record.status);
-            $('#edit-center').val(record.center);
-            openModal('#edit-fee-modal');
-        });
-
-        $('#update-fee').on('click', function() {
-            const index = $('#edit-fee-index').val();
-            const amount = parseFloat($('#edit-amount').val());
-            const due_date = $('#edit-due-date').val();
-            const status = $('#edit-status').val();
-            if (!isNaN(amount) && due_date && status) {
-                showLoader();
-                feesData[index].amount = amount;
-                feesData[index].due_date = due_date;
-                feesData[index].status = status;
-                $('#edit-fee-message').css({'background': 'var(--success-bg)', 'color': 'var(--success-text)'}).text('Fee updated successfully!');
-                setTimeout(() => {
-                    closeModal('#edit-fee-modal');
-                    loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter, false);
-                }, 2000);
-            } else {
-                $('#edit-fee-message').css({'background': 'var(--error-bg)', 'color': 'var(--error-text)'}).text('Please fill all required fields correctly.');
-                setTimeout(() => clearMessages('#edit-fee-modal'), 3000);
-            }
-        });
-
-        $(document).on('click', '.delete-fee', function() {
-            if (!confirm('Are you sure you want to delete this fee record?')) return;
-            const index = $(this).data('fee-index');
-            showLoader();
-            feesData.splice(index, 1);
-            setTimeout(() => {
-                loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter, false);
-                hideLoader();
-            }, 100);
-        });
-
-        $('#import-fees').on('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                showLoader();
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const text = e.target.result;
-                    const rows = text.split('\n').slice(1).filter(row => row.trim());
-                    const newRecords = rows.map(row => {
-                        const [fee_id, student_id, student_name, amount, due_date, status, center] = row.split(',');
-                        return {
-                            fee_id,
-                            student_id,
-                            student_name,
-                            amount: parseFloat(amount),
-                            due_date,
-                            status,
-                            center
-                        };
-                    }).filter(record => record.fee_id && !feesData.some(f => f.fee_id === record.fee_id));
-                    feesData.push(...newRecords);
-                    loadFees(currentPage, perPage, studentIdSearch, studentNameSearch, centerFilter, statusFilter, monthFilter, yearFilter, false);
-                    hideLoader();
-                };
-                reader.readAsText(file);
-                e.target.value = '';
-            }
-        });
-
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
+            $('#fees-table-body').html(html);
+            setupTableEvents();
         }
+
+        function setupTableEvents() {
+            $('.expand-details').off('click').on('click', function() {
+                var index = $(this).data('fee-index');
+                var $detailsRow = $('#fee-details-' + index);
+                var $modal = $('#fee-details-modal');
+                var $modalContent = $('#modal-content-inner');
+                $modalContent.html($detailsRow.find('.fee-details-content').clone());
+                $modal.css('display', 'block');
+                $detailsRow.css('display', 'none');
+            });
+
+            $('.modal-close').on('click', function() {
+                $('#fee-details-modal').css('display', 'none');
+                $('#modal-content-inner').empty();
+            });
+
+            $(window).on('click', function(event) {
+                if (event.target == $('#fee-details-modal')[0]) {
+                    $('#fee-details-modal').css('display', 'none');
+                    $('#modal-content-inner').empty();
+                }
+            });
+
+            $('.toggle-details-btn').off('click').on('click', function() {
+                var index = $(this).data('fee-index');
+                var $feeEntries = $('#fee-entries-' + index);
+                $(this).toggleClass('active');
+                $feeEntries.slideToggle(300);
+            });
+        }
+
+        $('#search-button').on('click', function(e) {
+            e.preventDefault();
+            loadFeesData();
+        });
+
+        $('#search-year, #search-status').on('change', function() {
+            loadFeesData();
+        });
+
+        loadFeesData();
     });
     </script>
     <?php
