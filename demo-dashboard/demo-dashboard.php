@@ -2013,8 +2013,7 @@ function demoRenderSuperadminContent($section, $action, $data = []) {
                                             return demoRenderSuperadminDeleteConversation();
                                         default:
                                             return demoRenderSuperadminMessages();
-                                    } } 
-  
+                                    }}
     elseif ($section === 'fees') {
         switch ($action) {
            
