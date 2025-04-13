@@ -509,6 +509,24 @@ function demoRenderSidebar($role, $active_section) {
             ['action' => 'export-staff-attendance', 'label' => 'Export Staff Attendance', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'attendance', 'demo-action' => 'export-staff-attendance'])],
         ]],
     ]],
+    ['section' => 'classes', 'label' => 'Classes and Sections', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'classes']), 'icon' => 'school', 'submenu' => [
+        ['action' => 'manage-classes', 'label' => 'Manage Classes', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'classes', 'demo-action' => 'manage-classes'])],
+        ['action' => 'add-class', 'label' => 'Add Class', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'classes', 'demo-action' => 'add-class'])],
+        ['action' => 'edit-class', 'label' => 'Edit Class', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'classes', 'demo-action' => 'edit-class'])],
+        ['action' => 'delete-class', 'label' => 'Delete Class', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'classes', 'demo-action' => 'delete-class'])],
+    ]],
+    ['section' => 'subjects', 'label' => 'Subjects Management', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subjects']), 'icon' => 'book', 'submenu' => [
+        ['action' => 'manage-subjects', 'label' => 'Manage Subjects', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subjects', 'demo-action' => 'manage-subjects'])],
+        ['action' => 'add-subject', 'label' => 'Add Subject', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subjects', 'demo-action' => 'add-subject'])],
+        ['action' => 'edit-subject', 'label' => 'Edit Subject', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subjects', 'demo-action' => 'edit-subject'])],
+        ['action' => 'delete-subject', 'label' => 'Delete Subject', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subjects', 'demo-action' => 'delete-subject'])],
+    ]],
+    ['section' => 'homeworks', 'label' => 'Homeworks Management', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'homeworks']), 'icon' => 'tasks', 'submenu' => [
+        ['action' => 'manage-homeworks', 'label' => 'Manage Homeworks', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'homeworks', 'demo-action' => 'manage-homeworks'])],
+        ['action' => 'add-homework', 'label' => 'Add Homework', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'homeworks', 'demo-action' => 'add-homework'])],
+        ['action' => 'edit-homework', 'label' => 'Edit Homework', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'homeworks', 'demo-action' => 'edit-homework'])],
+        ['action' => 'delete-homework', 'label' => 'Delete Homework', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'homeworks', 'demo-action' => 'delete-homework'])],
+    ]],
     ['section' => 'subscription', 'label' => 'Subscriptions', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription']), 'icon' => 'fa-money-check-alt', 'submenu' => [
         ['action' => 'manage-subscription', 'label' => 'Manage Subscriptions', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription', 'demo-action' => 'manage-subscription'])],
         ['action' => 'add-subscription', 'label' => 'Add Subscription', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription', 'demo-action' => 'add-subscription'])],
@@ -521,6 +539,55 @@ function demoRenderSidebar($role, $active_section) {
         ['action' => 'edit-payment-method', 'label' => 'Edit Payment Method', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'payment_methods', 'demo-action' => 'edit-payment-method'])],
         ['action' => 'delete-payment-method', 'label' => 'Delete Payment Method', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'payment_methods', 'demo-action' => 'delete-payment-method'])],
     ]],
+    [
+        'section' => 'timetable',
+        'label' => 'Timetable',
+        'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'timetable']),
+        'icon' => 'calendar-alt',
+        'submenu' => [
+            ['action' => 'manage-timetable', 'label' => 'Manage Timetable', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'timetable', 'demo-action' => 'manage-timetable'])],
+            ['action' => 'add-timetable', 'label' => 'Add Timetable', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'timetable', 'demo-action' => 'add-timetable'])],
+            ['action' => 'edit-timetable', 'label' => 'Edit Timetable', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'timetable', 'demo-action' => 'edit-timetable'])],
+            ['action' => 'delete-timetable', 'label' => 'Delete Timetable', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'timetable', 'demo-action' => 'delete-timetable'])],
+        ]
+    ],
+    [
+        'section' => 'departments',
+        'label' => 'Departments',
+        'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'departments']),
+        'icon' => 'building',
+        'submenu' => [
+            ['action' => 'manage-departments', 'label' => 'Manage Departments', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'departments', 'demo-action' => 'manage-departments'])],
+            ['action' => 'add-department', 'label' => 'Add Department', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'departments', 'demo-action' => 'add-department'])],
+            ['action' => 'edit-department', 'label' => 'Edit Department', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'departments', 'demo-action' => 'edit-department'])],
+            ['action' => 'delete-department', 'label' => 'Delete Department', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'departments', 'demo-action' => 'delete-department'])],
+        ]
+    ],
+    [
+        'section' => 'library',
+        'label' => 'Library',
+        'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library']),
+        'icon' => 'book',
+        'submenu' => [
+            ['action' => 'manage-library', 'label' => 'Manage Library', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library', 'demo-action' => 'manage-library'])],
+            ['action' => 'add-book', 'label' => 'Add Book', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library', 'demo-action' => 'add-book'])],
+            ['action' => 'edit-book', 'label' => 'Edit Book', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library', 'demo-action' => 'edit-book'])],
+            ['action' => 'delete-book', 'label' => 'Delete Book', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library', 'demo-action' => 'delete-book'])],
+        ]
+    ],
+    [
+        'section' => 'inventory',
+        'label' => 'Inventory',
+        'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory']),
+        'icon' => 'boxes',
+        'submenu' => [
+            ['action' => 'manage-inventory', 'label' => 'Manage Inventory', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory', 'demo-action' => 'manage-inventory'])],
+            ['action' => 'add-item', 'label' => 'Add Item', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory', 'demo-action' => 'add-item'])],
+            ['action' => 'edit-item', 'label' => 'Edit Item', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory', 'demo-action' => 'edit-item'])],
+            ['action' => 'delete-item', 'label' => 'Delete Item', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory', 'demo-action' => 'delete-item'])],
+        ]
+    ],
+    
     ['section' => 'fees', 'label' => 'Fees Management', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees']), 'icon' => 'money-bill', 'submenu' => [
         ['action' => 'fees', 'label' => 'Fees', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'fees']), 'submenu' => [
             ['action' => 'manage-fees', 'label' => 'Manage Fees', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'manage-fees'])],
@@ -539,8 +606,69 @@ function demoRenderSidebar($role, $active_section) {
             ['action' => 'export-fee-templates', 'label' => 'Export Fee Templates', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'fees', 'demo-action' => 'export-fee-templates'])],
         ]],
     ]],
-    ]
-
+        
+        [
+            'section' => 'library-transactions',
+            'label' => 'Library Transactions',
+            'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library-transactions']),
+            'icon' => 'book-reader',
+            'submenu' => [
+                ['action' => 'manage-library-transactions', 'label' => 'Manage Library Transactions', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library-transactions', 'demo-action' => 'manage-library-transactions'])],
+                ['action' => 'add-transaction', 'label' => 'Add Transaction', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library-transactions', 'demo-action' => 'add-transaction'])],
+                ['action' => 'edit-transaction', 'label' => 'Edit Transaction', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library-transactions', 'demo-action' => 'edit-transaction'])],
+                ['action' => 'delete-transaction', 'label' => 'Delete Transaction', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library-transactions', 'demo-action' => 'delete-transaction'])],
+            ]
+        ],
+        [
+            'section' => 'inventory-transactions',
+            'label' => 'Inventory Transactions',
+            'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory-transactions']),
+            'icon' => 'cogs',
+            'submenu' => [
+                ['action' => 'manage-inventory-transactions', 'label' => 'Manage Inventory Transactions', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory-transactions', 'demo-action' => 'manage-inventory-transactions'])],
+                ['action' => 'add-transaction', 'label' => 'Add Transaction', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory-transactions', 'demo-action' => 'add-transaction'])],
+                ['action' => 'edit-transaction', 'label' => 'Edit Transaction', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory-transactions', 'demo-action' => 'edit-transaction'])],
+                ['action' => 'delete-transaction', 'label' => 'Delete Transaction', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory-transactions', 'demo-action' => 'delete-transaction'])],
+            ]
+        ],
+        [
+            'section' => 'noticeboard',
+            'label' => 'Noticeboard',
+            'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'noticeboard']),
+            'icon' => 'bullhorn',
+            'submenu' => [
+                ['action' => 'manage-noticeboard', 'label' => 'Manage Noticeboard', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'noticeboard', 'demo-action' => 'manage-noticeboard'])],
+                ['action' => 'add-notice', 'label' => 'Add Notice', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'noticeboard', 'demo-action' => 'add-notice'])],
+                ['action' => 'edit-notice', 'label' => 'Edit Notice', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'noticeboard', 'demo-action' => 'edit-notice'])],
+                ['action' => 'delete-notice', 'label' => 'Delete Notice', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'noticeboard', 'demo-action' => 'delete-notice'])],
+            ]
+        ],
+        [
+            'section' => 'announcements',
+            'label' => 'Announcements',
+            'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements']),
+            'icon' => 'megaphone',
+            'submenu' => [
+                ['action' => 'manage-announcements', 'label' => 'Manage Announcements', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'manage-announcements'])],
+                ['action' => 'add-announcement', 'label' => 'Add Announcement', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'add-announcement'])],
+                ['action' => 'edit-announcement', 'label' => 'Edit Announcement', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'edit-announcement'])],
+                ['action' => 'delete-announcement', 'label' => 'Delete Announcement', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'delete-announcement'])],
+            ]
+        ] ,
+        [
+            'section' => 'messages',
+            'label' => 'Messages',
+            'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages']),
+            'icon' => 'envelope',
+            'submenu' => [
+                ['action' => 'manage-messages', 'label' => 'Manage Messages', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'manage-messages'])],
+                ['action' => 'add-conversation', 'label' => 'Add Conversation', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'add-conversation'])],
+                ['action' => 'edit-conversation', 'label' => 'Edit Conversation', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'edit-conversation'])],
+                ['action' => 'delete-conversation', 'label' => 'Delete Conversation', 'url' => add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'delete-conversation'])],
+            ]
+        ]
+               
+        ]        
 
     ];
 
@@ -1709,7 +1837,8 @@ function demoRenderSuperadminContent($section, $action, $data = []) {
             default:
                 echo demoRenderSuperadminSubscription($data);
         }
-    } elseif ($section === 'payment_methods') {
+    }
+     elseif ($section === 'payment_methods') {
         switch ($action) {
             case 'add-payment-method':
                 echo demoRenderSuperadminAddPaymentMethods();
@@ -1723,7 +1852,170 @@ function demoRenderSuperadminContent($section, $action, $data = []) {
             default:
                 echo demoRenderSuperadminPaymentMethods($data);
         }
-    } elseif ($section === 'fees') {
+    } 
+     elseif ($section === 'classes') {
+            switch ($action) {
+                case 'manage-classes':
+                    return demoRenderSuperadminClasses($data);
+                case 'add-class':
+                    return demoRenderSuperadminAddClass($data);
+                case 'edit-class':
+                    return demoRenderSuperadminEditClass($data);
+                case 'delete-class':
+                    return demoRenderSuperadminDeleteClass($data);
+                default:
+                    return demoRenderSuperadminClasses($data);
+            }} elseif ($section === 'subjects') {
+     
+            switch ($action) {
+                case 'manage-subjects':
+                    return demoRenderSuperadminSubjects($data);
+                case 'add-subject':
+                    return demoRenderSuperadminAddSubject($data);
+                case 'edit-subject':
+                    return demoRenderSuperadminEditSubject($data);
+                case 'delete-subject':
+                    return demoRenderSuperadminDeleteSubject($data);
+                default:
+                    return demoRenderSuperadminSubjects($data);
+            }}
+            elseif ($section === 'homeworks') {
+            switch ($action) {
+                case 'manage-homeworks':
+                    return demoRenderSuperadminHomeworks($data);
+                case 'add-homework':
+                    return demoRenderSuperadminAddHomework($data);
+                case 'edit-homework':
+                    return demoRenderSuperadminEditHomework($data);
+                case 'delete-homework':
+                    return demoRenderSuperadminDeleteHomework($data);
+                default:
+                    return demoRenderSuperadminHomeworks($data);
+            }
+    } 
+            elseif ($section === 'timetable') {
+           
+                    switch ($action) {
+                        case 'manage-timetable':
+                            return demoRenderSuperadminTimetable();
+                        case 'add-timetable':
+                            return demoRenderSuperadminAddTimetable();
+                        case 'edit-timetable':
+                            return demoRenderSuperadminEditTimetable();
+                        case 'delete-timetable':
+                            return demoRenderSuperadminDeleteTimetable();
+                        default:
+                            return demoRenderSuperadminTimetable();
+                    }}elseif ($section === 'departments') {
+              
+                    switch ($action) {
+                        case 'manage-departments':
+                            return demoRenderSuperadminDepartments();
+                        case 'add-department':
+                            return demoRenderSuperadminAddDepartment();
+                        case 'edit-department':
+                            return demoRenderSuperadminEditDepartment();
+                        case 'delete-department':
+                            return demoRenderSuperadminDeleteDepartment();
+                        default:
+                            return demoRenderSuperadminDepartments();
+                    }}elseif ($section === 'library') {
+                    switch ($action) {
+                        case 'manage-library':
+                            return demoRenderSuperadminLibrary();
+                        case 'add-book':
+                            return demoRenderSuperadminAddBook();
+                        case 'edit-book':
+                            return demoRenderSuperadminEditBook();
+                        case 'delete-book':
+                            return demoRenderSuperadminDeleteBook();
+                        default:
+                            return demoRenderSuperadminLibrary();
+                    }}
+                    elseif ($section === 'inventory') {
+                
+                    switch ($action) {
+                        case 'manage-inventory':
+                            return demoRenderSuperadminInventory();
+                        case 'add-item':
+                            return demoRenderSuperadminAddItem();
+                        case 'edit-item':
+                            return demoRenderSuperadminEditItem();
+                        case 'delete-item':
+                            return demoRenderSuperadminDeleteItem();
+                        default:
+                            return demoRenderSuperadminInventory();
+                    }  } 
+                    elseif ($section === 'library-transactions') {
+                
+                            switch ($action) {
+                                case 'manage-library-transactions':
+                                    return demoRenderSuperadminLibraryTransactions();
+                                case 'add-transaction':
+                                    return demoRenderSuperadminAddLibraryTransaction();
+                                case 'edit-transaction':
+                                    return demoRenderSuperadminEditLibraryTransaction();
+                                case 'delete-transaction':
+                                    return demoRenderSuperadminDeleteLibraryTransaction();
+                                default:
+                                    return demoRenderSuperadminLibraryTransactions();
+                                }}elseif ($section === 'inventory-transactions') {
+          
+                            switch ($action) {
+                                case 'manage-inventory-transactions':
+                                    return demoRenderSuperadminInventoryTransactions();
+                                case 'add-transaction':
+                                    return demoRenderSuperadminAddInventoryTransaction();
+                                case 'edit-transaction':
+                                    return demoRenderSuperadminEditInventoryTransaction();
+                                case 'delete-transaction':
+                                    return demoRenderSuperadminDeleteInventoryTransaction();
+                                default:
+                                    return demoRenderSuperadminInventoryTransactions();
+                                }}elseif ($section === 'noticeboard') {
+                     
+                            switch ($action) {
+                                case 'manage-noticeboard':
+                                    return demoRenderSuperadminNoticeboard();
+                                case 'add-notice':
+                                    return demoRenderSuperadminAddNotice();
+                                case 'edit-notice':
+                                    return demoRenderSuperadminEditNotice();
+                                case 'delete-notice':
+                                    return demoRenderSuperadminDeleteNotice();
+                                default:
+                                    return demoRenderSuperadminNoticeboard();
+                            }}
+                            
+                            elseif ($section === 'announcements') {
+                     
+                            switch ($action) {
+                                case 'manage-announcements':
+                                    return demoRenderSuperadminAnnouncements();
+                                case 'add-announcement':
+                                    return demoRenderSuperadminAddAnnouncement();
+                                case 'edit-announcement':
+                                    return demoRenderSuperadminEditAnnouncement();
+                                case 'delete-announcement':
+                                    return demoRenderSuperadminDeleteAnnouncement();
+                                default:
+                                    return demoRenderSuperadminAnnouncements();
+                            }  } 
+                            elseif ($section === 'messages') {
+                                    switch ($action) {
+                                        case 'manage-messages':
+                                            return demoRenderSuperadminMessages();
+                                        case 'add-conversation':
+                                            return demoRenderSuperadminAddConversation();
+                                        case 'edit-conversation':
+                                            return demoRenderSuperadminEditConversation();
+                                        case 'delete-conversation':
+                                            return demoRenderSuperadminDeleteConversation();
+                                        default:
+                                            return demoRenderSuperadminMessages();
+                                    } } 
+  
+    elseif ($section === 'fees') {
         switch ($action) {
            
             case 'manage-fees':
@@ -1816,11 +2108,11 @@ function demoRenderSuperadminManageTeacherAttendance($data = []) {
                     </tr>
                 </thead>
                 <tbody id="attendance-table-body">
-                    <?php foreach ($data['teacher_attendance'] as $att): ?>
-                        <tr data-attendance-id="<?php echo esc_attr($att['id']); ?>">
-                            <td><?php echo esc_html($att['id']); ?></td>
-                            <td><?php echo esc_html($att['teacher_id']); ?></td>
-                            <td><?php echo esc_html($att['teacher_name']); ?></td>
+    <?php foreach ($data['teacher_attendance'] as $att): ?>
+        <tr data-attendance-id="<?php echo esc_attr($att['teacher_id']); ?>"> <!-- Using teacher_id -->
+            <td><?php echo esc_html($att['teacher_id']); ?></td> <!-- teacher_id instead of id -->
+ 
+                           <td><?php echo esc_html($att['teacher_name']); ?></td>
                             <td><?php echo esc_html($att['center']); ?></td>
                             <td><?php echo esc_html($att['date']); ?></td>
                             <td><?php echo esc_html($att['status']); ?></td>
@@ -2293,11 +2585,11 @@ function demoRenderSuperadminManageStudentAttendance($data = []) {
                     </tr>
                 </thead>
                 <tbody id="attendance-table-body">
-                    <?php foreach ($data['student_attendance'] as $att): ?>
-                        <tr data-attendance-id="<?php echo esc_attr($att['id']); ?>">
-                            <td><?php echo esc_html($att['id']); ?></td>
-                            <td><?php echo esc_html($att['student_id']); ?></td>
-                            <td><?php echo esc_html($att['student_name']); ?></td>
+    <?php foreach ($data['student_attendance'] as $att): ?>
+        <tr data-attendance-id="<?php echo esc_attr($att['student_id']); ?>"> <!-- Using student_id here -->
+            <td><?php echo esc_html($att['student_id']); ?></td> <!-- student_id instead of id -->
+            <td><?php echo esc_html($att['student_name']); ?></td>
+           
                             <td><?php echo esc_html($att['class']); ?></td>
                             <td><?php echo esc_html($att['section']); ?></td>
                             <td><?php echo esc_html($att['center']); ?></td>
@@ -7354,6 +7646,2500 @@ function demoRenderSuperadminExportFeeTemplates($data = []) {
     <?php
     return ob_get_clean();
 }
+function demoRenderSuperadminClasses() {
+    // Hardcoded data for classes
+    $classes = [
+        ['class_id' => 'CL001', 'name' => 'Class 10', 'section' => 'A', 'center' => 'Main Campus'],
+        ['class_id' => 'CL002', 'name' => 'Class 10', 'section' => 'B', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Classes Management</h2>
+        <div class="alert alert-info">Manage classes below.</div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="classes-search" placeholder="Search Classes...">
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'classes', 'demo-action' => 'add-class'])); ?>" class="btn btn-primary">Add Class</a>
+            </div>
+        </div>
+        <table class="table" id="superadmin-classes">
+            <thead>
+                <tr>
+                    <th>Class ID</th>
+                    <th>Name</th>
+                    <th>Section</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($classes as $class): ?>
+                    <tr>
+                        <td><?php echo esc_html($class['class_id']); ?></td>
+                        <td><?php echo esc_html($class['name']); ?></td>
+                        <td><?php echo esc_html($class['section']); ?></td>
+                        <td><?php echo esc_html($class['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'classes', 'demo-action' => 'edit-class'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'classes', 'demo-action' => 'delete-class'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminAddClass($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Class</h2>
+        <form id="add-class-form" class="edu-form">
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="class-id">Class ID</label>
+                <input type="text" id="class-id" class="edu-form-input" placeholder="e.g., CL001" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="class-name">Class Name</label>
+                <input type="text" id="class-name" class="edu-form-input" placeholder="e.g., Class 10" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="section">Section</label>
+                <input type="text" id="section" class="edu-form-input" placeholder="e.g., A" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="center">Center</label>
+                <select id="center" class="edu-form-input" required>
+                    <?php foreach ($data['centers'] as $center): ?>
+                        <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-actions">
+                <button type="submit" class="edu-button edu-button-primary">Add Class</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'classes', 'demo-action' => 'manage-classes'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </div>
+            <div class="edu-form-message" id="form-message"></div>
+        </form>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#add-class-form').on('submit', function(e) {
+                e.preventDefault();
+                const classId = $('#class-id').val().trim();
+                const className = $('#class-name').val().trim();
+                const section = $('#section').val().trim();
+                const center = $('#center').val();
+                if (classId && className && section && center) {
+                    // Simulate adding class
+                    $('#form-message').removeClass('edu-error').addClass('edu-success').text('Class added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'classes', 'demo-action' => 'manage-classes'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#form-message').removeClass('edu-success').addClass('edu-error').text('Please fill all fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminSubjects() {
+    // Hardcoded data for subjects
+    $subjects = [
+        ['subject_id' => 'SUB001', 'name' => 'Mathematics', 'class' => 'Class 10', 'center' => 'Main Campus'],
+        ['subject_id' => 'SUB002', 'name' => 'Science', 'class' => 'Class 10', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Subjects Management</h2>
+        <div class="alert alert-info">Manage subjects below.</div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="subjects-search" placeholder="Search Subjects...">
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subjects', 'demo-action' => 'add-subject'])); ?>" class="btn btn-primary">Add Subject</a>
+            </div>
+        </div>
+        <table class="table" id="superadmin-subjects">
+            <thead>
+                <tr>
+                    <th>Subject ID</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($subjects as $subject): ?>
+                    <tr>
+                        <td><?php echo esc_html($subject['subject_id']); ?></td>
+                        <td><?php echo esc_html($subject['name']); ?></td>
+                        <td><?php echo esc_html($subject['class']); ?></td>
+                        <td><?php echo esc_html($subject['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subjects', 'demo-action' => 'edit-subject'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subjects', 'demo-action' => 'delete-subject'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminAddSubject($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Subject</h2>
+        <form id="add-subject-form" class="edu-form">
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="subject-id">Subject ID</label>
+                <input type="text" id="subject-id" class="edu-form-input" placeholder="e.g., SUB001" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="subject-name">Subject Name</label>
+                <input type="text" id="subject-name" class="edu-form-input" placeholder="e.g., Mathematics" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="class">Class</label>
+                <select id="class" class="edu-form-input" required>
+                    <?php foreach ($data['classes'] as $class): ?>
+                        <option value="<?php echo esc_attr($class['name']); ?>"><?php echo esc_html($class['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="center">Center</label>
+                <select id="center" class="edu-form-input" required>
+                    <?php foreach ($data['centers'] as $center): ?>
+                        <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-actions">
+                <button type="submit" class="edu-button edu-button-primary">Add Subject</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subjects', 'demo-action' => 'manage-subjects'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </div>
+            <div class="edu-form-message" id="form-message"></div>
+        </form>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#add-subject-form').on('submit', function(e) {
+                e.preventDefault();
+                const subjectId = $('#subject-id').val().trim();
+                const subjectName = $('#subject-name').val().trim();
+                const className = $('#class').val();
+                const center = $('#center').val();
+                if (subjectId && subjectName && className && center) {
+                    $('#form-message').removeClass('edu-error').addClass('edu-success').text('Subject added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subjects', 'demo-action' => 'manage-subjects'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#form-message').removeClass('edu-success').addClass('edu-error').text('Please fill all fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminHomeworks() {
+    // Hardcoded data for homeworks
+    $homeworks = [
+        ['homework_id' => 'HW001', 'title' => 'Algebra Practice', 'subject' => 'Mathematics', 'class' => 'Class 10', 'due_date' => '2025-04-20', 'center' => 'Main Campus'],
+        ['homework_id' => 'HW002', 'title' => 'Physics Lab Report', 'subject' => 'Science', 'class' => 'Class 10', 'due_date' => '2025-04-22', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Homeworks Management</h2>
+        <div class="alert alert-info">Manage homeworks below.</div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="homeworks-search" placeholder="Search Homeworks...">
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'homeworks', 'demo-action' => 'add-homework'])); ?>" class="btn btn-primary">Add Homework</a>
+            </div>
+        </div>
+        <table class="table" id="superadmin-homeworks">
+            <thead>
+                <tr>
+                    <th>Homework ID</th>
+                    <th>Title</th>
+                    <th>Subject</th>
+                    <th>Class</th>
+                    <th>Due Date</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($homeworks as $homework): ?>
+                    <tr>
+                        <td><?php echo esc_html($homework['homework_id']); ?></td>
+                        <td><?php echo esc_html($homework['title']); ?></td>
+                        <td><?php echo esc_html($homework['subject']); ?></td>
+                        <td><?php echo esc_html($homework['class']); ?></td>
+                        <td><?php echo esc_html($homework['due_date']); ?></td>
+                        <td><?php echo esc_html($homework['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'homeworks', 'demo-action' => 'edit-homework'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'homeworks', 'demo-action' => 'delete-homework'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminAddHomework($data = []) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Homework</h2>
+        <form id="add-homework-form" class="edu-form">
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="homework-id">Homework ID</label>
+                <input type="text" id="homework-id" class="edu-form-input" placeholder="e.g., HW001" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="homework-title">Title</label>
+                <input type="text" id="homework-title" class="edu-form-input" placeholder="e.g., Algebra Practice" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="subject">Subject</label>
+                <select id="subject" class="edu-form-input" required>
+                    <?php foreach ($data['subjects'] as $subject): ?>
+                        <option value="<?php echo esc_attr($subject['name']); ?>"><?php echo esc_html($subject['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="class">Class</label>
+                <select id="class" class="edu-form-input" required>
+                    <?php foreach ($data['classes'] as $class): ?>
+                        <option value="<?php echo esc_attr($class['name']); ?>"><?php echo esc_html($class['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="due-date">Due Date</label>
+                <input type="date" id="due-date" class="edu-form-input" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="center">Center</label>
+                <select id="center" class="edu-form-input" required>
+                    <?php foreach ($data['centers'] as $center): ?>
+                        <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-actions">
+                <button type="submit" class="edu-button edu-button-primary">Add Homework</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'homeworks', 'demo-action' => 'manage-homeworks'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </div>
+            <div class="edu-form-message" id="form-message"></div>
+        </form>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#add-homework-form').on('submit', function(e) {
+                e.preventDefault();
+                const homeworkId = $('#homework-id').val().trim();
+                const title = $('#homework-title').val().trim();
+                const subject = $('#subject').val();
+                const className = $('#class').val();
+                const dueDate = $('#due-date').val();
+                const center = $('#center').val();
+                if (homeworkId && title && subject && className && dueDate && center) {
+                    $('#form-message').removeClass('edu-error').addClass('edu-success').text('Homework added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'homeworks', 'demo-action' => 'manage-homeworks'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#form-message').removeClass('edu-success').addClass('edu-error').text('Please fill all fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminEditClass() {
+    // Hardcoded data for classes
+    $classes = [
+        ['class_id' => 'CL001', 'name' => 'Class 10', 'section' => 'A', 'center' => 'Main Campus'],
+        ['class_id' => 'CL002', 'name' => 'Class 10', 'section' => 'B', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Class</h2>
+        <div class="alert alert-info">Select a class to edit from the list below.</div>
+        <table class="table" id="superadmin-classes">
+            <thead>
+                <tr>
+                    <th>Class ID</th>
+                    <th>Name</th>
+                    <th>Section</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($classes as $class): ?>
+                    <tr>
+                        <td><?php echo esc_html($class['class_id']); ?></td>
+                        <td><?php echo esc_html($class['name']); ?></td>
+                        <td><?php echo esc_html($class['section']); ?></td>
+                        <td><?php echo esc_html($class['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'classes', 'demo-action' => 'manage-classes'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'classes', 'demo-action' => 'delete-class'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminDeleteClass() {
+    // Hardcoded data for classes
+    $classes = [
+        ['class_id' => 'CL001', 'name' => 'Class 10', 'section' => 'A', 'center' => 'Main Campus'],
+        ['class_id' => 'CL002', 'name' => 'Class 10', 'section' => 'B', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Class</h2>
+        <div class="alert alert-warning">Click "Delete" to remove a class.</div>
+        <table class="table" id="superadmin-classes">
+            <thead>
+                <tr>
+                    <th>Class ID</th>
+                    <th>Name</th>
+                    <th>Section</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($classes as $class): ?>
+                    <tr>
+                        <td><?php echo esc_html($class['class_id']); ?></td>
+                        <td><?php echo esc_html($class['name']); ?></td>
+                        <td><?php echo esc_html($class['section']); ?></td>
+                        <td><?php echo esc_html($class['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'classes', 'demo-action' => 'manage-classes'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminEditSubject() {
+    // Hardcoded data for subjects
+    $subjects = [
+        ['subject_id' => 'SUB001', 'name' => 'Mathematics', 'class' => 'Class 10', 'center' => 'Main Campus'],
+        ['subject_id' => 'SUB002', 'name' => 'Science', 'class' => 'Class 10', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Subject</h2>
+        <div class="alert alert-info">Select a subject to edit from the list below.</div>
+        <table class="table" id="superadmin-subjects">
+            <thead>
+                <tr>
+                    <th>Subject ID</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($subjects as $subject): ?>
+                    <tr>
+                        <td><?php echo esc_html($subject['subject_id']); ?></td>
+                        <td><?php echo esc_html($subject['name']); ?></td>
+                        <td><?php echo esc_html($subject['class']); ?></td>
+                        <td><?php echo esc_html($subject['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subjects', 'demo-action' => 'manage-subjects'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subjects', 'demo-action' => 'delete-subject'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminDeleteSubject() {
+    // Hardcoded data for subjects
+    $subjects = [
+        ['subject_id' => 'SUB001', 'name' => 'Mathematics', 'class' => 'Class 10', 'center' => 'Main Campus'],
+        ['subject_id' => 'SUB002', 'name' => 'Science', 'class' => 'Class 10', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Subject</h2>
+        <div class="alert alert-warning">Click "Delete" to remove a subject.</div>
+        <table class="table" id="superadmin-subjects">
+            <thead>
+                <tr>
+                    <th>Subject ID</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($subjects as $subject): ?>
+                    <tr>
+                        <td><?php echo esc_html($subject['subject_id']); ?></td>
+                        <td><?php echo esc_html($subject['name']); ?></td>
+                        <td><?php echo esc_html($subject['class']); ?></td>
+                        <td><?php echo esc_html($subject['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subjects', 'demo-action' => 'manage-subjects'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminEditHomework() {
+    // Hardcoded data for homeworks
+    $homeworks = [
+        ['homework_id' => 'HW001', 'title' => 'Algebra Practice', 'subject' => 'Mathematics', 'class' => 'Class 10', 'due_date' => '2025-04-20', 'center' => 'Main Campus'],
+        ['homework_id' => 'HW002', 'title' => 'Physics Lab Report', 'subject' => 'Science', 'class' => 'Class 10', 'due_date' => '2025-04-22', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Homework</h2>
+        <div class="alert alert-info">Select a homework to edit from the list below.</div>
+        <table class="table" id="superadmin-homeworks">
+            <thead>
+                <tr>
+                    <th>Homework ID</th>
+                    <th>Title</th>
+                    <th>Subject</th>
+                    <th>Class</th>
+                    <th>Due Date</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($homeworks as $homework): ?>
+                    <tr>
+                        <td><?php echo esc_html($homework['homework_id']); ?></td>
+                        <td><?php echo esc_html($homework['title']); ?></td>
+                        <td><?php echo esc_html($homework['subject']); ?></td>
+                        <td><?php echo esc_html($homework['class']); ?></td>
+                        <td><?php echo esc_html($homework['due_date']); ?></td>
+                        <td><?php echo esc_html($homework['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'homeworks', 'demo-action' => 'manage-homeworks'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'homeworks', 'demo-action' => 'delete-homework'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminDeleteHomework() {
+    // Hardcoded data for homeworks
+    $homeworks = [
+        ['homework_id' => 'HW001', 'title' => 'Algebra Practice', 'subject' => 'Mathematics', 'class' => 'Class 10', 'due_date' => '2025-04-20', 'center' => 'Main Campus'],
+        ['homework_id' => 'HW002', 'title' => 'Physics Lab Report', 'subject' => 'Science', 'class' => 'Class 10', 'due_date' => '2025-04-22', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Homework</h2>
+        <div class="alert alert-warning">Click "Delete" to remove a homework.</div>
+        <table class="table" id="superadmin-homeworks">
+            <thead>
+                <tr>
+                    <th>Homework ID</th>
+                    <th>Title</th>
+                    <th>Subject</th>
+                    <th>Class</th>
+                    <th>Due Date</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($homeworks as $homework): ?>
+                    <tr>
+                        <td><?php echo esc_html($homework['homework_id']); ?></td>
+                        <td><?php echo esc_html($homework['title']); ?></td>
+                        <td><?php echo esc_html($homework['subject']); ?></td>
+                        <td><?php echo esc_html($homework['class']); ?></td>
+                        <td><?php echo esc_html($homework['due_date']); ?></td>
+                        <td><?php echo esc_html($homework['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'homeworks', 'demo-action' => 'manage-homeworks'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminTimetable() {
+    // Hardcoded data for timetable
+    $timetable = [
+        ['timetable_id' => 'TT001', 'class' => 'Class 10', 'subject' => 'Mathematics', 'day' => 'Monday', 'time' => '09:00-10:00', 'center' => 'Main Campus'],
+        ['timetable_id' => 'TT002', 'class' => 'Class 10', 'subject' => 'Science', 'day' => 'Tuesday', 'time' => '10:00-11:00', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Timetable Management</h2>
+        <div class="alert alert-info">Manage timetable below.</div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="timetable-search" placeholder="Search Timetable...">
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'timetable', 'demo-action' => 'add-timetable'])); ?>" class="btn btn-primary">Add Timetable</a>
+            </div>
+        </div>
+        <table class="table" id="superadmin-timetable">
+            <thead>
+                <tr>
+                    <th>Timetable ID</th>
+                    <th>Class</th>
+                    <th>Subject</th>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($timetable as $entry): ?>
+                    <tr>
+                        <td><?php echo esc_html($entry['timetable_id']); ?></td>
+                        <td><?php echo esc_html($entry['class']); ?></td>
+                        <td><?php echo esc_html($entry['subject']); ?></td>
+                        <td><?php echo esc_html($entry['day']); ?></td>
+                        <td><?php echo esc_html($entry['time']); ?></td>
+                        <td><?php echo esc_html($entry['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'timetable', 'demo-action' => 'edit-timetable'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'timetable', 'demo-action' => 'delete-timetable'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminAddTimetable() {
+    // Hardcoded options for classes, subjects, centers
+    $classes = [
+        ['name' => 'Class 10'],
+        ['name' => 'Class 11'],
+    ];
+    $subjects = [
+        ['name' => 'Mathematics'],
+        ['name' => 'Science'],
+    ];
+    $centers = [
+        ['name' => 'Main Campus'],
+        ['name' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Timetable</h2>
+        <form id="add-timetable-form" class="edu-form">
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="timetable-id">Timetable ID</label>
+                <input type="text" id="timetable-id" class="edu-form-input" placeholder="e.g., TT001" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="class">Class</label>
+                <select id="class" class="edu-form-input" required>
+                    <?php foreach ($classes as $class): ?>
+                        <option value="<?php echo esc_attr($class['name']); ?>"><?php echo esc_html($class['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="subject">Subject</label>
+                <select id="subject" class="edu-form-input" required>
+                    <?php foreach ($subjects as $subject): ?>
+                        <option value="<?php echo esc_attr($subject['name']); ?>"><?php echo esc_html($subject['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="day">Day</label>
+                <select id="day" class="edu-form-input" required>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                </select>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="time">Time</label>
+                <input type="text" id="time" class="edu-form-input" placeholder="e.g., 09:00-10:00" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="center">Center</label>
+                <select id="center" class="edu-form-input" required>
+                    <?php foreach ($centers as $center): ?>
+                        <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-actions">
+                <button type="submit" class="edu-button edu-button-primary">Add Timetable</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'timetable', 'demo-action' => 'manage-timetable'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </div>
+            <div class="edu-form-message" id="form-message"></div>
+        </form>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#add-timetable-form').on('submit', function(e) {
+                e.preventDefault();
+                const timetableId = $('#timetable-id').val().trim();
+                const className = $('#class').val();
+                const subject = $('#subject').val();
+                const day = $('#day').val();
+                const time = $('#time').val().trim();
+                const center = $('#center').val();
+                if (timetableId && className && subject && day && time && center) {
+                    $('#form-message').removeClass('edu-error').addClass('edu-success').text('Timetable added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'timetable', 'demo-action' => 'manage-timetable'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#form-message').removeClass('edu-success').addClass('edu-error').text('Please fill all fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminEditTimetable() {
+    // Hardcoded data for timetable
+    $timetable = [
+        ['timetable_id' => 'TT001', 'class' => 'Class 10', 'subject' => 'Mathematics', 'day' => 'Monday', 'time' => '09:00-10:00', 'center' => 'Main Campus'],
+        ['timetable_id' => 'TT002', 'class' => 'Class 10', 'subject' => 'Science', 'day' => 'Tuesday', 'time' => '10:00-11:00', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Timetable</h2>
+        <div class="alert alert-info">Select a timetable entry to edit from the list below.</div>
+        <table class="table" id="superadmin-timetable">
+            <thead>
+                <tr>
+                    <th>Timetable ID</th>
+                    <th>Class</th>
+                    <th>Subject</th>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($timetable as $entry): ?>
+                    <tr>
+                        <td><?php echo esc_html($entry['timetable_id']); ?></td>
+                        <td><?php echo esc_html($entry['class']); ?></td>
+                        <td><?php echo esc_html($entry['subject']); ?></td>
+                        <td><?php echo esc_html($entry['day']); ?></td>
+                        <td><?php echo esc_html($entry['time']); ?></td>
+                        <td><?php echo esc_html($entry['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'timetable', 'demo-action' => 'manage-timetable'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'timetable', 'demo-action' => 'delete-timetable'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminDeleteTimetable() {
+    // Hardcoded data for timetable
+    $timetable = [
+        ['timetable_id' => 'TT001', 'class' => 'Class 10', 'subject' => 'Mathematics', 'day' => 'Monday', 'time' => '09:00-10:00', 'center' => 'Main Campus'],
+        ['timetable_id' => 'TT002', 'class' => 'Class 10', 'subject' => 'Science', 'day' => 'Tuesday', 'time' => '10:00-11:00', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Timetable</h2>
+        <div class="alert alert-warning">Click "Delete" to remove a timetable entry.</div>
+        <table class="table" id="superadmin-timetable">
+            <thead>
+                <tr>
+                    <th>Timetable ID</th>
+                    <th>Class</th>
+                    <th>Subject</th>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($timetable as $entry): ?>
+                    <tr>
+                        <td><?php echo esc_html($entry['timetable_id']); ?></td>
+                        <td><?php echo esc_html($entry['class']); ?></td>
+                        <td><?php echo esc_html($entry['subject']); ?></td>
+                        <td><?php echo esc_html($entry['day']); ?></td>
+                        <td><?php echo esc_html($entry['time']); ?></td>
+                        <td><?php echo esc_html($entry['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'timetable', 'demo-action' => 'manage-timetable'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminDepartments() {
+    // Hardcoded data for departments
+    $departments = [
+        ['department_id' => 'DEP001', 'name' => 'Mathematics', 'head' => 'Dr. John Smith', 'center' => 'Main Campus'],
+        ['department_id' => 'DEP002', 'name' => 'Science', 'head' => 'Prof. Jane Doe', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Departments Management</h2>
+        <div class="alert alert-info">Manage departments below.</div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="departments-search" placeholder="Search Departments...">
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'departments', 'demo-action' => 'add-department'])); ?>" class="btn btn-primary">Add Department</a>
+            </div>
+        </div>
+        <table class="table" id="superadmin-departments">
+            <thead>
+                <tr>
+                    <th>Department ID</th>
+                    <th>Name</th>
+                    <th>Head</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($departments as $department): ?>
+                    <tr>
+                        <td><?php echo esc_html($department['department_id']); ?></td>
+                        <td><?php echo esc_html($department['name']); ?></td>
+                        <td><?php echo esc_html($department['head']); ?></td>
+                        <td><?php echo esc_html($department['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'departments', 'demo-action' => 'edit-department'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'departments', 'demo-action' => 'delete-department'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminAddDepartment() {
+    // Hardcoded options for centers
+    $centers = [
+        ['name' => 'Main Campus'],
+        ['name' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Department</h2>
+        <form id="add-department-form" class="edu-form">
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="department-id">Department ID</label>
+                <input type="text" id="department-id" class="edu-form-input" placeholder="e.g., DEP001" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="department-name">Department Name</label>
+                <input type="text" id="department-name" class="edu-form-input" placeholder="e.g., Mathematics" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="head">Head of Department</label>
+                <input type="text" id="head" class="edu-form-input" placeholder="e.g., Dr. John Smith" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="center">Center</label>
+                <select id="center" class="edu-form-input" required>
+                    <?php foreach ($centers as $center): ?>
+                        <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-actions">
+                <button type="submit" class="edu-button edu-button-primary">Add Department</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'departments', 'demo-action' => 'manage-departments'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </div>
+            <div class="edu-form-message" id="form-message"></div>
+        </form>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#add-department-form').on('submit', function(e) {
+                e.preventDefault();
+                const departmentId = $('#department-id').val().trim();
+                const departmentName = $('#department-name').val().trim();
+                const head = $('#head').val().trim();
+                const center = $('#center').val();
+                if (departmentId && departmentName && head && center) {
+                    $('#form-message').removeClass('edu-error').addClass('edu-success').text('Department added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'departments', 'demo-action' => 'manage-departments'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#form-message').removeClass('edu-success').addClass('edu-error').text('Please fill all fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminEditDepartment() {
+    // Hardcoded data for departments
+    $departments = [
+        ['department_id' => 'DEP001', 'name' => 'Mathematics', 'head' => 'Dr. John Smith', 'center' => 'Main Campus'],
+        ['department_id' => 'DEP002', 'name' => 'Science', 'head' => 'Prof. Jane Doe', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Department</h2>
+        <div class="alert alert-info">Select a department to edit from the list below.</div>
+        <table class="table" id="superadmin-departments">
+            <thead>
+                <tr>
+                    <th>Department ID</th>
+                    <th>Name</th>
+                    <th>Head</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($departments as $department): ?>
+                    <tr>
+                        <td><?php echo esc_html($department['department_id']); ?></td>
+                        <td><?php echo esc_html($department['name']); ?></td>
+                        <td><?php echo esc_html($department['head']); ?></td>
+                        <td><?php echo esc_html($department['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'departments', 'demo-action' => 'manage-departments'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'departments', 'demo-action' => 'delete-department'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminDeleteDepartment() {
+    // Hardcoded data for departments
+    $departments = [
+        ['department_id' => 'DEP001', 'name' => 'Mathematics', 'head' => 'Dr. John Smith', 'center' => 'Main Campus'],
+        ['department_id' => 'DEP002', 'name' => 'Science', 'head' => 'Prof. Jane Doe', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Department</h2>
+        <div class="alert alert-warning">Click "Delete" to remove a department.</div>
+        <table class="table" id="superadmin-departments">
+            <thead>
+                <tr>
+                    <th>Department ID</th>
+                    <th>Name</th>
+                    <th>Head</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($departments as $department): ?>
+                    <tr>
+                        <td><?php echo esc_html($department['department_id']); ?></td>
+                        <td><?php echo esc_html($department['name']); ?></td>
+                        <td><?php echo esc_html($department['head']); ?></td>
+                        <td><?php echo esc_html($department['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'departments', 'demo-action' => 'manage-departments'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminLibrary() {
+    // Hardcoded data for library
+    $library = [
+        ['book_id' => 'BK001', 'title' => 'Calculus', 'author' => 'James Stewart', 'status' => 'Available', 'center' => 'Main Campus'],
+        ['book_id' => 'BK002', 'title' => 'Physics', 'author' => 'David Halliday', 'status' => 'Borrowed', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Library Management</h2>
+        <div class="alert alert-info">Manage library books below.</div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="library-search" placeholder="Search Library...">
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library', 'demo-action' => 'add-book'])); ?>" class="btn btn-primary">Add Book</a>
+            </div>
+        </div>
+        <table class="table" id="superadmin-library">
+            <thead>
+                <tr>
+                    <th>Book ID</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Status</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($library as $book): ?>
+                    <tr>
+                        <td><?php echo esc_html($book['book_id']); ?></td>
+                        <td><?php echo esc_html($book['title']); ?></td>
+                        <td><?php echo esc_html($book['author']); ?></td>
+                        <td><?php echo esc_html($book['status']); ?></td>
+                        <td><?php echo esc_html($book['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library', 'demo-action' => 'edit-book'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library', 'demo-action' => 'delete-book'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminAddBook() {
+    // Hardcoded options for centers
+    $centers = [
+        ['name' => 'Main Campus'],
+        ['name' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Book</h2>
+        <form id="add-book-form" class="edu-form">
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="book-id">Book ID</label>
+                <input type="text" id="book-id" class="edu-form-input" placeholder="e.g., BK001" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="book-title">Title</label>
+                <input type="text" id="book-title" class="edu-form-input" placeholder="e.g., Calculus" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="author">Author</label>
+                <input type="text" id="author" class="edu-form-input" placeholder="e.g., James Stewart" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="status">Status</label>
+                <select id="status" class="edu-form-input" required>
+                    <option value="Available">Available</option>
+                    <option value="Borrowed">Borrowed</option>
+                </select>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="center">Center</label>
+                <select id="center" class="edu-form-input" required>
+                    <?php foreach ($centers as $center): ?>
+                        <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-actions">
+                <button type="submit" class="edu-button edu-button-primary">Add Book</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library', 'demo-action' => 'manage-library'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </div>
+            <div class="edu-form-message" id="form-message"></div>
+        </form>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#add-book-form').on('submit', function(e) {
+                e.preventDefault();
+                const bookId = $('#book-id').val().trim();
+                const title = $('#book-title').val().trim();
+                const author = $('#author').val().trim();
+                const status = $('#status').val();
+                const center = $('#center').val();
+                if (bookId && title && author && status && center) {
+                    $('#form-message').removeClass('edu-error').addClass('edu-success').text('Book added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library', 'demo-action' => 'manage-library'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#form-message').removeClass('edu-success').addClass('edu-error').text('Please fill all fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+} 
+function demoRenderSuperadminEditBook() {
+    // Hardcoded data for library
+    $library = [
+        ['book_id' => 'BK001', 'title' => 'Calculus', 'author' => 'James Stewart', 'status' => 'Available', 'center' => 'Main Campus'],
+        ['book_id' => 'BK002', 'title' => 'Physics', 'author' => 'David Halliday', 'status' => 'Borrowed', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Book</h2>
+        <div class="alert alert-info">Select a book to edit from the list below.</div>
+        <table class="table" id="superadmin-library">
+            <thead>
+                <tr>
+                    <th>Book ID</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Status</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($library as $book): ?>
+                    <tr>
+                        <td><?php echo esc_html($book['book_id']); ?></td>
+                        <td><?php echo esc_html($book['title']); ?></td>
+                        <td><?php echo esc_html($book['author']); ?></td>
+                        <td><?php echo esc_html($book['status']); ?></td>
+                        <td><?php echo esc_html($book['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library', 'demo-action' => 'manage-library'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library', 'demo-action' => 'delete-book'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminDeleteBook() {
+    // Hardcoded data for library
+    $library = [
+        ['book_id' => 'BK001', 'title' => 'Calculus', 'author' => 'James Stewart', 'status' => 'Available', 'center' => 'Main Campus'],
+        ['book_id' => 'BK002', 'title' => 'Physics', 'author' => 'David Halliday', 'status' => 'Borrowed', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Book</h2>
+        <div class="alert alert-warning">Click "Delete" to remove a book.</div>
+        <table class="table" id="superadmin-library">
+            <thead>
+                <tr>
+                    <th>Book ID</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Status</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($library as $book): ?>
+                    <tr>
+                        <td><?php echo esc_html($book['book_id']); ?></td>
+                        <td><?php echo esc_html($book['title']); ?></td>
+                        <td><?php echo esc_html($book['author']); ?></td>
+                        <td><?php echo esc_html($book['status']); ?></td>
+                        <td><?php echo esc_html($book['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library', 'demo-action' => 'manage-library'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminInventory() {
+    // Hardcoded data for inventory
+    $inventory = [
+        ['item_id' => 'INV001', 'name' => 'Projector', 'quantity' => 10, 'category' => 'Electronics', 'center' => 'Main Campus'],
+        ['item_id' => 'INV002', 'name' => 'Lab Equipment', 'quantity' => 5, 'category' => 'Science', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Inventory Management</h2>
+        <div class="alert alert-info">Manage inventory items below.</div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="inventory-search" placeholder="Search Inventory...">
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory', 'demo-action' => 'add-item'])); ?>" class="btn btn-primary">Add Item</a>
+            </div>
+        </div>
+        <table class="table" id="superadmin-inventory">
+            <thead>
+                <tr>
+                    <th>Item ID</th>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Category</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($inventory as $item): ?>
+                    <tr>
+                        <td><?php echo esc_html($item['item_id']); ?></td>
+                        <td><?php echo esc_html($item['name']); ?></td>
+                        <td><?php echo esc_html($item['quantity']); ?></td>
+                        <td><?php echo esc_html($item['category']); ?></td>
+                        <td><?php echo esc_html($item['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory', 'demo-action' => 'edit-item'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory', 'demo-action' => 'delete-item'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminAddItem() {
+    // Hardcoded options for centers
+    $centers = [
+        ['name' => 'Main Campus'],
+        ['name' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Inventory Item</h2>
+        <form id="add-item-form" class="edu-form">
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="item-id">Item ID</label>
+                <input type="text" id="item-id" class="edu-form-input" placeholder="e.g., INV001" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="item-name">Item Name</label>
+                <input type="text" id="item-name" class="edu-form-input" placeholder="e.g., Projector" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="quantity">Quantity</label>
+                <input type="number" id="quantity" class="edu-form-input" placeholder="e.g., 10" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="category">Category</label>
+                <input type="text" id="category" class="edu-form-input" placeholder="e.g., Electronics" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="center">Center</label>
+                <select id="center" class="edu-form-input" required>
+                    <?php foreach ($centers as $center): ?>
+                        <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-actions">
+                <button type="submit" class="edu-button edu-button-primary">Add Item</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory', 'demo-action' => 'manage-inventory'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </div>
+            <div class="edu-form-message" id="form-message"></div>
+        </form>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#add-item-form').on('submit', function(e) {
+                e.preventDefault();
+                const itemId = $('#item-id').val().trim();
+                const itemName = $('#item-name').val().trim();
+                const quantity = $('#quantity').val();
+                const category = $('#category').val().trim();
+                const center = $('#center').val();
+                if (itemId && itemName && quantity && category && center) {
+                    $('#form-message').removeClass('edu-error').addClass('edu-success').text('Item added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory', 'demo-action' => 'manage-inventory'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#form-message').removeClass('edu-success').addClass('edu-error').text('Please fill all fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminEditItem() {
+    // Hardcoded data for inventory
+    $inventory = [
+        ['item_id' => 'INV001', 'name' => 'Projector', 'quantity' => 10, 'category' => 'Electronics', 'center' => 'Main Campus'],
+        ['item_id' => 'INV002', 'name' => 'Lab Equipment', 'quantity' => 5, 'category' => 'Science', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Inventory Item</h2>
+        <div class="alert alert-info">Select an item to edit from the list below.</div>
+        <table class="table" id="superadmin-inventory">
+            <thead>
+                <tr>
+                    <th>Item ID</th>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Category</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($inventory as $item): ?>
+                    <tr>
+                        <td><?php echo esc_html($item['item_id']); ?></td>
+                        <td><?php echo esc_html($item['name']); ?></td>
+                        <td><?php echo esc_html($item['quantity']); ?></td>
+                        <td><?php echo esc_html($item['category']); ?></td>
+                        <td><?php echo esc_html($item['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory', 'demo-action' => 'manage-inventory'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory', 'demo-action' => 'delete-item'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminDeleteItem() {
+    // Hardcoded data for inventory
+    $inventory = [
+        ['item_id' => 'INV001', 'name' => 'Projector', 'quantity' => 10, 'category' => 'Electronics', 'center' => 'Main Campus'],
+        ['item_id' => 'INV002', 'name' => 'Lab Equipment', 'quantity' => 5, 'category' => 'Science', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Inventory Item</h2>
+        <div class="alert alert-warning">Click "Delete" to remove an item.</div>
+        <table class="table" id="superadmin-inventory">
+            <thead>
+                <tr>
+                    <th>Item ID</th>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Category</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($inventory as $item): ?>
+                    <tr>
+                        <td><?php echo esc_html($item['item_id']); ?></td>
+                        <td><?php echo esc_html($item['name']); ?></td>
+                        <td><?php echo esc_html($item['quantity']); ?></td>
+                        <td><?php echo esc_html($item['category']); ?></td>
+                        <td><?php echo esc_html($item['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory', 'demo-action' => 'manage-inventory'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminLibraryTransactions() {
+    // Hardcoded data for library transactions
+    $library_transactions = [
+        ['transaction_id' => 'LT001', 'book_id' => 'BK001', 'student_id' => 'ST001', 'issue_date' => '2025-04-10', 'return_date' => '2025-04-17', 'status' => 'Issued', 'center' => 'Main Campus'],
+        ['transaction_id' => 'LT002', 'book_id' => 'BK002', 'student_id' => 'ST002', 'issue_date' => '2025-04-11', 'return_date' => '', 'status' => 'Returned', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Library Transactions Management</h2>
+        <div class="alert alert-info">Manage library transactions below.</div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="library-transactions-search" placeholder="Search Library Transactions...">
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library-transactions', 'demo-action' => 'add-transaction'])); ?>" class="btn btn-primary">Add Transaction</a>
+            </div>
+        </div>
+        <table class="table" id="superadmin-library-transactions">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Book ID</th>
+                    <th>Student ID</th>
+                    <th>Issue Date</th>
+                    <th>Return Date</th>
+                    <th>Status</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($library_transactions as $transaction): ?>
+                    <tr>
+                        <td><?php echo esc_html($transaction['transaction_id']); ?></td>
+                        <td><?php echo esc_html($transaction['book_id']); ?></td>
+                        <td><?php echo esc_html($transaction['student_id']); ?></td>
+                        <td><?php echo esc_html($transaction['issue_date']); ?></td>
+                        <td><?php echo esc_html($transaction['return_date']); ?></td>
+                        <td><?php echo esc_html($transaction['status']); ?></td>
+                        <td><?php echo esc_html($transaction['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library-transactions', 'demo-action' => 'edit-transaction'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library-transactions', 'demo-action' => 'delete-transaction'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminAddLibraryTransaction() {
+    // Hardcoded options for books, students, centers
+    $books = [
+        ['book_id' => 'BK001', 'title' => 'Calculus'],
+        ['book_id' => 'BK002', 'title' => 'Physics'],
+    ];
+    $students = [
+        ['student_id' => 'ST001', 'name' => 'John Doe'],
+        ['student_id' => 'ST002', 'name' => 'Jane Smith'],
+    ];
+    $centers = [
+        ['name' => 'Main Campus'],
+        ['name' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Library Transaction</h2>
+        <form id="add-library-transaction-form" class="edu-form">
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="transaction-id">Transaction ID</label>
+                <input type="text" id="transaction-id" class="edu-form-input" placeholder="e.g., LT001" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="book-id">Book</label>
+                <select id="book-id" class="edu-form-input" required>
+                    <?php foreach ($books as $book): ?>
+                        <option value="<?php echo esc_attr($book['book_id']); ?>"><?php echo esc_html($book['book_id'] . ' - ' . $book['title']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="student-id">Student</label>
+                <select id="student-id" class="edu-form-input" required>
+                    <?php foreach ($students as $student): ?>
+                        <option value="<?php echo esc_attr($student['student_id']); ?>"><?php echo esc_html($student['student_id'] . ' - ' . $student['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="issue-date">Issue Date</label>
+                <input type="date" id="issue-date" class="edu-form-input" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="return-date">Return Date</label>
+                <input type="date" id="return-date" class="edu-form-input">
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="status">Status</label>
+                <select id="status" class="edu-form-input" required>
+                    <option value="Issued">Issued</option>
+                    <option value="Returned">Returned</option>
+                </select>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="center">Center</label>
+                <select id="center" class="edu-form-input" required>
+                    <?php foreach ($centers as $center): ?>
+                        <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-actions">
+                <button type="submit" class="edu-button edu-button-primary">Add Transaction</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library-transactions', 'demo-action' => 'manage-library-transactions'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </div>
+            <div class="edu-form-message" id="form-message"></div>
+        </form>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#add-library-transaction-form').on('submit', function(e) {
+                e.preventDefault();
+                const transactionId = $('#transaction-id').val().trim();
+                const bookId = $('#book-id').val();
+                const studentId = $('#student-id').val();
+                const issueDate = $('#issue-date').val();
+                const status = $('#status').val();
+                const center = $('#center').val();
+                if (transactionId && bookId && studentId && issueDate && status && center) {
+                    $('#form-message').removeClass('edu-error').addClass('edu-success').text('Transaction added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library-transactions', 'demo-action' => 'manage-library-transactions'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#form-message').removeClass('edu-success').addClass('edu-error').text('Please fill all fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminEditLibraryTransaction() {
+    // Hardcoded data for library transactions
+    $library_transactions = [
+        ['transaction_id' => 'LT001', 'book_id' => 'BK001', 'student_id' => 'ST001', 'issue_date' => '2025-04-10', 'return_date' => '2025-04-17', 'status' => 'Issued', 'center' => 'Main Campus'],
+        ['transaction_id' => 'LT002', 'book_id' => 'BK002', 'student_id' => 'ST002', 'issue_date' => '2025-04-11', 'return_date' => '', 'status' => 'Returned', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Library Transaction</h2>
+        <div class="alert alert-info">Select a transaction to edit from the list below.</div>
+        <table class="table" id="superadmin-library-transactions">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Book ID</th>
+                    <th>Student ID</th>
+                    <th>Issue Date</th>
+                    <th>Return Date</th>
+                    <th>Status</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($library_transactions as $transaction): ?>
+                    <tr>
+                        <td><?php echo esc_html($transaction['transaction_id']); ?></td>
+                        <td><?php echo esc_html($transaction['book_id']); ?></td>
+                        <td><?php echo esc_html($transaction['student_id']); ?></td>
+                        <td><?php echo esc_html($transaction['issue_date']); ?></td>
+                        <td><?php echo esc_html($transaction['return_date']); ?></td>
+                        <td><?php echo esc_html($transaction['status']); ?></td>
+                        <td><?php echo esc_html($transaction['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library-transactions', 'demo-action' => 'manage-library-transactions'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library-transactions', 'demo-action' => 'delete-transaction'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminDeleteLibraryTransaction() {
+    // Hardcoded data for library transactions
+    $library_transactions = [
+        ['transaction_id' => 'LT001', 'book_id' => 'BK001', 'student_id' => 'ST001', 'issue_date' => '2025-04-10', 'return_date' => '2025-04-17', 'status' => 'Issued', 'center' => 'Main Campus'],
+        ['transaction_id' => 'LT002', 'book_id' => 'BK002', 'student_id' => 'ST002', 'issue_date' => '2025-04-11', 'return_date' => '', 'status' => 'Returned', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Library Transaction</h2>
+        <div class="alert alert-warning">Click "Delete" to remove a transaction.</div>
+        <table class="table" id="superadmin-library-transactions">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Book ID</th>
+                    <th>Student ID</th>
+                    <th>Issue Date</th>
+                    <th>Return Date</th>
+                    <th>Status</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($library_transactions as $transaction): ?>
+                    <tr>
+                        <td><?php echo esc_html($transaction['transaction_id']); ?></td>
+                        <td><?php echo esc_html($transaction['book_id']); ?></td>
+                        <td><?php echo esc_html($transaction['student_id']); ?></td>
+                        <td><?php echo esc_html($transaction['issue_date']); ?></td>
+                        <td><?php echo esc_html($transaction['return_date']); ?></td>
+                        <td><?php echo esc_html($transaction['status']); ?></td>
+                        <td><?php echo esc_html($transaction['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'library-transactions', 'demo-action' => 'manage-library-transactions'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminInventoryTransactions() {
+    // Hardcoded data for inventory transactions
+    $inventory_transactions = [
+        ['transaction_id' => 'IT001', 'item_id' => 'INV001', 'type' => 'Issue', 'quantity' => 2, 'date' => '2025-04-10', 'center' => 'Main Campus'],
+        ['transaction_id' => 'IT002', 'item_id' => 'INV002', 'type' => 'Return', 'quantity' => 1, 'date' => '2025-04-11', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Inventory Transactions Management</h2>
+        <div class="alert alert-info">Manage inventory transactions below.</div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="inventory-transactions-search" placeholder="Search Inventory Transactions...">
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory-transactions', 'demo-action' => 'add-transaction'])); ?>" class="btn btn-primary">Add Transaction</a>
+            </div>
+        </div>
+        <table class="table" id="superadmin-inventory-transactions">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Item ID</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>Date</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($inventory_transactions as $transaction): ?>
+                    <tr>
+                        <td><?php echo esc_html($transaction['transaction_id']); ?></td>
+                        <td><?php echo esc_html($transaction['item_id']); ?></td>
+                        <td><?php echo esc_html($transaction['type']); ?></td>
+                        <td><?php echo esc_html($transaction['quantity']); ?></td>
+                        <td><?php echo esc_html($transaction['date']); ?></td>
+                        <td><?php echo esc_html($transaction['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory-transactions', 'demo-action' => 'edit-transaction'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory-transactions', 'demo-action' => 'delete-transaction'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminAddInventoryTransaction() {
+    // Hardcoded options for items, centers
+    $items = [
+        ['item_id' => 'INV001', 'name' => 'Projector'],
+        ['item_id' => 'INV002', 'name' => 'Lab Equipment'],
+    ];
+    $centers = [
+        ['name' => 'Main Campus'],
+        ['name' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Inventory Transaction</h2>
+        <form id="add-inventory-transaction-form" class="edu-form">
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="transaction-id">Transaction ID</label>
+                <input type="text" id="transaction-id" class="edu-form-input" placeholder="e.g., IT001" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="item-id">Item</label>
+                <select id="item-id" class="edu-form-input" required>
+                    <?php foreach ($items as $item): ?>
+                        <option value="<?php echo esc_attr($item['item_id']); ?>"><?php echo esc_html($item['item_id'] . ' - ' . $item['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="type">Type</label>
+                <select id="type" class="edu-form-input" required>
+                    <option value="Issue">Issue</option>
+                    <option value="Return">Return</option>
+                </select>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="quantity">Quantity</label>
+                <input type="number" id="quantity" class="edu-form-input" placeholder="e.g., 2" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="date">Date</label>
+                <input type="date" id="date" class="edu-form-input" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="center">Center</label>
+                <select id="center" class="edu-form-input" required>
+                    <?php foreach ($centers as $center): ?>
+                        <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-actions">
+                <button type="submit" class="edu-button edu-button-primary">Add Transaction</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory-transactions', 'demo-action' => 'manage-inventory-transactions'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </div>
+            <div class="edu-form-message" id="form-message"></div>
+        </form>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#add-inventory-transaction-form').on('submit', function(e) {
+                e.preventDefault();
+                const transactionId = $('#transaction-id').val().trim();
+                const itemId = $('#item-id').val();
+                const type = $('#type').val();
+                const quantity = $('#quantity').val();
+                const date = $('#date').val();
+                const center = $('#center').val();
+                if (transactionId && itemId && type && quantity && date && center) {
+                    $('#form-message').removeClass('edu-error').addClass('edu-success').text('Transaction added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory-transactions', 'demo-action' => 'manage-inventory-transactions'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#form-message').removeClass('edu-success').addClass('edu-error').text('Please fill all fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminEditInventoryTransaction() {
+    // Hardcoded data for inventory transactions
+    $inventory_transactions = [
+        ['transaction_id' => 'IT001', 'item_id' => 'INV001', 'type' => 'Issue', 'quantity' => 2, 'date' => '2025-04-10', 'center' => 'Main Campus'],
+        ['transaction_id' => 'IT002', 'item_id' => 'INV002', 'type' => 'Return', 'quantity' => 1, 'date' => '2025-04-11', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Inventory Transaction</h2>
+        <div class="alert alert-info">Select a transaction to edit from the list below.</div>
+        <table class="table" id="superadmin-inventory-transactions">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Item ID</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>Date</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($inventory_transactions as $transaction): ?>
+                    <tr>
+                        <td><?php echo esc_html($transaction['transaction_id']); ?></td>
+                        <td><?php echo esc_html($transaction['item_id']); ?></td>
+                        <td><?php echo esc_html($transaction['type']); ?></td>
+                        <td><?php echo esc_html($transaction['quantity']); ?></td>
+                        <td><?php echo esc_html($transaction['date']); ?></td>
+                        <td><?php echo esc_html($transaction['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory-transactions', 'demo-action' => 'manage-inventory-transactions'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'inventory-transactions', 'demo-action' => 'delete-transaction'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminDeleteInventoryTransaction() {
+    // Hardcoded data for inventory transactions
+    $inventory_transactions = [
+        ['transaction_id' => 'IT001', 'item_id' => 'INV001', 'type' => 'Issue', 'quantity' => 2, 'date' => '2025-04-10', 'center' => 'Main Campus'],
+        ['transaction_id' => 'IT002', 'item_id' => 'INV002', 'type' => 'Return', 'quantity' => 1, 'date' => '2025-04-11', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Inventory Transaction</h2>
+        <div class="alert alert-warning">Click "Delete" to remove a transaction.</div>
+        <table class="table" id="superadmin-inventory-transactions">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Item ID</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>Date</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($inventory_transactions as $transaction): ?>
+                    <tr>
+                        <td><?php echo esc_html($transaction['transaction_id']); ?></td>
+                        <td><?php echo esc_html($transaction['item_id']); ?></td>
+                        <td><?php echo esc_html($transaction['type']); ?></td>
+                        <td><?php echo esc_html($transaction['quantity']); ?></td>
+                        <td><?php echo esc_html($transaction['date']); ?></td>
+                        <td><?php echo esc_html($transaction['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg([
+                                'demo-role' => 'superadmin',
+                                'demo-section' => 'inventory-transactions',
+                                'demo-action' => 'manage-inventory-transactions'
+                            ])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderSuperadminNoticeboard() {
+    // Hardcoded data for noticeboard
+    $notices = [
+        ['notice_id' => 'NT001', 'title' => 'School Closure', 'content' => 'School will be closed on April 15.', 'posted_date' => '2025-04-10', 'center' => 'Main Campus'],
+        ['notice_id' => 'NT002', 'title' => 'Exam Schedule', 'content' => 'Exams start on April 20.', 'posted_date' => '2025-04-11', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Noticeboard Management</h2>
+        <div class="alert alert-info">Manage notices below.</div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="noticeboard-search" placeholder="Search Notices...">
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'noticeboard', 'demo-action' => 'add-notice'])); ?>" class="btn btn-primary">Add Notice</a>
+            </div>
+        </div>
+        <table class="table" id="superadmin-noticeboard">
+            <thead>
+                <tr>
+                    <th>Notice ID</th>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Posted Date</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($notices as $notice): ?>
+                    <tr>
+                        <td><?php echo esc_html($notice['notice_id']); ?></td>
+                        <td><?php echo esc_html($notice['title']); ?></td>
+                        <td><?php echo esc_html($notice['content']); ?></td>
+                        <td><?php echo esc_html($notice['posted_date']); ?></td>
+                        <td><?php echo esc_html($notice['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'noticeboard', 'demo-action' => 'edit-notice'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'noticeboard', 'demo-action' => 'delete-notice'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminAddNotice() {
+    // Hardcoded options for centers
+    $centers = [
+        ['name' => 'Main Campus'],
+        ['name' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Notice</h2>
+        <form id="add-notice-form" class="edu-form">
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="notice-id">Notice ID</label>
+                <input type="text" id="notice-id" class="edu-form-input" placeholder="e.g., NT001" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="notice-title">Title</label>
+                <input type="text" id="notice-title" class="edu-form-input" placeholder="e.g., School Closure" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="content">Content</label>
+                <textarea id="content" class="edu-form-input" placeholder="e.g., School will be closed on April 15." required></textarea>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="posted-date">Posted Date</label>
+                <input type="date" id="posted-date" class="edu-form-input" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="center">Center</label>
+                <select id="center" class="edu-form-input" required>
+                    <?php foreach ($centers as $center): ?>
+                        <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-actions">
+                <button type="submit" class="edu-button edu-button-primary">Add Notice</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'noticeboard', 'demo-action' => 'manage-noticeboard'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </div>
+            <div class="edu-form-message" id="form-message"></div>
+        </form>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#add-notice-form').on('submit', function(e) {
+                e.preventDefault();
+                const noticeId = $('#notice-id').val().trim();
+                const title = $('#notice-title').val().trim();
+                const content = $('#content').val().trim();
+                const postedDate = $('#posted-date').val();
+                const center = $('#center').val();
+                if (noticeId && title && content && postedDate && center) {
+                    $('#form-message').removeClass('edu-error').addClass('edu-success').text('Notice added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'noticeboard', 'demo-action' => 'manage-noticeboard'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#form-message').removeClass('edu-success').addClass('edu-error').text('Please fill all fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminEditNotice() {
+    // Hardcoded data for noticeboard
+    $notices = [
+        ['notice_id' => 'NT001', 'title' => 'School Closure', 'content' => 'School will be closed on April 15.', 'posted_date' => '2025-04-10', 'center' => 'Main Campus'],
+        ['notice_id' => 'NT002', 'title' => 'Exam Schedule', 'content' => 'Exams start on April 20.', 'posted_date' => '2025-04-11', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Notice</h2>
+        <div class="alert alert-info">Select a notice to edit from the list below.</div>
+        <table class="table" id="superadmin-noticeboard">
+            <thead>
+                <tr>
+                    <th>Notice ID</th>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Posted Date</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($notices as $notice): ?>
+                    <tr>
+                        <td><?php echo esc_html($notice['notice_id']); ?></td>
+                        <td><?php echo esc_html($notice['title']); ?></td>
+                        <td><?php echo esc_html($notice['content']); ?></td>
+                        <td><?php echo esc_html($notice['posted_date']); ?></td>
+                        <td><?php echo esc_html($notice['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'noticeboard', 'demo-action' => 'manage-noticeboard'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'noticeboard', 'demo-action' => 'delete-notice'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminDeleteNotice() {
+    // Hardcoded data for noticeboard
+    $notices = [
+        ['notice_id' => 'NT001', 'title' => 'School Closure', 'content' => 'School will be closed on April 15.', 'posted_date' => '2025-04-10', 'center' => 'Main Campus'],
+        ['notice_id' => 'NT002', 'title' => 'Exam Schedule', 'content' => 'Exams start on April 20.', 'posted_date' => '2025-04-11', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Notice</h2>
+        <div class="alert alert-warning">Click "Delete" to remove a notice.</div>
+        <table class="table" id="superadmin-noticeboard">
+            <thead>
+                <tr>
+                    <th>Notice ID</th>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Posted Date</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($notices as $notice): ?>
+                    <tr>
+                        <td><?php echo esc_html($notice['notice_id']); ?></td>
+                        <td><?php echo esc_html($notice['title']); ?></td>
+                        <td><?php echo esc_html($notice['content']); ?></td>
+                        <td><?php echo esc_html($notice['posted_date']); ?></td>
+                        <td><?php echo esc_html($notice['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'noticeboard', 'demo-action' => 'manage-noticeboard'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminAnnouncements() {
+    // Hardcoded data for announcements
+    $announcements = [
+        ['announcement_id' => 'AN001', 'title' => 'Annual Day', 'content' => 'Annual Day on April 25.', 'posted_date' => '2025-04-10', 'center' => 'Main Campus'],
+        ['announcement_id' => 'AN002', 'title' => 'Sports Meet', 'content' => 'Sports Meet on April 30.', 'posted_date' => '2025-04-11', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Announcements Management</h2>
+        <div class="alert alert-info">Manage announcements below.</div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="announcements-search" placeholder="Search Announcements...">
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'add-announcement'])); ?>" class="btn btn-primary">Add Announcement</a>
+            </div>
+        </div>
+        <table class="table" id="superadmin-announcements">
+            <thead>
+                <tr>
+                    <th>Announcement ID</th>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Posted Date</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($announcements as $announcement): ?>
+                    <tr>
+                        <td><?php echo esc_html($announcement['announcement_id']); ?></td>
+                        <td><?php echo esc_html($announcement['title']); ?></td>
+                        <td><?php echo esc_html($announcement['content']); ?></td>
+                        <td><?php echo esc_html($announcement['posted_date']); ?></td>
+                        <td><?php echo esc_html($announcement['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'edit-announcement'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'delete-announcement'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminAddAnnouncement() {
+    // Hardcoded options for centers
+    $centers = [
+        ['name' => 'Main Campus'],
+        ['name' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Announcement</h2>
+        <form id="add-announcement-form" class="edu-form">
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="announcement-id">Announcement ID</label>
+                <input type="text" id="announcement-id" class="edu-form-input" placeholder="e.g., AN001" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="announcement-title">Title</label>
+                <input type="text" id="announcement-title" class="edu-form-input" placeholder="e.g., Annual Day" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="content">Content</label>
+                <textarea id="content" class="edu-form-input" placeholder="e.g., Annual Day on April 25." required></textarea>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="posted-date">Posted Date</label>
+                <input type="date" id="posted-date" class="edu-form-input" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="center">Center</label>
+                <select id="center" class="edu-form-input" required>
+                    <?php foreach ($centers as $center): ?>
+                        <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-actions">
+                <button type="submit" class="edu-button edu-button-primary">Add Announcement</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'manage-announcements'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </div>
+            <div class="edu-form-message" id="form-message"></div>
+        </form>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#add-announcement-form').on('submit', function(e) {
+                e.preventDefault();
+                const announcementId = $('#announcement-id').val().trim();
+                const title = $('#announcement-title').val().trim();
+                const content = $('#content').val().trim();
+                const postedDate = $('#posted-date').val();
+                const center = $('#center').val();
+                if (announcementId && title && content && postedDate && center) {
+                    $('#form-message').removeClass('edu-error').addClass('edu-success').text('Announcement added successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'manage-announcements'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#form-message').removeClass('edu-success').addClass('edu-error').text('Please fill all fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminEditAnnouncement() {
+    // Hardcoded data for announcements
+    $announcements = [
+        ['announcement_id' => 'AN001', 'title' => 'Annual Day', 'content' => 'Annual Day on April 25.', 'posted_date' => '2025-04-10', 'center' => 'Main Campus'],
+        ['announcement_id' => 'AN002', 'title' => 'Sports Meet', 'content' => 'Sports Meet on April 30.', 'posted_date' => '2025-04-11', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Announcement</h2>
+        <div class="alert alert-info">Select an announcement to edit from the list below.</div>
+        <table class="table" id="superadmin-announcements">
+            <thead>
+                <tr>
+                    <th>Announcement ID</th>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Posted Date</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($announcements as $announcement): ?>
+                    <tr>
+                        <td><?php echo esc_html($announcement['announcement_id']); ?></td>
+                        <td><?php echo esc_html($announcement['title']); ?></td>
+                        <td><?php echo esc_html($announcement['content']); ?></td>
+                        <td><?php echo esc_html($announcement['posted_date']); ?></td>
+                        <td><?php echo esc_html($announcement['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'manage-announcements'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'delete-announcement'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminDeleteAnnouncement() {
+    // Hardcoded data for announcements
+    $announcements = [
+        ['announcement_id' => 'AN001', 'title' => 'Annual Day', 'content' => 'Annual Day on April 25.', 'posted_date' => '2025-04-10', 'center' => 'Main Campus'],
+        ['announcement_id' => 'AN002', 'title' => 'Sports Meet', 'content' => 'Sports Meet on April 30.', 'posted_date' => '2025-04-11', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Announcement</h2>
+        <div class="alert alert-warning">Click "Delete" to remove an announcement.</div>
+        <table class="table" id="superadmin-announcements">
+            <thead>
+                <tr>
+                    <th>Announcement ID</th>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Posted Date</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($announcements as $announcement): ?>
+                    <tr>
+                        <td><?php echo esc_html($announcement['announcement_id']); ?></td>
+                        <td><?php echo esc_html($announcement['title']); ?></td>
+                        <td><?php echo esc_html($announcement['content']); ?></td>
+                        <td><?php echo esc_html($announcement['posted_date']); ?></td>
+                        <td><?php echo esc_html($announcement['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'manage-announcements'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminDeleteConversation() {
+    // Hardcoded data for conversations
+    $conversations = [
+        ['conversation_id' => 'CV001', 'recipient' => 'John Doe (Teacher)', 'last_message' => 'Meeting at 3 PM', 'timestamp' => '2025-04-12 14:30', 'center' => 'Main Campus'],
+        ['conversation_id' => 'CV002', 'recipient' => 'Jane Smith (Student)', 'last_message' => 'Assignment submitted', 'timestamp' => '2025-04-12 10:15', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Conversation</h2>
+        <div class="alert alert-warning">Click "Delete" to remove a conversation.</div>
+        <table class="table" id="superadmin-conversations">
+            <thead>
+                <tr>
+                    <th>Conversation ID</th>
+                    <th>Recipient</th>
+                    <th>Last Message</th>
+                    <th>Timestamp</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($conversations as $conv): ?>
+                    <tr>
+                        <td><?php echo esc_html($conv['conversation_id']); ?></td>
+                        <td><?php echo esc_html($conv['recipient']); ?></td>
+                        <td><?php echo esc_html($conv['last_message']); ?></td>
+                        <td><?php echo esc_html($conv['timestamp']); ?></td>
+                        <td><?php echo esc_html($conv['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'manage-messages'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminEditConversation() {
+    // Hardcoded data for conversations
+    $conversations = [
+        ['conversation_id' => 'CV001', 'recipient' => 'John Doe (Teacher)', 'last_message' => 'Meeting at 3 PM', 'timestamp' => '2025-04-12 14:30', 'center' => 'Main Campus'],
+        ['conversation_id' => 'CV002', 'recipient' => 'Jane Smith (Student)', 'last_message' => 'Assignment submitted', 'timestamp' => '2025-04-12 10:15', 'center' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Conversation</h2>
+        <div class="alert alert-info">Select a conversation to edit from the list below.</div>
+        <table class="table" id="superadmin-conversations">
+            <thead>
+                <tr>
+                    <th>Conversation ID</th>
+                    <th>Recipient</th>
+                    <th>Last Message</th>
+                    <th>Timestamp</th>
+                    <th>Center</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($conversations as $conv): ?>
+                    <tr>
+                        <td><?php echo esc_html($conv['conversation_id']); ?></td>
+                        <td><?php echo esc_html($conv['recipient']); ?></td>
+                        <td><?php echo esc_html($conv['last_message']); ?></td>
+                        <td><?php echo esc_html($conv['timestamp']); ?></td>
+                        <td><?php echo esc_html($conv['center']); ?></td>
+                        <td>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'manage-messages'])); ?>" class="btn btn-warning">Edit</a>
+                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'delete-conversation'])); ?>" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminAddConversation() {
+    // Hardcoded options for recipients, centers
+    $recipients = [
+        ['id' => 'TC001', 'name' => 'John Doe (Teacher)'],
+        ['id' => 'ST001', 'name' => 'Jane Smith (Student)'],
+    ];
+    $centers = [
+        ['name' => 'Main Campus'],
+        ['name' => 'West Campus'],
+    ];
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Conversation</h2>
+        <form id="add-conversation-form" class="edu-form">
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="conversation-id">Conversation ID</label>
+                <input type="text" id="conversation-id" class="edu-form-input" placeholder="e.g., CV001" required>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="recipient">Recipient</label>
+                <select id="recipient" class="edu-form-input" required>
+                    <?php foreach ($recipients as $recipient): ?>
+                        <option value="<?php echo esc_attr($recipient['id']); ?>"><?php echo esc_html($recipient['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="initial-message">Initial Message</label>
+                <textarea id="initial-message" class="edu-form-input" placeholder="Type your message..." required></textarea>
+            </div>
+            <div class="edu-form-group">
+                <label class="edu-form-label" for="center">Center</label>
+                <select id="center" class="edu-form-input" required>
+                    <?php foreach ($centers as $center): ?>
+                        <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="edu-form-actions">
+                <button type="submit" class="edu-button edu-button-primary">Start Conversation</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'manage-messages'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+            </div>
+            <div class="edu-form-message" id="form-message"></div>
+        </form>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#add-conversation-form').on('submit', function(e) {
+                e.preventDefault();
+                const conversationId = $('#conversation-id').val().trim();
+                const recipient = $('#recipient').val();
+                const initialMessage = $('#initial-message').val().trim();
+                const center = $('#center').val();
+                if (conversationId && recipient && initialMessage && center) {
+                    $('#form-message').removeClass('edu-error').addClass('edu-success').text('Conversation started successfully!');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'manage-messages'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#form-message').removeClass('edu-success').addClass('edu-error').text('Please fill all fields.');
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminMessages() {
+    // Hardcoded data for conversations
+    $conversations = [
+        ['conversation_id' => 'CV001', 'recipient' => 'John Doe (Teacher)', 'last_message' => 'Meeting at 3 PM', 'timestamp' => '2025-04-12 14:30', 'center' => 'Main Campus'],
+        ['conversation_id' => 'CV002', 'recipient' => 'Jane Smith (Student)', 'last_message' => 'Assignment submitted', 'timestamp' => '2025-04-12 10:15', 'center' => 'West Campus'],
+    ];
+    // Hardcoded data for messages in selected conversation (default to CV001)
+    $messages = [
+        ['message_id' => 'MSG001', 'conversation_id' => 'CV001', 'sender_id' => 'SA001', 'content' => 'Hi John, can we discuss the schedule?', 'timestamp' => '2025-04-12 14:00', 'status' => 'sent'],
+        ['message_id' => 'MSG002', 'conversation_id' => 'CV001', 'sender_id' => 'TC001', 'content' => 'Sure, how about 3 PM?', 'timestamp' => '2025-04-12 14:30', 'status' => 'received'],
+    ];
+    ob_start();
+    ?>
+    <div class="chat-container">
+        <div class="chat-wrapper">
+            <div class="chat-sidebar">
+                <div class="sidebar-header">
+                    <h4>Conversations</h4>
+                    <input type="text" id="conversation-search" class="form-control" placeholder="Search conversations...">
+                </div>
+                <ul class="conversation-list">
+                    <?php foreach ($conversations as $index => $conv): ?>
+                        <li class="conversation-item <?php echo $index === 0 ? 'active' : ''; ?>" data-conversation-id="<?php echo esc_attr($conv['conversation_id']); ?>">
+                            <strong><?php echo esc_html($conv['recipient']); ?></strong>
+                            <p><?php echo esc_html($conv['last_message']); ?></p>
+                            <small><?php echo esc_html($conv['timestamp']); ?></small>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <div class="chat-main">
+                <div class="chat-header">
+                    <h4><?php echo esc_html($conversations[0]['recipient']); ?></h4>
+                </div>
+                <div class="chat-messages">
+                    <?php foreach ($messages as $msg): ?>
+                        <div class="chat-message <?php echo $msg['status']; ?>">
+                            <div class="bubble"><?php echo esc_html($msg['content']); ?></div>
+                            <div class="meta"><?php echo esc_html($msg['timestamp']); ?></div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <form class="chat-form" id="send-message-form">
+                    <div class="recipient-select">
+                        <textarea class="form-control" rows="2" placeholder="Type a message..." required></textarea>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-12 text-end">
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'add-conversation'])); ?>" class="btn btn-primary">New Conversation</a>
+            </div>
+        </div>
+    </div>
+    <script>
+    jQuery(document).ready(function($) {
+        // Simulate conversation selection (static, no AJAX)
+        $('.conversation-item').on('click', function() {
+            $('.conversation-item').removeClass('active');
+            $(this).addClass('active');
+            // In a real app, update chat-messages via AJAX; here, it's static
+        });
+        // Handle message sending
+        $('#send-message-form').on('submit', function(e) {
+            e.preventDefault();
+            const message = $(this).find('textarea').val().trim();
+            if (message) {
+                // Simulate message send
+                alert('Message sent: ' + message);
+                $(this).find('textarea').val('');
+                // Redirect to manage-messages (no real storage)
+                window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'manage-messages'])); ?>';
+            }
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+
+
+
+
+
 
 
 
@@ -7395,7 +10181,7 @@ function demoGetTeacherData() {
 }
 
 function demoGetSuperadminData() {
-    return [
+    $data = [
         'centers' => [
             ['id' => 1, 'name' => 'Main Campus'],
             ['id' => 2, 'name' => 'West Campus'],
@@ -7414,11 +10200,11 @@ function demoGetSuperadminData() {
         ],
         'student_attendance' => [
             ['student_id' => 'ST1001', 'student_name' => 'John Doe', 'education_center_id' => 'CA001', 'class' => '10A', 'section' => 'A', 'date' => '2025-04-10', 'status' => 'Present', 'subject' => 'Math', 'teacher_id' => 'TR1001'],
-            ['student_id' => 'ST1002', 'student_name' => 'Jane Smith', 'education_center_id' => 'CB001', 'class' => '10B', 'section' => 'B', 'date' => '2025-04-10', 'status' => 'Absent', 'subject' => 'Science', 'teacher_id' => 'TR1002']
+            ['student_id' => 'ST1002', 'student_name' => 'Jane Smith', 'education_center_id' => 'CB001', 'class' => '10B', 'section' => 'B', 'date' => '2025-04-10', 'status' => 'Absent', 'subject' => 'Science', 'teacher_id' => 'TR1002'],
         ],
         'teacher_attendance' => [
             ['teacher_id' => 'TR1001', 'teacher_name' => 'Alice Brown', 'education_center_id' => 'CA001', 'department' => 'Math', 'date' => '2025-04-10', 'status' => 'Present'],
-            ['teacher_id' => 'TR1002', 'teacher_name' => 'Bob Wilson', 'education_center_id' => 'CB001', 'department' => 'Science', 'date' => '2025-04-10', 'status' => 'Late']
+            ['teacher_id' => 'TR1002', 'teacher_name' => 'Bob Wilson', 'education_center_id' => 'CB001', 'department' => 'Science', 'date' => '2025-04-10', 'status' => 'Late'],
         ],
         'staff_attendance' => [
             ['staff_id' => 'ST001', 'staff_name' => 'Carol Lee', 'education_center_id' => 'CA001', 'role' => 'Admin', 'date' => '2025-04-10', 'status' => 'Present'],
@@ -7445,7 +10231,20 @@ function demoGetSuperadminData() {
             ['id' => 1, 'title' => 'Math Midterm', 'date' => '2025-05-01', 'center' => 'Main Campus'],
             ['id' => 2, 'title' => 'Science Final', 'date' => '2025-06-01', 'center' => 'West Campus'],
         ],
+        'classes' => [
+            ['class_id' => 'CL001', 'name' => 'Class 10', 'section' => 'A', 'center' => 'Main Campus'],
+            ['class_id' => 'CL002', 'name' => 'Class 10', 'section' => 'B', 'center' => 'West Campus'],
+        ],
+        'subjects' => [
+            ['subject_id' => 'SUB001', 'name' => 'Mathematics', 'class' => 'Class 10', 'center' => 'Main Campus'],
+            ['subject_id' => 'SUB002', 'name' => 'Science', 'class' => 'Class 10', 'center' => 'West Campus'],
+        ],
+        'homeworks' => [
+            ['homework_id' => 'HW001', 'title' => 'Algebra Practice', 'subject' => 'Mathematics', 'class' => 'Class 10', 'due_date' => '2025-04-20', 'center' => 'Main Campus'],
+            ['homework_id' => 'HW002', 'title' => 'Physics Lab Report', 'subject' => 'Science', 'class' => 'Class 10', 'due_date' => '2025-04-22', 'center' => 'West Campus'],
+        ],
     ];
+    return $data;
 }
 function demoGetStudentData() {
     return [
