@@ -15,9 +15,6 @@ add_action('wp_enqueue_scripts', 'aspire_demo_enqueue_scripts');
 /**
  * Dashboard Shortcode
  */
-/**
- * Dashboard Shortcode
- */
 function aspire_demo_dashboard_shortcode() {
     $role = isset($_GET['demo-role']) ? sanitize_text_field($_GET['demo-role']) : '';
     $section = isset($_GET['demo-section']) ? sanitize_text_field($_GET['demo-section']) : 'overview';
@@ -419,9 +416,6 @@ add_shortcode('demo-dashboard', 'aspire_demo_dashboard_shortcode');
 /**
  * Sidebar Function
  */
-/**
- * Sidebar Function
- */
 function demoRenderSidebar($role, $active_section) {
     $active_action = isset($_GET['demo-action']) ? sanitize_text_field($_GET['demo-action']) : '';
     $links = [
@@ -607,42 +601,12 @@ function demoRenderSidebar($role, $active_section) {
                 ['action' => 'edit-announcement', 'label' => 'Edit Announcement', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'edit-announcement']))],
                 ['action' => 'delete-announcement', 'label' => 'Delete Announcement', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'delete-announcement']))],
             ]],
-            ['section' => 'messages', 'label' => 'messages', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages'])), 'icon' => 'megaphone', 'submenu' => [
-                ['action' => 'manage-messages', 'label' => 'Manage messages', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'manage-messages']))],
-                ['action' => 'add-announcement', 'label' => 'Add Announcement', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'add-announcement']))],
-                ['action' => 'edit-announcement', 'label' => 'Edit Announcement', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'edit-announcement']))],
-                ['action' => 'delete-announcement', 'label' => 'Delete Announcement', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'delete-announcement']))],
+            ['section' => 'messages', 'label' => 'Messages', 'url' => esc_url(home_url() . '?demo-role=superadmin&demo-section=messages'), 'icon' => 'envelope', 'submenu' => [
+                ['action' => 'manage-messages', 'label' => 'Manage Messages', 'url' => esc_url(home_url() . '?demo-role=superadmin&demo-section=messages&demo-action=manage-messages')],
+                ['action' => 'add-message', 'label' => 'Add Message', 'url' => esc_url(home_url() . '?demo-role=superadmin&demo-section=messages&demo-action=add-message')],
+                ['action' => 'edit-message', 'label' => 'Edit Message', 'url' => esc_url(home_url() . '?demo-role=superadmin&demo-section=messages&demo-action=edit-message')],
+                ['action' => 'delete-message', 'label' => 'Delete Message', 'url' => esc_url(home_url() . '?demo-role=superadmin&demo-section=messages&demo-action=delete-message')],
             ]],
-
-
-            [
-                'section' => 'messages',
-                'label' => 'Messages',
-                'url' => esc_url(home_url() . '?demo-role=superadmin&demo-section=messages'), // Manually construct URL to avoid encoding
-                'icon' => 'envelope',
-                'submenu' => [
-                    [
-                        'action' => 'manage-messages',
-                        'label' => 'Manage Messages',
-                        'url' => esc_url(home_url() . '?demo-role=superadmin&demo-section=messages&demo-action=manage-messages')
-                    ],
-                    [
-                        'action' => 'add-message',
-                        'label' => 'Add Message',
-                        'url' => esc_url(home_url() . '?demo-role=superadmin&demo-section=messages&demo-action=add-message')
-                    ],
-                    [
-                        'action' => 'edit-message',
-                        'label' => 'Edit Message',
-                        'url' => esc_url(home_url() . '?demo-role=superadmin&demo-section=messages&demo-action=edit-message')
-                    ],
-                    [
-                        'action' => 'delete-message',
-                        'label' => 'Delete Message',
-                        'url' => esc_url(home_url() . '?demo-role=superadmin&demo-section=messages&demo-action=delete-message')
-                    ],
-                ]
-            ],
         ],
     ];
 
