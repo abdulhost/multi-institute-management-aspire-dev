@@ -613,6 +613,8 @@ function demoRenderSidebar($role, $active_section) {
                 ['action' => 'edit-announcement', 'label' => 'Edit Announcement', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'edit-announcement']))],
                 ['action' => 'delete-announcement', 'label' => 'Delete Announcement', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'delete-announcement']))],
             ]],
+
+
             [
                 'section' => 'messages',
                 'label' => 'Messages',
@@ -722,7 +724,7 @@ function demoRenderSidebar($role, $active_section) {
                             <?php elseif ($link['icon'] === 'money-check-alt'): ?>
                                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
                                     <path d="M8 6h8v2H8V6zm8 4H8v2h8v-2zm-8 4h5v2H8v-2zm12-8H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 13H4V8h16v11z"/>
-                                </svg>
+                            </svg>
                             <?php elseif ($link['icon'] === 'calendar-alt'): ?>
                                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
                                     <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
@@ -1644,7 +1646,6 @@ function demoRenderStudentExams($data) {
     <?php
     return ob_get_clean();
 }
-
 function demoRenderStudentAttendance($data) {
     ob_start();
     ?>
