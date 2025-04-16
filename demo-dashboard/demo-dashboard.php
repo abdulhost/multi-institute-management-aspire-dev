@@ -601,12 +601,34 @@ function demoRenderSidebar($role, $active_section) {
                 ['action' => 'edit-announcement', 'label' => 'Edit Announcement', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'edit-announcement']))],
                 ['action' => 'delete-announcement', 'label' => 'Delete Announcement', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'delete-announcement']))],
             ]],
-            ['section' => 'messages', 'label' => 'Messages', 'url' => esc_url(home_url() . '?demo-role=superadmin&demo-section=messages'), 'icon' => 'envelope', 'submenu' => [
-                ['action' => 'manage-messages', 'label' => 'Manage Messages', 'url' => esc_url(home_url() . '?demo-role=superadmin&demo-section=messages&demo-action=manage-messages')],
-                ['action' => 'add-message', 'label' => 'Add Message', 'url' => esc_url(home_url() . '?demo-role=superadmin&demo-section=messages&demo-action=add-message')],
-                ['action' => 'edit-message', 'label' => 'Edit Message', 'url' => esc_url(home_url() . '?demo-role=superadmin&demo-section=messages&demo-action=edit-message')],
-                ['action' => 'delete-message', 'label' => 'Delete Message', 'url' => esc_url(home_url() . '?demo-role=superadmin&demo-section=messages&demo-action=delete-message')],
-            ]],
+            [
+                'section' => 'messages',
+                'label' => 'Messages',
+                'url' => 'http://your-site.com/?demo-role=superadmin&demo-section=messages', // Hardcoded for testing
+                'icon' => 'envelope',
+                'submenu' => [
+                    [
+                        'action' => 'manage-messages',
+                        'label' => 'Manage Messages',
+                        'url' => 'http://your-site.com/?demo-role=superadmin&demo-section=messages&demo-action=manage-messages'
+                    ],
+                    [
+                        'action' => 'add-conversation',
+                        'label' => 'Add Conversation',
+                        'url' => 'http://your-site.com/?demo-role=superadmin&demo-section=messages&demo-action=add-conversation'
+                    ],
+                    [
+                        'action' => 'edit-conversation',
+                        'label' => 'Edit Conversation',
+                        'url' => 'http://your-site.com/?demo-role=superadmin&demo-section=messages&demo-action=edit-conversation'
+                    ],
+                    [
+                        'action' => 'delete-conversation',
+                        'label' => 'Delete Conversation',
+                        'url' => 'http://your-site.com/?demo-role=superadmin&demo-section=messages&demo-action=delete-conversation'
+                    ],
+                ]
+            ],
         ],
     ];
 
