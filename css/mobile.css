@@ -1,19 +1,34 @@
 /* Mobile-specific styles (up to 767px) */
 @media screen and (max-width: 767px) {
-    /* General Layout */
-    .institute-dashboard-wrapper {
-        flex-direction: column;
-        min-height: auto;
+    /* Root Variables for Consistency */
+    :root {
+        --font-size-base: 14px;
+        --padding-base: 10px;
+        --border-radius: 4px;
     }
 
-    .main-content {
-        padding: 10px;
+    /* General Layout */
+    body {
+        font-size: var(--font-size-base);
+        line-height: 1.5;
+        overflow-x: hidden;
+    }
+
+    .institute-dashboard-wrapper, .edu-main-wrapper {
+        flex-direction: column;
+        padding: var(--padding-base);
+        margin-top: 60px;
+    }
+
+    .main-content, .edu-content-wrapper {
+        padding: var(--padding-base);
+        width: 100%;
     }
 
     .container, .institute-dashboard-container, .students-section, .classes-section {
-        padding: 10px;
-        margin-bottom: 10px;
-        border-radius: 4px;
+        padding: var(--padding-base);
+        margin-bottom: var(--padding-base);
+        border-radius: var(--border-radius);
     }
 
     /* Sidebar */
@@ -22,7 +37,6 @@
         height: auto;
         position: static;
         padding: 5px;
-        border-right: none;
         border-bottom: 1px solid var(--border-color);
     }
 
@@ -37,20 +51,30 @@
 
     #sidebar a, #sidebar .dropdown-btn {
         padding: 8px;
-        font-size: 14px;
+        font-size: var(--font-size-base);
     }
 
     #toggle-btn {
         display: block;
-        position: static;
         padding: 5px;
+    }
+
+    .sub-menu, .sub-sub-menu {
+        position: static;
+        width: 100%;
+        padding-left: 15px;
+        box-shadow: none;
     }
 
     /* Header */
     .header-container {
         flex-direction: column;
-        padding: 10px;
+        padding: var(--padding-base);
         height: auto;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1000;
     }
 
     .header-left, .header-right {
@@ -58,15 +82,11 @@
         justify-content: space-between;
     }
 
-    .header-nav {
+    .header-nav, .nav-links {
         display: none;
     }
 
-    .mobile-menu-toggle {
-        display: block;
-    }
-
-    .nav-toggle {
+    .mobile-menu-toggle, .nav-toggle {
         display: block;
     }
 
@@ -89,16 +109,12 @@
         padding: 1px 4px;
     }
 
-    .dropdown {
+    .dropdown, .profile-dropdown, .search-dropdown {
         width: 90%;
         left: 5%;
-        transform: none;
-        padding: 10px;
-    }
-
-    .profile-dropdown {
-        width: 90%;
-        right: 5%;
+        padding: var(--padding-base);
+        position: fixed;
+        top: 60px;
     }
 
     .search-input {
@@ -107,41 +123,48 @@
         font-size: 0.8rem !important;
     }
 
-    .search-dropdown {
-        width: 100%;
+    .results-list li {
+        padding: 8px;
+        font-size: var(--font-size-base);
+    }
+
+    .results-list a {
+        display: block;
+        color: var(--primary-color);
     }
 
     /* Forms */
-    .form-row {
+    .form-table, .form-row {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
     }
 
     .form-group-half, .form-group-full {
         max-width: 100%;
         flex: 1 1 100%;
+        margin-bottom: var(--padding-base);
     }
 
     .form-input, .form-select, input[type="text"], input[type="number"], input[type="email"], input[type="date"], input[type="password"], textarea {
         width: 100%;
         padding: 8px;
-        font-size: 14px;
+        font-size: var(--font-size-base);
+        border-radius: var(--border-radius);
     }
 
     .form-button, .submit-btn, .edu-button {
         width: 100%;
-        padding: 10px;
-        font-size: 14px;
+        padding: var(--padding-base);
+        font-size: var(--font-size-base);
     }
 
     label {
-        text-align: left;
-        font-size: 14px;
+        font-size: var(--font-size-base);
+        margin-bottom: 5px;
     }
 
     select {
         width: 100%;
-        margin: 5px 0;
     }
 
     /* Tables */
@@ -157,7 +180,7 @@
 
     .wp-list-table tr, .edu-table tr, .attendance-table tr, .timetable-table tr, .exams-table tr, .results-table tr {
         display: block;
-        margin-bottom: 10px;
+        margin-bottom: var(--padding-base);
         border-bottom: 1px solid var(--border-color);
     }
 
@@ -166,7 +189,6 @@
         text-align: left;
         padding: 8px;
         position: relative;
-        border: none;
     }
 
     .wp-list-table td:before, .edu-table td:before, .attendance-table td:before, .timetable-table td:before, .exams-table td:before, .results-table td:before {
@@ -178,23 +200,19 @@
     }
 
     /* Chat */
-    .chat-container {
-        height: auto;
-    }
-
-    .chat-wrapper {
+    .chat-container, .chat-wrapper {
         flex-direction: column;
         height: auto;
     }
 
     .chat-sidebar {
         width: 100%;
-        border-right: none;
         border-bottom: 1px solid var(--border-color);
     }
 
     .chat-main {
         flex: 1;
+        padding: var(--padding-base);
     }
 
     .chat-form textarea {
@@ -208,6 +226,7 @@
         max-width: 95%;
         padding: 15px;
         margin: 10% auto;
+        border-radius: var(--border-radius);
     }
 
     .edu-modal-close {
@@ -216,32 +235,87 @@
         right: 10px;
     }
 
-    /* Other Components */
+    /* Grids */
     .overview-grid, .profile-grid, .selection-grid, .snapshot-grid, .insights-grid, .stats-grid {
         grid-template-columns: 1fr;
+        gap: var(--padding-base);
     }
 
     .months-grid {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
 
-    .edu-main-wrapper {
-        padding: 20px 10px;
-        margin-top: 60px;
+    /* Additional Components */
+    .edu-card, .card {
+        padding: var(--padding-base);
+        margin-bottom: var(--padding-base);
+        border-radius: var(--border-radius);
     }
 
-    .edu-content-wrapper {
-        padding: 15px;
-        border-radius: 8px;
+    .edu-alert, .alert {
+        padding: var(--padding-base);
+        font-size: var(--font-size-base);
+        margin-bottom: var(--padding-base);
+    }
+
+    .pagination {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .pagination a, .pagination span {
+        padding: 6px 10px;
+        margin: 2px;
+        font-size: var(--font-size-base);
+    }
+
+    .tooltip {
+        display: none; /* Tooltips can be confusing on touch devices */
+    }
+
+    .accordion .accordion-item {
+        margin-bottom: var(--padding-base);
+    }
+
+    .accordion .accordion-header {
+        padding: 8px;
+        font-size: var(--font-size-base);
+    }
+
+    .accordion .accordion-content {
+        padding: 8px;
+        font-size: var(--font-size-base);
     }
 
     .edu-search-filters {
         grid-template-columns: 1fr;
+        gap: var(--padding-base);
     }
 
     .edu-actions {
         flex-direction: column;
-        align-items: stretch;
+        gap: 5px;
+    }
+
+    .edu-button-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .edu-button-group .edu-button {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    /* Library Section */
+    .library-section {
+        text-align: center;
+        padding: var(--padding-base);
+    }
+
+    .library-section .fa-book-open {
+        font-size: 24px;
+        margin-bottom: var(--padding-base);
     }
 
     /* Performance Optimizations */

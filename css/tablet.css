@@ -1,23 +1,34 @@
 /* Tablet-specific styles (768px to 991px) */
 @media screen and (min-width: 768px) and (max-width: 991px) {
+    /* Root Variables */
+    :root {
+        --font-size-base: 15px;
+        --padding-base: 15px;
+        --border-radius: 6px;
+    }
+
     /* General Layout */
+    body {
+        font-size: var(--font-size-base);
+    }
+
     .institute-dashboard-wrapper {
         flex-direction: row;
     }
 
-    .main-content {
-        padding: 15px;
+    .main-content, .edu-content-wrapper {
+        padding: var(--padding-base);
     }
 
     .container, .institute-dashboard-container, .students-section, .classes-section {
-        padding: 15px;
-        margin-bottom: 15px;
+        padding: var(--padding-base);
+        margin-bottom: var(--padding-base);
     }
 
     /* Sidebar */
     #sidebar {
         width: 200px;
-        padding: 10px;
+        padding: var(--padding-base);
         position: sticky;
         top: 60px;
         height: calc(100vh - 60px);
@@ -30,13 +41,21 @@
 
     #sidebar a, #sidebar .dropdown-btn {
         padding: 10px;
-        font-size: 14px;
+        font-size: var(--font-size-base);
+    }
+
+    .sub-menu, .sub-sub-menu {
+        position: absolute;
+        width: 180px;
+        padding: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
     /* Header */
     .header-container {
         flex-direction: row;
-        padding: 10px 15px;
+        padding: var(--padding-base);
+        height: 60px;
     }
 
     .header-left {
@@ -47,16 +66,12 @@
         flex: 0;
     }
 
-    .header-nav {
+    .header-nav, .nav-links {
         display: flex;
         gap: 8px;
     }
 
-    .mobile-menu-toggle {
-        display: none;
-    }
-
-    .nav-toggle {
+    .mobile-menu-toggle, .nav-toggle {
         display: none;
     }
 
@@ -74,12 +89,10 @@
         font-size: 1.2rem;
     }
 
-    .dropdown {
+    .dropdown, .profile-dropdown {
         width: 280px;
-    }
-
-    .profile-dropdown {
-        width: 280px;
+        position: absolute;
+        top: 60px;
     }
 
     .search-input {
@@ -88,8 +101,20 @@
         font-size: 0.9rem !important;
     }
 
+    .search-dropdown {
+        width: 280px;
+    }
+
+    .results-list li {
+        padding: 10px;
+    }
+
+    .results-list a:hover {
+        background: var(--hover-bg);
+    }
+
     /* Forms */
-    .form-row {
+    .form-table, .form-row {
         flex-direction: row;
         flex-wrap: wrap;
     }
@@ -105,22 +130,22 @@
 
     .form-input, .form-select, input[type="text"], input[type="number"], input[type="email"], input[type="date"], input[type="password"], textarea {
         padding: 10px;
-        font-size: 14px;
+        font-size: var(--font-size-base);
     }
 
     .form-button, .submit-btn, .edu-button {
         padding: 12px 20px;
-        font-size: 15px;
+        font-size: var(--font-size-base);
     }
 
     select {
         width: 100%;
-        margin: 5px 0;
     }
 
     /* Tables */
     .wp-list-table, .edu-table, .attendance-table, .timetable-table, .exams-table, .results-table {
         display: table;
+        width: 100%;
     }
 
     .wp-list-table thead, .edu-table thead, .attendance-table thead, .timetable-table thead, .exams-table thead, .results-table thead {
@@ -142,7 +167,7 @@
     }
 
     /* Chat */
-    .chat-wrapper {
+    .chat-container, .chat-wrapper {
         flex-direction: row;
     }
 
@@ -159,28 +184,78 @@
     .modal-content, .edu-modal-content {
         width: 80%;
         max-width: 600px;
-        padding: 20px;
+        padding: var(--padding-base);
     }
 
-    /* Other Components */
+    /* Grids */
     .overview-grid, .profile-grid, .selection-grid, .snapshot-grid, .insights-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: var(--padding-base);
     }
 
     .stats-grid {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     }
 
-    .edu-main-wrapper {
-        padding: 30px 15px;
+    .months-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
 
-    .edu-content-wrapper {
-        padding: 20px;
+    /* Additional Components */
+    .edu-card, .card {
+        padding: var(--padding-base);
+    }
+
+    .edu-alert, .alert {
+        padding: var(--padding-base);
+        font-size: var(--font-size-base);
+    }
+
+    .pagination {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .pagination a, .pagination span {
+        padding: 8px 12px;
+        margin: 4px;
+    }
+
+    .tooltip {
+        font-size: var(--font-size-base);
+        padding: 5px 10px;
+    }
+
+    .accordion .accordion-header {
+        padding: 10px;
+    }
+
+    .accordion .accordion-content {
+        padding: 10px;
     }
 
     .edu-search-filters {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .edu-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .edu-button-group {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .edu-button-group .edu-button {
+        width: auto;
+        margin-right: 8px;
+    }
+
+    .library-section .fa-book-open {
+        font-size: 28px;
     }
 
     /* Minimal Transitions */
