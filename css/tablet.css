@@ -1,22 +1,22 @@
-/* Laptop-specific styles (992px and above) */
-@media screen and (min-width: 992px) {
+/* Tablet-specific styles (768px to 991px) */
+@media screen and (min-width: 768px) and (max-width: 991px) {
     /* General Layout */
     .institute-dashboard-wrapper {
         flex-direction: row;
     }
 
     .main-content {
-        padding: 20px;
+        padding: 15px;
     }
 
     .container, .institute-dashboard-container, .students-section, .classes-section {
-        padding: 20px;
-        margin-bottom: 20px;
+        padding: 15px;
+        margin-bottom: 15px;
     }
 
     /* Sidebar */
     #sidebar {
-        width: 250px;
+        width: 200px;
         padding: 10px;
         position: sticky;
         top: 60px;
@@ -29,14 +29,14 @@
     }
 
     #sidebar a, #sidebar .dropdown-btn {
-        padding: 12px;
+        padding: 10px;
         font-size: 14px;
     }
 
     /* Header */
     .header-container {
         flex-direction: row;
-        padding: 10px 20px;
+        padding: 10px 15px;
     }
 
     .header-left {
@@ -49,7 +49,7 @@
 
     .header-nav {
         display: flex;
-        gap: 12px;
+        gap: 8px;
     }
 
     .mobile-menu-toggle {
@@ -61,40 +61,41 @@
     }
 
     .header-logo {
-        font-size: 1.6rem;
+        font-size: 1.2rem;
     }
 
     .logo-image {
-        width: 50px !important;
-        height: 50px !important;
+        width: 45px !important;
+        height: 45px !important;
     }
 
     .action-btn {
         padding: 8px;
-        font-size: 1.3rem;
+        font-size: 1.2rem;
     }
 
     .dropdown {
-        width: 300px;
+        width: 280px;
     }
 
     .profile-dropdown {
-        width: 300px;
+        width: 280px;
     }
 
     .search-input {
-        width: 250px;
+        width: 200px;
         padding: 6px !important;
-        font-size: 0.95rem !important;
+        font-size: 0.9rem !important;
     }
 
     /* Forms */
     .form-row {
         flex-direction: row;
+        flex-wrap: wrap;
     }
 
     .form-group-half {
-        flex: 1 1 45%;
+        flex: 1 1 48%;
         max-width: 48%;
     }
 
@@ -109,12 +110,12 @@
 
     .form-button, .submit-btn, .edu-button {
         padding: 12px 20px;
-        font-size: 16px;
+        font-size: 15px;
     }
 
     select {
-        width: 28%;
-        margin: 10px;
+        width: 100%;
+        margin: 5px 0;
     }
 
     /* Tables */
@@ -133,7 +134,7 @@
     .wp-list-table td, .edu-table td, .attendance-table td, .timetable-table td, .exams-table td, .results-table td {
         display: table-cell;
         text-align: center;
-        padding: 12px;
+        padding: 10px;
     }
 
     .wp-list-table td:before, .edu-table td:before, .attendance-table td:before, .timetable-table td:before, .exams-table td:before, .results-table td:before {
@@ -146,7 +147,7 @@
     }
 
     .chat-sidebar {
-        width: 300px;
+        width: 250px;
         border-right: 1px solid var(--border-color);
     }
 
@@ -156,34 +157,34 @@
 
     /* Modal */
     .modal-content, .edu-modal-content {
-        width: 90%;
+        width: 80%;
         max-width: 600px;
         padding: 20px;
     }
 
     /* Other Components */
     .overview-grid, .profile-grid, .selection-grid, .snapshot-grid, .insights-grid {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     }
 
     .edu-main-wrapper {
-        padding: 40px 20px;
+        padding: 30px 15px;
     }
 
     .edu-content-wrapper {
-        padding: 30px;
+        padding: 20px;
     }
 
     .edu-search-filters {
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
     }
 
     /* Minimal Transitions */
     * {
-        transition: background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease !important;
+        transition: background 0.2s ease, border-color 0.2s ease !important;
     }
 }
