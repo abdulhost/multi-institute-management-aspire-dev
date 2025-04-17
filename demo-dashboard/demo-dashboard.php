@@ -10318,10 +10318,10 @@ function demoRenderInstituteAdminContent($data, $section, $action) {
                         echo demoRenderSuperadminStudents($data = []);
                         break;
                     case 'edit-student':
-                        echo demoRenderInstituteAdminEditStudent($data['students']);
+                        echo demoRenderInstituteAdminEditStudent($data[]);
                         break;
                     case 'delete-student':
-                        echo demoRenderInstituteAdminDeleteStudent($data['students']);
+                        echo demoRenderInstituteAdminDeleteStudent($data[]);
                         break;
                     default:
                         echo demoRenderSuperadminStudents($data = []);
@@ -10330,16 +10330,16 @@ function demoRenderInstituteAdminContent($data, $section, $action) {
             case 'teachers':
                 switch ($action) {
                     case 'add-teacher':
-                        echo demoRenderSuperadminAddTeacher($data['centers']);
+                        echo demoRenderSuperadminAddTeacher($data[]);
                         break;
                     case 'edit-teacher':
-                        echo demoRenderInstituteAdminEditTeacher($data['teachers']);
+                        echo demoRenderInstituteAdminEditTeacher($data[]);
                         break;
                     case 'delete-teacher':
-                        echo demoRenderInstituteAdminDeleteTeacher($data['teachers']);
+                        echo demoRenderInstituteAdminDeleteTeacher($data[]);
                         break;
                     default:
-                        echo demoRenderSuperadminManageTeachers($data['teachers']);
+                        echo demoRenderSuperadminManageTeachers($data[]);
                 }
                 break;
             case 'staff':
