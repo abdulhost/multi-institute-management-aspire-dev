@@ -76,7 +76,6 @@ function aspire_demo_dashboard_shortcode() {
                             </div>
                         </div>
 
-                        <!-- Messages Dropdown -->
                         <div class="header-messages">
                             <a href="<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'messages'])); ?>" class="action-btn" id="messages-toggle">
                                 <i class="fas fa-envelope fa-lg"></i>
@@ -601,34 +600,10 @@ function demoRenderSidebar($role, $active_section) {
                 ['action' => 'edit-announcement', 'label' => 'Edit Announcement', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'edit-announcement']))],
                 ['action' => 'delete-announcement', 'label' => 'Delete Announcement', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'announcements', 'demo-action' => 'delete-announcement']))],
             ]],
-            [
-                'section' => 'messages',
-                'label' => 'Messages',
-                'url' => 'http://your-site.com/?demo-role=superadmin&demo-section=messages', // Hardcoded for testing
-                'icon' => 'envelope',
-                'submenu' => [
-                    [
-                        'action' => 'manage-messages',
-                        'label' => 'Manage Messages',
-                        'url' => 'http://your-site.com/?demo-role=superadmin&demo-section=messages&demo-action=manage-messages'
-                    ],
-                    [
-                        'action' => 'add-conversation',
-                        'label' => 'Add Conversation',
-                        'url' => 'http://your-site.com/?demo-role=superadmin&demo-section=messages&demo-action=add-conversation'
-                    ],
-                    [
-                        'action' => 'edit-conversation',
-                        'label' => 'Edit Conversation',
-                        'url' => 'http://your-site.com/?demo-role=superadmin&demo-section=messages&demo-action=edit-conversation'
-                    ],
-                    [
-                        'action' => 'delete-conversation',
-                        'label' => 'Delete Conversation',
-                        'url' => 'http://your-site.com/?demo-role=superadmin&demo-section=messages&demo-action=delete-conversation'
-                    ],
-                ]
-            ],
+            ['section' => 'messages', 'label' => 'Messages', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages'])), 'icon' => 'envelope', 'submenu' => [
+                ['action' => '', 'label' => 'Inbox', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages']))],
+                ['action' => 'new-conversation', 'label' => 'New Conversation', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'new-conversation']))],
+            ]],
         ],
     ];
 
@@ -2055,19 +2030,6 @@ function demoRenderSuperadminContent($section, $action, $data = []) {
                                 default:
                                     return demoRenderSuperadminAnnouncements();
                             }  } 
-                            elseif ($section === 'messages') {
-                                switch ($action) {
-                                   
-                                    case 'add-conversation':
-                                        return demoRenderSuperadminAddConversation();
-                                    case 'edit-conversation':
-                                        return demoRenderSuperadminEditConversation();
-                                    case 'delete-conversation':
-                                        return demoRenderSuperadminDeleteConversation();
-                                    case 'manage-messages':
-                                    default:
-                                        return demoRenderSuperadminMessages();
-                                }}
     elseif ($section === 'fees') {
         switch ($action) {
            
@@ -2112,7 +2074,14 @@ function demoRenderSuperadminContent($section, $action, $data = []) {
                 echo demoRenderSuperadminFees($data);
                 break;
         }}
-       
+        elseif ($section === 'messages') {
+            switch ($action) {
+                        case 'new-conversation':
+                            return demoRenderSuperadminNewConversation();
+                        default:
+                            return demoRenderSuperadminMessages($action);
+                    }
+            }
     else {
         switch ($section) {
             case 'exams':
@@ -9956,146 +9925,211 @@ function demoRenderSuperadminDeleteAnnouncement() {
     <?php
     return ob_get_clean();
 }
-function demoRenderSuperadminDeleteConversation() {
-    // Hardcoded data for conversations
+
+function demoRenderSuperadminMessages($action) {
+    // Hardcoded conversation data
     $conversations = [
-        ['conversation_id' => 'CV001', 'recipient' => 'John Doe (Teacher)', 'last_message' => 'Meeting at 3 PM', 'timestamp' => '2025-04-12 14:30', 'center' => 'Main Campus'],
-        ['conversation_id' => 'CV002', 'recipient' => 'Jane Smith (Student)', 'last_message' => 'Assignment submitted', 'timestamp' => '2025-04-12 10:15', 'center' => 'West Campus'],
+        ['id' => 'CONV001', 'recipient_id' => 'T001', 'recipient_name' => 'Alice Johnson', 'last_message' => 'Can we discuss the exam schedule?', 'last_message_time' => '2025-04-16 10:30', 'unread' => 2],
+        ['id' => 'CONV002', 'recipient_id' => 'S001', 'recipient_name' => 'John Doe', 'last_message' => 'I have a question about homework.', 'last_message_time' => '2025-04-15 14:20', 'unread' => 0],
+        ['id' => 'CONV003', 'recipient_id' => 'P001', 'recipient_name' => 'Mary Brown', 'last_message' => 'Please update on my child’s attendance.', 'last_message_time' => '2025-04-14 09:15', 'unread' => 1],
     ];
+
+    // Hardcoded messages for the first conversation (CONV001)
+    $messages = [
+        ['sender' => 'T001', 'sender_name' => 'Alice Johnson', 'content' => 'Can we discuss the exam schedule?', 'time' => '2025-04-16 10:30', 'status' => 'received'],
+        ['sender' => 'SA001', 'sender_name' => 'Super Admin', 'content' => 'Sure, let’s meet tomorrow.', 'time' => '2025-04-16 10:35', 'status' => 'sent'],
+        ['sender' => 'T001', 'sender_name' => 'Alice Johnson', 'content' => 'Great, what time?', 'time' => '2025-04-16 10:40', 'status' => 'received'],
+    ];
+
     ob_start();
     ?>
-    <div class="dashboard-section">
-        <h2>Delete Conversation</h2>
-        <div class="alert alert-warning">Click "Delete" to remove a conversation.</div>
-        <table class="table" id="superadmin-conversations">
-            <thead>
-                <tr>
-                    <th>Conversation ID</th>
-                    <th>Recipient</th>
-                    <th>Last Message</th>
-                    <th>Timestamp</th>
-                    <th>Center</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($conversations as $conv): ?>
-                    <tr>
-                        <td><?php echo esc_html($conv['conversation_id']); ?></td>
-                        <td><?php echo esc_html($conv['recipient']); ?></td>
-                        <td><?php echo esc_html($conv['last_message']); ?></td>
-                        <td><?php echo esc_html($conv['timestamp']); ?></td>
-                        <td><?php echo esc_html($conv['center']); ?></td>
-                        <td>
-                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'manage-messages'])); ?>" class="btn btn-danger">Delete</a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-    <?php
-    return ob_get_clean();
-}
-function demoRenderSuperadminEditConversation() {
-    // Hardcoded data for conversations
-    $conversations = [
-        ['conversation_id' => 'CV001', 'recipient' => 'John Doe (Teacher)', 'last_message' => 'Meeting at 3 PM', 'timestamp' => '2025-04-12 14:30', 'center' => 'Main Campus'],
-        ['conversation_id' => 'CV002', 'recipient' => 'Jane Smith (Student)', 'last_message' => 'Assignment submitted', 'timestamp' => '2025-04-12 10:15', 'center' => 'West Campus'],
-    ];
-    ob_start();
-    ?>
-    <div class="dashboard-section">
-        <h2>Edit Conversation</h2>
-        <div class="alert alert-info">Select a conversation to edit from the list below.</div>
-        <table class="table" id="superadmin-conversations">
-            <thead>
-                <tr>
-                    <th>Conversation ID</th>
-                    <th>Recipient</th>
-                    <th>Last Message</th>
-                    <th>Timestamp</th>
-                    <th>Center</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($conversations as $conv): ?>
-                    <tr>
-                        <td><?php echo esc_html($conv['conversation_id']); ?></td>
-                        <td><?php echo esc_html($conv['recipient']); ?></td>
-                        <td><?php echo esc_html($conv['last_message']); ?></td>
-                        <td><?php echo esc_html($conv['timestamp']); ?></td>
-                        <td><?php echo esc_html($conv['center']); ?></td>
-                        <td>
-                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'manage-messages'])); ?>" class="btn btn-warning">Edit</a>
-                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'delete-conversation'])); ?>" class="btn btn-danger">Delete</a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-    <?php
-    return ob_get_clean();
-}
-function demoRenderSuperadminAddConversation() {
-    // Hardcoded options for recipients, centers
-    $recipients = [
-        ['id' => 'TC001', 'name' => 'John Doe (Teacher)'],
-        ['id' => 'ST001', 'name' => 'Jane Smith (Student)'],
-    ];
-    $centers = [
-        ['name' => 'Main Campus'],
-        ['name' => 'West Campus'],
-    ];
-    ob_start();
-    ?>
-    <div class="dashboard-section">
-        <h2>Add Conversation</h2>
-        <form id="add-conversation-form" class="edu-form">
-            <div class="edu-form-group">
-                <label class="edu-form-label" for="conversation-id">Conversation ID</label>
-                <input type="text" id="conversation-id" class="edu-form-input" placeholder="e.g., CV001" required>
+    <div class="dashboard-section chat-container">
+        <h2>Messages Inbox</h2>
+        <div class="chat-wrapper">
+            <!-- Sidebar -->
+            <div class="chat-sidebar">
+                <div class="sidebar-header">
+                    <h4>Conversations</h4>
+                    <input type="text" id="conversation-search" class="form-control" placeholder="Search conversations...">
+                </div>
+                <ul class="conversation-list">
+                    <?php foreach ($conversations as $index => $conv): ?>
+                        <li class="conversation-item <?php echo $index === 0 ? 'active' : ''; ?>" data-conv-id="<?php echo esc_attr($conv['id']); ?>">
+                            <strong><?php echo esc_html($conv['recipient_name']); ?> (<?php echo esc_html($conv['recipient_id']); ?>)</strong>
+                            <p><?php echo esc_html($conv['last_message']); ?></p>
+                            <span class="meta"><?php echo esc_html($conv['last_message_time']); ?></span>
+                            <?php if ($conv['unread'] > 0): ?>
+                                <span class="badge bg-primary"><?php echo esc_html($conv['unread']); ?></span>
+                            <?php endif; ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
             </div>
+            <!-- Main Chat Area -->
+            <div class="chat-main">
+                <div class="chat-header">
+                    <h4>Conversation with <?php echo esc_html($conversations[0]['recipient_name']); ?> (<?php echo esc_html($conversations[0]['recipient_id']); ?>)</h4>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <?php foreach ($messages as $msg): ?>
+                        <div class="chat-message <?php echo $msg['status']; ?>">
+                            <div class="bubble"><?php echo esc_html($msg['content']); ?></div>
+                            <div class="meta"><?php echo esc_html($msg['sender_name']); ?> • <?php echo esc_html($msg['time']); ?></div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <form class="chat-form" id="chat-form">
+                    <div class="d-flex align-items-center">
+                        <textarea class="form-control" id="chat-input" rows="2" placeholder="Type a message..."></textarea>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </form>
+                <div class="chat-loading" id="chat-loading">Loading...</div>
+            </div>
+        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            // Conversation search
+            $('#conversation-search').on('input', function() {
+                const query = $(this).val().toLowerCase();
+                $('.conversation-item').each(function() {
+                    const name = $(this).find('strong').text().toLowerCase();
+                    const message = $(this).find('p').text().toLowerCase();
+                    $(this).toggle(name.includes(query) || message.includes(query));
+                });
+            });
+
+            // Conversation selection
+            $('.conversation-item').on('click', function() {
+                $('.conversation-item').removeClass('active');
+                $(this).addClass('active');
+                const convId = $(this).data('conv-id');
+                $('#chat-messages').html('<div class="chat-loading active">Loading...</div>');
+                // Simulate loading messages (hardcoded)
+                setTimeout(() => {
+                    $('#chat-messages').html(`
+                        <div class="chat-message received">
+                            <div class="bubble">Can we discuss the exam schedule?</div>
+                            <div class="meta">Alice Johnson • 2025-04-16 10:30</div>
+                        </div>
+                        <div class="chat-message sent">
+                            <div class="bubble">Sure, let’s meet tomorrow.</div>
+                            <div class="meta">Super Admin • 2025-04-16 10:35</div>
+                        </div>
+                        <div class="chat-message received">
+                            <div class="bubble">Great, what time?</div>
+                            <div class="meta">Alice Johnson • 2025-04-16 10:40</div>
+                        </div>
+                    `);
+                }, 500);
+            });
+
+            // Send message
+            $('#chat-form').on('submit', function(e) {
+                e.preventDefault();
+                const message = $('#chat-input').val().trim();
+                if (message) {
+                    $('#chat-messages').append(`
+                        <div class="chat-message sent">
+                            <div class="bubble">${message}</div>
+                            <div class="meta">Super Admin • ${new Date().toLocaleString()}</div>
+                        </div>
+                    `);
+                    $('#chat-input').val('');
+                    $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderSuperadminNewConversation() {
+    // Hardcoded recipient data
+    $recipients = [
+        'admins' => [
+            ['id' => 'SA001', 'name' => 'Super Admin'],
+            ['id' => 'SA002', 'name' => 'Admin Smith'],
+        ],
+        'teachers' => [
+            ['id' => 'T001', 'name' => 'Alice Johnson'],
+            ['id' => 'T002', 'name' => 'Bob Wilson'],
+        ],
+        'students' => [
+            ['id' => 'S001', 'name' => 'John Doe'],
+            ['id' => 'S002', 'name' => 'Jane Smith'],
+        ],
+        'parents' => [
+            ['id' => 'P001', 'name' => 'Mary Brown'],
+            ['id' => 'P002', 'name' => 'James Wilson'],
+        ],
+    ];
+
+    ob_start();
+    ?>
+    <div class="dashboard-section chat-container">
+        <h2>New Conversation</h2>
+        <form id="new-conversation-form" class="edu-form">
             <div class="edu-form-group">
                 <label class="edu-form-label" for="recipient">Recipient</label>
                 <select id="recipient" class="edu-form-input" required>
-                    <?php foreach ($recipients as $recipient): ?>
-                        <option value="<?php echo esc_attr($recipient['id']); ?>"><?php echo esc_html($recipient['name']); ?></option>
-                    <?php endforeach; ?>
+                    <option value="">Select a recipient</option>
+                    <optgroup label="Institute Admins">
+                        <?php foreach ($recipients['admins'] as $admin): ?>
+                            <option value="<?php echo esc_attr($admin['id']); ?>">
+                                <?php echo esc_html($admin['name'] . ' (' . $admin['id'] . ')'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                    <optgroup label="Teachers">
+                        <?php foreach ($recipients['teachers'] as $teacher): ?>
+                            <option value="<?php echo esc_attr($teacher['id']); ?>">
+                                <?php echo esc_html($teacher['name'] . ' (' . $teacher['id'] . ')'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                    <optgroup label="Students">
+                        <?php foreach ($recipients['students'] as $student): ?>
+                            <option value="<?php echo esc_attr($student['id']); ?>">
+                                <?php echo esc_html($student['name'] . ' (' . $student['id'] . ')'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                    <optgroup label="Parents">
+                        <?php foreach ($recipients['parents'] as $parent): ?>
+                            <option value="<?php echo esc_attr($parent['id']); ?>">
+                                <?php echo esc_html($parent['name'] . ' (' . $parent['id'] . ')'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
                 </select>
             </div>
             <div class="edu-form-group">
-                <label class="edu-form-label" for="initial-message">Initial Message</label>
-                <textarea id="initial-message" class="edu-form-input" placeholder="Type your message..." required></textarea>
+                <label class="edu-form-label" for="subject">Subject</label>
+                <input type="text" id="subject" class="edu-form-input" placeholder="e.g., Exam Schedule Discussion" required>
             </div>
             <div class="edu-form-group">
-                <label class="edu-form-label" for="center">Center</label>
-                <select id="center" class="edu-form-input" required>
-                    <?php foreach ($centers as $center): ?>
-                        <option value="<?php echo esc_attr($center['name']); ?>"><?php echo esc_html($center['name']); ?></option>
-                    <?php endforeach; ?>
-                </select>
+                <label class="edu-form-label" for="message">Message</label>
+                <textarea id="message" class="edu-form-input" rows="5" placeholder="Type your message..." required></textarea>
             </div>
             <div class="edu-form-actions">
-                <button type="submit" class="edu-button edu-button-primary">Start Conversation</button>
-                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'manage-messages'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
+                <button type="submit" class="edu-button edu-button-primary">Send Message</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages'])); ?>" class="edu-button edu-button-secondary">Cancel</a>
             </div>
             <div class="edu-form-message" id="form-message"></div>
         </form>
         <script>
         jQuery(document).ready(function($) {
-            $('#add-conversation-form').on('submit', function(e) {
+            $('#new-conversation-form').on('submit', function(e) {
                 e.preventDefault();
-                const conversationId = $('#conversation-id').val().trim();
                 const recipient = $('#recipient').val();
-                const initialMessage = $('#initial-message').val().trim();
-                const center = $('#center').val();
-                if (conversationId && recipient && initialMessage && center) {
-                    $('#form-message').removeClass('edu-error').addClass('edu-success').text('Conversation started successfully!');
+                const subject = $('#subject').val().trim();
+                const message = $('#message').val().trim();
+                if (recipient && subject && message) {
+                    $('#form-message').removeClass('edu-error').addClass('edu-success').text('Message sent successfully!');
                     setTimeout(() => {
-                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'manage-messages'])); ?>';
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages'])); ?>';
                     }, 1000);
                 } else {
                     $('#form-message').removeClass('edu-success').addClass('edu-error').text('Please fill all fields.');
@@ -10107,137 +10141,7 @@ function demoRenderSuperadminAddConversation() {
     <?php
     return ob_get_clean();
 }
-function demoRenderSuperadminMessages() {
-    // Hardcoded data for conversations
-    $conversations = [
-        ['conversation_id' => 'CV001', 'recipient' => 'John Doe (Teacher)', 'last_message' => 'Meeting at 3 PM', 'timestamp' => '2025-04-12 14:30', 'center' => 'Main Campus'],
-        ['conversation_id' => 'CV002', 'recipient' => 'Jane Smith (Student)', 'last_message' => 'Assignment submitted', 'timestamp' => '2025-04-12 10:15', 'center' => 'West Campus'],
-    ];
-    // Hardcoded data for messages in selected conversation (default to CV001)
-    $messages = [
-        ['message_id' => 'MSG001', 'conversation_id' => 'CV001', 'sender_id' => 'SA001', 'content' => 'Hi John, can we discuss the schedule?', 'timestamp' => '2025-04-12 14:00', 'status' => 'sent'],
-        ['message_id' => 'MSG002', 'conversation_id' => 'CV001', 'sender_id' => 'TC001', 'content' => 'Sure, how about 3 PM?', 'timestamp' => '2025-04-12 14:30', 'status' => 'received'],
-    ];
-    ob_start();
-    ?>
-    <div class="chat-container">
-        <div class="chat-wrapper">
-            <div class="chat-sidebar">
-                <div class="sidebar-header">
-                    <h4>Conversations</h4>
-                    <input type="text" id="conversation-search" class="form-control" placeholder="Search conversations...">
-                </div>
-                <ul class="conversation-list">
-                    <?php foreach ($conversations as $index => $conv): ?>
-                        <li class="conversation-item <?php echo $index === 0 ? 'active' : ''; ?>" data-conversation-id="<?php echo esc_attr($conv['conversation_id']); ?>">
-                            <strong><?php echo esc_html($conv['recipient']); ?></strong>
-                            <p><?php echo esc_html($conv['last_message']); ?></p>
-                            <small><?php echo esc_html($conv['timestamp']); ?></small>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-            <div class="chat-main">
-                <div class="chat-header">
-                    <h4 id="chat-recipient"><?php echo esc_html($conversations[0]['recipient']); ?></h4>
-                </div>
-                <div class="chat-messages" id="chat-messages">
-                    <?php foreach ($messages as $msg): ?>
-                        <div class="chat-message <?php echo $msg['status'] === 'sent' ? 'sent' : 'received'; ?>">
-                            <div class="bubble"><?php echo esc_html($msg['content']); ?></div>
-                            <div class="meta"><?php echo esc_html($msg['timestamp']); ?></div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-                <form class="chat-form" id="send-message-form">
-                    <div class="recipient-select">
-                        <textarea class="form-control" id="message-input" rows="2" placeholder="Type a message..." required></textarea>
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-md-12 text-end">
-                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'messages', 'demo-action' => 'add-conversation'])); ?>" class="btn btn-primary">New Conversation</a>
-            </div>
-        </div>
-    </div>
-    <script>
-    jQuery(document).ready(function($) {
-        // Hardcoded messages data for simplicity
-        const messagesData = {
-            'CV001': [
-                { message_id: 'MSG001', conversation_id: 'CV001', sender_id: 'SA001', content: 'Hi John, can we discuss the schedule?', timestamp: '2025-04-12 14:00', status: 'sent' },
-                { message_id: 'MSG002', conversation_id: 'CV001', sender_id: 'TC001', content: 'Sure, how about 3 PM?', timestamp: '2025-04-12 14:30', status: 'received' }
-            ],
-            'CV002': [
-                { message_id: 'MSG003', conversation_id: 'CV002', sender_id: 'SA001', content: 'Hi Jane, did you submit the assignment?', timestamp: '2025-04-12 10:00', status: 'sent' },
-                { message_id: 'MSG004', conversation_id: 'CV002', sender_id: 'ST001', content: 'Yes, submitted it yesterday.', timestamp: '2025-04-12 10:15', status: 'received' }
-            ]
-        };
 
-        // Handle conversation selection
-        $('.conversation-item').on('click', function() {
-            $('.conversation-item').removeClass('active');
-            $(this).addClass('active');
-            const conversationId = $(this).data('conversation-id');
-            const recipient = $(this).find('strong').text();
-
-            // Update chat header
-            $('#chat-recipient').text(recipient);
-
-            // Update messages
-            const messages = messagesData[conversationId] || [];
-            const $chatMessages = $('#chat-messages').empty();
-            messages.forEach(msg => {
-                const messageClass = msg.status === 'sent' ? 'sent' : 'received';
-                $chatMessages.append(`
-                    <div class="chat-message ${messageClass}">
-                        <div class="bubble">${msg.content}</div>
-                        <div class="meta">${msg.timestamp}</div>
-                    </div>
-                `);
-            });
-        });
-
-        // Handle message sending
-        $('#send-message-form').on('submit', function(e) {
-            e.preventDefault();
-            const message = $('#message-input').val().trim();
-            if (message) {
-                const activeConversation = $('.conversation-item.active').data('conversation-id');
-                if (activeConversation) {
-                    // Simulate adding message
-                    $('#chat-messages').append(`
-                        <div class="chat-message sent">
-                            <div class="bubble">${message}</div>
-                            <div class="meta">${new Date().toLocaleString()}</div>
-                        </div>
-                    `);
-                    $('#message-input').val('');
-                    // Update conversation list last message
-                    $(`.conversation-item[data-conversation-id="${activeConversation}"] p`).text(message);
-                } else {
-                    alert('Please select a conversation.');
-                }
-            }
-        });
-
-        // Search conversations
-        $('#conversation-search').on('input', function() {
-            const query = $(this).val().toLowerCase();
-            $('.conversation-item').each(function() {
-                const recipient = $(this).find('strong').text().toLowerCase();
-                const lastMessage = $(this).find('p').text().toLowerCase();
-                $(this).toggle(recipient.includes(query) || lastMessage.includes(query));
-            });
-        });
-    });
-    </script>
-    <?php
-    return ob_get_clean();
-}
 
 
 
