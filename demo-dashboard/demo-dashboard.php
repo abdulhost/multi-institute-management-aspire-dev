@@ -611,7 +611,6 @@ function demoRenderSidebar($role, $active_section) {
         ],
     'institute-admin' => [
         ['section' => 'overview', 'label' => 'Overview', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'overview'])), 'icon' => 'tachometer-alt'],
-        ['section' => 'centers', 'label' => 'Centers', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'centers'])), 'icon' => 'school'],
         ['section' => 'students', 'label' => 'Students Management', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'students'])), 'icon' => 'users', 'submenu' => [
             ['action' => 'manage-students', 'label' => 'Manage Students', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'students', 'demo-action' => 'manage-students']))],
             ['action' => 'add-student', 'label' => 'Add Student', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'students', 'demo-action' => 'add-student']))],
@@ -10295,11 +10294,7 @@ function demoRenderInstituteAdminOverview($data) {
             <p><?php echo count($data['teachers']); ?> Teachers</p>
             <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'teachers'])); ?>" class="btn btn-secondary">Manage Teachers</a>
         </div>
-        <div class="widget">
-            <h3>Chats</h3>
-            <p><?php echo count($data['messages']); ?> Active Chats</p>
-            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'chats'])); ?>" class="btn btn-secondary">View Chats</a>
-        </div>
+        
     </div>
     <?php
     return ob_get_clean();
@@ -10317,25 +10312,10 @@ function demoRenderInstituteAdminContent($data, $section, $action) {
             case 'overview':
                 echo demoRenderInstituteAdminOverview($data);
                 break;
-            case 'centers':
-                switch ($action) {
-                    case 'add-center':
-                        echo demoRenderSuperadminAddCenter($data['centers']);
-                        break;
-                    case 'edit-center':
-                        echo demoRenderSuperadminEditCenter($data['centers']);
-                        break;
-                    case 'delete-center':
-                        echo demoRenderSuperadminDeleteCenter($data['centers']);
-                        break;
-                    default:
-                        echo demoRenderSuperadminCenters($data['centers']);
-                }
-                break;
             case 'students':
                 switch ($action) {
                     case 'add-student':
-                        echo demoRenderSuperadminAddStudent($data['centers']);
+                        echo demoRenderSuperadminStudents($data = []);
                         break;
                     case 'edit-student':
                         echo demoRenderInstituteAdminEditStudent($data['students']);
@@ -10344,7 +10324,7 @@ function demoRenderInstituteAdminContent($data, $section, $action) {
                         echo demoRenderInstituteAdminDeleteStudent($data['students']);
                         break;
                     default:
-                        echo demoRenderSuperadminManageStudents($data['students']);
+                        echo demoRenderSuperadminStudents($data = []);
                 }
                 break;
             case 'teachers':
