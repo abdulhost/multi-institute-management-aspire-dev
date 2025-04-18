@@ -220,7 +220,10 @@ function aspire_demo_dashboard_shortcode() {
                                     $data = demoGetSuperadminData();
                                     echo demoRenderSuperadminContent($section, $action, $data);
                                     break;
-                           
+                                    case 'institute-admin':
+                                        $data = demoGetInstituteAdminData();
+                                        echo demoRenderInstituteAdminContent($section, $action, $data);
+                                        break;
                                 case 'teacher':
                                     $data = demoGetTeacherData();
                                     echo demoRenderTeacherContent($section, $action, $data);
@@ -607,253 +610,450 @@ function demoRenderSidebar($role, $active_section) {
                 ['action' => 'new-conversation', 'label' => 'New Conversation', 'url' => esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'chats', 'demo-action' => 'new-conversation']))],
             ]],
         ],
-
+       'institute-admin' => [
+             ['section' => 'overview', 'label' => 'Overview', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'overview'])), 'icon' => 'tachometer-alt'],
+        ['section' => 'students', 'label' => 'Students Management', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'students'])), 'icon' => 'users', 'submenu' => [
+        ['action' => 'manage-students', 'label' => 'Manage Students', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'students', 'demo-action' => 'manage-students']))],
+        ['action' => 'add-student', 'label' => 'Add Student', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'students', 'demo-action' => 'add-student']))],
+        ['action' => 'edit-student', 'label' => 'Edit Student', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'students', 'demo-action' => 'edit-student']))],
+        ['action' => 'delete-student', 'label' => 'Delete Student', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'students', 'demo-action' => 'delete-student']))],
+    ]],
+    ['section' => 'teachers', 'label' => 'Teachers Management', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'teachers'])), 'icon' => 'chalkboard-teacher', 'submenu' => [
+        ['action' => 'manage-teachers', 'label' => 'Manage Teachers', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'teachers', 'demo-action' => 'manage-teachers']))],
+        ['action' => 'add-teacher', 'label' => 'Add Teacher', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'teachers', 'demo-action' => 'add-teacher']))],
+        ['action' => 'edit-teacher', 'label' => 'Edit Teacher', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'teachers', 'demo-action' => 'edit-teacher']))],
+        ['action' => 'delete-teacher', 'label' => 'Delete Teacher', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'teachers', 'demo-action' => 'delete-teacher']))],
+    ]],
+    ['section' => 'exams', 'label' => 'Exams', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'exams'])), 'icon' => 'book', 'submenu' => [
+        ['action' => 'manage-exams', 'label' => 'Manage Exams', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'exams', 'demo-action' => 'manage-exams']))],
+        ['action' => 'add-exam', 'label' => 'Add Exam', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'exams', 'demo-action' => 'add-exam']))],
+        ['action' => 'edit-exam', 'label' => 'Edit Exam', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'exams', 'demo-action' => 'edit-exam']))],
+        ['action' => 'delete-exam', 'label' => 'Delete Exam', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'exams', 'demo-action' => 'delete-exam']))],
+    ]],
+    ['section' => 'attendance', 'label' => 'Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance'])), 'icon' => 'calendar-check', 'submenu' => [
+        ['action' => 'student-attendance', 'label' => 'Student Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'student-attendance'])), 'submenu' => [
+            ['action' => 'manage-student-attendance', 'label' => 'Manage Student Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance']))],
+            ['action' => 'add-student-attendance', 'label' => 'Add Student Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'add-student-attendance']))],
+            ['action' => 'edit-student-attendance', 'label' => 'Edit Student Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'edit-student-attendance']))],
+            ['action' => 'delete-student-attendance', 'label' => 'Delete Student Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'delete-student-attendance']))],
+        ]],
+        ['action' => 'teacher-attendance', 'label' => 'Teacher Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'teacher-attendance'])), 'submenu' => [
+            ['action' => 'manage-teacher-attendance', 'label' => 'Manage Teacher Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance']))],
+            ['action' => 'add-teacher-attendance', 'label' => 'Add Teacher Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'add-teacher-attendance']))],
+            ['action' => 'edit-teacher-attendance', 'label' => 'Edit Teacher Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'edit-teacher-attendance']))],
+            ['action' => 'delete-teacher-attendance', 'label' => 'Delete Teacher Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'delete-teacher-attendance']))],
+        ]],
+    ]],
+    ['section' => 'fees', 'label' => 'Fees', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fees'])), 'icon' => 'money-bill', 'submenu' => [
+        ['action' => 'manage-fees', 'label' => 'Manage Fees', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fees', 'demo-action' => 'manage-fees']))],
+        ['action' => 'add-fee', 'label' => 'Add Fee', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fees', 'demo-action' => 'add-fee']))],
+        ['action' => 'edit-fee', 'label' => 'Edit Fee', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fees', 'demo-action' => 'edit-fee']))],
+        ['action' => 'delete-fee', 'label' => 'Delete Fee', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fees', 'demo-action' => 'delete-fee']))],
+    ]],
+    ['section' => 'notices', 'label' => 'Notices', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'notices'])), 'icon' => 'bullhorn', 'submenu' => [
+        ['action' => 'manage-notices', 'label' => 'Manage Notices', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'notices', 'demo-action' => 'manage-notices']))],
+        ['action' => 'add-notice', 'label' => 'Add Notice', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'notices', 'demo-action' => 'add-notice']))],
+        ['action' => 'edit-notice', 'label' => 'Edit Notice', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'notices', 'demo-action' => 'edit-notice']))],
+        ['action' => 'delete-notice', 'label' => 'Delete Notice', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'notices', 'demo-action' => 'delete-notice']))],
+    ]],
+    ['section' => 'announcements', 'label' => 'Announcements', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'announcements'])), 'icon' => 'megaphone', 'submenu' => [
+        ['action' => 'manage-announcements', 'label' => 'Manage Announcements', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'announcements', 'demo-action' => 'manage-announcements']))],
+        ['action' => 'add-announcement', 'label' => 'Add Announcement', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'announcements', 'demo-action' => 'add-announcement']))],
+        ['action' => 'edit-announcement', 'label' => 'Edit Announcement', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'announcements', 'demo-action' => 'edit-announcement']))],
+        ['action' => 'delete-announcement', 'label' => 'Delete Announcement', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'announcements', 'demo-action' => 'delete-announcement']))],
+    ]],
+    ['section' => 'library', 'label' => 'Library', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library'])), 'icon' => 'book', 'submenu' => [
+        ['action' => 'manage-books', 'label' => 'Manage Books', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library', 'demo-action' => 'manage-books']))],
+        ['action' => 'add-book', 'label' => 'Add Book', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library', 'demo-action' => 'add-book']))],
+        ['action' => 'edit-book', 'label' => 'Edit Book', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library', 'demo-action' => 'edit-book']))],
+        ['action' => 'delete-book', 'label' => 'Delete Book', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library', 'demo-action' => 'delete-book']))],
+    ]],
+    ['section' => 'library_transactions', 'label' => 'Library Transactions', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library_transactions'])), 'icon' => 'book-reader', 'submenu' => [
+        ['action' => 'manage-transactions', 'label' => 'Manage Transactions', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library_transactions', 'demo-action' => 'manage-transactions']))],
+        ['action' => 'add-transaction', 'label' => 'Add Transaction', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library_transactions', 'demo-action' => 'add-transaction']))],
+        ['action' => 'edit-transaction', 'label' => 'Edit Transaction', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library_transactions', 'demo-action' => 'edit-transaction']))],
+        ['action' => 'delete-transaction', 'label' => 'Delete Transaction', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library_transactions', 'demo-action' => 'delete-transaction']))],
+    ]],
+    ['section' => 'inventory', 'label' => 'Inventory', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory'])), 'icon' => 'boxes', 'submenu' => [
+        ['action' => 'manage-items', 'label' => 'Manage Items', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory', 'demo-action' => 'manage-items']))],
+        ['action' => 'add-item', 'label' => 'Add Item', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory', 'demo-action' => 'add-item']))],
+        ['action' => 'edit-item', 'label' => 'Edit Item', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory', 'demo-action' => 'edit-item']))],
+        ['action' => 'delete-item', 'label' => 'Delete Item', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory', 'demo-action' => 'delete-item']))],
+    ]],
+    ['section' => 'inventory_transactions', 'label' => 'Inventory Transactions', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory_transactions'])), 'icon' => 'cogs', 'submenu' => [
+        ['action' => 'manage-transactions', 'label' => 'Manage Transactions', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory_transactions', 'demo-action' => 'manage-transactions']))],
+        ['action' => 'add-transaction', 'label' => 'Add Transaction', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory_transactions', 'demo-action' => 'add-transaction']))],
+        ['action' => 'edit-transaction', 'label' => 'Edit Transaction', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory_transactions', 'demo-action' => 'edit-transaction']))],
+        ['action' => 'delete-transaction', 'label' => 'Delete Transaction', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory_transactions', 'demo-action' => 'delete-transaction']))],
+    ]],
+    ['section' => 'chats', 'label' => 'Chats', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'chats'])), 'icon' => 'envelope', 'submenu' => [
+        ['action' => 'view-chats', 'label' => 'View Chats', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'chats', 'demo-action' => 'view-chats']))],
+        ['action' => 'view-chat', 'label' => 'View Chat', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'chats', 'demo-action' => 'view-chat']))],
+    ]],
+    ['section' => 'reports', 'label' => 'Reports', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'reports'])), 'icon' => 'chart-bar', 'submenu' => [
+        ['action' => 'view-reports', 'label' => 'View Reports', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'reports', 'demo-action' => 'view-reports']))],
+        ['action' => 'generate-report', 'label' => 'Generate Report', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'reports', 'demo-action' => 'generate-report']))],
+    ]],
+    ['section' => 'results', 'label' => 'Results', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'results'])), 'icon' => 'graduation-cap', 'submenu' => [
+        ['action' => 'manage-results', 'label' => 'Manage Results', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'results', 'demo-action' => 'manage-results']))],
+        ['action' => 'add-result', 'label' => 'Add Result', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'results', 'demo-action' => 'add-result']))],
+        ['action' => 'edit-result', 'label' => 'Edit Result', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'results', 'demo-action' => 'edit-result']))],
+        ['action' => 'delete-result', 'label' => 'Delete Result', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'results', 'demo-action' => 'delete-result']))],
+    ]],
+    ['section' => 'fee_templates', 'label' => 'Fee Templates', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fee_templates'])), 'icon' => 'file-invoice-dollar', 'submenu' => [
+        ['action' => 'manage-templates', 'label' => 'Manage Templates', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fee_templates', 'demo-action' => 'manage-templates']))],
+        ['action' => 'add-template', 'label' => 'Add Template', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fee_templates', 'demo-action' => 'add-template']))],
+        ['action' => 'edit-template', 'label' => 'Edit Template', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fee_templates', 'demo-action' => 'edit-template']))],
+        ['action' => 'delete-template', 'label' => 'Delete Template', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fee_templates', 'demo-action' => 'delete-template']))],
+    ]],
+    ['section' => 'transport', 'label' => 'Transport', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport'])), 'icon' => 'bus', 'submenu' => [
+        ['action' => 'manage-routes', 'label' => 'Manage Routes', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport', 'demo-action' => 'manage-routes']))],
+        ['action' => 'add-route', 'label' => 'Add Route', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport', 'demo-action' => 'add-route']))],
+        ['action' => 'edit-route', 'label' => 'Edit Route', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport', 'demo-action' => 'edit-route']))],
+        ['action' => 'delete-route', 'label' => 'Delete Route', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport', 'demo-action' => 'delete-route']))],
+    ]],
+    ['section' => 'transport_enrollments', 'label' => 'Transport Enrollments', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport_enrollments'])), 'icon' => 'bus-alt', 'submenu' => [
+        ['action' => 'manage-enrollments', 'label' => 'Manage Enrollments', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport_enrollments', 'demo-action' => 'manage-enrollments']))],
+        ['action' => 'add-enrollment', 'label' => 'Add Enrollment', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport_enrollments', 'demo-action' => 'add-enrollment']))],
+        ['action' => 'edit-enrollment', 'label' => 'Edit Enrollment', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport_enrollments', 'demo-action' => 'edit-enrollment']))],
+        ['action' => 'delete-enrollment', 'label' => 'Delete Enrollment', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport_enrollments', 'demo-action' => 'delete-enrollment']))],
+    ]],
+    ['section' => 'departments', 'label' => 'Departments', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'departments'])), 'icon' => 'building', 'submenu' => [
+        ['action' => 'manage-departments', 'label' => 'Manage Departments', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'departments', 'demo-action' => 'manage-departments']))],
+        ['action' => 'add-department', 'label' => 'Add Department', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'departments', 'demo-action' => 'add-department']))],
+        ['action' => 'edit-department', 'label' => 'Edit Department', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'departments', 'demo-action' => 'edit-department']))],
+        ['action' => 'delete-department', 'label' => 'Delete Department', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'departments', 'demo-action' => 'delete-department']))],
+    ]],
+    ['section' => 'subjects', 'label' => 'Subjects', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subjects'])), 'icon' => 'book', 'submenu' => [
+        ['action' => 'manage-subjects', 'label' => 'Manage Subjects', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subjects', 'demo-action' => 'manage-subjects']))],
+        ['action' => 'add-subject', 'label' => 'Add Subject', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subjects', 'demo-action' => 'add-subject']))],
+        ['action' => 'edit-subject', 'label' => 'Edit Subject', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subjects', 'demo-action' => 'edit-subject']))],
+        ['action' => 'delete-subject', 'label' => 'Delete Subject', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subjects', 'demo-action' => 'delete-subject']))],
+    ]],
+    ['section' => 'timetable', 'label' => 'Timetable', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'timetable'])), 'icon' => 'calendar-alt', 'submenu' => [
+        ['action' => 'view-timetable', 'label' => 'View Timetable', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'timetable', 'demo-action' => 'view-timetable']))],
+        ['action' => 'add-timetable', 'label' => 'Add Timetable', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'timetable', 'demo-action' => 'add-timetable']))],
+        ['action' => 'edit-timetable', 'label' => 'Edit Timetable', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'timetable', 'demo-action' => 'edit-timetable']))],
+        ['action' => 'delete-timetable', 'label' => 'Delete Timetable', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'timetable', 'demo-action' => 'delete-timetable']))],
+    ]],
+    ['section' => 'homework', 'label' => 'Homework', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'homework'])), 'icon' => 'tasks', 'submenu' => [
+        ['action' => 'manage-homework', 'label' => 'Manage Homework', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'homework', 'demo-action' => 'manage-homework']))],
+        ['action' => 'add-homework', 'label' => 'Add Homework', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'homework', 'demo-action' => 'add-homework']))],
+        ['action' => 'edit-homework', 'label' => 'Edit Homework', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'homework', 'demo-action' => 'edit-homework']))],
+        ['action' => 'delete-homework', 'label' => 'Delete Homework', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'homework', 'demo-action' => 'delete-homework']))],
+    ]],
+    ['section' => 'classes_sections', 'label' => 'Classes & Sections', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'classes_sections'])), 'icon' => 'school', 'submenu' => [
+        ['action' => 'manage-classes-sections', 'label' => 'Manage Classes & Sections', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'classes_sections', 'demo-action' => 'manage-classes-sections']))],
+        ['action' => 'add-class-section', 'label' => 'Add Class/Section', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'classes_sections', 'demo-action' => 'add-class-section']))],
+        ['action' => 'edit-class-section', 'label' => 'Edit Class/Section', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'classes_sections', 'demo-action' => 'edit-class-section']))],
+        ['action' => 'delete-class-section', 'label' => 'Delete Class/Section', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'classes_sections', 'demo-action' => 'delete-class-section']))],
+    ]],
+    ['section' => 'subscriptions', 'label' => 'Subscriptions', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subscriptions'])), 'icon' => 'money-check-alt', 'submenu' => [
+        ['action' => 'view-subscriptions', 'label' => 'View Subscriptions', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subscriptions', 'demo-action' => 'view-subscriptions']))],
+        ['action' => 'extend-subscription', 'label' => 'Extend Subscription', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subscriptions', 'demo-action' => 'extend-subscription']))],
+    ]],
+    ['section' => 'parents', 'label' => 'Parents', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'parents'])), 'icon' => 'user-friends', 'submenu' => [
+        ['action' => 'manage-parents', 'label' => 'Manage Parents', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'parents', 'demo-action' => 'manage-parents']))],
+        ['action' => 'add-parent', 'label' => 'Add Parent', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'parents', 'demo-action' => 'add-parent']))],
+        ['action' => 'edit-parent', 'label' => 'Edit Parent', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'parents', 'demo-action' => 'edit-parent']))],
+        ['action' => 'delete-parent', 'label' => 'Delete Parent', 'url' => esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'parents', 'demo-action' => 'delete-parent']))],
+    ]],
+    ]
     ];
 
     $title = ucfirst($role) === 'Superadmin' ? 'Super Admin' : ucfirst($role);
     ob_start();
     ?>
-    <nav id="sidebar">
-        <ul>
-            <li>
-                <div class="logo-title-section">
-                    <div class="institute-logo">
-                        <img src="<?php echo esc_url(plugin_dir_url(__FILE__) . '../logo instituto.jpg'); ?>" alt="Avatar" 
-                             style="border-radius: 50%; width: 60px; height: 60px; object-fit: cover;" class="profile-avatar mb-3">
-                    </div>
-                    <h4 class="institute-title" style="margin-bottom:0; margin-left:4px; color: var(--text-clr);"><?php echo esc_html($title); ?></h4>
+<nav id="sidebar">
+    <ul>
+        <li>
+            <div class="logo-title-section">
+                <div class="institute-logo">
+                    <img src="<?php echo esc_url(plugin_dir_url(__FILE__) . '../logo instituto.jpg'); ?>" alt="Avatar" 
+                         style="border-radius: 50%; width: 60px; height: 60px; object-fit: cover;" class="profile-avatar mb-3">
                 </div>
-                <button onclick="toggleSidebar()" id="toggle-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
-                        <path d="m313-480 155 156q11 11 11.5 27.5T468-268q-11 11-28 11t-28-11L228-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T468-692q11 11 11 28t-11 28L313-480Zm264 0 155 156q11 11 11.5 27.5T732-268q-11 11-28 11t-28-11L492-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T732-692q11 11 11 28t-11 28L577-480Z"/>
-                    </svg>
-                </button>
-            </li>
-            <?php foreach ($links[$role] as $link): ?>
-                <?php if (isset($link['submenu'])): ?>
-                    <li>
-                        <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section === $link['section'] ? 'rotate' : ''; ?>">
-                            <?php if ($link['icon'] === 'tachometer-alt'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93s3.05-7.44 7-7.93V6h2V4c3.94.49 7 3.85 7 7.93s-3.05 7.44-7 7.93v-2h-2v2zM12 14l3-3h-2V7h-2v4H9l3 3z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'school'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'users'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'chalkboard-teacher'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'user-tie'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M12 2C9.24 2 7 4.24 7 7c0 1.69.88 3.19 2.22 4.03C6.47 11.81 4 14.43 4 17.5V20h16v-2.5c0-3.07-2.47-5.69-5.22-6.47C16.12 10.19 17 8.69 17 7c0-2.76-2.24-5-5-5zm-2 5c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm2 10.5l-2-2 2-3 2 3-2 2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'calendar-check'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13zm-5-6l-4-4-2 2 6 6 9-9-2-2-7 7z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'credit-card'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V8h16v10zm-4-4h-2v2h-4v-2H8v-2h2v-2h4v2h2v2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'money-bill'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M21 4H3c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 15H3V6h18v13zm-6-6c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'list'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'calendar'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'user'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'book'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'tasks'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'money-check-alt'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M8 6h8v2H8V6zm8 4H8v2h8v-2zm-8 4h5v2H8v-2zm12-8H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 13H4V8h16v11z"/>
+                <h4 class="institute-title" style="margin-bottom:0; margin-left:4px; color: var(--text-clr);"><?php echo esc_html($title); ?></h4>
+            </div>
+            <button onclick="toggleSidebar()" id="toggle-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+                    <path d="m313-480 155 156q11 11 11.5 27.5T468-268q-11 11-28 11t-28-11L228-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T468-692q11 11 11 28t-11 28L313-480Zm264 0 155 156q11 11 11.5 27.5T732-268q-11 11-28 11t-28-11L492-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T732-692q11 11 11 28t-11 28L577-480Z"/>
+                </svg>
+            </button>
+        </li>
+        <?php foreach ($links[$role] as $link): ?>
+            <?php if (isset($link['submenu'])): ?>
+                <li>
+                    <button onclick="toggleSubMenu(this)" class="dropdown-btn <?php echo $active_section === $link['section'] ? 'rotate' : ''; ?>">
+                        <?php if ($link['icon'] === 'tachometer-alt'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93s3.05-7.44 7-7.93V6h2V4c3.94.49 7 3.85 7 7.93s-3.05 7.44-7 7.93v-2h-2v2zM12 14l3-3h-2V7h-2v4H9l3 3z"/>
                             </svg>
-                            <?php elseif ($link['icon'] === 'calendar-alt'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'building'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'boxes'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 16H7v-4h4v4zm0-6H7V9h4v4zm0-6H7V5h4v2zm6 12h-4v-4h4v4zm0-6h-4V9h4v4zm0-6h-4V5h4v2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'book-reader'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M21 4H3c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 15H3V6h18v13zM9 8h2v2H9V8zm0 4h2v2H9v-2zm4-4h2v2h-2V8zm0 4h2v2h-2v-2zm4-4h2v2h-2V8zm0 4h2v2h-2v-2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'cogs'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.44.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.3-.06.64-.06.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'bullhorn'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H4V4h16v16zM18 6h-5l-1 2h6V6zm-1 4H8l-1 2h10v-2zm-4 4H6l-1 2h8v-2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'megaphone'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M18 3v2h-2V3H8v2H6V3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h2.01L9 18h6l1 3h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 12H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm8 8h-2v-2h2v2zm0-4h-2V9h2v2zm0-4h-2V5h2v2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'envelope'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                                </svg>
-                            <?php endif; ?>
-                            <span><?php echo esc_html($link['label']); ?></span>
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
-                                <path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/>
+                        <?php elseif ($link['icon'] === 'school'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
                             </svg>
-                        </button>
-                        <ul class="sub-menu <?php echo $active_section === $link['section'] ? 'show' : ''; ?>">
-                            <div>
-                                <?php foreach ($link['submenu'] as $sub_link): ?>
-                                    <?php if (isset($sub_link['submenu'])): ?>
-                                        <li>
-                                            <button onclick="toggleNestedSubMenu(this)" class="nested-dropdown-btn <?php echo $active_action === $sub_link['action'] ? 'rotate' : ''; ?>">
-                                                <?php echo esc_html($sub_link['label']); ?>
-                                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
-                                                    <path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/>
-                                                </svg>
-                                            </button>
-                                            <ul class="nested-sub-menu <?php echo $active_action === $sub_link['action'] ? 'show' : ''; ?>">
-                                                <?php foreach ($sub_link['submenu'] as $nested_link): ?>
-                                                    <li class="<?php echo $active_action === $nested_link['action'] ? 'active' : ''; ?>">
-                                                        <a href="<?php echo esc_url($nested_link['url']); ?>"><?php echo esc_html($nested_link['label']); ?></a>
-                                                    </li>
-                                                <?php endforeach; ?>
-                                            </ul>
-                                        </li>
-                                    <?php else: ?>
-                                        <li class="<?php echo $active_section === $link['section'] && $active_action === $sub_link['action'] ? 'active' : ''; ?>">
-                                            <a href="<?php echo esc_url($sub_link['url']); ?>"><?php echo esc_html($sub_link['label']); ?></a>
-                                        </li>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            </div>
-                        </ul>
-                    </li>
-                <?php else: ?>
-                    <li class="<?php echo $active_section === $link['section'] ? 'active' : ''; ?>">
-                        <a href="<?php echo esc_url($link['url']); ?>">
-                            <?php if ($link['icon'] === 'tachometer-alt'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93s3.05-7.44 7-7.93V6h2V4c3.94.49 7 3.85 7 7.93s-3.05 7.44-7 7.93v-2h-2v2zM12 14l3-3h-2V7h-2v4H9l3 3z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'school'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'users'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'chalkboard-teacher'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'user-tie'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M12 2C9.24 2 7 4.24 7 7c0 1.69.88 3.19 2.22 4.03C6.47 11.81 4 14.43 4 17.5V20h16v-2.5c0-3.07-2.47-5.69-5.22-6.47C16.12 10.19 17 8.69 17 7c0-2.76-2.24-5-5-5zm-2 5c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm2 10.5l-2-2 2-3 2 3-2 2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'calendar-check'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13zm-5-6l-4-4-2 2 6 6 9-9-2-2-7 7z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'credit-card'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox"0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.1 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V8h16v10zm-4-4h-2v2h-4v-2H8v-2h2v-2h4v2h2v2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'money-bill'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M21 4H3c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 15H3V6h18v13zm-6-6c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'list'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'calendar'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'user'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'book'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'tasks'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'money-check-alt'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M8 6h8v2H8V6zm8 4H8v2h8v-2zm-8 4h5v2H8v-2zm12-8H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 13H4V8h16v11z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'calendar-alt'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'building'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'boxes'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 16H7v-4h4v4zm0-6H7V9h4v4zm0-6H7V5h4v2zm6 12h-4v-4h4v4zm0-6h-4V9h4v4zm0-6h-4V5h4v2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'book-reader'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M21 4H3c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 15H3V6h18v13zM9 8h2v2H9V8zm0 4h2v2H9v-2zm4-4h2v2h-2V8zm0 4h2v2h-2v-2zm4-4h2v2h-2V8zm0 4h2v2h-2v-2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'cogs'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.44.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.3-.06.64-.06.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'bullhorn'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H4V4h16v16zM18 6h-5l-1 2h6V6zm-1 4H8l-1 2h10v-2zm-4 4H6l-1 2h8v-2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'megaphone'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M18 3v2h-2V3H8v2H6V3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h2.01L9 18h6l1 3h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 12H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm8 8h-2v-2h2v2zm0-4h-2V9h2v2zm0-4h-2V5h2v2z"/>
-                                </svg>
-                            <?php elseif ($link['icon'] === 'envelope'): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-                                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                                </svg>
-                            <?php endif; ?>
-                            <span><?php echo esc_html($link['label']); ?></span>
-                        </a>
-                    </li>
-                <?php endif; ?>
-            <?php endforeach; ?>
-        </ul>
-    </nav>
+                        <?php elseif ($link['icon'] === 'users'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'chalkboard-teacher'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'user-tie'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M12 2C9.24 2 7 4.24 7 7c0 1.69.88 3.19 2.22 4.03C6.47 11.81 4 14.43 4 17.5V20h16v-2.5c0-3.07-2.47-5.69-5.22-6.47C16.12 10.19 17 8.69 17 7c0-2.76-2.24-5-5-5zm-2 5c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm2 10.5l-2-2 2-3 2 3-2 2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'calendar-check'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13zm-5-6l-4-4-2 2 6 6 9-9-2-2-7 7z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'credit-card'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V8h16v10zm-4-4h-2v2h-4v-2H8v-2h2v-2h4v2h2v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'money-bill'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M21 4H3c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 15H3V6h18v13zm-6-6c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'list'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'calendar'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'user'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'book'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'tasks'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'money-check-alt'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M8 6h8v2H8V6zm8 4H8v2h8v-2zm-8 4h5v2H8v-2zm12-8H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 13H4V8h16v11z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'calendar-alt'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'building'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'boxes'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 16H7v-4h4v4zm0-6H7V9h4v4zm0-6H7V5h4v2zm6 12h-4v-4h4v4zm0-6h-4V9h4v4zm0-6h-4V5h4v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'book-reader'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M21 4H3c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 15H3V6h18v13zM9 8h2v2H9V8zm0 4h2v2H9v-2zm4-4h2v2h-2V8zm0 4h2v2h-2v-2zm4-4h2v2h-2V8zm0 4h2v2h-2v-2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'cogs'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.44.17-.47-.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.3-.06.64-.06.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'bullhorn'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H4V4h16v16zM18 6h-5l-1 2h6V6zm-1 4H8l-1 2h10v-2zm-4 4H6l-1 2h8v-2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'megaphone'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M18 3v2h-2V3H8v2H6V3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h2.01L9 18h6l1 3h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 12H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm8 8h-2v-2h2v2zm0-4h-2V9h2v2zm0-4h-2V5h2v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'envelope'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'chart-bar'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M22 3H2c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 14h-4v-4h4v4zm-6 0h-4V7h4v10zm-6 0H4V9h4v8z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'graduation-cap'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'file-invoice-dollar'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-3v2h1.5c.83 0 1.5-.67 1.5-1.5 0-.83-.67-1.5-1.5-1.5zm-3-3h3c0-1.66-1.34-3-3-3v2zm-2-3c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1h3v2h-3c-1.66 0-3-1.34-3-3V8h3zm-3 6H6v-2h4v2zm0-4H6V8h4v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'bus'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'bus-alt'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M17 3H7c-1.1 0-2 .9-2 2v11c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h6v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V5c0-1.1-.9-2-2-2zm-2 13.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-6 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM17 11H7V6h10v5z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'user-friends'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05C16.19 13.88 17 15.03 17 16.5V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                            </svg>
+                        <?php endif; ?>
+                        <span><?php echo esc_html($link['label']); ?></span>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+                            <path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/>
+                        </svg>
+                    </button>
+                    <ul class="sub-menu <?php echo $active_section === $link['section'] ? 'show' : ''; ?>">
+                        <div>
+                            <?php foreach ($link['submenu'] as $sub_link): ?>
+                                <?php if (isset($sub_link['submenu'])): ?>
+                                    <li>
+                                        <button onclick="toggleNestedSubMenu(this)" class="nested-dropdown-btn <?php echo $active_action === $sub_link['action'] ? 'rotate' : ''; ?>">
+                                            <?php echo esc_html($sub_link['label']); ?>
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+                                                <path d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z"/>
+                                            </svg>
+                                        </button>
+                                        <ul class="nested-sub-menu <?php echo $active_action === $sub_link['action'] ? 'show' : ''; ?>">
+                                            <?php foreach ($sub_link['submenu'] as $nested_link): ?>
+                                                <li class="<?php echo $active_action === $nested_link['action'] ? 'active' : ''; ?>">
+                                                    <a href="<?php echo esc_url($nested_link['url']); ?>"><?php echo esc_html($nested_link['label']); ?></a>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    </li>
+                                <?php else: ?>
+                                    <li class="<?php echo $active_section === $link['section'] && $active_action === $sub_link['action'] ? 'active' : ''; ?>">
+                                        <a href="<?php echo esc_url($sub_link['url']); ?>"><?php echo esc_html($sub_link['label']); ?></a>
+                                    </li>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </div>
+                    </ul>
+                </li>
+            <?php else: ?>
+                <li class="<?php echo $active_section === $link['section'] ? 'active' : ''; ?>">
+                    <a href="<?php echo esc_url($link['url']); ?>">
+                        <?php if ($link['icon'] === 'tachometer-alt'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93s3.05-7.44 7-7.93V6h2V4c3.94.49 7 3.85 7 7.93s-3.05 7.44-7 7.93v-2h-2v2zM12 14l3-3h-2V7h-2v4H9l3 3z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'school'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'users'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'chalkboard-teacher'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'user-tie'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M12 2C9.24 2 7 4.24 7 7c0 1.69.88 3.19 2.22 4.03C6.47 11.81 4 14.43 4 17.5V20h16v-2.5c0-3.07-2.47-5.69-5.22-6.47C16.12 10.19 17 8.69 17 7c0-2.76-2.24-5-5-5zm-2 5c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm2 10.5l-2-2 2-3 2 3-2 2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'calendar-check'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13zm-5-6l-4-4-2 2 6 6 9-9-2-2-7 7z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'credit-card'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V8h16v10zm-4-4h-2v2h-4v-2H8v-2h2v-2h4v2h2v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'money-bill'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M21 4H3c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 15H3V6h18v13zm-6-6c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'list'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'calendar'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'user'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'book'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'tasks'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'money-check-alt'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M8 6h8v2H8V6zm8 4H8v2h8v-2zm-8 4h5v2H8v-2zm12-8H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 13H4V8h16v11z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'calendar-alt'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'building'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'boxes'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 16H7v-4h4v4zm0-6H7V9h4v4zm0-6H7V5h4v2zm6 12h-4v-4h4v4zm0-6h-4V9h4v4zm0-6h-4V5h4v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'book-reader'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M21 4H3c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 15H3V6h18v13zM9 8h2v2H9V8zm0 4h2v2H9v-2zm4-4h2v2h-2V8zm0 4h2v2h-2v-2zm4-4h2v2h-2V8zm0 4h2v2h-2v-2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'cogs'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.44.17-.47-.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.3-.06.64-.06.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'bullhorn'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H4V4h16v16zM18 6h-5l-1 2h6V6zm-1 4H8l-1 2h10v-2zm-4 4H6l-1 2h8v-2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'megaphone'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M18 3v2h-2V3H8v2H6V3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h2.01L9 18h6l1 3h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 12H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm8 8h-2v-2h2v2zm0-4h-2V9h2v2zm0-4h-2V5h2v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'envelope'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'chart-bar'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M22 3H2c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 14h-4v-4h4v4zm-6 0h-4V7h4v10zm-6 0H4V9h4v8z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'graduation-cap'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'file-invoice-dollar'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-3v2h1.5c.83 0 1.5-.67 1.5-1.5 0-.83-.67-1.5-1.5-1.5zm-3-3h3c0-1.66-1.34-3-3-3v2zm-2-3c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1h3v2h-3c-1.66 0-3-1.34-3-3V8h3zm-3 6H6v-2h4v2zm0-4H6V8h4v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'bus'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1- main-content2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'bus-alt'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M17 3H7c-1.1 0-2 .9-2 2v11c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h6v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V5c0-1.1-.9-2-2-2zm-2 13.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-6 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM17 11H7V6h10v5z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'user-friends'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05C16.19 13.88 17 15.03 17 16.5V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                            </svg>
+                        <?php endif; ?>
+                        <span><?php echo esc_html($link['label']); ?></span>
+                    </a>
+                </li>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </ul>
+</nav>
+
     <script>
         function toggleNestedSubMenu(button) {
             const subMenu = button.nextElementSibling;
@@ -10159,6 +10359,3866 @@ function demoRenderSuperadminNewConversation() {
  * Render Institute Admin Content
  */
 
+// Data Function
+function demoGetInstituteAdminData() {
+    return [
+        'institute' => 'Sunrise International School',
+        'students' => [
+            ['id' => 1, 'name' => 'John Doe', 'email' => 'john.doe@example.com', 'grade' => '10'],
+            ['id' => 2, 'name' => 'Aisha Khan', 'email' => 'aisha.k@example.com', 'grade' => '11'],
+            ['id' => 3, 'name' => 'Michael Chen', 'email' => 'm.chen@example.com', 'grade' => '9'],
+            ['id' => 4, 'name' => 'Priya Sharma', 'email' => '', 'grade' => '10'], // Missing email
+            ['id' => 5, 'name' => 'Carlos Rivera', 'email' => 'carlos.rivera@example.com', 'grade' => '12'],
+            ['id' => 6, 'name' => 'Emma Wilson', 'email' => 'emma.w@example.com', 'grade' => '11'],
+        ],
+        'teachers' => [
+            ['id' => 1, 'name' => 'Jane Smith', 'email' => 'jane.smith@example.com', 'subject' => 'Mathematics'],
+            ['id' => 2, 'name' => 'Robert Patel', 'email' => 'r.patel@example.com', 'subject' => 'Physics'],
+            ['id' => 3, 'name' => 'Linda Brown', 'email' => 'linda.b@example.com', 'subject' => 'English'],
+            ['id' => 4, 'name' => 'Ahmed Zaki', 'email' => 'ahmed.zaki@example.com', 'subject' => 'Chemistry'],
+        ],
+        'staff' => [
+            ['id' => 1, 'name' => 'Mike Brown', 'email' => 'mike.brown@example.com', 'role' => 'Librarian'],
+            ['id' => 2, 'name' => 'Sarah Lee', 'email' => 'sarah.lee@example.com', 'role' => 'Receptionist'],
+            ['id' => 3, 'name' => 'David Kim', 'email' => '', 'role' => 'Janitor'], // Missing email
+        ],
+        'exams' => [
+            ['id' => 1, 'name' => 'Midterm', 'date' => '2025-05-01', 'subject' => 'Mathematics'],
+            ['id' => 2, 'name' => 'Quarterly', 'date' => '2025-04-25', 'subject' => 'Physics'],
+            ['id' => 3, 'name' => 'Final', 'date' => '2025-06-15', 'subject' => 'English'],
+            ['id' => 4, 'name' => 'Mock Test', 'date' => '2025-05-10', 'subject' => 'Chemistry'],
+            ['id' => 5, 'name' => 'Unit Test', 'date' => '2025-04-20', 'subject' => 'Biology'],
+        ],
+        'student_attendance' => [
+            ['id' => 1, 'student_name' => 'John Doe', 'date' => '2025-04-18', 'status' => 'Present'],
+            ['id' => 2, 'student_name' => 'Aisha Khan', 'date' => '2025-04-18', 'status' => 'Absent'],
+            ['id' => 3, 'student_name' => 'Michael Chen', 'date' => '2025-04-18', 'status' => 'Present'],
+            ['id' => 4, 'student_name' => 'Priya Sharma', 'date' => '2025-04-18', 'status' => 'Late'],
+            ['id' => 5, 'student_name' => 'Carlos Rivera', 'date' => '2025-04-19', 'status' => 'Present'],
+            ['id' => 6, 'student_name' => 'Emma Wilson', 'date' => '2025-04-19', 'status' => 'Absent'],
+            ['id' => 7, 'student_name' => 'John Doe', 'date' => '2025-04-19', 'status' => 'Present'],
+        ],
+        'teacher_attendance' => [
+            ['id' => 1, 'teacher_name' => 'Jane Smith', 'date' => '2025-04-18', 'status' => 'Present'],
+            ['id' => 2, 'teacher_name' => 'Robert Patel', 'date' => '2025-04-18', 'status' => 'Present'],
+            ['id' => 3, 'teacher_name' => 'Linda Brown', 'date' => '2025-04-18', 'status' => 'Absent'],
+            ['id' => 4, 'teacher_name' => 'Ahmed Zaki', 'date' => '2025-04-19', 'status' => 'Present'],
+        ],
+        'staff_attendance' => [
+            ['id' => 1, 'staff_name' => 'Mike Brown', 'date' => '2025-04-18', 'status' => 'Present'],
+            ['id' => 2, 'staff_name' => 'Sarah Lee', 'date' => '2025-04-18', 'status' => 'Present'],
+            ['id' => 3, 'staff_name' => 'David Kim', 'date' => '2025-04-18', 'status' => 'Absent'],
+            ['id' => 4, 'staff_name' => 'Mike Brown', 'date' => '2025-04-19', 'status' => 'Present'],
+        ],
+        'fees' => [
+            ['id' => 1, 'student_name' => 'John Doe', 'amount' => 500, 'due_date' => '2025-05-01', 'status' => 'Pending'],
+            ['id' => 2, 'student_name' => 'Aisha Khan', 'amount' => 600, 'due_date' => '2025-05-01', 'status' => 'Paid'],
+            ['id' => 3, 'student_name' => 'Michael Chen', 'amount' => 450, 'due_date' => '2025-04-30', 'status' => 'Pending'],
+            ['id' => 4, 'student_name' => 'Priya Sharma', 'amount' => 500, 'due_date' => '2025-05-01', 'status' => 'Overdue'],
+            ['id' => 5, 'student_name' => 'Carlos Rivera', 'amount' => 700, 'due_date' => '2025-05-15', 'status' => 'Paid'],
+        ],
+        'notices' => [
+            ['id' => 1, 'title' => 'Holiday Notice', 'content' => 'School closed on May 1 for Labor Day.', 'date' => '2025-04-18'],
+            ['id' => 2, 'title' => 'Parent-Teacher Meeting', 'content' => 'Scheduled for April 25.', 'date' => '2025-04-20'],
+        ],
+        'announcements' => [
+            ['id' => 1, 'title' => 'Annual Day', 'content' => 'Join us on June 1 for performances.', 'date' => '2025-04-18'],
+            ['id' => 2, 'title' => 'Science Fair', 'content' => 'Submit projects by May 15.', 'date' => '2025-04-19'],
+            ['id' => 3, 'title' => 'Sports Day', 'content' => 'Event on May 20, all welcome.', 'date' => '2025-04-20'],
+            ['id' => 4, 'title' => 'Book Fair', 'content' => 'Visit the library on April 30.', 'date' => '2025-04-22'],
+        ],
+        'library' => [
+            ['id' => 1, 'title' => 'Mathematics 101', 'author' => 'John Author', 'isbn' => '1234567890'],
+            ['id' => 2, 'title' => 'Physics for Beginners', 'author' => 'Dr. Alice', 'isbn' => '0987654321'],
+            ['id' => 3, 'title' => 'Classic Literature', 'author' => 'Various', 'isbn' => '1122334455'],
+            ['id' => 4, 'title' => 'Chemistry Basics', 'author' => '', 'isbn' => '2233445566'], // Missing author
+        ],
+        'library_transactions' => [
+            ['id' => 1, 'book_title' => 'Mathematics 101', 'user_name' => 'John Doe', 'issue_date' => '2025-04-18', 'status' => 'Issued'],
+            ['id' => 2, 'book_title' => 'Physics for Beginners', 'user_name' => 'Aisha Khan', 'issue_date' => '2025-04-17', 'status' => 'Returned'],
+            ['id' => 3, 'book_title' => 'Classic Literature', 'user_name' => 'Michael Chen', 'issue_date' => '2025-04-19', 'status' => 'Issued'],
+            ['id' => 4, 'book_title' => 'Chemistry Basics', 'user_name' => 'Priya Sharma', 'issue_date' => '2025-04-16', 'status' => 'Overdue'],
+        ],
+        'inventory' => [
+            ['id' => 1, 'item_name' => 'Projector', 'quantity' => 5, 'status' => 'Available'],
+            ['id' => 2, 'item_name' => 'Laptop', 'quantity' => 10, 'status' => 'Available'],
+            ['id' => 3, 'item_name' => 'Microscope', 'quantity' => 3, 'status' => 'In Use'],
+            ['id' => 4, 'item_name' => 'Whiteboard', 'quantity' => 8, 'status' => 'Available'],
+            ['id' => 5, 'item_name' => 'Sports Kit', 'quantity' => 2, 'status' => 'Damaged'],
+        ],
+        'inventory_transactions' => [
+            ['id' => 1, 'item_name' => 'Projector', 'user_name' => 'Jane Smith', 'issue_date' => '2025-04-18', 'status' => 'Issued'],
+            ['id' => 2, 'item_name' => 'Laptop', 'user_name' => 'Robert Patel', 'issue_date' => '2025-04-17', 'status' => 'Returned'],
+            ['id' => 3, 'item_name' => 'Microscope', 'user_name' => 'Ahmed Zaki', 'issue_date' => '2025-04-19', 'status' => 'Issued'],
+        ],
+        'chats' => [
+            ['id' => 1, 'sender' => 'John Doe', 'receiver' => 'Jane Smith', 'message' => 'Meeting at 3 PM?', 'timestamp' => '2025-04-18 14:00'],
+            ['id' => 2, 'sender' => 'Jane Smith', 'receiver' => 'John Doe', 'message' => 'Yes, confirmed.', 'timestamp' => '2025-04-18 14:05'],
+            ['id' => 3, 'sender' => 'Aisha Khan', 'receiver' => 'Robert Patel', 'message' => 'Need help with physics homework.', 'timestamp' => '2025-04-19 09:30'],
+            ['id' => 4, 'sender' => 'Robert Patel', 'receiver' => 'Aisha Khan', 'message' => 'Come to my office at 11 AM.', 'timestamp' => '2025-04-19 09:35'],
+            ['id' => 5, 'sender' => 'Michael Chen', 'receiver' => 'Linda Brown', 'message' => 'Can we discuss the essay?', 'timestamp' => '2025-04-19 10:00'],
+        ],
+        'reports' => [
+            ['id' => 1, 'type' => 'Attendance', 'date' => '2025-04-18', 'summary' => '90% attendance rate'],
+            ['id' => 2, 'type' => 'Fee Collection', 'date' => '2025-04-19', 'summary' => '75% fees collected'],
+            ['id' => 3, 'type' => 'Exam Performance', 'date' => '2025-04-20', 'summary' => 'Average score: 82%'],
+        ],
+        'results' => [
+            ['id' => 1, 'student_name' => 'John Doe', 'exam' => 'Midterm', 'marks' => 85],
+            ['id' => 2, 'student_name' => 'Aisha Khan', 'exam' => 'Midterm', 'marks' => 92],
+            ['id' => 3, 'student_name' => 'Michael Chen', 'exam' => 'Quarterly', 'marks' => 78],
+            ['id' => 4, 'student_name' => 'Priya Sharma', 'exam' => 'Midterm', 'marks' => 88],
+            ['id' => 5, 'student_name' => 'Carlos Rivera', 'exam' => 'Unit Test', 'marks' => 90],
+            ['id' => 6, 'student_name' => 'Emma Wilson', 'exam' => 'Midterm', 'marks' => 76],
+        ],
+        'fee_templates' => [
+            ['id' => 1, 'name' => 'Annual Fee', 'amount' => 1000, 'frequency' => 'Yearly'],
+            ['id' => 2, 'name' => 'Monthly Tuition', 'amount' => 200, 'frequency' => 'Monthly'],
+            ['id' => 3, 'name' => 'Transport Fee', 'amount' => 150, 'frequency' => 'Monthly'],
+            ['id' => 4, 'name' => 'Lab Fee', 'amount' => 50, 'frequency' => 'Quarterly'],
+        ],
+        'transport' => [
+            ['id' => 1, 'route' => 'Route A', 'vehicle' => 'Bus 101', 'capacity' => 50],
+            ['id' => 2, 'route' => 'Route B', 'vehicle' => 'Van 202', 'capacity' => 20],
+            ['id' => 3, 'route' => 'Route C', 'vehicle' => 'Bus 103', 'capacity' => 45],
+        ],
+        'transport_enrollments' => [
+            ['id' => 1, 'student_name' => 'John Doe', 'route' => 'Route A', 'status' => 'Active'],
+            ['id' => 2, 'student_name' => 'Aisha Khan', 'route' => 'Route B', 'status' => 'Active'],
+            ['id' => 3, 'student_name' => 'Michael Chen', 'route' => 'Route A', 'status' => 'Inactive'],
+            ['id' => 4, 'student_name' => 'Priya Sharma', 'route' => 'Route C', 'status' => 'Active'],
+        ],
+        'departments' => [
+            ['id' => 1, 'name' => 'Science', 'head' => 'Jane Smith'],
+            ['id' => 2, 'name' => 'Arts', 'head' => 'Linda Brown'],
+            ['id' => 3, 'name' => 'Mathematics', 'head' => 'Robert Patel'],
+        ],
+        'subjects' => [
+            ['id' => 1, 'name' => 'Mathematics', 'teacher' => 'Jane Smith', 'class' => '10'],
+            ['id' => 2, 'name' => 'Physics', 'teacher' => 'Robert Patel', 'class' => '11'],
+            ['id' => 3, 'name' => 'English', 'teacher' => 'Linda Brown', 'class' => '9'],
+            ['id' => 4, 'name' => 'Chemistry', 'teacher' => 'Ahmed Zaki', 'class' => '10'],
+            ['id' => 5, 'name' => 'Biology', 'teacher' => 'Ahmed Zaki', 'class' => '11'],
+        ],
+        'timetable' => [
+            ['id' => 1, 'class' => '10', 'day' => 'Monday', 'period' => 1, 'subject' => 'Mathematics', 'teacher' => 'Jane Smith', 'time' => '08:00-09:00'],
+            ['id' => 2, 'class' => '10', 'day' => 'Monday', 'period' => 2, 'subject' => 'English', 'teacher' => 'Linda Brown', 'time' => '09:00-10:00'],
+            ['id' => 3, 'class' => '11', 'day' => 'Tuesday', 'period' => 1, 'subject' => 'Physics', 'teacher' => 'Robert Patel', 'time' => '08:00-09:00'],
+            ['id' => 4, 'class' => '9', 'day' => 'Wednesday', 'period' => 3, 'subject' => 'English', 'teacher' => 'Linda Brown', 'time' => '10:00-11:00'],
+            ['id' => 5, 'class' => '10', 'day' => 'Friday', 'period' => 4, 'subject' => 'Chemistry', 'teacher' => 'Ahmed Zaki', 'time' => '11:00-12:00'],
+        ],
+        'homework' => [
+            ['id' => 1, 'subject' => 'Mathematics', 'class' => '10', 'due_date' => '2025-04-20', 'description' => 'Solve chapter 5 exercises'],
+            ['id' => 2, 'subject' => 'English', 'class' => '9', 'due_date' => '2025-04-22', 'description' => 'Write an essay on Shakespeare'],
+            ['id' => 3, 'subject' => 'Physics', 'class' => '11', 'due_date' => '2025-04-21', 'description' => 'Complete lab report'],
+            ['id' => 4, 'subject' => 'Chemistry', 'class' => '10', 'due_date' => '2025-04-23', 'description' => 'Balance 10 chemical equations'],
+        ],
+        'classes_sections' => [
+            ['id' => 1, 'class' => '10', 'section' => 'A', 'teacher' => 'Jane Smith'],
+            ['id' => 2, 'class' => '10', 'section' => 'B', 'teacher' => 'Robert Patel'],
+            ['id' => 3, 'class' => '11', 'section' => 'A', 'teacher' => 'Ahmed Zaki'],
+            ['id' => 4, 'class' => '9', 'section' => 'A', 'teacher' => 'Linda Brown'],
+        ],
+        'subscriptions' => [
+            ['id' => 1, 'plan' => 'Premium', 'start_date' => '2025-01-01', 'end_date' => '2025-12-31', 'status' => 'Active'],
+            ['id' => 2, 'plan' => 'Basic', 'start_date' => '2025-03-01', 'end_date' => '2025-08-31', 'status' => 'Active'],
+            ['id' => 3, 'plan' => 'Premium', 'start_date' => '2025-02-15', 'end_date' => '2026-02-14', 'status' => 'Active'],
+            ['id' => 4, 'plan' => 'Standard', 'start_date' => '2025-04-01', 'end_date' => '2025-09-30', 'status' => 'Inactive'],
+        ],
+        'parents' => [
+            ['id' => 1, 'parent_name' => 'Mary Doe', 'contact' => '0123456789', 'email' => 'mary.doe@example.com', 'student_name' => 'John Doe'],
+            ['id' => 2, 'parent_name' => 'Rahul Khan', 'contact' => '0987654321', 'email' => 'rahul.k@example.com', 'student_name' => 'Aisha Khan'],
+            ['id' => 3, 'parent_name' => 'Li Chen', 'contact' => '1122334455', 'email' => '', 'student_name' => 'Michael Chen'], // Missing email
+            ['id' => 4, 'parent_name' => 'Anita Sharma', 'contact' => '2233445566', 'email' => 'anita.s@example.com', 'student_name' => 'Priya Sharma'],
+            ['id' => 5, 'parent_name' => 'Maria Rivera', 'contact' => '3344556677', 'email' => 'maria.r@example.com', 'student_name' => 'Carlos Rivera'],
+        ],
+    ];
+}
+
+// Updated Content Rendering Function
+function demoRenderInstituteAdminContent($section, $action, $data) {
+    ob_start();
+    switch ($section) {
+        case 'overview':
+            ?>
+            <div class="dashboard-section">
+                <h2>Institute Admin Dashboard</h2>
+                <div class="alert alert-info">Welcome to the <?php echo esc_html($data['institute']); ?> Admin Dashboard.</div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Students</h5>
+                                <p class="card-text"><?php echo count($data['students']); ?> Students</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Teachers</h5>
+                                <p class="card-text"><?php echo count($data['teachers']); ?> Teachers</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Staff</h5>
+                                <p class="card-text"><?php echo count($data['staff']); ?> Staff</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php
+            break;
+
+        case 'students':
+            if ($action === 'add-student') {
+                echo demoRenderInstituteAdminAddStudent();
+            } elseif ($action === 'edit-student') {
+                echo demoRenderInstituteAdminEditStudent();
+            } elseif ($action === 'delete-student') {
+                echo demoRenderInstituteAdminDeleteStudent();
+            } else {
+                echo demoRenderInstituteAdminStudents($data);
+            }
+            break;
+
+        case 'teachers':
+            if ($action === 'add-teacher') {
+                echo demoRenderInstituteAdminAddTeacher();
+            } elseif ($action === 'edit-teacher') {
+                echo demoRenderInstituteAdminEditTeacher();
+            } elseif ($action === 'delete-teacher') {
+                echo demoRenderInstituteAdminDeleteTeacher();
+            } else {
+                echo demoRenderInstituteAdminTeachers($data);
+            }
+            break;
+
+        case 'staff':
+            if ($action === 'add-staff') {
+                echo demoRenderInstituteAdminAddStaff();
+            } elseif ($action === 'edit-staff') {
+                echo demoRenderInstituteAdminEditStaff();
+            } elseif ($action === 'delete-staff') {
+                echo demoRenderInstituteAdminDeleteStaff();
+            } else {
+                echo demoRenderInstituteAdminStaff($data);
+            }
+            break;
+
+        case 'exams':
+            if ($action === 'add-exam') {
+                echo demoRenderInstituteAdminAddExam();
+            } elseif ($action === 'edit-exam') {
+                echo demoRenderInstituteAdminEditExam();
+            } elseif ($action === 'delete-exam') {
+                echo demoRenderInstituteAdminDeleteExam();
+            } else {
+                echo demoRenderInstituteAdminExams($data);
+            }
+            break;
+
+        case 'attendance':
+            if ($action === 'manage-student-attendance') {
+                echo demoRenderInstituteAdminStudentAttendance($data);
+            } elseif ($action === 'add-student-attendance') {
+                echo demoRenderInstituteAdminAddStudentAttendance();
+            } elseif ($action === 'edit-student-attendance') {
+                echo demoRenderInstituteAdminEditStudentAttendance();
+            } elseif ($action === 'delete-student-attendance') {
+                echo demoRenderInstituteAdminDeleteStudentAttendance();
+            } elseif ($action === 'manage-teacher-attendance') {
+                echo demoRenderInstituteAdminTeacherAttendance($data);
+            } elseif ($action === 'add-teacher-attendance') {
+                echo demoRenderInstituteAdminAddTeacherAttendance();
+            } elseif ($action === 'edit-teacher-attendance') {
+                echo demoRenderInstituteAdminEditTeacherAttendance();
+            } elseif ($action === 'delete-teacher-attendance') {
+                echo demoRenderInstituteAdminDeleteTeacherAttendance();
+            } elseif ($action === 'manage-staff-attendance') {
+                echo demoRenderInstituteAdminStaffAttendance($data);
+            } elseif ($action === 'add-staff-attendance') {
+                echo demoRenderInstituteAdminAddStaffAttendance();
+            } elseif ($action === 'edit-staff-attendance') {
+                echo demoRenderInstituteAdminEditStaffAttendance();
+            } elseif ($action === 'delete-staff-attendance') {
+                echo demoRenderInstituteAdminDeleteStaffAttendance();
+            } else {
+                echo demoRenderInstituteAdminAttendance($data);
+            }
+            break;
+
+        case 'fees':
+            if ($action === 'add-fee') {
+                echo demoRenderInstituteAdminAddFee();
+            } elseif ($action === 'edit-fee') {
+                echo demoRenderInstituteAdminEditFee();
+            } elseif ($action === 'delete-fee') {
+                echo demoRenderInstituteAdminDeleteFee();
+            } else {
+                echo demoRenderInstituteAdminFees($data);
+            }
+            break;
+
+        case 'notices':
+            if ($action === 'add-notice') {
+                echo demoRenderInstituteAdminAddNotice();
+            } elseif ($action === 'edit-notice') {
+                echo demoRenderInstituteAdminEditNotice();
+            } elseif ($action === 'delete-notice') {
+                echo demoRenderInstituteAdminDeleteNotice();
+            } else {
+                echo demoRenderInstituteAdminNotices($data);
+            }
+            break;
+
+        case 'announcements':
+            if ($action === 'add-announcement') {
+                echo demoRenderInstituteAdminAddAnnouncement();
+            } elseif ($action === 'edit-announcement') {
+                echo demoRenderInstituteAdminEditAnnouncement();
+            } elseif ($action === 'delete-announcement') {
+                echo demoRenderInstituteAdminDeleteAnnouncement();
+            } else {
+                echo demoRenderInstituteAdminAnnouncements($data);
+            }
+            break;
+
+        case 'library':
+            if ($action === 'add-book') {
+                echo demoRenderInstituteAdminAddBook();
+            } elseif ($action === 'edit-book') {
+                echo demoRenderInstituteAdminEditBook();
+            } elseif ($action === 'delete-book') {
+                echo demoRenderInstituteAdminDeleteBook();
+            } else {
+                echo demoRenderInstituteAdminLibrary($data);
+            }
+            break;
+
+        case 'library_transactions':
+            if ($action === 'add-transaction') {
+                echo demoRenderInstituteAdminAddLibraryTransaction();
+            } elseif ($action === 'edit-transaction') {
+                echo demoRenderInstituteAdminEditLibraryTransaction();
+            } elseif ($action === 'delete-transaction') {
+                echo demoRenderInstituteAdminDeleteLibraryTransaction();
+            } else {
+                echo demoRenderInstituteAdminLibraryTransactions($data);
+            }
+            break;
+
+        case 'inventory':
+            if ($action === 'add-item') {
+                echo demoRenderInstituteAdminAddInventoryItem();
+            } elseif ($action === 'edit-item') {
+                echo demoRenderInstituteAdminEditInventoryItem();
+            } elseif ($action === 'delete-item') {
+                echo demoRenderInstituteAdminDeleteInventoryItem();
+            } else {
+                echo demoRenderInstituteAdminInventory($data);
+            }
+            break;
+
+        case 'inventory_transactions':
+            if ($action === 'add-transaction') {
+                echo demoRenderInstituteAdminAddInventoryTransaction();
+            } elseif ($action === 'edit-transaction') {
+                echo demoRenderInstituteAdminEditInventoryTransaction();
+            } elseif ($action === 'delete-transaction') {
+                echo demoRenderInstituteAdminDeleteInventoryTransaction();
+            } else {
+                echo demoRenderInstituteAdminInventoryTransactions($data);
+            }
+            break;
+
+        case 'chats':
+            if ($action === 'view-chat') {
+                echo demoRenderInstituteAdminViewChat();
+            } else {
+                echo demoRenderInstituteAdminChats($data);
+            }
+            break;
+
+        case 'reports':
+            if ($action === 'generate-report') {
+                echo demoRenderInstituteAdminGenerateReport();
+            } else {
+                echo demoRenderInstituteAdminReports($data);
+            }
+            break;
+
+        case 'results':
+            if ($action === 'add-result') {
+                echo demoRenderInstituteAdminAddResult();
+            } elseif ($action === 'edit-result') {
+                echo demoRenderInstituteAdminEditResult();
+            } elseif ($action === 'delete-result') {
+                echo demoRenderInstituteAdminDeleteResult();
+            } else {
+                echo demoRenderInstituteAdminResults($data);
+            }
+            break;
+
+        case 'fee_templates':
+            if ($action === 'add-template') {
+                echo demoRenderInstituteAdminAddFeeTemplate();
+            } elseif ($action === 'edit-template') {
+                echo demoRenderInstituteAdminEditFeeTemplate();
+            } elseif ($action === 'delete-template') {
+                echo demoRenderInstituteAdminDeleteFeeTemplate();
+            } else {
+                echo demoRenderInstituteAdminFeeTemplates($data);
+            }
+            break;
+
+        case 'transport':
+            if ($action === 'add-route') {
+                echo demoRenderInstituteAdminAddTransportRoute();
+            } elseif ($action === 'edit-route') {
+                echo demoRenderInstituteAdminEditTransportRoute();
+            } elseif ($action === 'delete-route') {
+                echo demoRenderInstituteAdminDeleteTransportRoute();
+            } else {
+                echo demoRenderInstituteAdminTransport($data);
+            }
+            break;
+
+        case 'transport_enrollments':
+            if ($action === 'add-enrollment') {
+                echo demoRenderInstituteAdminAddTransportEnrollment();
+            } elseif ($action === 'edit-enrollment') {
+                echo demoRenderInstituteAdminEditTransportEnrollment();
+            } elseif ($action === 'delete-enrollment') {
+                echo demoRenderInstituteAdminDeleteTransportEnrollment();
+            } else {
+                echo demoRenderInstituteAdminTransportEnrollments($data);
+            }
+            break;
+
+        case 'departments':
+            if ($action === 'add-department') {
+                echo demoRenderInstituteAdminAddDepartment();
+            } elseif ($action === 'edit-department') {
+                echo demoRenderInstituteAdminEditDepartment();
+            } elseif ($action === 'delete-department') {
+                echo demoRenderInstituteAdminDeleteDepartment();
+            } else {
+                echo demoRenderInstituteAdminDepartments($data);
+            }
+            break;
+
+        case 'subjects':
+            if ($action === 'add-subject') {
+                echo demoRenderInstituteAdminAddSubject();
+            } elseif ($action === 'edit-subject') {
+                echo demoRenderInstituteAdminEditSubject();
+            } elseif ($action === 'delete-subject') {
+                echo demoRenderInstituteAdminDeleteSubject();
+            } else {
+                echo demoRenderInstituteAdminSubjects($data);
+            }
+            break;
+
+        case 'timetable':
+            if ($action === 'add-timetable') {
+                echo demoRenderInstituteAdminAddTimetable();
+            } elseif ($action === 'edit-timetable') {
+                echo demoRenderInstituteAdminEditTimetable();
+            } elseif ($action === 'delete-timetable') {
+                echo demoRenderInstituteAdminDeleteTimetable();
+            } else {
+                echo demoRenderInstituteAdminTimetable($data);
+            }
+            break;
+
+        case 'homework':
+            if ($action === 'add-homework') {
+                echo demoRenderInstituteAdminAddHomework();
+            } elseif ($action === 'edit-homework') {
+                echo demoRenderInstituteAdminEditHomework();
+            } elseif ($action === 'delete-homework') {
+                echo demoRenderInstituteAdminDeleteHomework();
+            } else {
+                echo demoRenderInstituteAdminHomework($data);
+            }
+            break;
+
+        case 'classes_sections':
+            if ($action === 'add-class-section') {
+                echo demoRenderInstituteAdminAddClassSection();
+            } elseif ($action === 'edit-class-section') {
+                echo demoRenderInstituteAdminEditClassSection();
+            } elseif ($action === 'delete-class-section') {
+                echo demoRenderInstituteAdminDeleteClassSection();
+            } else {
+                echo demoRenderInstituteAdminClassesSections($data);
+            }
+            break;
+
+        case 'subscriptions':
+            if ($action === 'extend-subscription') {
+                echo demoRenderInstituteAdminExtendSubscription();
+            } else {
+                echo demoRenderInstituteAdminSubscriptions($data);
+            }
+            break;
+
+        case 'parents':
+            if ($action === 'add-parent') {
+                echo demoRenderInstituteAdminAddParent();
+            } elseif ($action === 'edit-parent') {
+                echo demoRenderInstituteAdminEditParent();
+            } elseif ($action === 'delete-parent') {
+                echo demoRenderInstituteAdminDeleteParent();
+            } else {
+                echo demoRenderInstituteAdminParents($data);
+            }
+            break;
+
+        default:
+            ?>
+            <div class="dashboard-section">
+                <h2>Invalid Section</h2>
+                <p>Please select a valid section.</p>
+            </div>
+            <?php
+            break;
+    }
+    return ob_get_clean();
+}
+
+// Existing Rendering Functions (Assumed from Previous Responses)
+// Note: These should already exist in your plugin from prior responses. Included here for reference.
+// Students
+function demoRenderInstituteAdminStudents($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Students Management</h2>
+        <div class="alert alert-info">Manage students for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'students', 'demo-action' => 'add-student'])); ?>" class="btn btn-primary">Add New Student</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Grade</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['students'])): ?>
+                        <?php foreach ($data['students'] as $student): ?>
+                            <tr>
+                                <td><?php echo esc_html($student['id']); ?></td>
+                                <td><?php echo esc_html($student['name']); ?></td>
+                                <td><?php echo esc_html($student['email']); ?></td>
+                                <td><?php echo esc_html($student['grade']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'students', 'demo-action' => 'edit-student', 'id' => $student['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'students', 'demo-action' => 'delete-student', 'id' => $student['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this student?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No students found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddStudent() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Student</h2>
+        <div class="alert alert-info">Fill in the details to add a new student.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="student_name" class="form-label">Student Name</label>
+                <input type="text" class="form-control" id="student_name" name="student_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="student_email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="student_email" name="student_email" required>
+            </div>
+            <div class="mb-3">
+                <label for="student_grade" class="form-label">Grade</label>
+                <input type="text" class="form-control" id="student_grade" name="student_grade" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Student</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'students'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditStudent() {
+    ob_start();
+    $student_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Student</h2>
+        <div class="alert alert-info">Update the details for student ID: <?php echo esc_html($student_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="student_name" class="form-label">Student Name</label>
+                <input type="text" class="form-control" id="student_name" name="student_name" value="Sample Student" required>
+            </div>
+            <div class="mb-3">
+                <label for="student_email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="student_email" name="student_email" value="student@example.com" required>
+            </div>
+            <div class="mb-3">
+                <label for="student_grade" class="form-label">Grade</label>
+                <input type="text" class="form-control" id="student_grade" name="student_grade" value="10" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Student</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'students'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteStudent() {
+    ob_start();
+    $student_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Student</h2>
+        <div class="alert alert-danger">Student ID: <?php echo esc_html($student_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'students'])); ?>" class="btn btn-primary">Back to Students</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Teachers
+function demoRenderInstituteAdminTeachers($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Teachers Management</h2>
+        <div class="alert alert-info">Manage teachers for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'teachers', 'demo-action' => 'add-teacher'])); ?>" class="btn btn-primary">Add New Teacher</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Subject</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['teachers'])): ?>
+                        <?php foreach ($data['teachers'] as $teacher): ?>
+                            <tr>
+                                <td><?php echo esc_html($teacher['id']); ?></td>
+                                <td><?php echo esc_html($teacher['name']); ?></td>
+                                <td><?php echo esc_html($teacher['email']); ?></td>
+                                <td><?php echo esc_html($teacher['subject']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'teachers', 'demo-action' => 'edit-teacher', 'id' => $teacher['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'teachers', 'demo-action' => 'delete-teacher', 'id' => $teacher['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this teacher?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No teachers found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddTeacher() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Teacher</h2>
+        <div class="alert alert-info">Fill in the details to add a new teacher.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="teacher_name" class="form-label">Teacher Name</label>
+                <input type="text" class="form-control" id="teacher_name" name="teacher_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="teacher_email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="teacher_email" name="teacher_email" required>
+            </div>
+            <div class="mb-3">
+                <label for="teacher_subject" class="form-label">Subject</label>
+                <input type="text" class="form-control" id="teacher_subject" name="teacher_subject" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Teacher</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'teachers'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditTeacher() {
+    ob_start();
+    $teacher_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Teacher</h2>
+        <div class="alert alert-info">Update the details for teacher ID: <?php echo esc_html($teacher_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="teacher_name" class="form-label">Teacher Name</label>
+                <input type="text" class="form-control" id="teacher_name" name="teacher_name" value="Sample Teacher" required>
+            </div>
+            <div class="mb-3">
+                <label for="teacher_email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="teacher_email" name="teacher_email" value="teacher@example.com" required>
+            </div>
+            <div class="mb-3">
+                <label for="teacher_subject" class="form-label">Subject</label>
+                <input type="text" class="form-control" id="teacher_subject" name="teacher_subject" value="Mathematics" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Teacher</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'teachers'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteTeacher() {
+    ob_start();
+    $teacher_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Teacher</h2>
+        <div class="alert alert-danger">Teacher ID: <?php echo esc_html($teacher_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'teachers'])); ?>" class="btn btn-primary">Back to Teachers</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Staff
+function demoRenderInstituteAdminStaff($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Staff Management</h2>
+        <div class="alert alert-info">Manage staff for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'staff', 'demo-action' => 'add-staff'])); ?>" class="btn btn-primary">Add New Staff</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['staff'])): ?>
+                        <?php foreach ($data['staff'] as $staff): ?>
+                            <tr>
+                                <td><?php echo esc_html($staff['id']); ?></td>
+                                <td><?php echo esc_html($staff['name']); ?></td>
+                                <td><?php echo esc_html($staff['email']); ?></td>
+                                <td><?php echo esc_html($staff['role']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'staff', 'demo-action' => 'edit-staff', 'id' => $staff['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'staff', 'demo-action' => 'delete-staff', 'id' => $staff['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this staff?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No staff found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddStaff() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Staff</h2>
+        <div class="alert alert-info">Fill in the details to add a new staff member.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="staff_name" class="form-label">Staff Name</label>
+                <input type="text" class="form-control" id="staff_name" name="staff_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="staff_email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="staff_email" name="staff_email" required>
+            </div>
+            <div class="mb-3">
+                <label for="staff_role" class="form-label">Role</label>
+                <input type="text" class="form-control" id="staff_role" name="staff_role" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Staff</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'staff'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditStaff() {
+    ob_start();
+    $staff_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Staff</h2>
+        <div class="alert alert-info">Update the details for staff ID: <?php echo esc_html($staff_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="staff_name" class="form-label">Staff Name</label>
+                <input type="text" class="form-control" id="staff_name" name="staff_name" value="Sample Staff" required>
+            </div>
+            <div class="mb-3">
+                <label for="staff_email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="staff_email" name="staff_email" value="staff@example.com" required>
+            </div>
+            <div class="mb-3">
+                <label for="staff_role" class="form-label">Role</label>
+                <input type="text" class="form-control" id="staff_role" name="staff_role" value="Librarian" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Staff</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'staff'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteStaff() {
+    ob_start();
+    $staff_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Staff</h2>
+        <div class="alert alert-danger">Staff ID: <?php echo esc_html($staff_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'staff'])); ?>" class="btn btn-primary">Back to Staff</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Exams
+function demoRenderInstituteAdminExams($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Exams Management</h2>
+        <div class="alert alert-info">Manage exams for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'exams', 'demo-action' => 'add-exam'])); ?>" class="btn btn-primary">Add New Exam</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Exam Name</th>
+                        <th>Date</th>
+                        <th>Subject</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['exams'])): ?>
+                        <?php foreach ($data['exams'] as $exam): ?>
+                            <tr>
+                                <td><?php echo esc_html($exam['id']); ?></td>
+                                <td><?php echo esc_html($exam['name']); ?></td>
+                                <td><?php echo esc_html($exam['date']); ?></td>
+                                <td><?php echo esc_html($exam['subject']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'exams', 'demo-action' => 'edit-exam', 'id' => $exam['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'exams', 'demo-action' => 'delete-exam', 'id' => $exam['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this exam?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No exams found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddExam() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Exam</h2>
+        <div class="alert alert-info">Fill in the details to add a new exam.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="exam_name" class="form-label">Exam Name</label>
+                <input type="text" class="form-control" id="exam_name" name="exam_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="exam_date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="exam_date" name="exam_date" required>
+            </div>
+            <div class="mb-3">
+                <label for="exam_subject" class="form-label">Subject</label>
+                <input type="text" class="form-control" id="exam_subject" name="exam_subject" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Exam</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'exams'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditExam() {
+    ob_start();
+    $exam_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Exam</h2>
+        <div class="alert alert-info">Update the details for exam ID: <?php echo esc_html($exam_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="exam_name" class="form-label">Exam Name</label>
+                <input type="text" class="form-control" id="exam_name" name="exam_name" value="Sample Exam" required>
+            </div>
+            <div class="mb-3">
+                <label for="exam_date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="exam_date" name="exam_date" value="2025-05-01" required>
+            </div>
+            <div class="mb-3">
+                <label for="exam_subject" class="form-label">Subject</label>
+                <input type="text" class="form-control" id="exam_subject" name="exam_subject" value="Mathematics" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Exam</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'exams'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteExam() {
+    ob_start();
+    $exam_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Exam</h2>
+        <div class="alert alert-danger">Exam ID: <?php echo esc_html($exam_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'exams'])); ?>" class="btn btn-primary">Back to Exams</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Attendance
+function demoRenderInstituteAdminAttendance($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Attendance Management</h2>
+        <div class="alert alert-info">Manage attendance for students, teachers, and staff at <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Student Attendance</h5>
+                        <p class="card-text">Manage student attendance records.</p>
+                        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>" class="btn btn-primary">Manage</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Teacher Attendance</h5>
+                        <p class="card-text">Manage teacher attendance records.</p>
+                        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>" class="btn btn-primary">Manage</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Staff Attendance</h5>
+                        <p class="card-text">Manage staff attendance records.</p>
+                        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'manage-staff-attendance'])); ?>" class="btn btn-primary">Manage</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminStudentAttendance($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Student Attendance</h2>
+        <div class="alert alert-info">Manage student attendance for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'add-student-attendance'])); ?>" class="btn btn-primary">Add New Attendance</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Student Name</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['student_attendance'])): ?>
+                        <?php foreach ($data['student_attendance'] as $attendance): ?>
+                            <tr>
+                                <td><?php echo esc_html($attendance['id']); ?></td>
+                                <td><?php echo esc_html($attendance['student_name']); ?></td>
+                                <td><?php echo esc_html($attendance['date']); ?></td>
+                                <td><?php echo esc_html($attendance['status']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'edit-student-attendance', 'id' => $attendance['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'delete-student-attendance', 'id' => $attendance['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this attendance record?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No attendance records found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddStudentAttendance() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Student Attendance</h2>
+        <div class="alert alert-info">Fill in the details to add a new student attendance record.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="student_name" class="form-label">Student Name</label>
+                <input type="text" class="form-control" id="student_name" name="student_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="attendance_date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="attendance_date" name="attendance_date" required>
+            </div>
+            <div class="mb-3">
+                <label for="attendance_status" class="form-label">Status</label>
+                <select class="form-control" id="attendance_status" name="attendance_status" required>
+                    <option value="Present">Present</option>
+                    <option value="Absent">Absent</option>
+                    <option value="Late">Late</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Attendance</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditStudentAttendance() {
+    ob_start();
+    $attendance_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Student Attendance</h2>
+        <div class="alert alert-info">Update the details for attendance ID: <?php echo esc_html($attendance_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="student_name" class="form-label">Student Name</label>
+                <input type="text" class="form-control" id="student_name" name="student_name" value="John Doe" required>
+            </div>
+            <div class="mb-3">
+                <label for="attendance_date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="attendance_date" name="attendance_date" value="2025-04-18" required>
+            </div>
+            <div class="mb-3">
+                <label for="attendance_status" class="form-label">Status</label>
+                <select class="form-control" id="attendance_status" name="attendance_status" required>
+                    <option value="Present" selected>Present</option>
+                    <option value="Absent">Absent</option>
+                    <option value="Late">Late</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Attendance</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteStudentAttendance() {
+    ob_start();
+    $attendance_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Student Attendance</h2>
+        <div class="alert alert-danger">Attendance ID: <?php echo esc_html($attendance_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance'])); ?>" class="btn btn-primary">Back to Student Attendance</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminTeacherAttendance($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Teacher Attendance</h2>
+        <div class="alert alert-info">Manage teacher attendance for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'add-teacher-attendance'])); ?>" class="btn btn-primary">Add New Attendance</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Teacher Name</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['teacher_attendance'])): ?>
+                        <?php foreach ($data['teacher_attendance'] as $attendance): ?>
+                            <tr>
+                                <td><?php echo esc_html($attendance['id']); ?></td>
+                                <td><?php echo esc_html($attendance['teacher_name']); ?></td>
+                                <td><?php echo esc_html($attendance['date']); ?></td>
+                                <td><?php echo esc_html($attendance['status']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'edit-teacher-attendance', 'id' => $attendance['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'delete-teacher-attendance', 'id' => $attendance['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this attendance record?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No attendance records found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddTeacherAttendance() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Teacher Attendance</h2>
+        <div class="alert alert-info">Fill in the details to add a new teacher attendance record.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="teacher_name" class="form-label">Teacher Name</label>
+                <input type="text" class="form-control" id="teacher_name" name="teacher_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="attendance_date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="attendance_date" name="attendance_date" required>
+            </div>
+            <div class="mb-3">
+                <label for="attendance_status" class="form-label">Status</label>
+                <select class="form-control" id="attendance_status" name="attendance_status" required>
+                    <option value="Present">Present</option>
+                    <option value="Absent">Absent</option>
+                    <option value="Late">Late</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Attendance</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditTeacherAttendance() {
+    ob_start();
+    $attendance_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Teacher Attendance</h2>
+        <div class="alert alert-info">Update the details for attendance ID: <?php echo esc_html($attendance_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="teacher_name" class="form-label">Teacher Name</label>
+                <input type="text" class="form-control" id="teacher_name" name="teacher_name" value="Jane Smith" required>
+            </div>
+            <div class="mb-3">
+                <label for="attendance_date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="attendance_date" name="attendance_date" value="2025-04-18" required>
+            </div>
+            <div class="mb-3">
+                <label for="attendance_status" class="form-label">Status</label>
+                <select class="form-control" id="attendance_status" name="attendance_status" required>
+                    <option value="Present" selected>Present</option>
+                    <option value="Absent">Absent</option>
+                    <option value="Late">Late</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Attendance</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteTeacherAttendance() {
+    ob_start();
+    $attendance_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Teacher Attendance</h2>
+        <div class="alert alert-danger">Attendance ID: <?php echo esc_html($attendance_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'manage-teacher-attendance'])); ?>" class="btn btn-primary">Back to Teacher Attendance</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminStaffAttendance($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Staff Attendance</h2>
+        <div class="alert alert-info">Manage staff attendance for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'add-staff-attendance'])); ?>" class="btn btn-primary">Add New Attendance</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Staff Name</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['staff_attendance'])): ?>
+                        <?php foreach ($data['staff_attendance'] as $attendance): ?>
+                            <tr>
+                                <td><?php echo esc_html($attendance['id']); ?></td>
+                                <td><?php echo esc_html($attendance['staff_name']); ?></td>
+                                <td><?php echo esc_html($attendance['date']); ?></td>
+                                <td><?php echo esc_html($attendance['status']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'edit-staff-attendance', 'id' => $attendance['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'delete-staff-attendance', 'id' => $attendance['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this attendance record?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No attendance records found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddStaffAttendance() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Staff Attendance</h2>
+        <div class="alert alert-info">Fill in the details to add a new staff attendance record.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="staff_name" class="form-label">Staff Name</label>
+                <input type="text" class="form-control" id="staff_name" name="staff_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="attendance_date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="attendance_date" name="attendance_date" required>
+            </div>
+            <div class="mb-3">
+                <label for="attendance_status" class="form-label">Status</label>
+                <select class="form-control" id="attendance_status" name="attendance_status" required>
+                    <option value="Present">Present</option>
+                    <option value="Absent">Absent</option>
+                    <option value="Late">Late</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Attendance</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'manage-staff-attendance'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditStaffAttendance() {
+    ob_start();
+    $attendance_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Staff Attendance</h2>
+        <div class="alert alert-info">Update the details for attendance ID: <?php echo esc_html($attendance_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="staff_name" class="form-label">Staff Name</label>
+                <input type="text" class="form-control" id="staff_name" name="staff_name" value="Mike Brown" required>
+            </div>
+            <div class="mb-3">
+                <label for="attendance_date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="attendance_date" name="attendance_date" value="2025-04-18" required>
+            </div>
+            <div class="mb-3">
+                <label for="attendance_status" class="form-label">Status</label>
+                <select class="form-control" id="attendance_status" name="attendance_status" required>
+                    <option value="Present" selected>Present</option>
+                    <option value="Absent">Absent</option>
+                    <option value="Late">Late</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Attendance</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'manage-staff-attendance'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteStaffAttendance() {
+    ob_start();
+    $attendance_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Staff Attendance</h2>
+        <div class="alert alert-danger">Attendance ID: <?php echo esc_html($attendance_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'attendance', 'demo-action' => 'manage-staff-attendance'])); ?>" class="btn btn-primary">Back to Staff Attendance</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Fees
+function demoRenderInstituteAdminFees($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Fees Management</h2>
+        <div class="alert alert-info">Manage fees for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fees', 'demo-action' => 'add-fee'])); ?>" class="btn btn-primary">Add New Fee</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Student Name</th>
+                        <th>Amount</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['fees'])): ?>
+                        <?php foreach ($data['fees'] as $fee): ?>
+                            <tr>
+                                <td><?php echo esc_html($fee['id']); ?></td>
+                                <td><?php echo esc_html($fee['student_name']); ?></td>
+                                <td><?php echo esc_html($fee['amount']); ?></td>
+                                <td><?php echo esc_html($fee['due_date']); ?></td>
+                                <td><?php echo esc_html($fee['status']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fees', 'demo-action' => 'edit-fee', 'id' => $fee['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fees', 'demo-action' => 'delete-fee', 'id' => $fee['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this fee?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6">No fees found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddFee() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Fee</h2>
+        <div class="alert alert-info">Fill in the details to add a new fee.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="student_name" class="form-label">Student Name</label>
+                <input type="text" class="form-control" id="student_name" name="student_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="fee_amount" class="form-label">Amount</label>
+                <input type="number" class="form-control" id="fee_amount" name="fee_amount" required>
+            </div>
+            <div class="mb-3">
+                <label for="due_date" class="form-label">Due Date</label>
+                <input type="date" class="form-control" id="due_date" name="due_date" required>
+            </div>
+            <div class="mb-3">
+                <label for="fee_status" class="form-label">Status</label>
+                <select class="form-control" id="fee_status" name="fee_status" required>
+                    <option value="Pending">Pending</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Overdue">Overdue</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Fee</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fees'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditFee() {
+    ob_start();
+    $fee_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Fee</h2>
+        <div class="alert alert-info">Update the details for fee ID: <?php echo esc_html($fee_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="student_name" class="form-label">Student Name</label>
+                <input type="text" class="form-control" id="student_name" name="student_name" value="John Doe" required>
+            </div>
+            <div class="mb-3">
+                <label for="fee_amount" class="form-label">Amount</label>
+                <input type="number" class="form-control" id="fee_amount" name="fee_amount" value="500" required>
+            </div>
+            <div class="mb-3">
+                <label for="due_date" class="form-label">Due Date</label>
+                <input type="date" class="form-control" id="due_date" name="due_date" value="2025-05-01" required>
+            </div>
+            <div class="mb-3">
+                <label for="fee_status" class="form-label">Status</label>
+                <select class="form-control" id="fee_status" name="fee_status" required>
+                    <option value="Pending" selected>Pending</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Overdue">Overdue</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Fee</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fees'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteFee() {
+    ob_start();
+    $fee_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Fee</h2>
+        <div class="alert alert-danger">Fee ID: <?php echo esc_html($fee_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fees'])); ?>" class="btn btn-primary">Back to Fees</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Notices
+function demoRenderInstituteAdminNotices($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Notices Management</h2>
+        <div class="alert alert-info">Manage notices for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'notices', 'demo-action' => 'add-notice'])); ?>" class="btn btn-primary">Add New Notice</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Content</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['notices'])): ?>
+                        <?php foreach ($data['notices'] as $notice): ?>
+                            <tr>
+                                <td><?php echo esc_html($notice['id']); ?></td>
+                                <td><?php echo esc_html($notice['title']); ?></td>
+                                <td><?php echo esc_html($notice['content']); ?></td>
+                                <td><?php echo esc_html($notice['date']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'notices', 'demo-action' => 'edit-notice', 'id' => $notice['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'notices', 'demo-action' => 'delete-notice', 'id' => $notice['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this notice?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No notices found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddNotice() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Notice</h2>
+        <div class="alert alert-info">Fill in the details to add a new notice.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="notice_title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="notice_title" name="notice_title" required>
+            </div>
+            <div class="mb-3">
+                <label for="notice_content" class="form-label">Content</label>
+                <textarea class="form-control" id="notice_content" name="notice_content" rows="5" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="notice_date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="notice_date" name="notice_date" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Notice</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'notices'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditNotice() {
+    ob_start();
+    $notice_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Notice</h2>
+        <div class="alert alert-info">Update the details for notice ID: <?php echo esc_html($notice_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="notice_title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="notice_title" name="notice_title" value="Holiday Notice" required>
+            </div>
+            <div class="mb-3">
+                <label for="notice_content" class="form-label">Content</label>
+                <textarea class="form-control" id="notice_content" name="notice_content" rows="5" required>School closed on May 1.</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="notice_date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="notice_date" name="notice_date" value="2025-04-18" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Notice</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'notices'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteNotice() {
+    ob_start();
+    $notice_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Notice</h2>
+        <div class="alert alert-danger">Notice ID: <?php echo esc_html($notice_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'notices'])); ?>" class="btn btn-primary">Back to Notices</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Announcements
+function demoRenderInstituteAdminAnnouncements($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Announcements Management</h2>
+        <div class="alert alert-info">Manage announcements for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'announcements', 'demo-action' => 'add-announcement'])); ?>" class="btn btn-primary">Add New Announcement</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Content</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['announcements'])): ?>
+                        <?php foreach ($data['announcements'] as $announcement): ?>
+                            <tr>
+                                <td><?php echo esc_html($announcement['id']); ?></td>
+                                <td><?php echo esc_html($announcement['title']); ?></td>
+                                <td><?php echo esc_html($announcement['content']); ?></td>
+                                <td><?php echo esc_html($announcement['date']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'announcements', 'demo-action' => 'edit-announcement', 'id' => $announcement['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'announcements', 'demo-action' => 'delete-announcement', 'id' => $announcement['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this announcement?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No announcements found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddAnnouncement() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Announcement</h2>
+        <div class="alert alert-info">Fill in the details to add a new announcement.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="announcement_title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="announcement_title" name="announcement_title" required>
+            </div>
+            <div class="mb-3">
+                <label for="announcement_content" class="form-label">Content</label>
+                <textarea class="form-control" id="announcement_content" name="announcement_content" rows="5" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="announcement_date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="announcement_date" name="announcement_date" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Announcement</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'announcements'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditAnnouncement() {
+    ob_start();
+    $announcement_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Announcement</h2>
+        <div class="alert alert-info">Update the details for announcement ID: <?php echo esc_html($announcement_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="announcement_title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="announcement_title" name="announcement_title" value="School Event" required>
+            </div>
+            <div class="mb-3">
+                <label for="announcement_content" class="form-label">Content</label>
+                <textarea class="form-control" id="announcement_content" name="announcement_content" rows="5" required>Annual day on June 1.</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="announcement_date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="announcement_date" name="announcement_date" value="2025-04-18" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Announcement</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'announcements'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteAnnouncement() {
+    ob_start();
+    $announcement_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Announcement</h2>
+        <div class="alert alert-danger">Announcement ID: <?php echo esc_html($announcement_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'announcements'])); ?>" class="btn btn-primary">Back to Announcements</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Library
+function demoRenderInstituteAdminLibrary($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Library Management</h2>
+        <div class="alert alert-info">Manage library books for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library', 'demo-action' => 'add-book'])); ?>" class="btn btn-primary">Add New Book</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>ISBN</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['library'])): ?>
+                        <?php foreach ($data['library'] as $book): ?>
+                            <tr>
+                                <td><?php echo esc_html($book['id']); ?></td>
+                                <td><?php echo esc_html($book['title']); ?></td>
+                                <td><?php echo esc_html($book['author']); ?></td>
+                                <td><?php echo esc_html($book['isbn']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library', 'demo-action' => 'edit-book', 'id' => $book['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library', 'demo-action' => 'delete-book', 'id' => $book['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this book?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No books found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddBook() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Book</h2>
+        <div class="alert alert-info">Fill in the details to add a new book.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="book_title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="book_title" name="book_title" required>
+            </div>
+            <div class="mb-3">
+                <label for="book_author" class="form-label">Author</label>
+                <input type="text" class="form-control" id="book_author" name="book_author" required>
+            </div>
+            <div class="mb-3">
+                <label for="book_isbn" class="form-label">ISBN</label>
+                <input type="text" class="form-control" id="book_isbn" name="book_isbn" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Book</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditBook() {
+    ob_start();
+    $book_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Book</h2>
+        <div class="alert alert-info">Update the details for book ID: <?php echo esc_html($book_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="book_title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="book_title" name="book_title" value="Mathematics 101" required>
+            </div>
+            <div class="mb-3">
+                <label for="book_author" class="form-label">Author</label>
+                <input type="text" class="form-control" id="book_author" name="book_author" value="John Author" required>
+            </div>
+            <div class="mb-3">
+                <label for="book_isbn" class="form-label">ISBN</label>
+                <input type="text" class="form-control" id="book_isbn" name="book_isbn" value="1234567890" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Book</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteBook() {
+    ob_start();
+    $book_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Book</h2>
+        <div class="alert alert-danger">Book ID: <?php echo esc_html($book_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library'])); ?>" class="btn btn-primary">Back to Library</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Library Transactions
+function demoRenderInstituteAdminLibraryTransactions($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Library Transactions</h2>
+        <div class="alert alert-info">Manage library transactions for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library_transactions', 'demo-action' => 'add-transaction'])); ?>" class="btn btn-primary">Add New Transaction</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Book Title</th>
+                        <th>User Name</th>
+                        <th>Issue Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['library_transactions'])): ?>
+                        <?php foreach ($data['library_transactions'] as $transaction): ?>
+                            <tr>
+                                <td><?php echo esc_html($transaction['id']); ?></td>
+                                <td><?php echo esc_html($transaction['book_title']); ?></td>
+                                <td><?php echo esc_html($transaction['user_name']); ?></td>
+                                <td><?php echo esc_html($transaction['issue_date']); ?></td>
+                                <td><?php echo esc_html($transaction['status']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library_transactions', 'demo-action' => 'edit-transaction', 'id' => $transaction['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library_transactions', 'demo-action' => 'delete-transaction', 'id' => $transaction['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this transaction?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6">No transactions found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddLibraryTransaction() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Library Transaction</h2>
+        <div class="alert alert-info">Fill in the details to add a new library transaction.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="book_title" class="form-label">Book Title</label>
+                <input type="text" class="form-control" id="book_title" name="book_title" required>
+            </div>
+            <div class="mb-3">
+                <label for="user_name" class="form-label">User Name</label>
+                <input type="text" class="form-control" id="user_name" name="user_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="issue_date" class="form-label">Issue Date</label>
+                <input type="date" class="form-control" id="issue_date" name="issue_date" required>
+            </div>
+            <div class="mb-3">
+                <label for="transaction_status" class="form-label">Status</label>
+                <select class="form-control" id="transaction_status" name="transaction_status" required>
+                    <option value="Issued">Issued</option>
+                    <option value="Returned">Returned</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Transaction</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library_transactions'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditLibraryTransaction() {
+    ob_start();
+    $transaction_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Library Transaction</h2>
+        <div class="alert alert-info">Update the details for transaction ID: <?php echo esc_html($transaction_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="book_title" class="form-label">Book Title</label>
+                <input type="text" class="form-control" id="book_title" name="book_title" value="Mathematics 101" required>
+            </div>
+            <div class="mb-3">
+                <label for="user_name" class="form-label">User Name</label>
+                <input type="text" class="form-control" id="user_name" name="user_name" value="John Doe" required>
+            </div>
+            <div class="mb-3">
+                <label for="issue_date" class="form-label">Issue Date</label>
+                <input type="date" class="form-control" id="issue_date" name="issue_date" value="2025-04-18" required>
+            </div>
+            <div class="mb-3">
+                <label for="transaction_status" class="form-label">Status</label>
+                <select class="form-control" id="transaction_status" name="transaction_status" required>
+                    <option value="Issued" selected>Issued</option>
+                    <option value="Returned">Returned</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Transaction</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library_transactions'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteLibraryTransaction() {
+    ob_start();
+    $transaction_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Library Transaction</h2>
+        <div class="alert alert-danger">Transaction ID: <?php echo esc_html($transaction_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'library_transactions'])); ?>" class="btn btn-primary">Back to Library Transactions</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Inventory
+function demoRenderInstituteAdminInventory($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Inventory Management</h2>
+        <div class="alert alert-info">Manage inventory items for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory', 'demo-action' => 'add-item'])); ?>" class="btn btn-primary">Add New Item</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Item Name</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['inventory'])): ?>
+                        <?php foreach ($data['inventory'] as $item): ?>
+                            <tr>
+                                <td><?php echo esc_html($item['id']); ?></td>
+                                <td><?php echo esc_html($item['item_name']); ?></td>
+                                <td><?php echo esc_html($item['quantity']); ?></td>
+                                <td><?php echo esc_html($item['status']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory', 'demo-action' => 'edit-item', 'id' => $item['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory', 'demo-action' => 'delete-item', 'id' => $item['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this item?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No items found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddInventoryItem() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Inventory Item</h2>
+        <div class="alert alert-info">Fill in the details to add a new inventory item.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="item_name" class="form-label">Item Name</label>
+                <input type="text" class="form-control" id="item_name" name="item_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="item_quantity" class="form-label">Quantity</label>
+                <input type="number" class="form-control" id="item_quantity" name="item_quantity" required>
+            </div>
+            <div class="mb-3">
+                <label for="item_status" class="form-label">Status</label>
+                <select class="form-control" id="item_status" name="item_status" required>
+                    <option value="Available">Available</option>
+                    <option value="Out of Stock">Out of Stock</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Item</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditInventoryItem() {
+    ob_start();
+    $item_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Inventory Item</h2>
+        <div class="alert alert-info">Update the details for item ID: <?php echo esc_html($item_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="item_name" class="form-label">Item Name</label>
+                <input type="text" class="form-control" id="item_name" name="item_name" value="Projector" required>
+            </div>
+            <div class="mb-3">
+                <label for="item_quantity" class="form-label">Quantity</label>
+                <input type="number" class="form-control" id="item_quantity" name="item_quantity" value="5" required>
+            </div>
+            <div class="mb-3">
+                <label for="item_status" class="form-label">Status</label>
+                <select class="form-control" id="item_status" name="item_status" required>
+                    <option value="Available" selected>Available</option>
+                    <option value="Out of Stock">Out of Stock</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Item</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteInventoryItem() {
+    ob_start();
+    $item_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Inventory Item</h2>
+        <div class="alert alert-danger">Item ID: <?php echo esc_html($item_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory'])); ?>" class="btn btn-primary">Back to Inventory</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Inventory Transactions
+function demoRenderInstituteAdminInventoryTransactions($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Inventory Transactions</h2>
+        <div class="alert alert-info">Manage inventory transactions for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory_transactions', 'demo-action' => 'add-transaction'])); ?>" class="btn btn-primary">Add New Transaction</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Item Name</th>
+                        <th>User Name</th>
+                        <th>Issue Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['inventory_transactions'])): ?>
+                        <?php foreach ($data['inventory_transactions'] as $transaction): ?>
+                            <tr>
+                                <td><?php echo esc_html($transaction['id']); ?></td>
+                                <td><?php echo esc_html($transaction['item_name']); ?></td>
+                                <td><?php echo esc_html($transaction['user_name']);?></td>
+                                <td><?php echo esc_html($transaction['issue_date']); ?></td>
+                                <td><?php echo esc_html($transaction['status']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory_transactions', 'demo-action' => 'edit-transaction', 'id' => $transaction['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory_transactions', 'demo-action' => 'delete-transaction', 'id' => $transaction['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this transaction?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6">No transactions found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddInventoryTransaction() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add Inventory Transaction</h2>
+        <div class="alert alert-info">Fill in the details to add a new inventory transaction.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="item_name" class="form-label">Item Name</label>
+                <input type="text" class="form-control" id="item_name" name="item_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="user_name" class="form-label">User Name</label>
+                <input type="text" class="form-control" id="user_name" name="user_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="issue_date" class="form-label">Issue Date</label>
+                <input type="date" class="form-control" id="issue_date" name="issue_date" required>
+            </div>
+            <div class="mb-3">
+                <label for="transaction_status" class="form-label">Status</label>
+                <select class="form-control" id="transaction_status" name="transaction_status" required>
+                    <option value="Issued">Issued</option>
+                    <option value="Returned">Returned</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Transaction</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory_transactions'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditInventoryTransaction() {
+    ob_start();
+    $transaction_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Inventory Transaction</h2>
+        <div class="alert alert-info">Update the details for transaction ID: <?php echo esc_html($transaction_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="item_name" class="form-label">Item Name</label>
+                <input type="text" class="form-control" id="item_name" name="item_name" value="Projector" required>
+            </div>
+            <div class="mb-3">
+                <label for="user_name" class="form-label">User Name</label>
+                <input type="text" class="form-control" id="user_name" name="user_name" value="Jane Smith" required>
+            </div>
+            <div class="mb-3">
+                <label for="issue_date" class="form-label">Issue Date</label>
+                <input type="date" class="form-control" id="issue_date" name="issue_date" value="2025-04-18" required>
+            </div>
+            <div class="mb-3">
+                <label for="transaction_status" class="form-label">Status</label>
+                <select class="form-control" id="transaction_status" name="transaction_status" required>
+                    <option value="Issued" selected>Issued</option>
+                    <option value="Returned">Returned</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Transaction</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory_transactions'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteInventoryTransaction() {
+    ob_start();
+    $transaction_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Inventory Transaction</h2>
+        <div class="alert alert-danger">Transaction ID: <?<a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'inventory_transactions'])); ?>" class="btn btn-primary">Back to Inventory Transactions</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Chats
+function demoRenderInstituteAdminChats($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Chats Management</h2>
+        <div class="alert alert-info">Manage chats for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'chats', 'demo-action' => 'start-chat'])); ?>" class="btn btn-primary">Start New Chat</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Participant</th>
+                        <th>Last Message</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['chats'])): ?>
+                        <?php foreach ($data['chats'] as $chat): ?>
+                            <tr>
+                                <td><?php echo esc_html($chat['id']); ?></td>
+                                <td><?php echo esc_html($chat['participant']); ?></td>
+                                <td><?php echo esc_html($chat['last_message']); ?></td>
+                                <td><?php echo esc_html($chat['date']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'chats', 'demo-action' => 'view-chat', 'id' => $chat['id']])); ?>" class="btn btn-sm btn-primary">View</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'chats', 'demo-action' => 'delete-chat', 'id' => $chat['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this chat?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No chats found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminStartChat() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Start New Chat</h2>
+        <div class="alert alert-info">Select a participant to start a new chat.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="participant" class="form-label">Participant</label>
+                <select class="form-control" id="participant" name="participant" required>
+                    <option value="">Select Participant</option>
+                    <option value="John Doe">John Doe (Student)</option>
+                    <option value="Jane Smith">Jane Smith (Teacher)</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="message" class="form-label">Initial Message</label>
+                <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Start Chat</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'chats'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminViewChat() {
+    ob_start();
+    $chat_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>View Chat</h2>
+        <div class="alert alert-info">Chat ID: <?php echo esc_html($chat_id); ?> with John Doe.</div>
+        <div class="chat-container" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+            <div class="chat-message"><strong>Admin:</strong> Hello, how can I assist you? <span class="text-muted">(2025-04-18 10:00)</span></div>
+            <div class="chat-message"><strong>John Doe:</strong> I have a question about the exam schedule. <span class="text-muted">(2025-04-18 10:05)</span></div>
+        </div>
+        <form method="post" action="" class="mt-3">
+            <div class="mb-3">
+                <label for="message" class="form-label">Send Message</label>
+                <textarea class="form-control" id="message" name="message" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'chats'])); ?>" class="btn btn-secondary">Back to Chats</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteChat() {
+    ob_start();
+    $chat_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Chat</h2>
+        <div class="alert alert-danger">Chat ID: <?php echo esc_html($chat_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'chats'])); ?>" class="btn btn-primary">Back to Chats</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Reports
+function demoRenderInstituteAdminReports($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Reports Management</h2>
+        <div class="alert alert-info">Generate and view reports for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Attendance Report</h5>
+                        <p class="card-text">View attendance statistics.</p>
+                        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'reports', 'demo-action' => 'attendance-report'])); ?>" class="btn btn-primary">Generate</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Fee Report</h5>
+                        <p class="card-text">View fee collection status.</p>
+                        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'reports', 'demo-action' => 'fee-report'])); ?>" class="btn btn-primary">Generate</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Exam Report</h5>
+                        <p class="card-text">View exam performance.</p>
+                        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'reports', 'demo-action' => 'exam-report'])); ?>" class="btn btn-primary">Generate</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAttendanceReport($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Attendance Report</h2>
+        <div class="alert alert-info">Attendance statistics for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Present Days</th>
+                        <th>Absent Days</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['attendance_report'])): ?>
+                        <?php foreach ($data['attendance_report'] as $report): ?>
+                            <tr>
+                                <td><?php echo esc_html($report['student_name']); ?></td>
+                                <td><?php echo esc_html($report['present_days']); ?></td>
+                                <td><?php echo esc_html($report['absent_days']); ?></td>
+                                <td><?php echo esc_html($report['percentage']); ?>%</td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="4">No attendance data available.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'reports'])); ?>" class="btn btn-primary">Back to Reports</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminFeeReport($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Fee Report</h2>
+        <div class="alert alert-info">Fee collection status for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Total Due</th>
+                        <th>Paid</th>
+                        <th>Outstanding</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['fee_report'])): ?>
+                        <?php foreach ($data['fee_report'] as $report): ?>
+                            <tr>
+                                <td><?php echo esc_html($report['student_name']); ?></td>
+                                <td><?php echo esc_html($report['total_due']); ?></td>
+                                <td><?php echo esc_html($report['paid']); ?></td>
+                                <td><?php echo esc_html($report['outstanding']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="4">No fee data available.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'reports'])); ?>" class="btn btn-primary">Back to Reports</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminExamReport($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Exam Report</h2>
+        <div class="alert alert-info">Exam performance for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Exam Name</th>
+                        <th>Marks</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['exam_report'])): ?>
+                        <?php foreach ($data['exam_report'] as $report): ?>
+                            <tr>
+                                <td><?php echo esc_html($report['student_name']); ?></td>
+                                <td><?php echo esc_html($report['exam_name']); ?></td>
+                                <td><?php echo esc_html($report['marks']); ?></td>
+                                <td><?php echo esc_html($report['percentage']); ?>%</td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="4">No exam data available.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'reports'])); ?>" class="btn btn-primary">Back to Reports</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Results
+function demoRenderInstituteAdminResults($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Results Management</h2>
+        <div class="alert alert-info">Manage exam results for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'results', 'demo-action' => 'add-result'])); ?>" class="btn btn-primary">Add New Result</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Student Name</th>
+                        <th>Exam Name</th>
+                        <th>Marks</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['results'])): ?>
+                        <?php foreach ($data['results'] as $result): ?>
+                            <tr>
+                                <td><?php echo esc_html($result['id']); ?></td>
+                                <td><?php echo esc_html($result['student_name']); ?></td>
+                                <td><?php echo esc_html($result['exam_name']); ?></td>
+                                <td><?php echo esc_html($result['marks']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'results', 'demo-action' => 'edit-result', 'id' => $result['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'results', 'demo-action' => 'delete-result', 'id' => $result['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this result?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No results found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddResult() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Result</h2>
+        <div class="alert alert-info">Fill in the details to add a new result.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="student_name" class="form-label">Student Name</label>
+                <input type="text" class="form-control" id="student_name" name="student_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="exam_name" class="form-label">Exam Name</label>
+                <input type="text" class="form-control" id="exam_name" name="exam_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="marks" class="form-label">Marks</label>
+                <input type="number" class="form-control" id="marks" name="marks" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Result</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'results'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditResult() {
+    ob_start();
+    $result_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Result</h2>
+        <div class="alert alert-info">Update the details for result ID: <?php echo esc_html($result_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="student_name" class="form-label">Student Name</label>
+                <input type="text" class="form-control" id="student_name" name="student_name" value="John Doe" required>
+            </div>
+            <div class="mb-3">
+                <label for="exam_name" class="form-label">Exam Name</label>
+                <input type="text" class="form-control" id="exam_name" name="exam_name" value="Midterm" required>
+            </div>
+            <div class="mb-3">
+                <label for="marks" class="form-label">Marks</label>
+                <input type="number" class="form-control" id="marks" name="marks" value="85" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Result</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'results'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteResult() {
+    ob_start();
+    $result_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Result</h2>
+        <div class="alert alert-danger">Result ID: <?php echo esc_html($result_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'results'])); ?>" class="btn btn-primary">Back to Results</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Fee Templates
+function demoRenderInstituteAdminFeeTemplates($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Fee Templates Management</h2>
+        <div class="alert alert-info">Manage fee templates for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fee_templates', 'demo-action' => 'add-template'])); ?>" class="btn btn-primary">Add New Template</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Template Name</th>
+                        <th>Amount</th>
+                        <th>Class</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['fee_templates'])): ?>
+                        <?php foreach ($data['fee_templates'] as $template): ?>
+                            <tr>
+                                <td><?php echo esc_html($template['id']); ?></td>
+                                <td><?php echo esc_html($template['template_name']); ?></td>
+                                <td><?php echo esc_html($template['amount']); ?></td>
+                                <td><?php echo esc_html($template['class']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fee_templates', 'demo-action' => 'edit-template', 'id' => $template['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fee_templates', 'demo-action' => 'delete-template', 'id' => $template['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this template?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No fee templates found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddFeeTemplate() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Fee Template</h2>
+        <div class="alert alert-info">Fill in the details to add a new fee template.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="template_name" class="form-label">Template Name</label>
+                <input type="text" class="form-control" id="template_name" name="template_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="amount" class="form-label">Amount</label>
+                <input type="number" class="form-control" id="amount" name="amount" required>
+            </div>
+            <div class="mb-3">
+                <label for="class" class="form-label">Class</label>
+                <input type="text" class="form-control" id="class" name="class" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Template</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fee_templates'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditFeeTemplate() {
+    ob_start();
+    $template_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Fee Template</h2>
+        <div class="alert alert-info">Update the details for template ID: <?php echo esc_html($template_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="template_name" class="form-label">Template Name</label>
+                <input type="text" class="form-control" id="template_name" name="template_name" value="Annual Fee" required>
+            </div>
+            <div class="mb-3">
+                <label for="amount" class="form-label">Amount</label>
+                <input type="number" class="form-control" id="amount" name="amount" value="1000" required>
+            </div>
+            <div class="mb-3">
+                <label for="class" class="form-label">Class</label>
+                <input type="text" class="form-control" id="class" name="class" value="Grade 10" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Template</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fee_templates'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteFeeTemplate() {
+    ob_start();
+    $template_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Fee Template</h2>
+        <div class="alert alert-danger">Template ID: <?php echo esc_html($template_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'fee_templates'])); ?>" class="btn btn-primary">Back to Fee Templates</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Transport
+function demoRenderInstituteAdminTransport($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Transport Management</h2>
+        <div class="alert alert-info">Manage transport vehicles for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport', 'demo-action' => 'add-vehicle'])); ?>" class="btn btn-primary">Add New Vehicle</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Vehicle Number</th>
+                        <th>Route</th>
+                        <th>Driver</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['transport'])): ?>
+                        <?php foreach ($data['transport'] as $vehicle): ?>
+                            <tr>
+                                <td><?php echo esc_html($vehicle['id']); ?></td>
+                                <td><?php echo esc_html($vehicle['vehicle_number']); ?></td>
+                                <td><?php echo esc_html($vehicle['route']); ?></td>
+                                <td><?php echo esc_html($vehicle['driver']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport', 'demo-action' => 'edit-vehicle', 'id' => $vehicle['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport', 'demo-action' => 'delete-vehicle', 'id' => $vehicle['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this vehicle?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No vehicles found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddVehicle() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Vehicle</h2>
+        <div class="alert alert-info">Fill in the details to add a new vehicle.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="vehicle_number" class="form-label">Vehicle Number</label>
+                <input type="text" class="form-control" id="vehicle_number" name="vehicle_number" required>
+            </div>
+            <div class="mb-3">
+                <label for="route" class="form-label">Route</label>
+                <input type="text" class="form-control" id="route" name="route" required>
+            </div>
+            <div class="mb-3">
+                <label for="driver" class="form-label">Driver Name</label>
+                <input type="text" class="form-control" id="driver" name="driver" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Vehicle</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditVehicle() {
+    ob_start();
+    $vehicle_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Vehicle</h2>
+        <div class="alert alert-info">Update the details for vehicle ID: <?php echo esc_html($vehicle_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="vehicle_number" class="form-label">Vehicle Number</label>
+                <input type="text" class="form-control" id="vehicle_number" name="vehicle_number" value="XYZ123" required>
+            </div>
+            <div class="mb-3">
+                <label for="route" class="form-label">Route</label>
+                <input type="text" class="form-control" id="route" name="route" value="Route A" required>
+            </div>
+            <div class="mb-3">
+                <label for="driver" class="form-label">Driver Name</label>
+                <input type="text" class="form-control" id="driver" name="driver" value="Mike Driver" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Vehicle</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteVehicle() {
+    ob_start();
+    $vehicle_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Vehicle</h2>
+        <div class="alert alert-danger">Vehicle ID: <?php echo esc_html($vehicle_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport'])); ?>" class="btn btn-primary">Back to Transport</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Transport Enrollments
+function demoRenderInstituteAdminTransportEnrollments($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Transport Enrollments</h2>
+        <div class="alert alert-info">Manage transport enrollments for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport_enrollments', 'demo-action' => 'add-enrollment'])); ?>" class="btn btn-primary">Add New Enrollment</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Student Name</th>
+                        <th>Vehicle Number</th>
+                        <th>Route</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['transport_enrollments'])): ?>
+                        <?php foreach ($data['transport_enrollments'] as $enrollment): ?>
+                            <tr>
+                                <td><?php echo esc_html($enrollment['id']); ?></td>
+                                <td><?php echo esc_html($enrollment['student_name']); ?></td>
+                                <td><?php echo esc_html($enrollment['vehicle_number']); ?></td>
+                                <td><?php echo esc_html($enrollment['route']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport_enrollments', 'demo-action' => 'edit-enrollment', 'id' => $enrollment['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport_enrollments', 'demo-action' => 'delete-enrollment', 'id' => $enrollment['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this enrollment?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No enrollments found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddTransportEnrollment() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Transport Enrollment</h2>
+        <div class="alert alert-info">Fill in the details to add a new transport enrollment.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="student_name" class="form-label">Student Name</label>
+                <input type="text" class="form-control" id="student_name" name="student_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="vehicle_number" class="form-label">Vehicle Number</label>
+                <input type="text" class="form-control" id="vehicle_number" name="vehicle_number" required>
+            </div>
+            <div class="mb-3">
+                <label for="route" class="form-label">Route</label>
+                <input type="text" class="form-control" id="route" name="route" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Enrollment</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport_enrollments'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditTransportEnrollment() {
+    ob_start();
+    $enrollment_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Transport Enrollment</h2>
+        <div class="alert alert-info">Update the details for enrollment ID: <?php echo esc_html($enrollment_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="student_name" class="form-label">Student Name</label>
+                <input type="text" class="form-control" id="student_name" name="student_name" value="John Doe" required>
+            </div>
+            <div class="mb-3">
+                <label for="vehicle_number" class="form-label">Vehicle Number</label>
+                <input type="text" class="form-control" id="vehicle_number" name="vehicle_number" value="XYZ123" required>
+            </div>
+            <div class="mb-3">
+                <label for="route" class="form-label">Route</label>
+                <input type="text" class="form-control" id="route" name="route" value="Route A" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Enrollment</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport_enrollments'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteTransportEnrollment() {
+    ob_start();
+    $enrollment_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Transport Enrollment</h2>
+        <div class="alert alert-danger">Enrollment ID: <?php echo esc_html($enrollment_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'transport_enrollments'])); ?>" class="btn btn-primary">Back to Transport Enrollments</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Departments
+function demoRenderInstituteAdminDepartments($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Departments Management</h2>
+        <div class="alert alert-info">Manage departments for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'departments', 'demo-action' => 'add-department'])); ?>" class="btn btn-primary">Add New Department</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Department Name</th>
+                        <th>Head</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['departments'])): ?>
+                        <?php foreach ($data['departments'] as $department): ?>
+                            <tr>
+                                <td><?php echo esc_html($department['id']); ?></td>
+                                <td><?php echo esc_html($department['name']); ?></td>
+                                <td><?php echo esc_html($department['head']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'departments', 'demo-action' => 'edit-department', 'id' => $department['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'departments', 'demo-action' => 'delete-department', 'id' => $department['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this department?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="4">No departments found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddDepartment() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Department</h2>
+        <div class="alert alert-info">Fill in the details to add a new department.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="department_name" class="form-label">Department Name</label>
+                <input type="text" class="form-control" id="department_name" name="department_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="department_head" class="form-label">Head of Department</label>
+                <input type="text" class="form-control" id="department_head" name="department_head" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Department</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'departments'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditDepartment() {
+    ob_start();
+    $department_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Department</h2>
+        <div class="alert alert-info">Update the details for department ID: <?php echo esc_html($department_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="department_name" class="form-label">Department Name</label>
+                <input type="text" class="form-control" id="department_name" name="department_name" value="Mathematics" required>
+            </div>
+            <div class="mb-3">
+                <label for="department_head" class="form-label">Head of Department</label>
+                <input type="text" class="form-control" id="department_head" name="department_head" value="Dr. Smith" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Department</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'departments'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteDepartment() {
+    ob_start();
+    $department_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Department</h2>
+        <div class="alert alert-danger">Department ID: <?php echo esc_html($department_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'departments'])); ?>" class="btn btn-primary">Back to Departments</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Subjects
+function demoRenderInstituteAdminSubjects($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Subjects Management</h2>
+        <div class="alert alert-info">Manage subjects for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subjects', 'demo-action' => 'add-subject'])); ?>" class="btn btn-primary">Add New Subject</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Subject Name</th>
+                        <th>Class</th>
+                        <th>Teacher</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['subjects'])): ?>
+                        <?php foreach ($data['subjects'] as $subject): ?>
+                            <tr>
+                                <td><?php echo esc_html($subject['id']); ?></td>
+                                <td><?php echo esc_html($subject['name']); ?></td>
+                                <td><?php echo esc_html($subject['class']); ?></td>
+                                <td><?php echo esc_html($subject['teacher']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subjects', 'demo-action' => 'edit-subject', 'id' => $subject['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subjects', 'demo-action' => 'delete-subject', 'id' => $subject['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this subject?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No subjects found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddSubject() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Subject</h2>
+        <div class="alert alert-info">Fill in the details to add a new subject.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="subject_name" class="form-label">Subject Name</label>
+                <input type="text" class="form-control" id="subject_name" name="subject_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="class" class="form-label">Class</label>
+                <input type="text" class="form-control" id="class" name="class" required>
+            </div>
+            <div class="mb-3">
+                <label for="teacher" class="form-label">Teacher</label>
+                <input type="text" class="form-control" id="teacher" name="teacher" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Subject</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subjects'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditSubject() {
+    ob_start();
+    $subject_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Subject</h2>
+        <div class="alert alert-info">Update the details for subject ID: <?php echo esc_html($subject_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="subject_name" class="form-label">Subject Name</label>
+                <input type="text" class="form-control" id="subject_name" name="subject_name" value="Physics" required>
+            </div>
+            <div class="mb-3">
+                <label for="class" class="form-label">Class</label>
+                <input type="text" class="form-control" id="class" name="class" value="Grade 11" required>
+            </div>
+            <div class="mb-3">
+                <label for="teacher" class="form-label">Teacher</label>
+                <input type="text" class="form-control" id="teacher" name="teacher" value="Ms. Johnson" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Subject</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subjects'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteSubject() {
+    ob_start();
+    $subject_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Subject</h2>
+        <div class="alert alert-danger">Subject ID: <?php echo esc_html($subject_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subjects'])); ?>" class="btn btn-primary">Back to Subjects</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Timetable
+function demoRenderInstituteAdminTimetable($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Timetable Management</h2>
+        <div class="alert alert-info">Manage timetable for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'timetable', 'demo-action' => 'add-timetable'])); ?>" class="btn btn-primary">Add New Timetable Entry</a>
+        </div>
+        <div class="mb-3">
+            <label for="class_filter" class="form-label">Filter by Class</label>
+            <select class="form-control" id="class_filter" onchange="location = this.value;">
+                <option value="">Select Class</option>
+                <?php foreach ($data['classes'] as $class): ?>
+                    <option value="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'timetable', 'class' => $class['name']])); ?>" <?php echo isset($_GET['class']) && $_GET['class'] === $class['name'] ? 'selected' : ''; ?>>
+                        <?php echo esc_html($class['name']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="timetable-container" style="overflow-x: auto;">
+            <table class="table table-bordered" style="min-width: 800px;">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $time_slots = ['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00', '12:00-13:00', '13:00-14:00', '14:00-15:00'];
+                    $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                    $colors = ['bg-primary', 'bg-success', 'bg-warning', 'bg-info', 'bg-danger'];
+                    foreach ($time_slots as $slot): ?>
+                        <tr>
+                            <td><?php echo esc_html($slot); ?></td>
+                            <?php foreach ($days as $day): ?>
+                                <td>
+                                    <?php
+                                    $entry = null;
+                                    foreach ($data['timetable'] as $t) {
+                                        if ($t['time_slot'] === $slot && $t['day'] === $day && (!isset($_GET['class']) || $t['class'] === $_GET['class'])) {
+                                            $entry = $t;
+                                            break;
+                                        }
+                                    }
+                                    if ($entry):
+                                        $color = $colors[array_rand($colors)];
+                                    ?>
+                                        <div class="p-2 text-white <?php echo esc_attr($color); ?>" style="border-radius: 5px;">
+                                            <?php echo esc_html($entry['subject']); ?><br>
+                                            <small><?php echo esc_html($entry['teacher']); ?></small><br>
+                                            <div class="mt-1">
+                                                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'timetable', 'demo-action' => 'edit-timetable', 'id' => $entry['id']])); ?>" class="btn btn-sm btn-light">Edit</a>
+                                                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'timetable', 'demo-action' => 'delete-timetable', 'id' => $entry['id']])); ?>" class="btn btn-sm btn-light" onclick="return confirm('Are you sure you want to delete this timetable entry?');">Delete</a>
+                                            </div>
+                                        </div>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </td>
+                            <?php endforeach; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddTimetable() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Timetable Entry</h2>
+        <div class="alert alert-info">Fill in the details to add a new timetable entry.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="class" class="form-label">Class</label>
+                <input type="text" class="form-control" id="class" name="class" required>
+            </div>
+            <div class="mb-3">
+                <label for="subject" class="form-label">Subject</label>
+                <input type="text" class="form-control" id="subject" name="subject" required>
+            </div>
+            <div class="mb-3">
+                <label for="teacher" class="form-label">Teacher</label>
+                <input type="text" class="form-control" id="teacher" name="teacher" required>
+            </div>
+            <div class="mb-3">
+                <label for="day" class="form-label">Day</label>
+                <select class="form-control" id="day" name="day" required>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="time_slot" class="form-label">Time Slot</label>
+                <select class="form-control" id="time_slot" name="time_slot" required>
+                    <option value="08:00-09:00">08:00-09:00</option>
+                    <option value="09:00-10:00">09:00-10:00</option>
+                    <option value="10:00-11:00">10:00-11:00</option>
+                    <option value="11:00-12:00">11:00-12:00</option>
+                    <option value="12:00-13:00">12:00-13:00</option>
+                    <option value="13:00-14:00">13:00-14:00</option>
+                    <option value="14:00-15:00">14:00-15:00</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Timetable Entry</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'timetable'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditTimetable() {
+    ob_start();
+    $timetable_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Timetable Entry</h2>
+        <div class="alert alert-info">Update the details for timetable entry ID: <?php echo esc_html($timetable_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="class" class="form-label">Class</label>
+                <input type="text" class="form-control" id="class" name="class" value="Grade 10" required>
+            </div>
+            <div class="mb-3">
+                <label for="subject" class="form-label">Subject</label>
+                <input type="text" class="form-control" id="subject" name="subject" value="Mathematics" required>
+            </div>
+            <div class="mb-3">
+                <label for="teacher" class="form-label">Teacher</label>
+                <input type="text" class="form-control" id="teacher" name="teacher" value="Mr. Brown" required>
+            </div>
+            <div class="mb-3">
+                <label for="day" class="form-label">Day</label>
+                <select class="form-control" id="day" name="day" required>
+                    <option value="Monday" selected>Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="time_slot" class="form-label">Time Slot</label>
+                <select class="form-control" id="time_slot" name="time_slot" required>
+                    <option value="08:00-09:00" selected>08:00-09:00</option>
+                    <option value="09:00-10:00">09:00-10:00</option>
+                    <option value="10:00-11:00">10:00-11:00</option>
+                    <option value="11:00-12:00">11:00-12:00</option>
+                    <option value="12:00-13:00">12:00-13:00</option>
+                    <option value="13:00-14:00">13:00-14:00</option>
+                    <option value="14:00-15:00">14:00-15:00</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Timetable Entry</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'timetable'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteTimetable() {
+    ob_start();
+    $timetable_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Timetable Entry</h2>
+        <div class="alert alert-danger">Timetable entry ID: <?php echo esc_html($timetable_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'timetable'])); ?>" class="btn btn-primary">Back to Timetable</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Homework
+function demoRenderInstituteAdminHomework($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Homework Management</h2>
+        <div class="alert alert-info">Manage homework for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'homework', 'demo-action' => 'add-homework'])); ?>" class="btn btn-primary">Add New Homework</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Subject</th>
+                        <th>Class</th>
+                        <th>Due Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['homework'])): ?>
+                        <?php foreach ($data['homework'] as $homework): ?>
+                            <tr>
+                                <td><?php echo esc_html($homework['id']); ?></td>
+                                <td><?php echo esc_html($homework['subject']); ?></td>
+                                <td><?php echo esc_html($homework['class']); ?></td>
+                                <td><?php echo esc_html($homework['due_date']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'homework', 'demo-action' => 'edit-homework', 'id' => $homework['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'homework', 'demo-action' => 'delete-homework', 'id' => $homework['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this homework?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No homework found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddHomework() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Homework</h2>
+        <div class="alert alert-info">Fill in the details to add a new homework.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="subject" class="form-label">Subject</label>
+                <input type="text" class="form-control" id="subject" name="subject" required>
+            </div>
+            <div class="mb-3">
+                <label for="class" class="form-label">Class</label>
+                <input type="text" class="form-control" id="class" name="class" required>
+            </div>
+            <div class="mb-3">
+                <label for="due_date" class="form-label">Due Date</label>
+                <input type="date" class="form-control" id="due_date" name="due_date" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Homework</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'homework'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditHomework() {
+    ob_start();
+    $homework_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Homework</h2>
+        <div class="alert alert-info">Update the details for homework ID: <?php echo esc_html($homework_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="subject" class="form-label">Subject</label>
+                <input type="text" class="form-control" id="subject" name="subject" value="English" required>
+            </div>
+            <div class="mb-3">
+                <label for="class" class="form-label">Class</label>
+                <input type="text" class="form-control" id="class" name="class" value="Grade 9" required>
+            </div>
+            <div class="mb-3">
+                <label for="due_date" class="form-label">Due Date</label>
+                <input type="date" class="form-control" id="due_date" name="due_date" value="2025-04-25" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="4" required>Write an essay on Shakespeare.</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Homework</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'homework'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteHomework() {
+    ob_start();
+    $homework_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Homework</h2>
+        <div class="alert alert-danger">Homework ID: <?php echo esc_html($homework_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'homework'])); ?>" class="btn btn-primary">Back to Homework</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Classes & Sections
+function demoRenderInstituteAdminClassesSections($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Classes & Sections Management</h2>
+        <div class="alert alert-info">Manage classes and sections for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'classes_sections', 'demo-action' => 'add-class'])); ?>" class="btn btn-primary">Add New Class</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Class Name</th>
+                        <th>Section</th>
+                        <th>Class Teacher</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['classes_sections'])): ?>
+                        <?php foreach ($data['classes_sections'] as $class): ?>
+                            <tr>
+                                <td><?php echo esc_html($class['id']); ?></td>
+                                <td><?php echo esc_html($class['class_name']); ?></td>
+                                <td><?php echo esc_html($class['section']); ?></td>
+                                <td><?php echo esc_html($class['class_teacher']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'classes_sections', 'demo-action' => 'edit-class', 'id' => $class['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'classes_sections', 'demo-action' => 'delete-class', 'id' => $class['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this class?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No classes found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddClass() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Class</h2>
+        <div class="alert alert-info">Fill in the details to add a new class.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="class_name" class="form-label">Class Name</label>
+                <input type="text" class="form-control" id="class_name" name="class_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="section" class="form-label">Section</label>
+                <input type="text" class="form-control" id="section" name="section" required>
+            </div>
+            <div class="mb-3">
+                <label for="class_teacher" class="form-label">Class Teacher</label>
+                <input type="text" class="form-control" id="class_teacher" name="class_teacher" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Class</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'classes_sections'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditClass() {
+    ob_start();
+    $class_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Class</h2>
+        <div class="alert alert-info">Update the details for class ID: <?php echo esc_html($class_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="class_name" class="form-label">Class Name</label>
+                <input type="text" class="form-control" id="class_name" name="class_name" value="Grade 8" required>
+            </div>
+            <div class="mb-3">
+                <label for="section" class="form-label">Section</label>
+                <input type="text" class="form-control" id="section" name="section" value="A" required>
+            </div>
+            <div class="mb-3">
+                <label for="class_teacher" class="form-label">Class Teacher</label>
+                <input type="text" class="form-control" id="class_teacher" name="class_teacher" value="Ms. Davis" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Class</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'classes_sections'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteClass() {
+    ob_start();
+    $class_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Class</h2>
+        <div class="alert alert-danger">Class ID: <?php echo esc_html($class_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'classes_sections'])); ?>" class="btn btn-primary">Back to Classes & Sections</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+// Subscriptions
+function demoRenderInstituteAdminSubscriptions($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Subscriptions Management</h2>
+        <div class="alert alert-info">Manage subscriptions for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subscriptions', 'demo-action' => 'add-subscription'])); ?>" class="btn btn-primary">Add New Subscription</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                  
+                        <th>Plan</th>
+                        <th>Start Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['subscriptions'])): ?>
+                        <?php foreach ($data['subscriptions'] as $subscription): ?>
+                            <tr>
+                                <td><?php echo esc_html($subscription['id']); ?></td>
+                                <td><?php echo esc_html($subscription['plan']); ?></td>
+                                <td><?php echo esc_html($subscription['start_date']); ?></td>
+                                <td><?php echo esc_html($subscription['status']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6">No subscriptions found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+
+// Parents
+function demoRenderInstituteAdminParents($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Parents Management</h2>
+        <div class="alert alert-info">Manage parents for <?php echo esc_html($data['institute']); ?>.</div>
+        <div class="mb-3">
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'parents', 'demo-action' => 'add-parent'])); ?>" class="btn btn-primary">Add New Parent</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Parent Name</th>
+                        <th>Student Name</th>
+                        <th>Contact</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($data['parents'])): ?>
+                        <?php foreach ($data['parents'] as $parent): ?>
+                            <tr>
+                                <td><?php echo esc_html($parent['id']); ?></td>
+                                <td><?php echo esc_html($parent['parent_name']); ?></td>
+                                <td><?php echo esc_html($parent['student_name']); ?></td>
+                                <td><?php echo esc_html($parent['contact']); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'parents', 'demo-action' => 'edit-parent', 'id' => $parent['id']])); ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'parents', 'demo-action' => 'delete-parent', 'id' => $parent['id']])); ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this parent?');">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No parents found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminAddParent() {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Add New Parent</h2>
+        <div class="alert alert-info">Fill in the details to add a new parent.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="parent_name" class="form-label">Parent Name</label>
+                <input type="text" class="form-control" id="parent_name" name="parent_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="student_name" class="form-label">Student Name</label>
+                <input type="text" class="form-control" id="student_name" name="student_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="contact" class="form-label">Contact</label>
+                <input type="text" class="form-control" id="contact" name="contact" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Parent</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'parents'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminEditParent() {
+    ob_start();
+    $parent_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Edit Parent</h2>
+        <div class="alert alert-info">Update the details for parent ID: <?php echo esc_html($parent_id); ?>.</div>
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="parent_name" class="form-label">Parent Name</label>
+                <input type="text" class="form-control" id="parent_name" name="parent_name" value="Mr. Smith" required>
+            </div>
+            <div class="mb-3">
+                <label for="student_name" class="form-label">Student Name</label>
+                <input type="text" class="form-control" id="student_name" name="student_name" value="John Smith" required>
+            </div>
+            <div class="mb-3">
+                <label for="contact" class="form-label">Contact</label>
+                <input type="text" class="form-control" id="contact" name="contact" value="123-456-7890" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Parent</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'parents'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function demoRenderInstituteAdminDeleteParent() {
+    ob_start();
+    $parent_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Delete Parent</h2>
+        <div class="alert alert-danger">Parent ID: <?php echo esc_html($parent_id); ?> has been deleted.</div>
+        <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'parents'])); ?>" class="btn btn-primary">Back to Parents</a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+function demoRenderInstituteAdminExtendSubscription() {
+    ob_start();
+    $subscription_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
+    ?>
+    <div class="dashboard-section">
+        <h2>Extend Subscription</h2>
+        <div class="alert alert-info">Extend the subscription for ID: <?php echo esc_html($subscription_id); ?>.</div>
+        <form method="post" action="">
+        
+            <div class="mb-3">
+                <label for="plan" class="form-label">Current Plan</label>
+                <input type="text" class="form-control" id="plan" name="plan" value="Monthly" readonly>
+            </div>
+            <div class="mb-3">
+                <label for="current_end_date" class="form-label">Current End Date</label>
+                <input type="date" class="form-control" id="current_end_date" name="current_end_date" value="2025-04-30" readonly>
+            </div>
+            <div class="mb-3">
+                <label for="extend_months" class="form-label">Extend by (Months)</label>
+                <input type="number" class="form-control" id="extend_months" name="extend_months" min="1" required>
+            </div>
+            <div class="mb-3">
+                <label for="new_end_date" class="form-label">Or Set New End Date</label>
+                <input type="date" class="form-control" id="new_end_date" name="new_end_date">
+            </div>
+            <button type="submit" class="btn btn-primary">Extend Subscription</button>
+            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'institute-admin', 'demo-section' => 'subscriptions'])); ?>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+
+
+
 
 /**
  * Data Functions
@@ -10296,4 +14356,7 @@ function demoGetParentData() {
         ]
     ];
 }
+
+
+
 
