@@ -1157,317 +1157,7 @@ function demoRenderTeacherContent($section, $action, $data = []) {
     return ob_get_clean();
 }
 
-function demoRenderTeacherManageStudentAttendance($data = []) {
-    ob_start();
-    ?>
-    <div class="edu-attendance-container" style="margin-top: 80px;">
-        <h2 class="edu-attendance-title">Manage Student Attendance</h2>
-        <div class="edu-attendance-actions">
-            <input type="text" id="student-attendance-search" class="edu-search-input" placeholder="Search Students..." style="margin-right: 20px; padding: 8px; width: 300px;">
-            <button class="edu-button edu-button-primary" id="add-student-attendance-btn">Add Attendance</button>
-            <button class="edu-button edu-button-secondary" id="export-student-attendance">Export CSV</button>
-            <input type="file" id="import-student-attendance" accept=".csv" style="display: none;">
-            <button class="edu-button edu-button-secondary" id="import-student-attendance-btn">Import CSV</button>
-        </div>
-        <div class="edu-pagination" style="margin: 20px 0;">
-            <label for="attendance-per-page">Show:</label>
-            <select id="attendance-per-page" class="edu-select" style="margin-right: 20px;">
-                <option value="10">10</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-            </select>
-            <button class="edu-button edu-button-nav" id="prev-page" disabled>Previous</button>
-            <span id="page-info" style="margin: 0 10px;"></span>
-            <button class="edu-button edu-button-nav" id="next-page">Next</button>
-        </div>
-        <div class="edu-table-wrapper">
-            <table class="edu-table" id="student-attendance-table">
-                <thead>
-                    <tr>
-                        <th>Student ID</th>
-                        <th>Name</th>
-                        <th>Class</th>
-                        <th>Section</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="student-attendance-table-body">
-                    <!-- Populated via JS -->
-                </tbody>
-            </table>
-        </div>
 
-        <!-- Add Student Attendance Modal -->
-        <div id="add-student-attendance-modal" class="edu-modal" style="display: none;">
-            <div class="edu-modal-content">
-                <span class="edu-modal-close" id="add-student-attendance-close">×</span>
-                <h2>Add Student Attendance</h2>
-                <form id="add-student-attendance-form" class="edu-form">
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-student-id">Student ID</label>
-                        <input type="text" class="edu-form-input" id="add-student-id" name="student_id" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-student-name">Student Name</label>
-                        <input type="text" class="edu-form-input" id="add-student-name" name="student_name" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-class">Class</label>
-                        <input type="text" class="edu-form-input" id="add-class" name="class" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-section">Section</label>
-                        <input type="text" class="edu-form-input" id="add-section" name="section" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-attendance-date">Date</label>
-                        <input type="date" class="edu-form-input" id="add-attendance-date" name="date" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="add-attendance-status">Status</label>
-                        <select class="edu-form-input" id="add-attendance-status" name="status" required>
-                            <option value="Present">Present</option>
-                            <option value="Absent">Absent</option>
-                            <option value="Late">Late</option>
-                        </select>
-                    </div>
-                    <button type="button" class="edu-button edu-button-primary" id="save-student-attendance">Add Attendance</button>
-                </form>
-                <div class="edu-form-message" id="add-student-attendance-message"></div>
-            </div>
-        </div>
-
-        <!-- Edit Student Attendance Modal -->
-        <div id="edit-student-attendance-modal" class="edu-modal" style="display: none;">
-            <div class="edu-modal-content">
-                <span class="edu-modal-close" id="edit-student-attendance-close">×</span>
-                <h2>Edit Student Attendance</h2>
-                <form id="edit-student-attendance-form" class="edu-form">
-                    <input type="hidden" id="edit-attendance-id">
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-student-id">Student ID</label>
-                        <input type="text" class="edu-form-input" id="edit-student-id" name="student_id" readonly>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-student-name">Student Name</label>
-                        <input type="text" class="edu-form-input" id="edit-student-name" name="student_name" readonly>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-class">Class</label>
-                        <input type="text" class="edu-form-input" id="edit-class" name="class" readonly>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-section">Section</label>
-                        <input type="text" class="edu-form-input" id="edit-section" name="section" readonly>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-attendance-date">Date</label>
-                        <input type="date" class="edu-form-input" id="edit-attendance-date" name="date" required>
-                    </div>
-                    <div class="edu-form-group">
-                        <label class="edu-form-label" for="edit-attendance-status">Status</label>
-                        <select class="edu-form-input" id="edit-attendance-status" name="status" required>
-                            <option value="Present">Present</option>
-                            <option value="Absent">Absent</option>
-                            <option value="Late">Late</option>
-                        </select>
-                    </div>
-                    <button type="button" class="edu-button edu-button-primary" id="update-student-attendance">Update Attendance</button>
-                </form>
-                <div class="edu-form-message" id="edit-student-attendance-message"></div>
-            </div>
-        </div>
-
-        <!-- Delete Student Attendance Modal -->
-        <div id="delete-student-attendance-modal" class="edu-modal" style="display: none;">
-            <div class="edu-modal-content">
-                <span class="edu-modal-close" id="delete-student-attendance-close">×</span>
-                <h2>Delete Student Attendance</h2>
-                <p>Are you sure you want to delete attendance for <span id="delete-student-name"></span> on <span id="delete-attendance-date"></span>?</p>
-                <input type="hidden" id="delete-attendance-id">
-                <button type="button" class="edu-button edu-button-delete" id="confirm-delete-student-attendance">Delete</button>
-                <button type="button" class="edu-button edu-button-secondary" id="cancel-delete-student-attendance">Cancel</button>
-                <div class="edu-form-message" id="delete-student-attendance-message"></div>
-            </div>
-        </div>
-
-        <script>
-        jQuery(document).ready(function($) {
-            let currentPage = 1;
-            let perPage = 10;
-            let searchQuery = '';
-            let studentAttendanceData = <?php echo json_encode($data['student_attendance'] ?? []); ?>;
-
-            function loadStudentAttendance(page, limit, query) {
-                const filtered = studentAttendanceData.filter(a => 
-                    !query || a.student_name.toLowerCase().includes(query.toLowerCase())
-                );
-                const total = filtered.length;
-                const start = (page - 1) * limit;
-                const end = start + limit;
-                const paginated = filtered.slice(start, end);
-                let html = '';
-                paginated.forEach((record, index) => {
-                    html += `
-                        <tr data-attendance-id="${start + index}">
-                            <td>${record.student_id}</td>
-                            <td>${record.student_name}</td>
-                            <td>${record.class}</td>
-                            <td>${record.section}</td>
-                            <td>${record.date}</td>
-                            <td>${record.status}</td>
-                            <td>
-                                <button class="edu-button edu-button-edit edit-student-attendance" data-attendance-id="${start + index}">Edit</button>
-                                <button class="edu-button edu-button-delete delete-student-attendance" data-attendance-id="${start + index}">Delete</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                $('#student-attendance-table-body').html(html || '<tr><td colspan="7">No attendance records found.</td></tr>');
-                const totalPages = Math.ceil(total / limit);
-                $('#page-info').text(`Page ${page} of ${totalPages}`);
-                $('#prev-page').prop('disabled', page === 1);
-                $('#next-page').prop('disabled', page === totalPages || total === 0);
-            }
-
-            loadStudentAttendance(currentPage, perPage, searchQuery);
-
-            $('#student-attendance-search').on('input', function() {
-                searchQuery = $(this).val();
-                currentPage = 1;
-                loadStudentAttendance(currentPage, perPage, searchQuery);
-            });
-
-            $('#attendance-per-page').on('change', function() {
-                perPage = parseInt($(this).val());
-                currentPage = 1;
-                loadStudentAttendance(currentPage, perPage, searchQuery);
-            });
-
-            $('#next-page').on('click', function() { currentPage++; loadStudentAttendance(currentPage, perPage, searchQuery); });
-            $('#prev-page').on('click', function() { currentPage--; loadStudentAttendance(currentPage, perPage, searchQuery); });
-
-            $('#add-student-attendance-btn').on('click', function() { $('#add-student-attendance-modal').show(); });
-            $('#add-student-attendance-close').on('click', function() { $('#add-student-attendance-modal').hide(); });
-            $('#save-student-attendance').on('click', function() {
-                const record = {
-                    student_id: $('#add-student-id').val(),
-                    student_name: $('#add-student-name').val(),
-                    class: $('#add-class').val(),
-                    section: $('#add-section').val(),
-                    date: $('#add-attendance-date').val(),
-                    status: $('#add-attendance-status').val()
-                };
-                if (record.student_id && record.student_name && record.class && record.section && record.date && record.status) {
-                    studentAttendanceData.push(record);
-                    $('#add-student-attendance-message').addClass('edu-success').text('Attendance added successfully!');
-                    setTimeout(() => {
-                        $('#add-student-attendance-modal').hide();
-                        $('#add-student-attendance-message').removeClass('edu-success').text('');
-                        $('#add-student-attendance-form')[0].reset();
-                        loadStudentAttendance(currentPage, perPage, searchQuery);
-                    }, 1000);
-                } else {
-                    $('#add-student-attendance-message').addClass('edu-error').text('Please fill all required fields.');
-                }
-            });
-
-            $(document).on('click', '.edit-student-attendance', function() {
-                const attendanceId = $(this).data('attendance-id');
-                const record = studentAttendanceData[attendanceId];
-                $('#edit-attendance-id').val(attendanceId);
-                $('#edit-student-id').val(record.student_id);
-                $('#edit-student-name').val(record.student_name);
-                $('#edit-class').val(record.class);
-                $('#edit-section').val(record.section);
-                $('#edit-attendance-date').val(record.date);
-                $('#edit-attendance-status').val(record.status);
-                $('#edit-student-attendance-modal').show();
-            });
-            $('#edit-student-attendance-close').on('click', function() { $('#edit-student-attendance-modal').hide(); });
-            $('#update-student-attendance').on('click', function() {
-                const attendanceId = $('#edit-attendance-id').val();
-                const record = studentAttendanceData[attendanceId];
-                record.date = $('#edit-attendance-date').val();
-                record.status = $('#edit-attendance-status').val();
-                if (record.date && record.status) {
-                    $('#edit-student-attendance-message').addClass('edu-success').text('Attendance updated successfully!');
-                    setTimeout(() => {
-                        $('#edit-student-attendance-modal').hide();
-                        $('#edit-student-attendance-message').removeClass('edu-success').text('');
-                        loadStudentAttendance(currentPage, perPage, searchQuery);
-                    }, 1000);
-                } else {
-                    $('#edit-student-attendance-message').addClass('edu-error').text('Please fill all required fields.');
-                }
-            });
-
-            $(document).on('click', '.delete-student-attendance', function() {
-                const attendanceId = $(this).data('attendance-id');
-                const record = studentAttendanceData[attendanceId];
-                $('#delete-attendance-id').val(attendanceId);
-                $('#delete-student-name').text(record.student_name);
-                $('#delete-attendance-date').text(record.date);
-                $('#delete-student-attendance-modal').show();
-            });
-            $('#delete-student-attendance-close, #cancel-delete-student-attendance').on('click', function() { $('#delete-student-attendance-modal').hide(); });
-            $('#confirm-delete-student-attendance').on('click', function() {
-                const attendanceId = $('#delete-attendance-id').val();
-                studentAttendanceData.splice(attendanceId, 1);
-                $('#delete-student-attendance-message').addClass('edu-success').text('Attendance deleted successfully!');
-                setTimeout(() => {
-                    $('#delete-student-attendance-modal').hide();
-                    $('#delete-student-attendance-message').removeClass('edu-success').text('');
-                    loadStudentAttendance(currentPage, perPage, searchQuery);
-                }, 1000);
-            });
-
-            $('#export-student-attendance').on('click', function() {
-                const csv = studentAttendanceData.map(row => `${row.student_id},${row.student_name},${row.class},${row.section},${row.date},${row.status}`).join('\n');
-                const headers = 'Student ID,Student Name,Class,Section,Date,Status\n';
-                const blob = new Blob([headers + csv], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'student_attendance.csv';
-                a.click();
-                window.URL.revokeObjectURL(url);
-            });
-
-            $('#import-student-attendance-btn').on('click', function() {
-                $('#import-student-attendance').click();
-            });
-
-            $('#import-student-attendance').on('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const text = e.target.result;
-                        const rows = text.split('\n').slice(1).filter(row => row.trim());
-                        const newRecords = rows.map(row => {
-                            const [student_id, student_name, class_name, section, date, status] = row.split(',');
-                            return { student_id, student_name, class: class_name, section, date, status };
-                        });
-                        studentAttendanceData.push(...newRecords);
-                        $('#add-student-attendance-message').addClass('edu-success').text('Attendance imported successfully!');
-                        setTimeout(() => {
-                            $('#add-student-attendance-message').removeClass('edu-success').text('');
-                            loadStudentAttendance(currentPage, perPage, searchQuery);
-                        }, 1000);
-                    };
-                    reader.readAsText(file);
-                    e.target.value = '';
-                }
-            });
-        });
-        </script>
-    </div>
-    <?php
-    return ob_get_clean();
-}
 // Add new profile function
 function demoRenderTeacherProfile($data) {
     ob_start();
@@ -1703,27 +1393,6 @@ function demoRenderTeacherDeleteExam($data) {
     return ob_get_clean();
 }
 
-function demoRenderTeacherAttendance($data) {
-    ob_start();
-    ?>
-    <div class="dashboard-section">
-        <h2>Attendance Reports</h2>
-        <table class="table" id="teacher-attendance">
-            <thead><tr><th>Date</th><th>Student</th><th>Status</th></tr></thead>
-            <tbody>
-                <?php foreach ($data['attendance'] as $record): ?>
-                    <tr>
-                        <td><?php echo esc_html($record['date']); ?></td>
-                        <td><?php echo esc_html($record['student']); ?></td>
-                        <td><?php echo esc_html($record['status']); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-    <?php
-    return ob_get_clean();
-}
 
 /**
  * Student Content
@@ -14223,39 +13892,39 @@ function demoRenderInstituteAdminExtendSubscription() {
 /**
  * Data Functions
  */
-// function demoGetTeacherData() {
-//     return [
-//         'role' => 'teacher',
-//         'exams' => [
-//             ['name' => 'Math Exam', 'date' => '2025-04-15', 'class' => 'Class 1A'],
-//             ['name' => 'Science Exam', 'date' => '2025-04-20', 'class' => 'Class 1A'],
-//             ['name' => 'History Quiz', 'date' => '2025-04-25', 'class' => 'Class 2B'],
-//             ['name' => 'English Test', 'date' => '2025-05-01', 'class' => 'Class 3C']
-//         ],
-//         'attendance' => [
-//             ['date' => '2025-04-01', 'student' => 'Student 1', 'status' => 'Present'],
-//             ['date' => '2025-04-02', 'student' => 'Student 2', 'status' => 'Absent'],
-//             ['date' => '2025-04-03', 'student' => 'Student 3', 'status' => 'Present'],
-//             ['date' => '2025-04-04', 'student' => 'Student 4', 'status' => 'Late']
-//         ],
-//         'students' => [
-//             ['id' => 'ST1001', 'name' => 'John Doe', 'email' => 'john@demo-pro.edu', 'class' => 'Class 1A', 'center' => 'Center A'],
-//             ['id' => 'ST1002', 'name' => 'Jane Smith', 'email' => 'jane@demo-pro.edu', 'class' => 'Class 1A', 'center' => 'Center A']
-//         ],
-//         'student_attendance' => [
-//             ['student_id' => 'S001', 'student_name' => 'John Doe', 'class' => '10', 'section' => 'A', 'date' => '2025-04-10', 'status' => 'Present'],
-//             ['student_id' => 'S002', 'student_name' => 'Jane Smith', 'class' => '10', 'section' => 'B', 'date' => '2025-04-10', 'status' => 'Absent'],
-//             ['student_id' => 'S001', 'student_name' => 'John Doe', 'class' => '10', 'section' => 'A', 'date' => '2025-04-11', 'status' => 'Late'],
-//         ],
-//         'profile' => [
-//             'teacher_id' => 'TR1001',
-//             'name' => 'Alice Brown',
-//             'email' => 'alice@demo-pro.edu',
-//             'subject' => 'Math',
-//             'center' => 'Center A'
-//         ]
-//     ];
-// }
+function demoGetTeacherData() {
+    return [
+        'role' => 'teacher',
+        'exams' => [
+            ['name' => 'Math Exam', 'date' => '2025-04-15', 'class' => 'Class 1A'],
+            ['name' => 'Science Exam', 'date' => '2025-04-20', 'class' => 'Class 1A'],
+            ['name' => 'History Quiz', 'date' => '2025-04-25', 'class' => 'Class 2B'],
+            ['name' => 'English Test', 'date' => '2025-05-01', 'class' => 'Class 3C']
+        ],
+        'attendance' => [
+            ['date' => '2025-04-01', 'student' => 'Student 1', 'status' => 'Present'],
+            ['date' => '2025-04-02', 'student' => 'Student 2', 'status' => 'Absent'],
+            ['date' => '2025-04-03', 'student' => 'Student 3', 'status' => 'Present'],
+            ['date' => '2025-04-04', 'student' => 'Student 4', 'status' => 'Late']
+        ],
+        'students' => [
+            ['id' => 'ST1001', 'name' => 'John Doe', 'email' => 'john@demo-pro.edu', 'class' => 'Class 1A', 'center' => 'Center A'],
+            ['id' => 'ST1002', 'name' => 'Jane Smith', 'email' => 'jane@demo-pro.edu', 'class' => 'Class 1A', 'center' => 'Center A']
+        ],
+        'student_attendance' => [
+            ['student_id' => 'S001', 'student_name' => 'John Doe', 'class' => '10', 'section' => 'A', 'date' => '2025-04-10', 'status' => 'Present'],
+            ['student_id' => 'S002', 'student_name' => 'Jane Smith', 'class' => '10', 'section' => 'B', 'date' => '2025-04-10', 'status' => 'Absent'],
+            ['student_id' => 'S001', 'student_name' => 'John Doe', 'class' => '10', 'section' => 'A', 'date' => '2025-04-11', 'status' => 'Late'],
+        ],
+        'profile' => [
+            'teacher_id' => 'TR1001',
+            'name' => 'Alice Brown',
+            'email' => 'alice@demo-pro.edu',
+            'subject' => 'Math',
+            'center' => 'Center A'
+        ]
+    ];
+}
 
 function demoGetSuperadminData() {
     $data = [
