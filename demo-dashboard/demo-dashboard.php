@@ -14223,39 +14223,39 @@ function demoRenderInstituteAdminExtendSubscription() {
 /**
  * Data Functions
  */
-function demoGetTeacherData() {
-    return [
-        'role' => 'teacher',
-        'exams' => [
-            ['name' => 'Math Exam', 'date' => '2025-04-15', 'class' => 'Class 1A'],
-            ['name' => 'Science Exam', 'date' => '2025-04-20', 'class' => 'Class 1A'],
-            ['name' => 'History Quiz', 'date' => '2025-04-25', 'class' => 'Class 2B'],
-            ['name' => 'English Test', 'date' => '2025-05-01', 'class' => 'Class 3C']
-        ],
-        'attendance' => [
-            ['date' => '2025-04-01', 'student' => 'Student 1', 'status' => 'Present'],
-            ['date' => '2025-04-02', 'student' => 'Student 2', 'status' => 'Absent'],
-            ['date' => '2025-04-03', 'student' => 'Student 3', 'status' => 'Present'],
-            ['date' => '2025-04-04', 'student' => 'Student 4', 'status' => 'Late']
-        ],
-        'students' => [
-            ['id' => 'ST1001', 'name' => 'John Doe', 'email' => 'john@demo-pro.edu', 'class' => 'Class 1A', 'center' => 'Center A'],
-            ['id' => 'ST1002', 'name' => 'Jane Smith', 'email' => 'jane@demo-pro.edu', 'class' => 'Class 1A', 'center' => 'Center A']
-        ],
-        'student_attendance' => [
-            ['student_id' => 'S001', 'student_name' => 'John Doe', 'class' => '10', 'section' => 'A', 'date' => '2025-04-10', 'status' => 'Present'],
-            ['student_id' => 'S002', 'student_name' => 'Jane Smith', 'class' => '10', 'section' => 'B', 'date' => '2025-04-10', 'status' => 'Absent'],
-            ['student_id' => 'S001', 'student_name' => 'John Doe', 'class' => '10', 'section' => 'A', 'date' => '2025-04-11', 'status' => 'Late'],
-        ],
-        'profile' => [
-            'teacher_id' => 'TR1001',
-            'name' => 'Alice Brown',
-            'email' => 'alice@demo-pro.edu',
-            'subject' => 'Math',
-            'center' => 'Center A'
-        ]
-    ];
-}
+// function demoGetTeacherData() {
+//     return [
+//         'role' => 'teacher',
+//         'exams' => [
+//             ['name' => 'Math Exam', 'date' => '2025-04-15', 'class' => 'Class 1A'],
+//             ['name' => 'Science Exam', 'date' => '2025-04-20', 'class' => 'Class 1A'],
+//             ['name' => 'History Quiz', 'date' => '2025-04-25', 'class' => 'Class 2B'],
+//             ['name' => 'English Test', 'date' => '2025-05-01', 'class' => 'Class 3C']
+//         ],
+//         'attendance' => [
+//             ['date' => '2025-04-01', 'student' => 'Student 1', 'status' => 'Present'],
+//             ['date' => '2025-04-02', 'student' => 'Student 2', 'status' => 'Absent'],
+//             ['date' => '2025-04-03', 'student' => 'Student 3', 'status' => 'Present'],
+//             ['date' => '2025-04-04', 'student' => 'Student 4', 'status' => 'Late']
+//         ],
+//         'students' => [
+//             ['id' => 'ST1001', 'name' => 'John Doe', 'email' => 'john@demo-pro.edu', 'class' => 'Class 1A', 'center' => 'Center A'],
+//             ['id' => 'ST1002', 'name' => 'Jane Smith', 'email' => 'jane@demo-pro.edu', 'class' => 'Class 1A', 'center' => 'Center A']
+//         ],
+//         'student_attendance' => [
+//             ['student_id' => 'S001', 'student_name' => 'John Doe', 'class' => '10', 'section' => 'A', 'date' => '2025-04-10', 'status' => 'Present'],
+//             ['student_id' => 'S002', 'student_name' => 'Jane Smith', 'class' => '10', 'section' => 'B', 'date' => '2025-04-10', 'status' => 'Absent'],
+//             ['student_id' => 'S001', 'student_name' => 'John Doe', 'class' => '10', 'section' => 'A', 'date' => '2025-04-11', 'status' => 'Late'],
+//         ],
+//         'profile' => [
+//             'teacher_id' => 'TR1001',
+//             'name' => 'Alice Brown',
+//             'email' => 'alice@demo-pro.edu',
+//             'subject' => 'Math',
+//             'center' => 'Center A'
+//         ]
+//     ];
+// }
 
 function demoGetSuperadminData() {
     $data = [
