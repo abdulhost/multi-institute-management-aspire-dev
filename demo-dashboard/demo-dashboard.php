@@ -440,15 +440,81 @@ function demoRenderSidebar($role, $active_section) {
                 ['action' => 'edit-exam', 'label' => 'Edit Exam', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exam-management', 'demo-action' => 'edit-exam']))],
                 ['action' => 'delete-exam', 'label' => 'Delete Exam', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exam-management', 'demo-action' => 'delete-exam']))],
             ]],
-            ['section' => 'attendance', 'label' => 'Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance'])), 'icon' => 'calendar-check', 'submenu' => [
-                ['action' => 'student-attendance', 'label' => 'Student Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance', 'demo-action' => 'student-attendance'])), 'submenu' => [
-                    ['action' => 'manage-student-attendance', 'label' => 'Manage Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance', 'demo-action' => 'manage-student-attendance']))],
-                    ['action' => 'add-student-attendance', 'label' => 'Add Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance', 'demo-action' => 'add-student-attendance']))],
-                    ['action' => 'edit-student-attendance', 'label' => 'Edit Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance', 'demo-action' => 'edit-student-attendance']))],
-                    ['action' => 'delete-student-attendance', 'label' => 'Delete Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance', 'demo-action' => 'delete-student-attendance']))],
-                    ['action' => 'import-student-attendance', 'label' => 'Import Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance', 'demo-action' => 'import-student-attendance']))],
-                    ['action' => 'export-student-attendance', 'label' => 'Export Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance', 'demo-action' => 'export-student-attendance']))],
-                ]],
+            ['section' => 'attendance-management', 'label' => 'Track Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance-management'])), 'icon' => 'calendar-check', 'submenu' => [
+                ['action' => 'view-attendance', 'label' => 'View Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance-management', 'demo-action' => 'view-attendance']))],
+                ['action' => 'add-attendance', 'label' => 'Add Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance-management', 'demo-action' => 'add-attendance']))],
+                ['action' => 'edit-attendance', 'label' => 'Edit Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance-management', 'demo-action' => 'edit-attendance']))],
+                ['action' => 'delete-attendance', 'label' => 'Delete Attendance', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance-management', 'demo-action' => 'delete-attendance']))],
+            ]],
+            ['section' => 'fees-management', 'label' => 'Fee Tracker', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'fees-management'])), 'icon' => 'money-bill-wave', 'submenu' => [
+                ['action' => 'view-fees', 'label' => 'View Fees', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'fees-management', 'demo-action' => 'view-fees']))],
+                ['action' => 'add-fee', 'label' => 'Add Fee', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'fees-management', 'demo-action' => 'add-fee']))],
+                ['action' => 'edit-fee', 'label' => 'Edit Fee', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'fees-management', 'demo-action' => 'edit-fee']))],
+                ['action' => 'delete-fee', 'label' => 'Delete Fee', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'fees-management', 'demo-action' => 'delete-fee']))],
+            ]],
+            ['section' => 'notices', 'label' => 'Notice Board', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'notices'])), 'icon' => 'bullhorn', 'submenu' => [
+                ['action' => 'view-notices', 'label' => 'View Notices', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'notices', 'demo-action' => 'view-notices']))],
+                ['action' => 'add-notice', 'label' => 'Add Notice', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'notices', 'demo-action' => 'add-notice']))],
+                ['action' => 'edit-notice', 'label' => 'Edit Notice', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'notices', 'demo-action' => 'edit-notice']))],
+                ['action' => 'delete-notice', 'label' => 'Delete Notice', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'notices', 'demo-action' => 'delete-notice']))],
+            ]],
+            ['section' => 'library-management', 'label' => 'Library Hub', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'library-management'])), 'icon' => 'book-open', 'submenu' => [
+                ['action' => 'view-books', 'label' => 'View Books', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'library-management', 'demo-action' => 'view-books']))],
+                ['action' => 'add-book', 'label' => 'Add Book', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'library-management', 'demo-action' => 'add-book']))],
+                ['action' => 'edit-book', 'label' => 'Edit Book', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'library-management', 'demo-action' => 'edit-book']))],
+                ['action' => 'delete-book', 'label' => 'Delete Book', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'library-management', 'demo-action' => 'delete-book']))],
+            ]],
+            ['section' => 'classes_sections', 'label' => 'Classes & Sections', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'classes_sections'])), 'icon' => 'school', 'submenu' => [
+                ['action' => 'manage-classes-sections', 'label' => 'Manage Classes & Sections', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'classes_sections', 'demo-action' => 'manage-classes-sections']))],
+                ['action' => 'add-class-section', 'label' => 'Add Class/Section', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'classes_sections', 'demo-action' => 'add-class-section']))],
+                ['action' => 'edit-class-section', 'label' => 'Edit Class/Section', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'classes_sections', 'demo-action' => 'edit-class-section']))],
+                ['action' => 'delete-class-section', 'label' => 'Delete Class/Section', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'classes_sections', 'demo-action' => 'delete-class-section']))],
+            ]],
+            ['section' => 'subjects', 'label' => 'Subjects', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'subjects'])), 'icon' => 'book', 'submenu' => [
+                ['action' => 'manage-subjects', 'label' => 'Manage Subjects', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'subjects', 'demo-action' => 'manage-subjects']))],
+                ['action' => 'add-subject', 'label' => 'Add Subject', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'subjects', 'demo-action' => 'add-subjects']))],
+                ['action' => 'edit-subject', 'label' => 'Edit Subject', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'subjects', 'demo-action' => 'edit-subjects']))],
+                ['action' => 'delete-subject', 'label' => 'Delete Subject', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'subjects', 'demo-action' => 'delete-subjects']))],
+            ]],
+            ['section' => 'inventory-management', 'label' => 'Inventory Control', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'inventory-management'])), 'icon' => 'boxes', 'submenu' => [
+                ['action' => 'view-items', 'label' => 'View Items', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'inventory-management', 'demo-action' => 'view-items']))],
+                ['action' => 'add-item', 'label' => 'Add Item', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'inventory-management', 'demo-action' => 'add-item']))],
+                ['action' => 'edit-item', 'label' => 'Edit Item', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'inventory-management', 'demo-action' => 'edit-item']))],
+                ['action' => 'delete-item', 'label' => 'Delete Item', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'inventory-management', 'demo-action' => 'delete-item']))],
+            ]],
+            ['section' => 'chats', 'label' => 'Chat Room', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'chats'])), 'icon' => 'comments', 'submenu' => [
+                ['action' => 'view-chats', 'label' => 'View Chats', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'chats', 'demo-action' => 'view-chats']))],
+                ['action' => 'send-chat', 'label' => 'Send Message', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'chats', 'demo-action' => 'send-chat']))],
+            ]],
+            ['section' => 'reports', 'label' => 'Insight Reports', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'reports'])), 'icon' => 'chart-bar', 'submenu' => [
+                ['action' => 'view-reports', 'label' => 'View Reports', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'reports', 'demo-action' => 'view-reports']))],
+                ['action' => 'add-report', 'label' => 'Add Report', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'reports', 'demo-action' => 'add-report']))],
+                ['action' => 'edit-report', 'label' => 'Edit Report', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'reports', 'demo-action' => 'edit-report']))],
+                ['action' => 'delete-report', 'label' => 'Delete Report', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'reports', 'demo-action' => 'delete-report']))],
+            ]],
+            ['section' => 'results', 'label' => 'Exam Results', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'results'])), 'icon' => 'trophy', 'submenu' => [
+                ['action' => 'view-results', 'label' => 'View Results', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'results', 'demo-action' => 'view-results']))],
+                ['action' => 'add-result', 'label' => 'Add Result', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'results', 'demo-action' => 'add-result']))],
+                ['action' => 'edit-result', 'label' => 'Edit Result', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'results', 'demo-action' => 'edit-result']))],
+                ['action' => 'delete-result', 'label' => 'Delete Result', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'results', 'demo-action' => 'delete-result']))],
+            ]],
+            ['section' => 'timetable', 'label' => 'Class Schedule', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'timetable'])), 'icon' => 'clock', 'submenu' => [
+                ['action' => 'view-timetable', 'label' => 'View Timetable', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'timetable', 'demo-action' => 'view-timetable']))],
+                ['action' => 'add-timetable', 'label' => 'Add Timetable Entry', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'timetable', 'demo-action' => 'add-timetable']))],
+                ['action' => 'edit-timetable', 'label' => 'Edit Timetable Entry', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'timetable', 'demo-action' => 'edit-timetable']))],
+                ['action' => 'delete-timetable', 'label' => 'Delete Timetable Entry', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'timetable', 'demo-action' => 'delete-timetable']))],
+            ]],
+            ['section' => 'homework', 'label' => 'Assignments', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'homework'])), 'icon' => 'tasks', 'submenu' => [
+                ['action' => 'view-homework', 'label' => 'View Assignments', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'homework', 'demo-action' => 'view-homework']))],
+                ['action' => 'add-homework', 'label' => 'Add Assignment', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'homework', 'demo-action' => 'add-homework']))],
+                ['action' => 'edit-homework', 'label' => 'Edit Assignment', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'homework', 'demo-action' => 'edit-homework']))],
+                ['action' => 'delete-homework', 'label' => 'Delete Assignment', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'homework', 'demo-action' => 'delete-homework']))],
+            ]],
+            ['section' => 'parents', 'label' => 'Parents', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'parents'])), 'icon' => 'user-friends', 'submenu' => [
+                ['action' => 'manage-parents', 'label' => 'Manage Parents', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'parents', 'demo-action' => 'manage-parents']))],
+                ['action' => 'add-parent', 'label' => 'Add Parent', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'parents', 'demo-action' => 'add-parent']))],
+                ['action' => 'edit-parent', 'label' => 'Edit Parent', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'parents', 'demo-action' => 'edit-parent']))],
+                ['action' => 'delete-parent', 'label' => 'Delete Parent', 'url' => esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'parents', 'demo-action' => 'delete-parent']))],
             ]],
         ],
         'student' => [
@@ -764,7 +830,7 @@ function demoRenderSidebar($role, $active_section) {
     $title = ucfirst($role) === 'Superadmin' ? 'Super Admin' : ucfirst($role);
     ob_start();
     ?>
-<nav id="sidebar">
+    <nav id="sidebar">
     <ul>
         <li>
             <div class="logo-title-section">
@@ -1075,11 +1141,6 @@ function demoRenderSidebar($role, $active_section) {
     return ob_get_clean();
 }
 
-
-
-
-
-
 /**
  * Teacher Content
  */
@@ -1102,7 +1163,8 @@ function demoRenderTeacherContent($section, $action, $data = []) {
             default:
                 echo demoRenderTeacherExams($data);
         }
-    } elseif ($section === 'students') {
+    }
+     elseif ($section === 'students') {
         switch ($action) {
             case 'add-student':
                 echo demoRenderTeacherAddStudent();
@@ -1117,31 +1179,200 @@ function demoRenderTeacherContent($section, $action, $data = []) {
             default:
                 echo demoRenderTeacherStudents($data);
         }
-    } elseif ($section === 'profile') {
-        echo demoRenderTeacherProfile($data);
-    } elseif ($section === 'student-attendance') {
+    }
+     elseif ($section === 'attendance-management') {
         switch ($action) {
-            case 'manage-student-attendance':
-                echo demoRenderTeacherManageStudentAttendance($data);
+            case 'add-attendance':
+                echo demoRenderTeacherAddAttendance();
                 break;
-            case 'add-student-attendance':
-                echo demoRenderTeacherAddStudentAttendance();
+            case 'edit-attendance':
+                echo demoRenderTeacherEditAttendance();
                 break;
-            case 'edit-student-attendance':
-                echo demoRenderTeacherEditStudentAttendance($data);
+            case 'delete-attendance':
+                echo demoRenderTeacherDeleteAttendance();
                 break;
-            case 'delete-student-attendance':
-                echo demoRenderTeacherDeleteStudentAttendance($data);
-                break;
-                case 'import-student-attendance':
-                    echo demoRenderTeacherImportStudentAttendance($data);
-                    break;
-                case 'export-student-attendance':
-                    echo demoRenderTeacherExportStudentAttendance($data);
-                    break;
+            case 'manage-attendance':
             default:
-                echo demoRenderTeacherManageStudentAttendance($data);
+                echo demoRenderTeacherAttendance($data);
         }
+    }
+    elseif ($section === 'fees-management') {
+        switch ($action) {
+            case 'add-fee':
+                echo demoRenderTeacherAddFee();
+                break;
+            case 'edit-fee':
+                echo demoRenderTeacherEditFee();
+                break;
+            case 'delete-fee':
+                echo demoRenderTeacherDeleteFee();
+                break;
+            default:
+                echo demoRenderTeacherFees($data);
+        }
+    }
+    elseif ($section === 'notices') {
+        switch ($action) {
+            case 'add-notice':
+                echo demoRenderTeacherAddNotice();
+                break;
+            case 'edit-notice':
+                echo demoRenderTeacherEditNotice();
+                break;
+            case 'delete-notice':
+                echo demoRenderTeacherDeleteNotice();
+                break;
+            default:
+                echo demoRenderTeacherNotices($data);
+        }
+    }
+    
+    elseif ($section === 'library-management') {
+        switch ($action) {
+            case 'add-book':
+                echo demoRenderTeacherAddBook();
+                break;
+            case 'edit-book':
+                echo demoRenderTeacherEditBook();
+                break;
+            case 'delete-book':
+                echo demoRenderTeacherDeleteBook();
+                break;
+            default:
+                echo demoRenderTeacherLibrary($data);
+        }
+    }
+    
+    elseif ($section === 'inventory-management') {
+        switch ($action) {
+            case 'add-item':
+                echo demoRenderTeacherAddItem();
+                break;
+            case 'edit-item':
+                echo demoRenderTeacherEditItem();
+                break;
+            case 'delete-item':
+                echo demoRenderTeacherDeleteItem();
+                break;
+            default:
+                echo demoRenderTeacherInventory($data);
+        }
+    }
+    
+    elseif ($section === 'chats') {
+        switch ($action) {
+            case 'send-chat':
+                echo demoRenderTeacherSendChat();
+                break;
+            default:
+                echo demoRenderTeacherChats($data);
+        }
+    }
+    
+    elseif ($section === 'reports') {
+        switch ($action) {
+            case 'add-report':
+                echo demoRenderTeacherAddReport();
+                break;
+            case 'edit-report':
+                echo demoRenderTeacherEditReport();
+                break;
+            case 'delete-report':
+                echo demoRenderTeacherDeleteReport();
+                break;
+            default:
+                echo demoRenderTeacherReports($data);
+        }
+    }
+    
+    elseif ($section === 'results') {
+        switch ($action) {
+            case 'add-result':
+                echo demoRenderTeacherAddResult();
+                break;
+            case 'edit-result':
+                echo demoRenderTeacherEditResult();
+                break;
+            case 'delete-result':
+                echo demoRenderTeacherDeleteResult();
+                break;
+            default:
+                echo demoRenderTeacherResults($data);
+        }
+    }
+    
+    elseif ($section === 'timetable') {
+        switch ($action) {
+            case 'add-timetable':
+                echo demoRenderTeacherAddTimetable();
+                break;
+            case 'edit-timetable':
+                echo demoRenderTeacherEditTimetable();
+                break;
+            case 'delete-timetable':
+                echo demoRenderTeacherDeleteTimetable();
+                break;
+            default:
+                echo demoRenderTeacherTimetable($data);
+        }
+    }
+    
+    elseif ($section === 'homework') {
+        switch ($action) {
+            case 'add-homework':
+                echo demoRenderTeacherAddHomework();
+                break;
+            case 'edit-homework':
+                echo demoRenderTeacherEditHomework();
+                break;
+            case 'delete-homework':
+                echo demoRenderTeacherDeleteHomework();
+                break;
+            default:
+                echo demoRenderTeacherHomework($data);
+        }
+    }
+    elseif ($section === 'classes_sections') {
+        switch ($action) {
+            case 'manage-classes-sections':
+                return demoRenderTeacherClassSessions($data);
+            case 'add-class-section':
+                return demoRenderTeacherAddSession();
+            case 'edit-class-section':
+                return demoRenderTeacherEditSession();
+            case 'delete-class-section':
+                return demoRenderTeacherDeleteSession();
+            default:
+                return demoRenderTeacherClassSessions();
+        }}
+    elseif ($section === 'subjects') {
+        switch ($action) {
+            case 'manage-subjects':
+                return demoRenderTeacherSubjects($data);
+            case 'add-subjects':
+                return demoRenderTeacherAddSubject();
+            case 'edit-subjects':
+                return demoRenderTeacherEditSubject();
+            case 'delete-subjects':
+                return demoRenderTeacherDeleteSubject();
+            default:
+                return demoRenderTeacherSubjects($data);
+        }}
+    elseif ($section === 'parents') {
+        switch ($action) {
+            case 'manage-parent':
+                return demoRenderTeacherParents($data);
+            case 'add-parent':
+                return demoRenderTeacherAddParent();
+            case 'edit-parent':
+                return demoRenderTeacherEditParent();
+            case 'delete-parent':
+                return demoRenderTeacherDeleteParent();
+            default:
+                return demoRenderTeacherParents($data);
+        }}
+     elseif ($section === 'profile') {
+        echo demoRenderTeacherProfile($data);
     } else {
         switch ($section) {
             case 'exams':
@@ -1393,6 +1624,27 @@ function demoRenderTeacherDeleteExam($data) {
     return ob_get_clean();
 }
 
+function demoRenderTeacherAttendance($data) {
+    ob_start();
+    ?>
+    <div class="dashboard-section">
+        <h2>Attendance Reports</h2>
+        <table class="table" id="teacher-attendance">
+            <thead><tr><th>Date</th><th>Student</th><th>Status</th></tr></thead>
+            <tbody>
+                <?php foreach ($data['attendance'] as $record): ?>
+                    <tr>
+                        <td><?php echo esc_html($record['date']); ?></td>
+                        <td><?php echo esc_html($record['student']); ?></td>
+                        <td><?php echo esc_html($record['status']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    return ob_get_clean();
+}
 
 /**
  * Student Content
@@ -13892,39 +14144,39 @@ function demoRenderInstituteAdminExtendSubscription() {
 /**
  * Data Functions
  */
-function demoGetTeacherData() {
-    return [
-        'role' => 'teacher',
-        'exams' => [
-            ['name' => 'Math Exam', 'date' => '2025-04-15', 'class' => 'Class 1A'],
-            ['name' => 'Science Exam', 'date' => '2025-04-20', 'class' => 'Class 1A'],
-            ['name' => 'History Quiz', 'date' => '2025-04-25', 'class' => 'Class 2B'],
-            ['name' => 'English Test', 'date' => '2025-05-01', 'class' => 'Class 3C']
-        ],
-        'attendance' => [
-            ['date' => '2025-04-01', 'student' => 'Student 1', 'status' => 'Present'],
-            ['date' => '2025-04-02', 'student' => 'Student 2', 'status' => 'Absent'],
-            ['date' => '2025-04-03', 'student' => 'Student 3', 'status' => 'Present'],
-            ['date' => '2025-04-04', 'student' => 'Student 4', 'status' => 'Late']
-        ],
-        'students' => [
-            ['id' => 'ST1001', 'name' => 'John Doe', 'email' => 'john@demo-pro.edu', 'class' => 'Class 1A', 'center' => 'Center A'],
-            ['id' => 'ST1002', 'name' => 'Jane Smith', 'email' => 'jane@demo-pro.edu', 'class' => 'Class 1A', 'center' => 'Center A']
-        ],
-        'student_attendance' => [
-            ['student_id' => 'S001', 'student_name' => 'John Doe', 'class' => '10', 'section' => 'A', 'date' => '2025-04-10', 'status' => 'Present'],
-            ['student_id' => 'S002', 'student_name' => 'Jane Smith', 'class' => '10', 'section' => 'B', 'date' => '2025-04-10', 'status' => 'Absent'],
-            ['student_id' => 'S001', 'student_name' => 'John Doe', 'class' => '10', 'section' => 'A', 'date' => '2025-04-11', 'status' => 'Late'],
-        ],
-        'profile' => [
-            'teacher_id' => 'TR1001',
-            'name' => 'Alice Brown',
-            'email' => 'alice@demo-pro.edu',
-            'subject' => 'Math',
-            'center' => 'Center A'
-        ]
-    ];
-}
+// function demoGetTeacherData() {
+//     return [
+//         'role' => 'teacher',
+//         'exams' => [
+//             ['name' => 'Math Exam', 'date' => '2025-04-15', 'class' => 'Class 1A'],
+//             ['name' => 'Science Exam', 'date' => '2025-04-20', 'class' => 'Class 1A'],
+//             ['name' => 'History Quiz', 'date' => '2025-04-25', 'class' => 'Class 2B'],
+//             ['name' => 'English Test', 'date' => '2025-05-01', 'class' => 'Class 3C']
+//         ],
+//         'attendance' => [
+//             ['date' => '2025-04-01', 'student' => 'Student 1', 'status' => 'Present'],
+//             ['date' => '2025-04-02', 'student' => 'Student 2', 'status' => 'Absent'],
+//             ['date' => '2025-04-03', 'student' => 'Student 3', 'status' => 'Present'],
+//             ['date' => '2025-04-04', 'student' => 'Student 4', 'status' => 'Late']
+//         ],
+//         'students' => [
+//             ['id' => 'ST1001', 'name' => 'John Doe', 'email' => 'john@demo-pro.edu', 'class' => 'Class 1A', 'center' => 'Center A'],
+//             ['id' => 'ST1002', 'name' => 'Jane Smith', 'email' => 'jane@demo-pro.edu', 'class' => 'Class 1A', 'center' => 'Center A']
+//         ],
+//         'student_attendance' => [
+//             ['student_id' => 'S001', 'student_name' => 'John Doe', 'class' => '10', 'section' => 'A', 'date' => '2025-04-10', 'status' => 'Present'],
+//             ['student_id' => 'S002', 'student_name' => 'Jane Smith', 'class' => '10', 'section' => 'B', 'date' => '2025-04-10', 'status' => 'Absent'],
+//             ['student_id' => 'S001', 'student_name' => 'John Doe', 'class' => '10', 'section' => 'A', 'date' => '2025-04-11', 'status' => 'Late'],
+//         ],
+//         'profile' => [
+//             'teacher_id' => 'TR1001',
+//             'name' => 'Alice Brown',
+//             'email' => 'alice@demo-pro.edu',
+//             'subject' => 'Math',
+//             'center' => 'Center A'
+//         ]
+//     ];
+// }
 
 function demoGetSuperadminData() {
     $data = [
