@@ -1094,70 +1094,210 @@ function demoRenderTeacherDeleteItem() {
     return ob_get_clean();
 }
 
+/**
+ * Render Teacher Chats
+ * Updated to match superadmin chat structure with conversation sidebar and message area
+ */
 function demoRenderTeacherChats($data) {
+    // Hardcoded conversation data for teacher
+    $conversations = [
+        ['id' => 'CONV001', 'recipient_id' => 'S001', 'recipient_name' => 'John Doe', 'last_message' => 'Can you clarify the homework?', 'last_message_time' => '2025-04-19 09:15', 'unread' => 1],
+        ['id' => 'CONV002', 'recipient_id' => 'P001', 'recipient_name' => 'Mary Brown', 'last_message' => 'Can we discuss my child’s progress?', 'last_message_time' => '2025-04-18 14:30', 'unread' => 0],
+    ];
+
+    // Hardcoded chats for the first conversation (CONV001)
+    $chats = [
+        ['sender' => 'S001', 'sender_name' => 'John Doe', 'content' => 'Can you clarify the homework?', 'time' => '2025-04-19 09:15', 'status' => 'received'],
+        ['sender' => 'T001', 'sender_name' => 'Ms. Alice Johnson', 'content' => 'Sure, it’s about chapter 5.', 'time' => '2025-04-19 09:20', 'status' => 'sent'],
+        ['sender' => 'S001', 'sender_name' => 'John Doe', 'content' => 'Thanks! I’ll review it.', 'time' => '2025-04-19 09:25', 'status' => 'received'],
+    ];
+
     ob_start();
     ?>
-    <div class="dashboard-section">
-        <h2>Chat Room</h2>
-        <div class="alert alert-info">Communicate with students.</div>
-        <div class="mb-3">
-            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'chats', 'demo-action' => 'send-chat'])); ?>" class="btn btn-primary">Send New Message</a>
+    <div class="dashboard-section chat-container" style="padding: 20px; display: flex; flex-direction: column; height: 100%;">
+        <h2 style="color: #4a90e2;">Chat Room</h2>
+        <div class="chat-wrapper" style="display: flex; flex: 1; overflow: hidden;">
+            <!-- Sidebar -->
+            <div class="chat-sidebar" style="width: 300px; border-right: 1px solid #ddd; overflow-y: auto;">
+                <div class="sidebar-header" style="padding: 10px; border-bottom: 1px solid #ddd;">
+                    <h4>Conversations</h4>
+                    <input type="text" id="conversation-search" class="form-control" placeholder="Search conversations..." style="width: 100%; padding: 8px; border: 1px solid #4a90e2; border-radius: 5px;">
+                </div>
+                <ul class="conversation-list" style="list-style: none; padding: 0;">
+                    <?php foreach ($conversations as $index => $conv): ?>
+                        <li class="conversation-item <?php echo $index === 0 ? 'active' : ''; ?>" data-conv-id="<?php echo esc_attr($conv['id']); ?>" style="padding: 10px; cursor: pointer; <?php echo $index === 0 ? 'background: #f4f6f9;' : ''; ?>">
+                            <strong><?php echo esc_html($conv['recipient_name']); ?> (<?php echo esc_html($conv['recipient_id']); ?>)</strong>
+                            <p style="margin: 5px 0; color: #555;"><?php echo esc_html($conv['last_message']); ?></p>
+                            <span class="meta" style="font-size: 0.8em; color: #999;"><?php echo esc_html($conv['last_message_time']); ?></span>
+                            <?php if ($conv['unread'] > 0): ?>
+                                <span class="badge bg-primary" style="background: #4a90e2; color: #fff; padding: 2px 6px; border-radius: 10px;"><?php echo esc_html($conv['unread']); ?></span>
+                            <?php endif; ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <!-- Main Chat Area -->
+            <div class="chat-main" style="flex: 1; display: flex; flex-direction: column; padding: 10px;">
+                <div class="chat-header" style="padding: 10px; border-bottom: 1px solid #ddd;">
+                    <h4>Conversation with <?php echo esc_html($conversations[0]['recipient_name']); ?> (<?php echo esc_html($conversations[0]['recipient_id']); ?>)</h4>
+                    <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'chats', 'demo-action' => 'send-chat'])); ?>" class="btn btn-primary" style="background: #4a90e2; color: #fff; padding: 8px 15px; border-radius: 5px;">New Message</a>
+                </div>
+                <div class="chat-messages" id="chat-messages" style="flex: 1; overflow-y: auto; padding: 10px;">
+                    <?php foreach ($chats as $msg): ?>
+                        <div class="chat-message <?php echo $msg['status']; ?>" style="margin: 5px; padding: 10px; max-width: 70%; <?php echo $msg['status'] === 'sent' ? 'background: #4a90e2; color: #fff; align-self: flex-end; border-radius: 10px 10px 0 10px;' : 'background: #e8eaed; color: #000; align-self: flex-start; border-radius: 10px 10px 10px 0;'; ?>">
+                            <div class="bubble"><?php echo esc_html($msg['content']); ?></div>
+                            <div class="meta" style="font-size: 0.8em; color: <?php echo $msg['status'] === 'sent' ? '#e8eaed' : '#555'; ?>;"><?php echo esc_html($msg['sender_name']); ?> • <?php echo esc_html($msg['time']); ?></div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <form class="chat-form" id="chat-form" style="padding: 10px; border-top: 1px solid #ddd;">
+                    <div class="d-flex align-items-center">
+                        <textarea class="form-control" id="chat-input" rows="2" placeholder="Type a message..." style="width: 100%; padding: 10px; border: 1px solid #4a90e2; border-radius: 5px; margin-right: 10px;"></textarea>
+                        <button type="submit" class="btn btn-primary" style="background: #4a90e2; color: #fff; padding: 10px 15px; border-radius: 5px;"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </form>
+                <div class="chat-loading" id="chat-loading" style="display: none; text-align: center; padding: 10px;">Loading...</div>
+            </div>
         </div>
-        <div class="table-responsive">
-            <table class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>Chat ID</th>
-                        <th>Recipient</th>
-                        <th>Message</th>
-                        <th>Timestamp</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($data['chats'])): ?>
-                        <?php foreach ($data['chats'] as $chat): ?>
-                            <tr>
-                                <td><?php echo esc_html($chat['chat_id']); ?></td>
-                                <td><?php echo esc_html($chat['recipient']); ?></td>
-                                <td><?php echo esc_html($chat['message']); ?></td>
-                                <td><?php echo esc_html($chat['timestamp']); ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="4">No chats found.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+        <script>
+        jQuery(document).ready(function($) {
+            // Conversation search
+            $('#conversation-search').on('input', function() {
+                const query = $(this).val().toLowerCase();
+                $('.conversation-item').each(function() {
+                    const name = $(this).find('strong').text().toLowerCase();
+                    const message = $(this).find('p').text().toLowerCase();
+                    $(this).toggle(name.includes(query) || message.includes(query));
+                });
+            });
+
+            // Conversation selection
+            $('.conversation-item').on('click', function() {
+                $('.conversation-item').removeClass('active');
+                $(this).addClass('active');
+                const convId = $(this).data('conv-id');
+                $('#chat-messages').html('<div class="chat-loading active" style="text-align: center; padding: 10px;">Loading...</div>');
+                // Simulate loading chats (hardcoded)
+                setTimeout(() => {
+                    $('#chat-messages').html(`
+                        <div class="chat-message received" style="margin: 5px; padding: 10px; max-width: 70%; background: #e8eaed; color: #000; align-self: flex-start; border-radius: 10px 10px 10px 0;">
+                            <div class="bubble">Can you clarify the homework?</div>
+                            <div class="meta" style="font-size: 0.8em; color: #555;">John Doe • 2025-04-19 09:15</div>
+                        </div>
+                        <div class="chat-message sent" style="margin: 5px; padding: 10px; max-width: 70%; background: #4a90e2; color: #fff; align-self: flex-end; border-radius: 10px 10px 0 10px;">
+                            <div class="bubble">Sure, it’s about chapter 5.</div>
+                            <div class="meta" style="font-size: 0.8em; color: #e8eaed;">Ms. Alice Johnson • 2025-04-19 09:20</div>
+                        </div>
+                        <div class="chat-message received" style="margin: 5px; padding: 10px; max-width: 70%; background: #e8eaed; color: #000; align-self: flex-start; border-radius: 10px 10px 10px 0;">
+                            <div class="bubble">Thanks! I’ll review it.</div>
+                            <div class="meta" style="font-size: 0.8em; color: #555;">John Doe • 2025-04-19 09:25</div>
+                        </div>
+                    `);
+                    $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+                }, 500);
+            });
+
+            // Send chat
+            $('#chat-form').on('submit', function(e) {
+                e.preventDefault();
+                const message = $('#chat-input').val().trim();
+                if (message) {
+                    $('#chat-messages').append(`
+                        <div class="chat-message sent" style="margin: 5px; padding: 10px; max-width: 70%; background: #4a90e2; color: #fff; align-self: flex-end; border-radius: 10px 10px 0 10px;">
+                            <div class="bubble">${message}</div>
+                            <div class="meta" style="font-size: 0.8em; color: #e8eaed;">Ms. Alice Johnson • ${new Date().toLocaleString()}</div>
+                        </div>
+                    `);
+                    $('#chat-input').val('');
+                    $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+                }
+            });
+        });
+        </script>
     </div>
     <?php
     return ob_get_clean();
 }
 
+/**
+ * Render Teacher Send Chat
+ * Updated to match superadmin new conversation structure
+ */
 function demoRenderTeacherSendChat() {
+    // Hardcoded recipient data for teacher (students and parents)
+    $recipients = [
+        'students' => [
+            ['id' => 'S001', 'name' => 'John Doe'],
+            ['id' => 'S002', 'name' => 'Jane Smith'],
+        ],
+        'parents' => [
+            ['id' => 'P001', 'name' => 'Mary Brown'],
+            ['id' => 'P002', 'name' => 'James Wilson'],
+        ],
+    ];
+
     ob_start();
     ?>
-    <div class="dashboard-section">
-        <h2>Send New Message</h2>
-        <div class="alert alert-info">Send a message to a student.</div>
-        <form method="post" action="">
-            <div class="mb-3">
-                <label for="recipient" class="form-label">Recipient</label>
-                <input type="text" class="form-control" id="recipient" name="recipient" required>
+    <div class="dashboard-section chat-container" style="padding: 20px;">
+        <h2 style="color: #4a90e2;">Send New Message</h2>
+        <form id="new-chat-form" class="edu-form" style="max-width: 600px;">
+            <div class="edu-form-group" style="margin-bottom: 15px;">
+                <label class="edu-form-label" for="recipient" style="display: block; margin-bottom: 5px;">Recipient</label>
+                <select id="recipient" class="edu-form-input" style="width: 100%; padding: 10px; border: 1px solid #4a90e2; border-radius: 5px;" required>
+                    <option value="">Select a recipient</option>
+                    <optgroup label="Students">
+                        <?php foreach ($recipients['students'] as $student): ?>
+                            <option value="<?php echo esc_attr($student['id']); ?>">
+                                <?php echo esc_html($student['name'] . ' (' . $student['id'] . ')'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                    <optgroup label="Parents">
+                        <?php foreach ($recipients['parents'] as $parent): ?>
+                            <option value="<?php echo esc_attr($parent['id']); ?>">
+                                <?php echo esc_html($parent['name'] . ' (' . $parent['id'] . ')'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                </select>
             </div>
-            <div class="mb-3">
-                <label for="message" class="form-label">Message</label>
-                <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+            <div class="edu-form-group" style="margin-bottom: 15px;">
+                <label class="edu-form-label" for="subject" style="display: block; margin-bottom: 5px;">Subject</label>
+                <input type="text" id="subject" class="edu-form-input" placeholder="e.g., Homework Feedback" style="width: 100%; padding: 10px; border: 1px solid #4a90e2; border-radius: 5px;" required>
             </div>
-            <button type="submit" class="btn btn-primary">Send Message</button>
-            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'chats'])); ?>" class="btn btn-secondary">Cancel</a>
+            <div class="edu-form-group" style="margin-bottom: 15px;">
+                <label class="edu-form-label" for="chat" style="display: block; margin-bottom: 5px;">Message</label>
+                <textarea id="chat" class="edu-form-input" rows="5" placeholder="Type your message..." style="width: 100%; padding: 10px; border: 1px solid #4a90e2; border-radius: 5px;" required></textarea>
+            </div>
+            <div class="edu-form-actions" style="display: flex; gap: 10px;">
+                <button type="submit" class="edu-button edu-button-primary" style="background: #4a90e2; color: #fff; padding: 10px 20px; border-radius: 5px; border: none;">Send Message</button>
+                <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'chats'])); ?>" class="edu-button edu-button-secondary" style="background: #6c757d; color: #fff; padding: 10px 20px; border-radius: 5px; text-decoration: none;">Cancel</a>
+            </div>
+            <div class="edu-form-message" id="form-message" style="margin-top: 10px;"></div>
         </form>
+        <script>
+        jQuery(document).ready(function($) {
+            $('#new-chat-form').on('submit', function(e) {
+                e.preventDefault();
+                const recipient = $('#recipient').val();
+                const subject = $('#subject').val().trim();
+                const chat = $('#chat').val().trim();
+                if (recipient && subject && chat) {
+                    $('#form-message').removeClass('edu-error').addClass('edu-success').text('Message sent successfully!').css('color', '#4a90e2');
+                    setTimeout(() => {
+                        window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'chats'])); ?>';
+                    }, 1000);
+                } else {
+                    $('#form-message').removeClass('edu-success').addClass('edu-error').text('Please fill all fields.').css('color', '#dc3545');
+                }
+            });
+        });
+        </script>
     </div>
     <?php
     return ob_get_clean();
 }
+
 
 function demoRenderTeacherReports($data) {
     ob_start();
