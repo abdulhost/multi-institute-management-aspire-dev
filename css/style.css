@@ -2543,3 +2543,6 @@ input[type="date"]:focus,input[type="password"]:focus,
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+.demo-headings{
+    color: white;
+}

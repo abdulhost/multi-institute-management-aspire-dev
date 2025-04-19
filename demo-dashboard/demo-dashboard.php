@@ -15,406 +15,489 @@ add_action('wp_enqueue_scripts', 'aspire_demo_enqueue_scripts');
 /**
  * Dashboard Shortcode
  */
-function aspire_demo_dashboard_shortcode() {
-    $role = isset($_GET['demo-role']) ? sanitize_text_field($_GET['demo-role']) : '';
-    $section = isset($_GET['demo-section']) ? sanitize_text_field($_GET['demo-section']) : 'overview';
-    $action = isset($_GET['demo-action']) ? sanitize_text_field($_GET['demo-action']) : '';
 
-    ob_start();
-    ?>
-    <div id="demo-wrapper">
-        <header class="demo-header">
-            <div class="header-container">
-                <div class="header-left">
-                    <a href="<?php echo esc_url(home_url('/?page_id=' . get_the_ID())); ?>" class="header-logo">
-                        <img decoding="async" class="logo-image" src="<?php echo esc_url(plugin_dir_url(__FILE__) . '../logo instituto.jpg'); ?>" alt="Demo Pro Logo">
-                        <span class="logo-text">Demo Pro</span>
-                    </a>
-                    <div class="header-search">
-                        <input type="text" placeholder="Search" class="search-input" id="header-search-input" aria-label="Search">
-                        <div class="search-dropdown" id="search-results">
-                            <ul class="results-list" id="search-results-list"></ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="header-right">
-                    <nav class="header-nav">
-                        <a href="<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'overview'])); ?>" class="nav-item <?php echo $section === 'overview' ? 'active' : ''; ?>">Dashboard</a>
-                        <?php if ($role === 'teacher'): ?>
-                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exams'])); ?>" class="nav-item <?php echo $section === 'exams' ? 'active' : ''; ?>">Exams</a>
-                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance-reports'])); ?>" class="nav-item <?php echo $section === 'attendance-reports' ? 'active' : ''; ?>">Attendance</a>
-                        <?php elseif ($role === 'student'): ?>
-                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'student', 'demo-section' => 'exams'])); ?>" class="nav-item <?php echo $section === 'exams' ? 'active' : ''; ?>">Exams</a>
-                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'student', 'demo-section' => 'attendance'])); ?>" class="nav-item <?php echo $section === 'attendance' ? 'active' : ''; ?>">Attendance</a>
-                        <?php elseif ($role === 'parent'): ?>
-                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'parent', 'demo-section' => 'exams'])); ?>" class="nav-item <?php echo $section === 'exams' ? 'active' : ''; ?>">Child Exams</a>
-                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'parent', 'demo-section' => 'attendance'])); ?>" class="nav-item <?php echo $section === 'attendance' ? 'active' : ''; ?>">Child Attendance</a>
-                        <?php elseif ($role === 'superadmin'): ?>
-                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers'])); ?>" class="nav-item <?php echo $section === 'centers' ? 'active' : ''; ?>">Centers</a>
-                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription'])); ?>" class="nav-item <?php echo $section === 'subscription' ? 'active' : ''; ?>">Subscriptions</a>
-                        <?php endif; ?>
-                    </nav>
-                    <div class="header-actions">
-                        <!-- Quick Links Dropdown -->
-                        <div class="header-quick-links">
-                            <a href="#" class="action-btn" id="quick-links-toggle">
-                                <i class="fas fa-link fa-lg"></i>
-                            </a>
-                            <div class="dropdown quick-links-dropdown" id="quick-links-dropdown">
-                                <div class="dropdown-header">
-                                    <span>Quick Links</span>
-                                </div>
-                                <ul class="dropdown-list">
-                                    <?php if ($role === 'teacher'): ?>
-                                        <li><a href="<?php echo esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exam-management', 'demo-action' => 'add-exam'])); ?>" class="dropdown-link">Add Exam</a></li>
-                                    <?php elseif ($role === 'superadmin'): ?>
-                                        <li><a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'add-exam'])); ?>" class="dropdown-link">Add Exam</a></li>
-                                        <li><a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription', 'demo-action' => 'add-subscription'])); ?>" class="dropdown-link">Add Subscription</a></li>
-                                    <?php endif; ?>
-                                    <li><a href="https://support.demo-pro.edu" target="_blank" class="dropdown-link">Support</a></li>
-                                </ul>
-                            </div>
-                        </div>
+ 
+ function aspire_demo_dashboard_shortcode() {
+     $role = isset($_GET['demo-role']) ? sanitize_text_field($_GET['demo-role']) : '';
+     $section = isset($_GET['demo-section']) ? sanitize_text_field($_GET['demo-section']) : 'overview';
+     $action = isset($_GET['demo-action']) ? sanitize_text_field($_GET['demo-action']) : '';
+ 
+     ob_start();
+     ?>
+     <div id="demo-wrapper">
+         <header class="demo-header">
+             <div class="header-container">
+                 <div class="header-left">
+                     <a href="<?php echo esc_url(home_url('/?page_id=' . get_the_ID())); ?>" class="header-logo">
+                         <img decoding="async" class="logo-image" src="<?php echo esc_url(plugin_dir_url(__FILE__) . '../logo instituto.jpg'); ?>" alt="Demo Pro Logo">
+                         <span class="logo-text">Demo Pro</span>
+                     </a>
+                     <div class="header-search">
+                         <input type="text" placeholder="Search" class="search-input" id="header-search-input" aria-label="Search">
+                         <div class="search-dropdown" id="search-results">
+                             <ul class="results-list" id="search-results-list"></ul>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="header-right">
+                     <nav class="header-nav">
+                         <a href="<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'overview'])); ?>" class="nav-item <?php echo $section === 'overview' ? 'active' : ''; ?>">Dashboard</a>
+                         <?php if ($role === 'teacher'): ?>
+                             <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exams'])); ?>" class="nav-item <?php echo $section === 'exams' ? 'active' : ''; ?>">Exams</a>
+                             <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'attendance-reports'])); ?>" class="nav-item <?php echo $section === 'attendance-reports' ? 'active' : ''; ?>">Attendance</a>
+                         <?php elseif ($role === 'student'): ?>
+                             <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'student', 'demo-section' => 'exams'])); ?>" class="nav-item <?php echo $section === 'exams' ? 'active' : ''; ?>">Exams</a>
+                             <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'student', 'demo-section' => 'attendance'])); ?>" class="nav-item <?php echo $section === 'attendance' ? 'active' : ''; ?>">Attendance</a>
+                         <?php elseif ($role === 'parent'): ?>
+                             <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'parent', 'demo-section' => 'exams'])); ?>" class="nav-item <?php echo $section === 'exams' ? 'active' : ''; ?>">Child Exams</a>
+                             <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'parent', 'demo-section' => 'attendance'])); ?>" class="nav-item <?php echo $section === 'attendance' ? 'active' : ''; ?>">Child Attendance</a>
+                         <?php elseif ($role === 'superadmin'): ?>
+                             <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'centers'])); ?>" class="nav-item <?php echo $section === 'centers' ? 'active' : ''; ?>">Centers</a>
+                             <a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription'])); ?>" class="nav-item <?php echo $section === 'subscription' ? 'active' : ''; ?>">Subscriptions</a>
+                         <?php endif; ?>
+                     </nav>
+                     <div class="header-actions">
+                         <!-- Quick Links Dropdown -->
+                         <div class="header-quick-links">
+                             <a href="#" class="action-btn" id="quick-links-toggle">
+                                 <i class="fas fa-link fa-lg"></i>
+                             </a>
+                             <div class="dropdown quick-links-dropdown" id="quick-links-dropdown">
+                                 <div class="dropdown-header">
+                                     <span>Quick Links</span>
+                                 </div>
+                                 <ul class="dropdown-list">
+                                     <?php if ($role === 'teacher'): ?>
+                                         <li><a href="<?php echo esc_url(add_query_arg(['demo-role' => 'teacher', 'demo-section' => 'exam-management', 'demo-action' => 'add-exam'])); ?>" class="dropdown-link">Add Exam</a></li>
+                                     <?php elseif ($role === 'superadmin'): ?>
+                                         <li><a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'add-exam'])); ?>" class="dropdown-link">Add Exam</a></li>
+                                         <li><a href="<?php echo esc_url(add_query_arg(['demo-role' => 'superadmin', 'demo-section' => 'subscription', 'demo-action' => 'add-subscription'])); ?>" class="dropdown-link">Add Subscription</a></li>
+                                     <?php endif; ?>
+                                     <li><a href="https://support.demo-pro.edu" target="_blank" class="dropdown-link">Support</a></li>
+                                 </ul>
+                             </div>
+                         </div>
+ 
+                         <div class="header-messages">
+                             <a href="<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'messages'])); ?>" class="action-btn" id="messages-toggle">
+                                 <i class="fas fa-envelope fa-lg"></i>
+                                 <span class="action-badge <?php echo $role ? '' : 'd-none'; ?>" id="messages-count">3</span>
+                             </a>
+                             <div class="dropdown messages-dropdown" id="messages-dropdown">
+                                 <div class="dropdown-header">
+                                     <span>Messages (Last 7 Days)</span>
+                                 </div>
+                                 <ul class="dropdown-list">
+                                     <li>
+                                         <span class="msg-content">
+                                             <span class="msg-sender">System</span>:
+                                             <span class="msg-preview">Exam scheduled...</span>
+                                         </span>
+                                         <span class="msg-time">Apr 10, 2025</span>
+                                     </li>
+                                     <li>
+                                         <span class="msg-content">
+                                             <span class="msg-sender">Admin</span>:
+                                             <span class="msg-preview">Update available...</span>
+                                         </span>
+                                         <span class="msg-time">Apr 9, 2025</span>
+                                     </li>
+                                     <li>
+                                         <span class="msg-content">
+                                             <span class="msg-sender">Teacher</span>:
+                                             <span class="msg-preview">Class canceled...</span>
+                                         </span>
+                                         <span class="msg-time">Apr 8, 2025</span>
+                                     </li>
+                                 </ul>
+                                 <a href="<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'messages'])); ?>" class="dropdown-footer">View All Messages</a>
+                             </div>
+                         </div>
+ 
+                         <!-- Notifications Dropdown -->
+                         <div class="header-notifications">
+                             <a href="<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'notifications'])); ?>" class="action-btn" id="notifications-toggle">
+                                 <i class="fas fa-bell fa-lg"></i>
+                                 <span class="action-badge <?php echo $role ? '' : 'd-none'; ?>" id="notifications-count">2</span>
+                             </a>
+                             <div class="dropdown notifications-dropdown" id="notifications-dropdown">
+                                 <div class="dropdown-header">
+                                     <span>Notifications (Last 7 Days)</span>
+                                 </div>
+                                 <ul class="dropdown-list">
+                                     <li>
+                                         <span class="msg-content">
+                                             <span class="msg-sender">System</span>:
+                                             <span class="notif-text">New exam added...</span>
+                                         </span>
+                                         <span class="notif-time">Apr 11, 2025</span>
+                                     </li>
+                                     <li>
+                                         <span class="msg-content">
+                                             <span class="msg-sender">Admin</span>:
+                                             <span class="notif-text">Attendance updated...</span>
+                                         </span>
+                                         <span class="notif-time">Apr 10, 2025</span>
+                                     </li>
+                                 </ul>
+                                 <a href="<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'notifications'])); ?>" class="dropdown-footer">View All</a>
+                             </div>
+                         </div>
+ 
+                         <!-- Settings -->
+                         <div class="header-settings">
+                             <a href="<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'settings'])); ?>" class="action-btn" id="settings-toggle">
+                                 <i class="fas fa-cog fa-lg"></i>
+                             </a>
+                         </div>
+ 
+                         <!-- Help/Support -->
+                         <div class="header-help">
+                             <a href="https://support.demo-pro.edu" target="_blank" class="action-btn" id="help-toggle">
+                                 <i class="fas fa-question-circle fa-lg"></i>
+                             </a>
+                         </div>
+ 
+                         <!-- Dark Mode Toggle -->
+                         <div class="header-dark-mode">
+                             <button class="action-btn" id="dark-mode-toggle">
+                                 <i class="fas fa-moon fa-lg"></i>
+                             </button>
+                         </div>
+ 
+                         <!-- Profile Dropdown -->
+                         <div class="header-profile">
+                             <div class="profile-toggle" id="profile-toggle">
+                                 <img decoding="async" src="<?php echo esc_url(plugin_dir_url(__FILE__) . '../logo instituto.jpg'); ?>" alt="Profile" class="profile-img">
+                                 <i class="fas fa-caret-down profile-arrow"></i>
+                             </div>
+                             <div class="action-dropdown profile-dropdown" id="profile-dropdown">
+                                 <div class="profile-info">
+                                     <img decoding="async" src="<?php echo esc_url(plugin_dir_url(__FILE__) . '../logo instituto.jpg'); ?>" alt="Profile" class="profile-img-large">
+                                     <div>
+                                         <span class="profile-name"><?php echo esc_html($role ? ucfirst($role) : 'Demo User'); ?></span><br>
+                                         <span class="profile-email"><?php echo esc_html($role ? "$role@demo-pro.edu" : 'demo@demo-pro.edu'); ?></span>
+                                     </div>
+                                 </div>
+                                 <ul class="dropdown-list">
+                                     <li><a href="<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'settings'])); ?>" class="profile-link">Settings</a></li>
+                                     <li><a href="<?php echo esc_url(home_url('/?page_id=' . get_the_ID())); ?>" class="profile-link logout">Logout</a></li>
+                                 </ul>
+                             </div>
+                         </div>
+ 
+                         <button class="nav-toggle" id="nav-toggle" aria-label="Toggle Navigation">
+                             <i class="fas fa-bars"></i>
+                         </button>
+                     </div>
+                 </div>
+             </div>
+         </header>
+ 
+         <!-- Main Content -->
+         <div class="institute-dashboard-wrapper">
+             <div id="sidebar-container" class="sidebar-container">
+                 <button class="sidebar-toggle-btn btn btn-primary" id="sidebar-toggle-btn" style="display: none;">
+                     <i class="fas fa-chevron-left"></i>
+                 </button>
+                 <?php if ($role): ?>
+                     <?php echo demoRenderSidebar($role, $section); ?>
+                 <?php endif; ?>
+             </div>
+             <div class="main-content" id="dashboard-content">
+                 <?php if (!$role): ?>
+                     <div class="container py-4 role-selection">
+                         <h1 class="text-center mb-4">Welcome to Demo Pro</h1>
+                         <p class="text-center mb-4">Manage your educational institute with ease. Choose your role to begin.</p>
+                         <div class="row justify-content-center">
+                             <div class="col-md-4 col-sm-6 mb-4">
+                                 <a href="<?php echo esc_url(add_query_arg('demo-role', 'superadmin')); ?>" class="role-card btn btn-warning w-100">
+                                     <i class="fas fa-user-shield fa-2x"></i>
+                                     <h3 class="demo-headings">Super Admin</h3>
+                                     <p>Manage all institutes and subscriptions.</p>
+                                 </a>
+                             </div>
+                             <div class="col-md-4 col-sm-6 mb-4">
+                                 <a href="<?php echo esc_url(add_query_arg('demo-role', 'institute-admin')); ?>" class="role-card btn btn-danger w-100">
+                                     <i class="fas fa-university fa-2x"></i>
+                                     <h3 class="demo-headings">Institute Admin</h3>
+                                     <p>Oversee institute operations.</p>
+                                 </a>
+                             </div>
+                             <div class="col-md-4 col-sm-6 mb-4">
+                                 <a href="<?php echo esc_url(add_query_arg('demo-role', 'teacher')); ?>" class="role-card btn btn-primary w-100">
+                                     <i class="fas fa-chalkboard-teacher fa-2x"></i>
+                                     <h3 class="demo-headings">Teacher</h3>
+                                     <p>Manage classes and exams.</p>
+                                 </a>
+                             </div>
+                             <div class="col-md-4 col-sm-6 mb-4">
+                                 <a href="<?php echo esc_url(add_query_arg('demo-role', 'student')); ?>" class="role-card btn btn-success w-100">
+                                     <i class="fas fa-user-graduate fa-2x"></i>
+                                     <h3 class="demo-headings">Student</h3>
+                                     <p>View grades and attendance.</p>
+                                 </a>
+                             </div>
+                             <div class="col-md-4 col-sm-6 mb-4">
+                                 <a href="<?php echo esc_url(add_query_arg('demo-role', 'parent')); ?>" class="role-card btn btn-info w-100">
+                                     <i class="fas fa-user-friends fa-2x"></i>
+                                     <h3 class="demo-headings">Parent</h3>
+                                     <p>Monitor your child's progress.</p>
+                                 </a>
+                             </div>
+                         </div>
+                     </div>
+                 <?php else: ?>
+                     <div class="content-inner container py-4">
+                         <div class="row">
+                             <?php
+                             switch ($role) {
+                                 case 'superadmin':
+                                     $data = demoGetSuperadminData();
+                                     echo '<div class="col-12"><div class="dashboard-card">' . demoRenderSuperadminContent($section, $action, $data) . '</div></div>';
+                                     break;
+                                 case 'institute-admin':
+                                     $data = demoGetInstituteAdminData();
+                                     echo '<div class="col-12"><div class="dashboard-card">' . demoRenderInstituteAdminContent($section, $action, $data) . '</div></div>';
+                                     break;
+                                 case 'teacher':
+                                     $data = demoGetTeacherData();
+                                     echo '<div class="col-12"><div class="dashboard-card">' . demoRenderTeacherContent($section, $action, $data) . '</div></div>';
+                                     break;
+                                 case 'student':
+                                     $data = demoGetStudentData();
+                                     echo '<div class="col-12"><div class="dashboard-card">' . demoRenderStudentContent($section, $action, $data) . '</div></div>';
+                                     break;
+                                 case 'parent':
+                                     $data = demoGetParentData();
+                                     echo '<div class="col-12"><div class="dashboard-card">' . demoRenderParentContent($section, $action, $data) . '</div></div>';
+                                     break;
+                                 default:
+                                     echo '<div class="col-12"><div class="dashboard-card"><h2>Invalid Role</h2><p>Please select a valid role.</p></div></div>';
+                             }
+                             ?>
+                         </div>
+                     </div>
+                 <?php endif; ?>
+             </div>
+         </div>
+ 
+         <!-- JavaScript for Header Interactivity and Enhancements -->
+         <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+         <script type="text/javascript">
+         document.addEventListener('DOMContentLoaded', () => {
+             const fontAwesomeLink = document.createElement('link');
+             fontAwesomeLink.rel = 'stylesheet';
+             fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';
+             fontAwesomeLink.crossOrigin = 'anonymous';
+             document.head.appendChild(fontAwesomeLink);
+ 
+             const searchInput = document.getElementById('header-search-input');
+             const searchResults = document.getElementById('search-results');
+             const navToggle = document.getElementById('nav-toggle');
+             const headerNav = document.querySelector('.header-nav');
+             const messagesToggle = document.getElementById('messages-toggle');
+             const messagesDropdown = document.getElementById('messages-dropdown');
+             const notificationsToggle = document.getElementById('notifications-toggle');
+             const notificationsDropdown = document.getElementById('notifications-dropdown');
+             const quickLinksToggle = document.getElementById('quick-links-toggle');
+             const quickLinksDropdown = document.getElementById('quick-links-dropdown');
+             const darkModeToggle = document.getElementById('dark-mode-toggle');
+             const profileToggle = document.getElementById('profile-toggle');
+             const profileDropdown = document.getElementById('profile-dropdown');
+             const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
+             const sidebarContainer = document.getElementById('sidebar-container');
+ 
+             let activeDropdown = null;
+ 
+             function toggleDropdown(toggle, dropdown, isLink = false) {
+                 toggle.addEventListener('mouseenter', () => {
+                     closeAllDropdowns();
+                     dropdown.classList.add('visible');
+                     activeDropdown = dropdown;
+                 });
+ 
+                 dropdown.addEventListener('mouseenter', () => {
+                     dropdown.classList.add('visible');
+                     activeDropdown = dropdown;
+                 });
+ 
+                 toggle.addEventListener('mouseleave', () => {
+                     dropdown.addEventListener('mouseleave', () => {
+                         dropdown.classList.remove('visible');
+                         activeDropdown = null;
+                     });
+                 });
+ 
+                 if (!isLink) {
+                     toggle.addEventListener('click', (e) => {
+                         e.preventDefault();
+                         e.stopPropagation();
+                         if (dropdown.classList.contains('visible')) {
+                             dropdown.classList.remove('visible');
+                             activeDropdown = null;
+                         } else {
+                             closeAllDropdowns();
+                             dropdown.classList.add('visible');
+                             activeDropdown = dropdown;
+                         }
+                     });
+                 }
+             }
+ 
+             function closeAllDropdowns() {
+                 [messagesDropdown, notificationsDropdown, quickLinksDropdown, profileDropdown, searchResults].forEach(dropdown => {
+                     if (dropdown) dropdown.classList.remove('visible');
+                 });
+                 activeDropdown = null;
+             }
+ 
+             if (searchInput && searchResults) {
+                 let debounceTimer;
+                 searchInput.addEventListener('input', function() {
+                     clearTimeout(debounceTimer);
+                     debounceTimer = setTimeout(() => {
+                         const query = this.value.trim();
+                         if (query.length < 2) {
+                             searchResults.classList.remove('visible');
+                             return;
+                         }
+ 
+                         searchResults.querySelector('.results-list').innerHTML = '<li>Loading...</li>';
+                         searchResults.classList.add('visible');
+ 
+                         const sections = [
+                             { title: 'Dashboard', url: '<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'overview'])); ?>' },
+                             { title: 'Exams', url: '<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'exams'])); ?>' },
+                             { title: 'Attendance', url: '<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'attendance'])); ?>' },
+                             { title: 'Centers', url: '<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'centers'])); ?>' },
+                             { title: 'Subscriptions', url: '<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'subscription'])); ?>' }
+                         ];
+                         const resultsList = searchResults.querySelector('.results-list');
+                         resultsList.innerHTML = '';
+                         const filtered = sections.filter(item => item.title.toLowerCase().includes(query.toLowerCase()));
+                         if (filtered.length > 0) {
+                             filtered.forEach(item => {
+                                 resultsList.innerHTML += `<li><a href="${item.url}">${item.title}</a></li>`;
+                             });
+                         } else {
+                             resultsList.innerHTML = '<li>No results found</li>';
+                         }
+                     }, 150);
+                 });
+             }
+ 
+             if (navToggle && headerNav) {
+                 navToggle.addEventListener('click', () => {
+                     headerNav.classList.toggle('visible');
+                 });
+             }
+ 
+             if (messagesToggle && messagesDropdown) {
+                 toggleDropdown(messagesToggle, messagesDropdown, true);
+             }
+ 
+             if (notificationsToggle && notificationsDropdown) {
+                 toggleDropdown(notificationsToggle, notificationsDropdown, true);
+             }
+ 
+             if (quickLinksToggle && quickLinksDropdown) {
+                 toggleDropdown(quickLinksToggle, quickLinksDropdown);
+             }
+ 
+             if (darkModeToggle) {
+                 darkModeToggle.addEventListener('click', () => {
+                     document.body.classList.toggle('dark-mode');
+                     const isDark = document.body.classList.contains('dark-mode');
+                     darkModeToggle.querySelector('i').classList.toggle('fa-moon', !isDark);
+                     darkModeToggle.querySelector('i').classList.toggle('fa-sun', isDark);
+                 });
+             }
+ 
+             if (profileToggle && profileDropdown) {
+                 toggleDropdown(profileToggle, profileDropdown);
+             }
+ 
+             if (sidebarToggleBtn && sidebarContainer) {
+                 sidebarToggleBtn.addEventListener('click', () => {
+                     sidebarContainer.classList.toggle('collapsed');
+                     sidebarToggleBtn.querySelector('i').classList.toggle('fa-chevron-left');
+                     sidebarToggleBtn.querySelector('i').classList.toggle('fa-chevron-right');
+                 });
+ 
+                 // Show toggle button only when role is selected
+                 if ('<?php echo $role; ?>') {
+                     sidebarToggleBtn.style.display = 'block';
+                 }
+             }
+ 
+             document.addEventListener('click', (e) => {
+                 if (searchInput && searchResults && !searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                     searchResults.classList.remove('visible');
+                 }
+                 if (activeDropdown && !activeDropdown.contains(e.target) && !e.target.closest('.action-btn, .profile-toggle')) {
+                     activeDropdown.classList.remove('visible');
+                     activeDropdown = null;
+                 }
+             });
+ 
+             // Card animations
+             jQuery('.role-card').on('mouseenter', function() {
+                 jQuery(this).css({
+                     'transform': 'scale(1.05)',
+                     'transition': 'transform 0.3s ease'
+                 });
+             }).on('mouseleave', function() {
+                 jQuery(this).css({
+                     'transform': 'scale(1)',
+                     'transition': 'transform 0.3s ease'
+                 });
+             });
+ 
+             jQuery('.dashboard-card').on('mouseenter', function() {
+                 jQuery(this).css({
+                     'box-shadow': '0 6px 12px rgba(0, 0, 0, 0.15)',
+                     'transition': 'box-shadow 0.3s ease'
+                 });
+             }).on('mouseleave', function() {
+                 jQuery(this).css({
+                     'box-shadow': '0 4px 6px rgba(0, 0, 0, 0.1)',
+                     'transition': 'box-shadow 0.3s ease'
+                 });
+             });
+ 
+             // Sidebar animation
+             jQuery('.sidebar-menu li').on('click', function() {
+                 jQuery('.sidebar-menu li').removeClass('active');
+                 jQuery(this).addClass('active');
+                 jQuery(this).animate({ opacity: 0.7 }, 100).animate({ opacity: 1 }, 100);
+             });
+         });
+ 
+         jQuery(document).ready(function($) {
+             $('a[href*="section=messages"]').on('click', function(e) {
+                 e.preventDefault();
+                 $('#messages-count').text('0').addClass('d-none');
+                 $('#messages-dropdown .dropdown-list').html('<li><span class="msg-preview">No new messages</span></li>');
+                 $('#messages-dropdown .dropdown-footer').remove();
+                 window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'messages'])); ?>';
+             });
+ 
+             $('a[href*="section=notifications"]').on('click', function(e) {
+                 e.preventDefault();
+                 $('#notifications-count').text('0').addClass('d-none');
+                 $('#notifications-dropdown .dropdown-list').html('<li><span class="notif-text">No new notifications</span></li>');
+                 $('#notifications-dropdown .dropdown-footer').remove();
+                 window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'notifications'])); ?>';
+             });
+         });
+         </script>
+     </div>
+     <?php
+     return ob_get_clean();
+ }
 
-                        <div class="header-messages">
-                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'messages'])); ?>" class="action-btn" id="messages-toggle">
-                                <i class="fas fa-envelope fa-lg"></i>
-                                <span class="action-badge <?php echo $role ? '' : 'd-none'; ?>" id="messages-count">3</span> <!-- Hardcoded -->
-                            </a>
-                            <div class="dropdown messages-dropdown" id="messages-dropdown">
-                                <div class="dropdown-header">
-                                    <span>Messages (Last 7 Days)</span>
-                                </div>
-                                <ul class="dropdown-list">
-                                    <li>
-                                        <span class="msg-content">
-                                            <span class="msg-sender">System</span>:
-                                            <span class="msg-preview">Exam scheduled...</span>
-                                        </span>
-                                        <span class="msg-time">Apr 10, 2025</span>
-                                    </li>
-                                    <li>
-                                        <span class="msg-content">
-                                            <span class="msg-sender">Admin</span>:
-                                            <span class="msg-preview">Update available...</span>
-                                        </span>
-                                        <span class="msg-time">Apr 9, 2025</span>
-                                    </li>
-                                    <li>
-                                        <span class="msg-content">
-                                            <span class="msg-sender">Teacher</span>:
-                                            <span class="msg-preview">Class canceled...</span>
-                                        </span>
-                                        <span class="msg-time">Apr 8, 2025</span>
-                                    </li>
-                                </ul>
-                                <a href="<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'messages'])); ?>" class="dropdown-footer">View All Messages</a>
-                            </div>
-                        </div>
 
-                        <!-- Notifications Dropdown -->
-                        <div class="header-notifications">
-                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'notifications'])); ?>" class="action-btn" id="notifications-toggle">
-                                <i class="fas fa-bell fa-lg"></i>
-                                <span class="action-badge <?php echo $role ? '' : 'd-none'; ?>" id="notifications-count">2</span> <!-- Hardcoded -->
-                            </a>
-                            <div class="dropdown notifications-dropdown" id="notifications-dropdown">
-                                <div class="dropdown-header">
-                                    <span>Notifications (Last 7 Days)</span>
-                                </div>
-                                <ul class="dropdown-list">
-                                    <li>
-                                        <span class="msg-content">
-                                            <span class="msg-sender">System</span>:
-                                            <span class="notif-text">New exam added...</span>
-                                        </span>
-                                        <span class="notif-time">Apr 11, 2025</span>
-                                    </li>
-                                    <li>
-                                        <span class="msg-content">
-                                            <span class="msg-sender">Admin</span>:
-                                            <span class="notif-text">Attendance updated...</span>
-                                        </span>
-                                        <span class="notif-time">Apr 10, 2025</span>
-                                    </li>
-                                </ul>
-                                <a href="<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'notifications'])); ?>" class="dropdown-footer">View All</a>
-                            </div>
-                        </div>
-
-                        <!-- Settings -->
-                        <div class="header-settings">
-                            <a href="<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'settings'])); ?>" class="action-btn" id="settings-toggle">
-                                <i class="fas fa-cog fa-lg"></i>
-                            </a>
-                        </div>
-
-                        <!-- Help/Support -->
-                        <div class="header-help">
-                            <a href="https://support.demo-pro.edu" target="_blank" class="action-btn" id="help-toggle">
-                                <i class="fas fa-question-circle fa-lg"></i>
-                            </a>
-                        </div>
-
-                        <!-- Dark Mode Toggle -->
-                        <div class="header-dark-mode">
-                            <button class="action-btn" id="dark-mode-toggle">
-                                <i class="fas fa-moon fa-lg"></i>
-                            </button>
-                        </div>
-
-                        <!-- Profile Dropdown -->
-                        <div class="header-profile">
-                            <div class="profile-toggle" id="profile-toggle">
-                                <img decoding="async" src="<?php echo esc_url(plugin_dir_url(__FILE__) . '../logo instituto.jpg'); ?>" alt="Profile" class="profile-img">
-                                <i class="fas fa-caret-down profile-arrow"></i>
-                            </div>
-                            <div class="action-dropdown profile-dropdown" id="profile-dropdown">
-                                <div class="profile-info">
-                                    <img decoding="async" src="<?php echo esc_url(plugin_dir_url(__FILE__) . '../logo instituto.jpg'); ?>" alt="Profile" class="profile-img-large">
-                                    <div>
-                                        <span class="profile-name"><?php echo esc_html($role ? ucfirst($role) : 'Demo User'); ?></span><br>
-                                        <span class="profile-email"><?php echo esc_html($role ? "$role@demo-pro.edu" : 'demo@demo-pro.edu'); ?></span>
-                                    </div>
-                                </div>
-                                <ul class="dropdown-list">
-                                    <li><a href="<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'settings'])); ?>" class="profile-link">Settings</a></li>
-                                    <li><a href="<?php echo esc_url(home_url('/?page_id=' . get_the_ID())); ?>" class="profile-link logout">Logout</a></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <button class="nav-toggle" id="nav-toggle" aria-label="Toggle Navigation">
-                            <i class="fas fa-bars"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Rest of the shortcode remains unchanged -->
-        <div class="institute-dashboard-wrapper">
-            <div id="sidebar-container">
-                <?php if ($role): ?>
-                    <?php echo demoRenderSidebar($role, $section); ?>
-                <?php endif; ?>
-            </div>
-            <div class="main-content" id="dashboard-content">
-                <?php if (!$role): ?>
-                    <div class="container py-4" id="role-selection">
-                        <h1 class="text-center mb-4">Welcome to Demo Pro</h1>
-                        <p class="text-center mb-4">Manage your educational institute with ease. Choose your role to begin.</p>
-                        <div class="row justify-content-center">
-                        <div class="col-md-3"><a href="<?php echo esc_url(add_query_arg('demo-role', 'superadmin')); ?>" class="btn btn-warning w-100">Super Admin</a></div>
-                        <div class="col-md-3"><a href="<?php echo esc_url(add_query_arg('demo-role', 'institute-admin')); ?>" class="btn btn-warning w-100">Institute Admin</a></div>
-                            <div class="col-md-3"><a href="<?php echo esc_url(add_query_arg('demo-role', 'teacher')); ?>" class="btn btn-primary w-100">Teacher</a></div>
-                            <div class="col-md-3"><a href="<?php echo esc_url(add_query_arg('demo-role', 'student')); ?>" class="btn btn-success w-100">Student</a></div>
-                            <div class="col-md-3"><a href="<?php echo esc_url(add_query_arg('demo-role', 'parent')); ?>" class="btn btn-info w-100">Parent</a></div>
-                        </div>
-                    </div>
-                <?php else: ?>
-                    <div class="row">
-                        <div class="col-md-9 p-4" id="main-content-inner">
-                            <?php
-                            switch ($role) {case 'superadmin':
-                                    $data = demoGetSuperadminData();
-                                    echo demoRenderSuperadminContent($section, $action, $data);
-                                    break;
-                                    case 'institute-admin':
-                                        $data = demoGetInstituteAdminData();
-                                        echo demoRenderInstituteAdminContent($section, $action, $data);
-                                        break;
-                                case 'teacher':
-                                    $data = demoGetTeacherData();
-                                    echo demoRenderTeacherContent($section, $action, $data);
-                                    break;
-                                case 'student':
-                                    $data = demoGetStudentData();
-                                    echo demoRenderStudentContent($section, $action, $data);
-                                    break;
-                                case 'parent':
-                                    $data = demoGetParentData();
-                                    echo demoRenderParentContent($section, $action, $data);
-                                    break;
-                                
-                                default:
-                                    echo '<h2>Invalid Role</h2><p>Please select a valid role.</p>';
-                            }
-                            ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <!-- JavaScript for Header Interactivity -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', () => {
-        const fontAwesomeLink = document.createElement('link');
-        fontAwesomeLink.rel = 'stylesheet';
-        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';
-        fontAwesomeLink.crossOrigin = 'anonymous';
-        document.head.appendChild(fontAwesomeLink);
-
-        const searchInput = document.getElementById('header-search-input');
-        const searchResults = document.getElementById('search-results');
-        const navToggle = document.getElementById('nav-toggle');
-        const headerNav = document.querySelector('.header-nav');
-        const messagesToggle = document.getElementById('messages-toggle');
-        const messagesDropdown = document.getElementById('messages-dropdown');
-        const notificationsToggle = document.getElementById('notifications-toggle');
-        const notificationsDropdown = document.getElementById('notifications-dropdown');
-        const quickLinksToggle = document.getElementById('quick-links-toggle');
-        const quickLinksDropdown = document.getElementById('quick-links-dropdown');
-        const darkModeToggle = document.getElementById('dark-mode-toggle');
-        const profileToggle = document.getElementById('profile-toggle');
-        const profileDropdown = document.getElementById('profile-dropdown');
-
-        let activeDropdown = null;
-
-        function toggleDropdown(toggle, dropdown, isLink = false) {
-            toggle.addEventListener('mouseenter', () => {
-                closeAllDropdowns();
-                dropdown.classList.add('visible');
-                activeDropdown = dropdown;
-            });
-
-            dropdown.addEventListener('mouseenter', () => {
-                dropdown.classList.add('visible');
-                activeDropdown = dropdown;
-            });
-
-            toggle.addEventListener('mouseleave', () => {
-                dropdown.addEventListener('mouseleave', () => {
-                    dropdown.classList.remove('visible');
-                    activeDropdown = null;
-                });
-            });
-
-            if (!isLink) {
-                toggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (dropdown.classList.contains('visible')) {
-                        dropdown.classList.remove('visible');
-                        activeDropdown = null;
-                    } else {
-                        closeAllDropdowns();
-                        dropdown.classList.add('visible');
-                        activeDropdown = dropdown;
-                    }
-                });
-            }
-        }
-
-        function closeAllDropdowns() {
-            [messagesDropdown, notificationsDropdown, quickLinksDropdown, profileDropdown, searchResults].forEach(dropdown => {
-                if (dropdown) dropdown.classList.remove('visible');
-            });
-            activeDropdown = null;
-        }
-
-        if (searchInput && searchResults) {
-            let debounceTimer;
-            searchInput.addEventListener('input', function() {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => {
-                    const query = this.value.trim();
-                    if (query.length < 2) {
-                        searchResults.classList.remove('visible');
-                        return;
-                    }
-
-                    searchResults.querySelector('.results-list').innerHTML = '<li>Loading...</li>';
-                    searchResults.classList.add('visible');
-
-                    // Hardcoded search results
-                    const sections = [
-                        { title: 'Dashboard', url: '<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'overview'])); ?>' },
-                        { title: 'Exams', url: '<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'exams'])); ?>' },
-                        { title: 'Attendance', url: '<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'attendance'])); ?>' },
-                        { title: 'Centers', url: '<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'centers'])); ?>' },
-                        { title: 'Subscriptions', url: '<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'subscription'])); ?>' }
-                    ];
-                    const resultsList = searchResults.querySelector('.results-list');
-                    resultsList.innerHTML = '';
-                    const filtered = sections.filter(item => item.title.toLowerCase().includes(query.toLowerCase()));
-                    if (filtered.length > 0) {
-                        filtered.forEach(item => {
-                            resultsList.innerHTML += `<li><a href="${item.url}">${item.title}</a></li>`;
-                        });
-                    } else {
-                        resultsList.innerHTML = '<li>No results found</li>';
-                    }
-                }, 150);
-            });
-        }
-
-        if (navToggle && headerNav) {
-            navToggle.addEventListener('click', () => {
-                headerNav.classList.toggle('visible');
-            });
-        }
-
-        if (messagesToggle && messagesDropdown) {
-            toggleDropdown(messagesToggle, messagesDropdown, true);
-        }
-
-        if (notificationsToggle && notificationsDropdown) {
-            toggleDropdown(notificationsToggle, notificationsDropdown, true);
-        }
-
-        if (quickLinksToggle && quickLinksDropdown) {
-            toggleDropdown(quickLinksToggle, quickLinksDropdown);
-        }
-
-        if (darkModeToggle) {
-            darkModeToggle.addEventListener('click', () => {
-                document.body.classList.toggle('dark-mode');
-                const isDark = document.body.classList.contains('dark-mode');
-                darkModeToggle.querySelector('i').classList.toggle('fa-moon', !isDark);
-                darkModeToggle.querySelector('i').classList.toggle('fa-sun', isDark);
-            });
-        }
-
-        if (profileToggle && profileDropdown) {
-            toggleDropdown(profileToggle, profileDropdown);
-        }
-
-        document.addEventListener('click', (e) => {
-            if (searchInput && searchResults && !searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                searchResults.classList.remove('visible');
-            }
-            if (activeDropdown && !activeDropdown.contains(e.target) && !e.target.closest('.action-btn, .profile-toggle')) {
-                activeDropdown.classList.remove('visible');
-                activeDropdown = null;
-            }
-        });
-    });
-
-    jQuery(document).ready(function($) {
-        $('a[href*="section=messages"]').on('click', function(e) {
-            e.preventDefault();
-            $('#messages-count').text('0').addClass('d-none');
-            $('#messages-dropdown .dropdown-list').html('<li><span class="msg-preview">No new messages</span></li>');
-            $('#messages-dropdown .dropdown-footer').remove();
-            window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'messages'])); ?>';
-        });
-
-        $('a[href*="section=notifications"]').on('click', function(e) {
-            e.preventDefault();
-            $('#notifications-count').text('0').addClass('d-none');
-            $('#notifications-dropdown .dropdown-list').html('<li><span class="notif-text">No new notifications</span></li>');
-            $('#notifications-dropdown .dropdown-footer').remove();
-            window.location.href = '<?php echo esc_url(add_query_arg(['demo-role' => $role, 'demo-section' => 'notifications'])); ?>';
-        });
-    });
-    </script>
-    <?php
-    return ob_get_clean();
-}
 add_shortcode('demo-dashboard', 'aspire_demo_dashboard_shortcode');
 
 /**
@@ -986,45 +1069,45 @@ function demoRenderSidebar($role, $active_section) {
                                 <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05C16.19 13.88 17 15.03 17 16.5V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
                             </svg>
                             <?php elseif ($link['icon'] === 'home'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'clipboard-list'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'wallet'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M21 7h-3V5c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v2H3c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM8 5h8v2H8V5zm10 10h-2v-2h2v2zm-5 0h-2v-2h2v2zm-5 0H6v-2h2v2z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'bell'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'exchange-alt'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M8 6v3.59L3.71 5.3 2.29 6.71 8 12.41V16h2v-4.59l5.71 5.7 1.41-1.41L10 8.59V6H8zm14 2h-2v4.59l-5.71-5.7-1.41 1.41L20 15.41V12h2V8z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'file-alt'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'trophy'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM7 10.2c-1.15-.65-2-1.77-2-3.2V7h2v3.2zm10 0V7h2v1c0 1.43-.85 2.55-2 3.2z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'clock'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'child'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M12 2c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm6 6h-3.17l-2.5 3H12c-2.21 0-4 1.79-4 4v2h8v-2c0-1.1.9-2 2-2h2v-3zM6 14h3.17l2.5 3H12c2.21 0 4 1.79 4 4v2H8v-2c0-1.1-.9-2-2-2H4v-3z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'chart-line'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99l1.5 1.5z"/>
-    </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'clipboard-list'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'wallet'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M21 7h-3V5c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v2H3c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM8 5h8v2H8V5zm10 10h-2v-2h2v2zm-5 0h-2v-2h2v2zm-5 0H6v-2h2v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'bell'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'exchange-alt'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M8 6v3.59L3.71 5.3 2.29 6.71 8 12.41V16h2v-4.59l5.71 5.7 1.41-1.41L10 8.59V6H8zm14 2h-2v4.59l-5.71-5.7-1.41 1.41L20 15.41V12h2V8z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'file-alt'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'trophy'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM7 10.2c-1.15-.65-2-1.77-2-3.2V7h2v3.2zm10 0V7h2v1c0 1.43-.85 2.55-2 3.2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'clock'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'child'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M12 2c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm6 6h-3.17l-2.5 3H12c-2.21 0-4 1.79-4 4v2h8v-2c0-1.1.9-2 2-2h2v-3zM6 14h3.17l2.5 3H12c2.21 0 4 1.79 4 4v2H8v-2c0-1.1-.9-2-2-2H4v-3z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'chart-line'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99l1.5 1.5z"/>
+                            </svg>
                         <?php endif; ?>
                         <span><?php echo esc_html($link['label']); ?></span>
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
@@ -1175,49 +1258,49 @@ function demoRenderSidebar($role, $active_section) {
                                 <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05C16.19 13.88 17 15.03 17 16.5V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
                             </svg>
                             <?php elseif ($link['icon'] === 'user-friends'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05C16.19 13.88 17 15.03 17 16.5V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'home'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'clipboard-list'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'wallet'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M21 7h-3V5c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v2H3c-1.1 0-2 .9-2 2v9c0 1.1. кое 2 2 2h18c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM8 5h8v2H8V5zm10 10h-2v-2h2v2zm-5 0h-2v-2h2v2zm-5 0H6v-2h2v2z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'bell'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'exchange-alt'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M8 6v3.59L3.71 5.3 2.29 6.71 8 12.41V16h2v-4.59l5.71 5.7 1.41-1.41L10 8.59V6H8zm14 2h-2v4.59l-5.71-5.7-1.41 1.41L20 15.41V12h2V8z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'file-alt'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'trophy'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM7 10.2c-1.15-.65-2-1.77-2-3.2V7h2v3.2zm10 0V7h2v1c0 1.43-.85 2.55-2 3.2z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'clock'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'child'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M12 2c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm6 6h-3.17l-2.5 3H12c-2.21 0-4 1.79-4 4v2h8v-2c0-1.1.9-2 2-2h2v-3zM6 14h3.17l2.5 3H12c2.21 0 4 1.79 4 4v2H8v-2c0-1.1-.9-2-2-2H4v-3z"/>
-    </svg>
-<?php elseif ($link['icon'] === 'chart-line'): ?>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
-        <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99l1.5 1.5z"/>
-    </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05C16.19 13.88 17 15.03 17 16.5V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'home'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'clipboard-list'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'wallet'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M21 7h-3V5c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v2H3c-1.1 0-2 .9-2 2v9c0 1.1. кое 2 2 2h18c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM8 5h8v2H8V5zm10 10h-2v-2h2v2zm-5 0h-2v-2h2v2zm-5 0H6v-2h2v2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'bell'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'exchange-alt'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M8 6v3.59L3.71 5.3 2.29 6.71 8 12.41V16h2v-4.59l5.71 5.7 1.41-1.41L10 8.59V6H8zm14 2h-2v4.59l-5.71-5.7-1.41 1.41L20 15.41V12h2V8z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'file-alt'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'trophy'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM7 10.2c-1.15-.65-2-1.77-2-3.2V7h2v3.2zm10 0V7h2v1c0 1.43-.85 2.55-2 3.2z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'clock'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'child'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M12 2c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm6 6h-3.17l-2.5 3H12c-2.21 0-4 1.79-4 4v2h8v-2c0-1.1.9-2 2-2h2v-3zM6 14h3.17l2.5 3H12c2.21 0 4 1.79 4 4v2H8v-2c0-1.1-.9-2-2-2H4v-3z"/>
+                            </svg>
+                        <?php elseif ($link['icon'] === 'chart-line'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                                <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99l1.5 1.5z"/>
+                            </svg>
                         <?php endif; ?>
                         <span><?php echo esc_html($link['label']); ?></span>
                     </a>
