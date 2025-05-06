@@ -309,7 +309,6 @@ $charset_collate = $wpdb->get_charset_collate();
 
 
 $institute_admins = $wpdb->prefix . 'institute_admins';
-
 $sql = "CREATE TABLE IF NOT EXISTS $institute_admins (
     id BIGINT(20) NOT NULL AUTO_INCREMENT,
     institute_admin_id VARCHAR(50) NOT NULL, /* Username, e.g., adminC24162EFC0AE */
@@ -320,9 +319,8 @@ $sql = "CREATE TABLE IF NOT EXISTS $institute_admins (
     UNIQUE KEY (institute_admin_id),
     INDEX edu_center_idx (education_center_id)
 ) $charset_collate;";
+ dbDelta($sql);
 
-require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-dbDelta($sql);
 
 $table_name = $wpdb->prefix . 'student_attendance';
 $charset_collate = $wpdb->get_charset_collate();
@@ -352,6 +350,20 @@ $sql = "CREATE TABLE IF NOT EXISTS $table_name (
     teacher_id VARCHAR(50) NOT NULL,
     PRIMARY KEY (subject_id)
 ) $charset_collate;"; // Removed the extra comma here
+
+//
+// Create educational_center table
+$educational_center_table = $wpdb->prefix . 'educational_center'; // Table name with WordPress prefix (e.g., wp_educational_center)
+$sql = "CREATE TABLE IF NOT EXISTS $educational_center_table (
+    educational_center_id VARCHAR(255) NOT NULL,
+    institute_logo VARCHAR(255) DEFAULT NULL,
+    edu_center_name VARCHAR(255) NOT NULL,
+    mobile_number VARCHAR(50) DEFAULT NULL,
+    email_id VARCHAR(100) DEFAULT NULL,
+    address TEXT DEFAULT NULL,
+    PRIMARY KEY (educational_center_id),
+    INDEX (edu_center_name)
+) $charset_collate;";
 
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 dbDelta($sql);
@@ -397,8 +409,101 @@ function my_education_erp_seed_templates() {
         $wpdb->insert($exam_results_table, ['exam_id' => 1, 'subject_id' => 1, 'student_id' => 1, 'marks' => 85.50, 'education_center_id' => 1]);
         $wpdb->insert($exam_results_table, ['exam_id' => 1, 'subject_id' => 2, 'student_id' => 1, 'marks' => 78.00, 'education_center_id' => 1]);
     }
+    $educational_center_table = $wpdb->prefix . 'educational_center';
+
+    // Seed Educational Centers
+    if ($wpdb->get_var("SELECT COUNT(*) FROM $educational_center_table") == 0) {
+        $wpdb->insert($educational_center_table, [
+            'educational_center_id' => 'EC001',
+            'institute_logo' => '/wp-content/uploads/logos/sunrise.png',
+            'edu_center_name' => 'Sunrise Learning Academy',
+            'mobile_number' => '+1-555-123-4567',
+            'email_id' => 'contact@sunriseacademy.org',
+            'address' => '123 Main Street, Springfield, IL 62701, USA'
+        ]);
+        $wpdb->insert($educational_center_table, [
+            'educational_center_id' => 'EC002',
+            'institute_logo' => '/wp-content/uploads/logos/horizon.png',
+            'edu_center_name' => 'Horizon Education Center',
+            'mobile_number' => '+1-555-987-6543',
+            'email_id' => 'info@horizonedu.org',
+            'address' => '456 Oak Avenue, Boulder, CO 80301, USA'
+        ]);
+        $wpdb->insert($educational_center_table, [
+            'educational_center_id' => 'EC003',
+            'institute_logo' => null,
+            'edu_center_name' => 'Bright Future Institute',
+            'mobile_number' => '+1-555-456-7890',
+            'email_id' => 'admin@brightfuture.org',
+            'address' => '789 Pine Road, Austin, TX 73301, USA'
+        ]);
+    }
+    $institute_admins_table = $wpdb->prefix . 'institute_admins';
+
+    // Seed Institute Admins if table is empty
+    if ($wpdb->get_var("SELECT COUNT(*) FROM $institute_admins_table") == 0) {
+        $default_admins = [
+            [
+                'institute_admin_id' => 'adminC24162EFC0AE',
+                'education_center_id' => 'EC001',
+                'name' => 'John Doe',
+                'email' => 'john.doe@sunriseacademy.org',
+                'password' => 'admin123', // Handled by wp_insert_user
+                'role' => 'institute_admin'
+            ],
+            [
+                'institute_admin_id' => 'adminD39281AFB5CD',
+                'education_center_id' => 'EC002',
+                'name' => 'Jane Smith',
+                'email' => 'jane.smith@horizonedu.org',
+                'password' => 'securepass456',
+                'role' => 'institute_admin'
+            ],
+            [
+                'institute_admin_id' => 'adminE57192CDE6BF',
+                'education_center_id' => 'EC003',
+                'name' => 'Alice Brown',
+                'email' => 'alice.brown@brightfuture.org',
+                'password' => 'password789',
+                'role' => 'institute_admin'
+            ]
+        ];
+
+        foreach ($default_admins as $admin) {
+             $user_id = wp_create_user($admin['institute_admin_id'], $admin['password'], $admin['email']);
+
+             // Check if user creation was successful
+             if (!is_wp_error($user_id)) {
+                 // Set user role
+                 $user = new WP_User($user_id);
+                 $user->set_role($admin['role']);
+
+                 // Update display name
+                 wp_update_user([
+                     'ID' => $user_id,
+                     'display_name' => $admin['name']
+                 ]);
+
+                 // Insert into institute_admins table
+                 $wpdb->insert($institute_admins_table, [
+                     'institute_admin_id' => $admin['institute_admin_id'],
+                     'education_center_id' => $admin['education_center_id'],
+                     'name' => $admin['name'],
+                     'email' => $admin['email']
+                   
+                 ]);
+
+                 if ($wpdb->last_error) {
+                     error_log('Failed to insert institute admin ' . $admin['institute_admin_id'] . ': ' . $wpdb->last_error);
+                 }
+             } else {
+                 error_log('Failed to create user for ' . $admin['institute_admin_id'] . ': ' . $user_id->get_error_message());
+             }
+        }
+    }
 }
 // / Only run on activation, not on every include
 // Remove direct calls outside functions
 my_education_erp_create_db();
-my_education_erp_seed_templates();
+// my_education_erp_seed_templates();
+add_action('init', 'my_education_erp_seed_templates');
