@@ -193,10 +193,6 @@ function render_institute_dashboard($current_user, $educational_center) {
             $error_message = '<p class="error-message">Failed to update Educational Center: ' . esc_html($wpdb->last_error) . '</p>';
         }
     }
-     
-
-
-    
     ob_start();
     ?>
     <div class="institute-dashboard-container">
