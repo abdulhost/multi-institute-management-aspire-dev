@@ -356,7 +356,7 @@ $sql = "CREATE TABLE IF NOT EXISTS $table_name (
 $educational_center_table = $wpdb->prefix . 'educational_center'; // Table name with WordPress prefix (e.g., wp_educational_center)
 $sql = "CREATE TABLE IF NOT EXISTS $educational_center_table (
     educational_center_id VARCHAR(255) NOT NULL,
-    institute_logo VARCHAR(255) DEFAULT NULL,
+    institute_logo TEXT DEFAULT NULL,
     edu_center_name VARCHAR(255) NOT NULL,
     mobile_number VARCHAR(50) DEFAULT NULL,
     email_id VARCHAR(100) DEFAULT NULL,

@@ -1,5 +1,4 @@
 <?php
-// Shortcode to display educational center dashboard with conditional sidebar and reusable expired message
 // Reusable function to get educational center by admin ID
 function get_educational_center_by_admin_id($admin_id) {
     global $wpdb;
@@ -7,7 +6,6 @@ function get_educational_center_by_admin_id($admin_id) {
     $edu_center_table = $wpdb->prefix . 'educational_center';
     $institute_admins_table = $wpdb->prefix . 'institute_admins';
     
-    // Query to join educational_center and institute_admins tables
     $query = $wpdb->prepare(
         "SELECT ec.* 
          FROM $edu_center_table ec
@@ -17,7 +15,14 @@ function get_educational_center_by_admin_id($admin_id) {
         $admin_id
     );
     
-    $educational_center = $wpdb->get_row($query);
+    $educational_center = $wpdb->get_row($query, OBJECT);
+    
+    error_log("get_educational_center_by_admin_id Query: $query");
+    if ($educational_center) {
+        error_log("Educational Center Found: " . print_r($educational_center, true));
+    } else {
+        error_log("No Educational Center found for admin_id: $admin_id");
+    }
     
     return $educational_center;
 }
@@ -26,26 +31,32 @@ function aspire_institute_dashboard_shortcode() {
     global $wpdb;
     
     if (!function_exists('wp_get_current_user')) {
-        return '<div class="alert alert-danger">Some Error occurred</div>';
+        error_log("wp_get_current_user function not found");
+        return '<div class="alert alert-danger">System error: User functions unavailable.</div>';
     }
 
     $current_user = wp_get_current_user();
     $admin_id = $current_user->user_login;
 
     if (!$current_user->ID) {
-        return '<div class="alert alert-danger">Some Error occurred</div>';
+        error_log("No user logged in");
+        return '<div class="alert alert-danger">Please log in to access the dashboard.</div>';
     }
 
-    // Use the reusable function to get the educational center
     $educational_center = get_educational_center_by_admin_id($admin_id);
 
-    if (!$educational_center) {
-        return '<div class="alert alert-warning">Educational Center not found. Please contact administration.</div>';
+    error_log("Educational Center after get_educational_center_by_admin_id: " . print_r($educational_center, true));
+
+    if (!$educational_center || !is_object($educational_center) || !isset($educational_center->educational_center_id)) {
+        error_log("Invalid or no educational center data for admin_id: $admin_id");
+        return '<div class="alert alert-warning">Educational Center not found for this user. Please contact administration.</div>';
     }
 
     $educational_center_id = $educational_center->educational_center_id;
     $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'overview';
     $action = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : '';
+
+    error_log("Before render_admin_header with Educational Center: " . print_r($educational_center, true));
 
     ob_start();
     ?>
@@ -56,19 +67,18 @@ function aspire_institute_dashboard_shortcode() {
             $active_action = $action;
             echo render_admin_header($current_user);
             
+            error_log("After render_admin_header with Educational Center: " . print_r($educational_center, true));
+
             if (!is_center_subscribed($educational_center_id)) {
-                return render_subscription_expired_message($educational_center_id);
-            }
-            
-            include plugin_dir_path(__FILE__) . 'assets/sidebar.php';
+                echo render_subscription_expired_message($educational_center_id);
+            } else {
+                include plugin_dir_path(__FILE__) . 'assets/sidebar.php';
             ?>
-            
             <div class="main-content">
                 <?php
-                ob_start();
-                
                 switch ($section) {
                     case 'overview':
+                        error_log("Calling render_institute_dashboard with Educational Center: " . print_r($educational_center, true));
                         echo render_institute_dashboard($current_user, $educational_center);
                         break;
                     
@@ -83,36 +93,122 @@ function aspire_institute_dashboard_shortcode() {
                         break;
                     
                     default:
+                        error_log("Default case triggered, rendering dashboard with Educational Center: " . print_r($educational_center, true));
                         echo render_institute_dashboard($current_user, $educational_center);
                         break;
                 }
                 ?>
             </div>
+            <?php } ?>
         </div>
     </div>
     <?php
     return ob_get_clean();
 }
 
-// Helper function to render institute dashboard
 function render_institute_dashboard($current_user, $educational_center) {
     global $wpdb;
+    $admin_id = $current_user->user_login;
+    $educational_center = get_educational_center_by_admin_id($admin_id);
+
+    error_log('Educational Center Data for Render: ' . print_r($educational_center, true));
+
+    if (!is_object($educational_center) || !isset($educational_center->educational_center_id)) {
+        error_log('Invalid Educational Center Data passed to render_institute_dashboard. Expected stdClass, received: ' . gettype($educational_center));
+        return '<div class="alert alert-danger">Invalid Educational Center data. Please ensure your user is correctly associated with an educational center (ID: ' . esc_html($current_user->user_login) . ').</div>';
+    }
+
     $table_name = $wpdb->prefix . 'educational_center';
     $educational_center_id = $educational_center->educational_center_id;
-    global $wpdb;
-    $data = $wpdb->get_results( 
-        $wpdb->prepare( 
-            "SELECT * FROM wp_educational_center WHERE educational_center_id = %s", 
-            $educational_center_id 
-        ) 
-    );
-    error_log('data='. $data);
 
-        ob_start();
+    // Handle form submission
+    if (isset($_POST['update_center'])) {
+        $new_institute_name = sanitize_text_field($_POST['institute_name'] ?? '');
+        $new_mobile_number = sanitize_text_field($_POST['mobile_number'] ?? '');
+        $new_email_id = sanitize_email($_POST['email_id'] ?? '');
+        $new_address = sanitize_text_field($_POST['address'] ?? '');
+        
+        $update_data = array(
+            'edu_center_name' => $new_institute_name,
+            'mobile_number' => $new_mobile_number,
+            'email_id' => $new_email_id,
+            'address' => $new_address
+        );
+
+        error_log("Update Data: " . print_r($update_data, true));
+
+        if (isset($_FILES['institute_logo']) && $_FILES['institute_logo']['error'] === UPLOAD_ERR_OK) {
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+            require_once(ABSPATH . 'wp-admin/includes/image.php');
+            require_once(ABSPATH . 'wp-admin/includes/media.php');
+
+            $file = $_FILES['institute_logo'];
+            if ($file['size'] > 1048576) {
+                $error_message = '<p class="error-message">Logo size must be less than 1 MB.</p>';
+                error_log("Logo size exceeds 1 MB");
+            } else {
+                $upload = wp_handle_upload($file, array('test_form' => false));
+                if (isset($upload['error'])) {
+                    $error_message = '<p class="error-message">Failed to upload logo: ' . esc_html($upload['error']) . '</p>';
+                    error_log("Upload error: " . $upload['error']);
+                } else {
+                    // Register in Media Library
+                    $attachment = array(
+                        'guid' => $upload['url'],
+                        'post_mime_type' => $upload['type'],
+                        'post_title' => sanitize_file_name($file['name']),
+                        'post_content' => '',
+                        'post_status' => 'inherit'
+                    );
+                    $attachment_id = wp_insert_attachment($attachment, $upload['file']);
+                    if (!is_wp_error($attachment_id)) {
+                        wp_update_attachment_metadata($attachment_id, wp_generate_attachment_metadata($attachment_id, $upload['file']));
+                        // Save relative path
+                        $relative_path = str_replace(home_url(), '', $upload['url']);
+                        $update_data['institute_logo'] = $relative_path;
+                        error_log("Logo uploaded and registered: " . $relative_path);
+                    } else {
+                        $error_message = '<p class="error-message">Failed to register logo in Media Library.</p>';
+                        error_log("Attachment error: " . $attachment_id->get_error_message());
+                    }
+                }
+            }
+        }
+
+        $result = $wpdb->update(
+            $table_name,
+            $update_data,
+            array('educational_center_id' => $educational_center_id),
+            array('%s', '%s', '%s', '%s', '%s'),
+            array('%s')
+        );
+
+        error_log("Update Result: " . ($result !== false ? "Rows affected: $result" : "Failed: " . $wpdb->last_error));
+
+        if ($result !== false && ($result > 0 || empty($_FILES['institute_logo']['size']))) {
+            echo '<script>window.location.href = "' . esc_url($_SERVER['REQUEST_URI']) . '";</script>';
+            exit;
+           
+        } else {
+            $error_message = '<p class="error-message">Failed to update Educational Center: ' . esc_html($wpdb->last_error) . '</p>';
+        }
+    }
+     
+
+
+    
+    ob_start();
     ?>
     <div class="institute-dashboard-container">
+        <?php
+        if (isset($error_message)) {
+            echo $error_message;
+        } elseif (isset($_GET['update_success'])) {
+            echo '<p class="success-message">Educational Center updated successfully.</p>';
+        }
+        ?>
         <div class="institute-logo-container">
-            <?php if ($educational_center->institute_logo): ?>
+            <?php if (!empty($educational_center->institute_logo)): ?>
                 <div class="institute-logo" style="position: relative;">
                     <img id="institute-logo-image" src="<?php echo esc_url($educational_center->institute_logo); ?>" alt="Institute Logo" style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover;">
                     <span class="edit-logo-icon" onclick="document.getElementById('logo-file-input').click();">📷</span>
@@ -125,62 +221,25 @@ function render_institute_dashboard($current_user, $educational_center) {
             <?php endif; ?>
         </div>
 
-        <h2 style="text-transform:capitalize"><?php echo esc_html($educational_center->edu_center_name); ?></h2>
+        <h2 style="text-transform:capitalize"><?php echo esc_html($educational_center->edu_center_name ?: 'Unnamed Center'); ?></h2>
+        <p><strong>Address:</strong> <?php echo esc_html($educational_center->address ?: 'No address provided'); ?></p>
 
         <form method="POST" enctype="multipart/form-data">
             <label for="institute_name">Institute Name</label>
-            <input type="text" name="institute_name" value="<?php echo esc_html($educational_center->edu_center_name); ?>" required />
+            <input type="text" name="institute_name" value="<?php echo esc_html($educational_center->edu_center_name ?: ''); ?>" required />
             <br>
             <label for="mobile_number">Mobile Number</label>
-            <input type="text" name="mobile_number" value="<?php echo esc_html($educational_center->mobile_number); ?>" required />
+            <input type="text" name="mobile_number" value="<?php echo esc_html($educational_center->mobile_number ?: ''); ?>" required />
             <br>
             <label for="email_id">Email ID</label>
-            <input type="email" name="email_id" value="<?php echo esc_html($educational_center->email_id); ?>" required />
+            <input type="email" name="email_id" value="<?php echo esc_html($educational_center->email_id ?: ''); ?>" required />
+            <br>
+            <label for="address">Address</label>
+            <input type="text" name="address" value="<?php echo esc_html($educational_center->address ?: ''); ?>" />
             <br>
             <input type="file" name="institute_logo" accept="image/*" id="logo-file-input" style="display: none;" onchange="previewLogo(event)" />
             <input type="submit" name="update_center" value="Update Center" />
         </form>
-
-        <?php
-        if (isset($_POST['update_center'])) {
-            $new_institute_name = sanitize_text_field($_POST['institute_name']);
-            $new_mobile_number = sanitize_text_field($_POST['mobile_number']);
-            $new_email_id = sanitize_email($_POST['email_id']);
-            
-            $update_data = array(
-                'edu_center_name' => $new_institute_name,
-                'mobile_number' => $new_mobile_number,
-                'email_id' => $new_email_id
-            );
-
-            // Handle logo upload
-            if (isset($_FILES['institute_logo']) && $_FILES['institute_logo']['error'] === UPLOAD_ERR_OK) {
-                if ($_FILES['institute_logo']['size'] > 1048576) {
-                    echo '<p class="error-message">Logo size must be less than 1 MB.</p>';
-                } else {
-                    $file = $_FILES['institute_logo'];
-                    $upload_dir = wp_upload_dir();
-                    $target_file = $upload_dir['path'] . '/' . basename($file['name']);
-
-                    if (move_uploaded_file($file['tmp_name'], $target_file)) {
-                        $update_data['institute_logo'] = $upload_dir['url'] . '/' . basename($file['name']);
-                    }
-                }
-            }
-
-            // Update database
-            $wpdb->update(
-                $table_name,
-                array_filter($update_data),
-                array('educational_center_id' => $educational_center_id),
-                array('%s', '%s', '%s', '%s'),
-                array('%s')
-            );
-
-            header("Refresh:0");
-            echo '<p class="success-message">Educational Center updated successfully.</p>';
-        }
-        ?>
     </div>
 
     <script>
@@ -189,7 +248,10 @@ function render_institute_dashboard($current_user, $educational_center) {
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('institute-logo-image').src = e.target.result;
+                const img = document.getElementById('institute-logo-image');
+                if (img) {
+                    img.src = e.target.result;
+                }
             };
             reader.readAsDataURL(file);
         }
@@ -201,6 +263,7 @@ function render_institute_dashboard($current_user, $educational_center) {
 }
 
 add_shortcode('aspire_institute_dashboard', 'aspire_institute_dashboard_shortcode');
+
 
 // Reusable Helper Function for Subscription Expired Message with AJAX
 function render_subscription_expired_message($center_id) {
