@@ -60,7 +60,7 @@ function aspire_institute_dashboard_shortcode() {
 
     ob_start();
     ?>
-    <div class="container-fluid" style="background: linear-gradient(135deg, #f0f8ff, #e6e6fa); min-height: 100vh;">
+    <div class="container-fluid" style="background: linear-gradient(135deg, #f0f8ff, #e6e6fa); min-height: 100vh; margin-top:60px">
         <div class="row">
             <?php
             $active_section = $section;
