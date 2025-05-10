@@ -1533,3 +1533,408 @@ function render_change_password($current_user, $post_id = null) {
     <?php
     return ob_get_clean();
 }
+
+
+// Create custom page template in Astra theme
+// Create custom page template in Astra theme
+function dp_create_page_template() {
+    $template_content = "<?php
+/*
+Template Name: Dashboard Template
+*/
+get_template_part('content', 'dashboard');
+?>";
+    
+    $template_path = get_template_directory() . '/dashboard-template.php';
+    if (!file_exists($template_path)) {
+        file_put_contents($template_path, $template_content);
+    }
+}
+
+// Create content template part
+function dp_create_content_template() {
+    $content_template_content = "<?php
+while (have_posts()) : the_post();
+    the_content();
+endwhile;
+?>";
+    
+    $content_template_path = get_template_directory() . '/content-dashboard.php';
+    if (!file_exists($content_template_path)) {
+        file_put_contents($content_template_path, $content_template_content);
+    }
+}
+
+// Disable Astra header and footer for dashboard pages
+function dp_remove_astra_header_footer() {
+    $pages = get_option('dp_page_data', []);
+    $slugs = array_column($pages, 'slug');
+    if (is_page($slugs)) {
+        remove_action('astra_header', 'astra_header_markup');
+        remove_action('astra_footer', 'astra_footer_markup');
+        remove_action('astra_entry_before', 'astra_entry_top');
+        remove_action('astra_entry_after', 'astra_entry_bottom');
+    }
+}
+add_action('wp', 'dp_remove_astra_header_footer');
+
+// Add custom CSS for zero margins/padding
+function dp_add_custom_styles() {
+    $pages = get_option('dp_page_data', []);
+    $slugs = array_column($pages, 'slug');
+    if (is_page($slugs)) {
+        ?>
+        <style type="text/css">
+            .ast-container,
+            .site-content,
+            .entry-content,
+            .ast-page-builder-template .hentry {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            body {
+                width: 100%;
+                overflow-x: hidden;
+            }
+            .ast-page-builder-template .site-content > .ast-container {
+                max-width: 100% !important;
+            }
+        </style>
+        <?php
+    }
+}
+add_action('wp_head', 'dp_add_custom_styles');
+
+// Create or update a single page
+function dp_create_single_page($page_data) {
+    if (!function_exists('wp_insert_post')) {
+        require_once(ABSPATH . 'wp-admin/includes/post.php');
+    }
+
+    $existing_page = get_page_by_path($page_data['slug'], OBJECT, 'page');
+    $page_args = [
+        'post_title' => $page_data['title'],
+        'post_name' => $page_data['slug'],
+        'post_content' => $page_data['shortcode'],
+        'post_status' => 'publish',
+        'post_type' => 'page',
+        'page_template' => 'dashboard-template.php',
+    ];
+
+    ob_start();
+    if ($existing_page) {
+        $page_args['ID'] = $existing_page->ID;
+        wp_update_post($page_args);
+    } else {
+        wp_insert_post($page_args);
+    }
+    ob_end_clean();
+}
+
+// Initialize default pages
+function dp_initialize_pages() {
+    $default_pages = [
+        [
+            'title' => 'Students Dashboard',
+            'slug' => 'students-dashboard',
+            'shortcode' => '[students_dashboard]',
+        ],
+        [
+            'title' => 'Parents Dashboard',
+            'slug' => 'parents-dashboard',
+            'shortcode' => '[parents_dashboard]',
+        ],
+        [
+            'title' => 'Teachers Dashboard',
+            'slug' => 'teachers-dashboard',
+            'shortcode' => '[teachers_dashboard]',
+        ],
+  
+    ];
+
+    if (!get_option('dp_page_data')) {
+        update_option('dp_page_data', $default_pages);
+        error_log('Dashboard Pages: Initialized default pages');
+    }
+}
+
+// Admin menu and page
+function dp_admin_menu() {
+    error_log('Dashboard Pages: Registering admin menu');
+    add_menu_page(
+        'Dashboard Pages',
+        'Dashboard Pages',
+        'manage_options',
+        'dashboard-pages',
+        'dp_admin_page_content',
+        'dashicons-admin-page',
+        25
+    );
+}
+add_action('admin_menu', 'dp_admin_menu');
+
+function dp_admin_page_content() {
+    dp_initialize_pages(); // Ensure defaults are set
+    $pages = get_option('dp_page_data', []);
+    
+    // Handle form submissions
+    if (isset($_POST['dp_save_pages']) && check_admin_referer('dp_save_pages_action')) {
+        $new_pages = [];
+        foreach ($_POST['pages'] as $index => $page) {
+            $title = sanitize_text_field($page['title']);
+            $slug = !empty($page['slug']) ? sanitize_title($page['slug']) : sanitize_title($title);
+            $new_pages[$index] = [
+                'title' => $title,
+                'slug' => $slug,
+                'shortcode' => sanitize_text_field($page['shortcode']),
+            ];
+        }
+        update_option('dp_page_data', $new_pages);
+        echo '<div class="notice notice-success"><p>Pages updated successfully!</p></div>';
+    }
+
+    if (isset($_POST['dp_generate_page']) && check_admin_referer('dp_generate_page_action')) {
+        $index = intval($_POST['page_index']);
+        if (isset($pages[$index])) {
+            dp_create_single_page($pages[$index]);
+            echo '<div class="notice notice-success"><p>Page generated successfully!</p></div>';
+        }
+    }
+
+    if (isset($_POST['dp_add_page']) && check_admin_referer('dp_add_page_action')) {
+        $title = sanitize_text_field($_POST['new_title']);
+        $slug = !empty($_POST['new_slug']) ? sanitize_title($_POST['new_slug']) : sanitize_title($title);
+        $pages[] = [
+            'title' => $title,
+            'slug' => $slug,
+            'shortcode' => sanitize_text_field($_POST['new_shortcode']),
+        ];
+        update_option('dp_page_data', $pages);
+        echo '<div class="notice notice-success"><p>New page added successfully!</p></div>';
+    }
+
+    ?>
+    <div class="wrap">
+        <h1>Dashboard Pages</h1>
+        <p>Edit existing pages or add new ones. Click "Generate" to create/update a page.</p>
+        <form method="post" action="">
+            <?php wp_nonce_field('dp_save_pages_action'); ?>
+            <table class="wp-list-table widefat fixed striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Slug</th>
+                        <th>Shortcode</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($pages)): ?>
+                        <tr><td colspan="4">No pages found. Add a new page below.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($pages as $index => $page): ?>
+                            <tr>
+                                <td><input type="text" name="pages[<?php echo $index; ?>][title]" value="<?php echo esc_attr($page['title']); ?>"></td>
+                                <td><input type="text" name="pages[<?php echo $index; ?>][slug]" value="<?php echo esc_attr($page['slug']); ?>" placeholder="Auto-generated from title"></td>
+                                <td><input type="text" name="pages[<?php echo $index; ?>][shortcode]" value="<?php echo esc_attr($page['shortcode']); ?>"></td>
+                                <td>
+                                    <form method="post" action="" style="display:inline;">
+                                        <?php wp_nonce_field('dp_generate_page_action'); ?>
+                                        <input type="hidden" name="page_index" value="<?php echo $index; ?>">
+                                        <input type="submit" name="dp_generate_page" class="button button-primary" value="Generate">
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+            <p><input type="submit" name="dp_save_pages" class="button button-primary" value="Save Changes"></p>
+        </form>
+        
+        <h2>Add New Page</h2>
+        <form method="post" action="">
+            <?php wp_nonce_field('dp_add_page_action'); ?>
+            <table class="form-table">
+                <tr>
+                    <th><label for="new_title">Title</label></th>
+                    <td><input type="text" id="new_title" name="new_title" required></td>
+                </tr>
+                <tr>
+                    <th><label for="new_slug">Slug</label></th>
+                    <td><input type="text" id="new_slug" name="new_slug" placeholder="Auto-generated from title"></td>
+                </tr>
+                <tr>
+                    <th><label for="new_shortcode">Shortcode</label></th>
+                    <td><input type="text" id="new_shortcode" name="new_shortcode" required></td>
+                </tr>
+            </table>
+            <p><input type="submit" name="dp_add_page" class="button button-primary" value="Add Page"></p>
+        </form>
+        <script>
+            document.getElementById('new_title').addEventListener('input', function() {
+                var title = this.value.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+                document.getElementById('new_slug').value = title;
+            });
+        </script>
+    </div>
+    <?php
+}
+
+// Frontend management shortcode
+function dp_manage_pages_shortcode() {
+    if (!current_user_can('manage_options')) {
+        return '<p>You do not have permission to manage pages.</p>';
+    }
+
+    dp_initialize_pages(); // Ensure defaults are set
+    $pages = get_option('dp_page_data', []);
+    $output = '';
+
+    if (isset($_POST['dp_save_pages_frontend']) && check_admin_referer('dp_save_pages_frontend_action')) {
+        $new_pages = [];
+        foreach ($_POST['pages'] as $index => $page) {
+            $title = sanitize_text_field($page['title']);
+            $slug = !empty($page['slug']) ? sanitize_title($page['slug']) : sanitize_title($title);
+            $new_pages[$index] = [
+                'title' => $title,
+                'slug' => $slug,
+                'shortcode' => sanitize_text_field($page['shortcode']),
+            ];
+        }
+        update_option('dp_page_data', $new_pages);
+        $output .= '<div class="dp-notice dp-success">Pages updated successfully!</div>';
+    }
+
+    if (isset($_POST['dp_generate_page_frontend']) && check_admin_referer('dp_generate_page_frontend_action')) {
+        $index = intval($_POST['page_index']);
+        if (isset($pages[$index])) {
+            dp_create_single_page($pages[$index]);
+            $output .= '<div class="dp-notice dp-success">Page generated successfully!</div>';
+        }
+    }
+
+    if (isset($_POST['dp_add_page_frontend']) && check_admin_referer('dp_add_page_frontend_action')) {
+        $title = sanitize_text_field($_POST['new_title']);
+        $slug = !empty($_POST['new_slug']) ? sanitize_title($_POST['new_slug']) : sanitize_title($title);
+        $pages[] = [
+            'title' => $title,
+            'slug' => $slug,
+            'shortcode' => sanitize_text_field($_POST['new_shortcode']),
+        ];
+        update_option('dp_page_data', $pages);
+        $output .= '<div class="dp-notice dp-success">New page added successfully!</div>';
+    }
+
+    $output .= '
+    <style>
+        .dp-notice { padding: 10px; margin: 10px 0; }
+        .dp-success { background: #dff0d8; color: #3c763d; }
+        .dp-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .dp-table th, .dp-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .dp-table th { background: #f9f9f9; }
+        .dp-form { margin-bottom: 20px; }
+        .dp-form label { display: inline-block; width: 100px; }
+        .dp-form input[type="text"] { width: 200px; margin-bottom: 10px; }
+        .dp-form input[type="submit"] { background: #0073aa; color: #fff; border: none; padding: 8px 16px; cursor: pointer; }
+        .dp-form input[type="submit"]:hover { background: #005177; }
+    </style>
+    <div class="dp-manage-pages">
+        <h2>Manage Dashboard Pages</h2>
+        <p>Edit existing pages or add new ones. Click "Generate" to create/update a page.</p>
+        <form method="post" class="dp-form">
+            ' . wp_nonce_field('dp_save_pages_frontend_action', '_wpnonce', true, false) . '
+            <table class="dp-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Slug</th>
+                        <th>Shortcode</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>';
+
+    if (empty($pages)) {
+        $output .= '<tr><td colspan="4">No pages found. Add a new page below.</td></tr>';
+    } else {
+        foreach ($pages as $index => $page) {
+            $output .= '
+                <tr>
+                    <td><input type="text" name="pages[' . $index . '][title]" value="' . esc_attr($page['title']) . '"></td>
+                    <td><input type="text" name="pages[' . $index . '][slug]" value="' . esc_attr($page['slug']) . '" placeholder="Auto-generated from title"></td>
+                    <td><input type="text" name="pages[' . $index . '][shortcode]" value="' . esc_attr($page['shortcode']) . '"></td>
+                    <td>
+                        <form method="post" style="display:inline;">
+                            ' . wp_nonce_field('dp_generate_page_frontend_action', '_wpnonce', true, false) . '
+                            <input type="hidden" name="page_index" value="' . $index . '">
+                            <input type="submit" name="dp_generate_page_frontend" value="Generate">
+                        </form>
+                    </td>
+                </tr>';
+        }
+    }
+
+    $output .= '
+                </tbody>
+            </table>
+            <p><input type="submit" name="dp_save_pages_frontend" value="Save Changes"></p>
+        </form>
+        
+        <h3>Add New Page</h3>
+        <form method="post" class="dp-form">
+            ' . wp_nonce_field('dp_add_page_frontend_action', '_wpnonce', true, false) . '
+            <p>
+                <label for="new_title">Title</label>
+                <input type="text" id="new_title_frontend" name="new_title" required>
+            </p>
+            <p>
+                <label for="new_slug">Slug</label>
+                <input type="text" id="new_slug_frontend" name="new_slug" placeholder="Auto-generated from title">
+            </p>
+            <p>
+                <label for="new_shortcode">Shortcode</label>
+                <input type="text" id="new_shortcode" name="new_shortcode" required>
+            </p>
+            <p><input type="submit" name="dp_add_page_frontend" value="Add Page"></p>
+        </form>
+        <script>
+            document.getElementById("new_title_frontend").addEventListener("input", function() {
+                var title = this.value.toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
+                document.getElementById("new_slug_frontend").value = title;
+            });
+        </script>
+    </div>';
+
+    return $output;
+}
+add_shortcode('dp_manage_pages', 'dp_manage_pages_shortcode');
+
+// Run on plugin activation
+function dp_activate() {
+    dp_create_page_template();
+    dp_create_content_template();
+    dp_initialize_pages();
+    $pages = get_option('dp_page_data', []);
+    foreach ($pages as $page) {
+        dp_create_single_page($page);
+    }
+    flush_rewrite_rules();
+    error_log('Dashboard Pages: Plugin activated');
+}
+register_activation_hook(__FILE__, 'dp_activate');
+
+// Clean up on deactivation
+function dp_deactivate() {
+    $template_path = get_template_directory() . '/dashboard-template.php';
+    $content_template_path = get_template_directory() . '/content-dashboard.php';
+    if (file_exists($template_path)) {
+        unlink($template_path);
+    }
+    if (file_exists($content_template_path)) {
+        unlink($content_template_path);
+    }
+    flush_rewrite_rules();
+    error_log('Dashboard Pages: Plugin deactivated');
+}
+register_deactivation_hook(__FILE__, 'dp_deactivate');
