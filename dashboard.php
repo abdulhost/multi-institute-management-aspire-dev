@@ -65,9 +65,9 @@ function aspire_institute_dashboard_shortcode() {
             <?php
             $active_section = $section;
             $active_action = $action;
-            echo render_admin_header($current_user);
+            // echo render_admin_header($current_user);
             
-            error_log("After render_admin_header with Educational Center: " . print_r($educational_center, true));
+            // error_log("After render_admin_header with Educational Center: " . print_r($educational_center, true));
 
             if (!is_center_subscribed($educational_center_id)) {
                 echo render_subscription_expired_message($educational_center_id);
@@ -111,7 +111,7 @@ function render_institute_dashboard($current_user, $educational_center) {
     $admin_id = $current_user->user_login;
     $educational_center = get_educational_center_by_admin_id($admin_id);
 
-    error_log('Educational Center Data for Render: ' . print_r($educational_center, true));
+    // error_log('Educational Center Data for Render: ' . print_r($educational_center, true));
 
     if (!is_object($educational_center) || !isset($educational_center->educational_center_id)) {
         error_log('Invalid Educational Center Data passed to render_institute_dashboard. Expected stdClass, received: ' . gettype($educational_center));
@@ -135,7 +135,7 @@ function render_institute_dashboard($current_user, $educational_center) {
             'address' => $new_address
         );
 
-        error_log("Update Data: " . print_r($update_data, true));
+        // error_log("Update Data: " . print_r($update_data, true));
 
         if (isset($_FILES['institute_logo']) && $_FILES['institute_logo']['error'] === UPLOAD_ERR_OK) {
             require_once(ABSPATH . 'wp-admin/includes/file.php');
