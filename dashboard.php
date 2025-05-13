@@ -65,7 +65,7 @@ function aspire_institute_dashboard_shortcode() {
             <?php
             $active_section = $section;
             $active_action = $action;
-            // echo render_admin_header($current_user);
+            echo render_admin_header($current_user);
             
             // error_log("After render_admin_header with Educational Center: " . print_r($educational_center, true));
 

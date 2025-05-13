@@ -440,7 +440,6 @@ function my_education_erp_seed_templates() {
     }
     $institute_admins_table = $wpdb->prefix . 'institute_admins';
 
-    // Seed Institute Admins if table is empty
     if ($wpdb->get_var("SELECT COUNT(*) FROM $institute_admins_table") == 0) {
         $default_admins = [
             [
