@@ -473,17 +473,12 @@ function my_education_erp_seed_templates() {
              $user_id = wp_create_user($admin['institute_admin_id'], $admin['password'], $admin['email']);
 
              if (!is_wp_error($user_id)) {
-                 // Set user role
                  $user = new WP_User($user_id);
                  $user->set_role($admin['role']);
-
-                 // Update display name
                  wp_update_user([
                      'ID' => $user_id,
                      'display_name' => $admin['name']
                  ]);
-
-                 // Insert into institute_admins table
                  $wpdb->insert($institute_admins_table, [
                      'institute_admin_id' => $admin['institute_admin_id'],
                      'education_center_id' => $admin['education_center_id'],
@@ -501,8 +496,6 @@ function my_education_erp_seed_templates() {
         }
     }
 }
-// / Only run on activation, not on every include
-// Remove direct calls outside functions
 my_education_erp_create_db();
 // my_education_erp_seed_templates();
 add_action('init', 'my_education_erp_seed_templates');
