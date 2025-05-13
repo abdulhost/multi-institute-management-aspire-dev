@@ -448,7 +448,7 @@ function my_education_erp_seed_templates() {
                 'education_center_id' => 'EC001',
                 'name' => 'John Doe',
                 'email' => 'john.doe@sunriseacademy.org',
-                'password' => 'admin123', // Handled by wp_insert_user
+                'password' => 'admin123',
                 'role' => 'institute_admin'
             ],
             [
@@ -472,7 +472,6 @@ function my_education_erp_seed_templates() {
         foreach ($default_admins as $admin) {
              $user_id = wp_create_user($admin['institute_admin_id'], $admin['password'], $admin['email']);
 
-             // Check if user creation was successful
              if (!is_wp_error($user_id)) {
                  // Set user role
                  $user = new WP_User($user_id);
