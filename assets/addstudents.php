@@ -1,6 +1,3 @@
-
-
-<!-- addstudents file -->
 <!-- Add Student Button -->
 <button id="add-student-btn" onclick="toggleForm()">+ Add Student</button>
 <?php
@@ -8,29 +5,15 @@ global $wpdb;
     $table_name = $wpdb->prefix . 'class_sections';
     $charset_collate = $wpdb->get_charset_collate();
 
-    // Check if the table exists before creating it
-    // if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
-    //     $sql = "CREATE TABLE $table_name (
-    //         id mediumint(9) NOT NULL AUTO_INCREMENT,
-    //         class_name varchar(255) NOT NULL,
-    //         sections text NOT NULL,
-    //         PRIMARY KEY (id)
-    //     ) $charset_collate;";
-
-    //     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    //     dbDelta($sql);
-    // }
-
-
 // Fetch all classes and sections
-$educational_center_id = get_educational_center_data();
+// $educational_center_id = get_educational_center_data();
 if (empty($educational_center_id)) {
     wp_redirect(home_url('/login')); // Redirect to login page
     exit();
 }
-if (is_string($educational_center_id) && strpos($educational_center_id, '<p>') === 0) {
-    return $educational_center_id;
-}
+// if (is_string($educational_center_id) && strpos($educational_center_id, '<p>') === 0) {
+//     return $educational_center_id;
+// }
 // Fetch all classes and sections
 $class_sections = $wpdb->get_results(
     $wpdb->prepare("SELECT * FROM $table_name WHERE education_center_id = %s", $educational_center_id),
@@ -51,8 +34,8 @@ $class_sections = $wpdb->get_results(
             </div>
             <div class="section-content" id="basic-details">
                 <!-- Class Dropdown -->
-                <label for="class_name">Class:</label>
-                <select name="class_name" id="class_nameadd" required>
+                <label for="class">Class:</label>
+                <select name="class" id="class_nameadd" required>
                     <option value="">Select Class</option>
                     <?php foreach ($class_sections as $row) : ?>
                         <option value="<?php echo esc_attr($row['class_name']); ?>"><?php echo esc_html($row['class_name']); ?></option>
@@ -67,85 +50,81 @@ $class_sections = $wpdb->get_results(
                 <br>
                 <!-- Student Details -->
                 <label for="admission_number">Admission Number</label>
-                <input type="text" name="admission_number" required>
+                <input type="text" name="admission_number" maxlength="50">
                 <br>
                 <label for="student_name">Student Full Name</label>
-                <input type="text" name="student_name" required>
+                <input type="text" name="student_name" maxlength="255" required>
                 <br>
                 <label for="student_email">Student Email</label>
-                <input type="email" name="student_email">
+                <input type="email" name="student_email" maxlength="100">
                 <br>
                 <label for="phone_number">Phone Number</label>
-                <input type="text" name="phone_number">
+                <input type="text" name="phone_number" maxlength="50">
                 <br>
                 <!-- Hidden field for educational center ID -->
                 <input type="hidden" name="educational_center_id" value="<?php echo esc_attr($educational_center_id); ?>">
                 <label for="student_id">Student ID (Auto-generated)</label>
-                <input type="text" name="student_id" value="<?php echo 'STU-' . uniqid(); ?>" readonly>
+                <input type="text" name="student_id" value="<?php echo 'STU-' . uniqid(); ?>" maxlength="255" readonly>
                 <br>
                 <!-- Roll Number -->
                 <label for="roll_number">Roll Number:</label>
-                <input type="number" name="roll_number" id="roll_number" required>
+                <input type="text" name="roll_number" id="roll_number" maxlength="50">
                 <br>
                 <!-- Admission Date -->
                 <label for="admission_date">Admission Date:</label>
-                <input type="date" name="admission_date" id="admission_date" required>
+                <input type="date" name="admission_date" id="admission_date">
             </div>
         </div>
 
-        <!-- Medical Details Section -->
-        <div class="form-section">
-            <div class="section-header" onclick="toggleSection('medical-details')">
-                <h4>Medical Details</h4>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="section-content" id="medical-details" style="display: none;">
-                <?php
-                $gender_field = get_field_object('field_67ab1ab5978fc');
-                if ($gender_field) : ?>
+         <!-- Medical Details Section -->
+         <div class="form-section">
+                <div class="section-header" onclick="toggleSection('medical-details')">
+                    <h4>Medical Details</h4>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content" id="medical-details" style="display: none;">
                     <label for="gender">Gender:</label>
                     <select name="gender" id="gender">
                         <option value="">Select Gender</option>
-                        <?php foreach ($gender_field['choices'] as $value => $label) : ?>
-                            <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
-                        <?php endforeach; ?>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
                     </select>
-                <?php endif; ?>
-
-                <?php
-                $religion_field = get_field_object('field_67ab1b6d978fe');
-                if ($religion_field) : ?>
+                    <br>
                     <label for="religion">Religion:</label>
                     <select name="religion" id="religion">
                         <option value="">Select Religion</option>
-                        <?php foreach ($religion_field['choices'] as $value => $label) : ?>
-                            <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
-                        <?php endforeach; ?>
+                        <option value="Hindu">Hindu</option>
+                        <option value="Muslim">Muslim</option>
+                        <option value="Christian">Christian</option>
+                        <option value="Sikh">Sikh</option>
+                        <option value="Other">Other</option>
                     </select>
-                <?php endif; ?>
-                <br>
-                <?php
-                $blood_group_field = get_field_object('field_67ab1c0197900');
-                if ($blood_group_field) : ?>
+                    <br>
                     <label for="blood_group">Blood Group:</label>
                     <select name="blood_group" id="blood_group">
                         <option value="">Select Blood Group</option>
-                        <?php foreach ($blood_group_field['choices'] as $value => $label) : ?>
-                            <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
-                        <?php endforeach; ?>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
                     </select>
-                <?php endif; ?>
-                <br>
-                <label for="date_of_birth">Date of Birth</label>
-                <input type="date" name="date_of_birth">
-                <br>
-                <label for="height">Height (in cm):</label>
-                <input type="number" name="height" id="height" required>
-                <br>
-                <label for="weight">Weight (in kg):</label>
-                <input type="number" name="weight" id="weight" required>
+                    <br>
+                    <label for="date_of_birth">Date of Birth</label>
+                    <input type="date" name="date_of_birth">
+                    <br>
+                    <label for="height">Height (in cm):</label>
+                    <input type="number" name="height" step="0.1">
+                    <br>
+                    <label for="weight">Weight (in kg):</label>
+                    <input type="number" name="weight" step="0.1">
+                </div>
             </div>
-        </div>
+
 
         <!-- Address Details Section -->
         <div class="form-section">
@@ -155,9 +134,9 @@ $class_sections = $wpdb->get_results(
             </div>
             <div class="section-content" id="address-details" style="display: none;">
                 <label for="current_address">Current Address:</label>
-                <textarea name="current_address" id="current_address" rows="4" required></textarea>
+                <textarea name="current_address" id="current_address" rows="4"></textarea>
                 <label for="permanent_address">Permanent Address:</label>
-                <textarea name="permanent_address" id="permanent_address" rows="4" required></textarea>
+                <textarea name="permanent_address" id="permanent_address" rows="4"></textarea>
             </div>
         </div>
 
@@ -169,7 +148,7 @@ $class_sections = $wpdb->get_results(
             </div>
             <div class="section-content" id="profile-photo" style="display: none;">
                 <label for="student_profile_photo">Student Profile Photo</label>
-                <input type="file" name="student_profile_photo">
+                <input type="file" name="student_profile_photo" accept="image/jpeg,image/png,image/gif">
             </div>
         </div>
 
@@ -179,9 +158,15 @@ $class_sections = $wpdb->get_results(
 </div>
 
 <!-- JavaScript to dynamically populate sections based on selected class -->
-
-
 <script>
+// function toggleForm() {
+//     var form = document.getElementById('add-student-form');
+//     if (form.style.display === 'none') {
+//         form.style.display = 'block';
+//     } else {
+//         form.style.display = 'none';
+//     }
+// }
 jQuery(document).ready(function($) {
     var sectionsData = {};
     <?php
@@ -232,5 +217,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
 </script>

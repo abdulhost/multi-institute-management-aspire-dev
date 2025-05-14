@@ -2,7 +2,7 @@
 /*
 Plugin Name: Multiple Institute Management System
 Description: A plugin to manage multiple educational institutes.
-Version: 1.0
+Version: 2.0
 Author: Aspire Dev
 */
 
@@ -70,180 +70,6 @@ function generate_random_meta_fields($post_id) {
 add_action('save_post', 'generate_random_meta_fields');
 
 
-
-//form login 
-// Custom Login Authentication
-// Custom Login Authentication with Error Message Display
-// function custom_login_processing() {
-//     // Initialize error message variable
-//     $error_message = '';
-
-//     // Check if the form has been submitted
-//     if (isset($_POST['submit_login'])) {
-//         // Get the user input (admin_id and password)
-//         $admin_id = sanitize_text_field($_POST['admin_id']);
-//         $password = sanitize_text_field($_POST['password']);
-
-//         // Check if the admin ID starts with 'admin' (for Institute Admin)
-//         if (strpos($admin_id, 'admin') === 0) {  // If the admin ID starts with 'admin'
-//             // Attempt to find the user by admin ID (login)
-//             $user = get_user_by('login', $admin_id);
-            
-//             // If user exists and password matches
-//             if ($user && wp_check_password($password, $user->user_pass, $user->ID)) {
-//                 // Set authentication cookie
-//                 wp_set_auth_cookie($user->ID);
-                
-//                 // Redirect to the Institute Admin dashboard if the user is an Institute Admin
-//                 if (in_array('institute_admin', (array) $user->roles)) {
-//                     wp_redirect(home_url('/institute-dashboard/'));  // Redirect to Institute Admin Dashboard
-//                     exit;
-//                 }
-//             } else {
-//                 // Invalid login credentials for Institute Admin
-//                 $error_message = 'Invalid ID or Password. Please try again.';
-//             }
-//         } else {
-//             // If the admin_id doesn't start with 'admin_' (for Institute Admin)
-//             $error_message = 'Incorrect ID Password. Please try again.';
-//         }
-//     }
-
-//     // Pass error message to the page to display below the form
-//     if (!empty($error_message)) {
-//         echo "<script type='text/javascript'>
-//                 document.addEventListener('DOMContentLoaded', function() {
-//                     var errorMessageElement = document.getElementById('login-error-message');
-//                     if (errorMessageElement) {
-//                         errorMessageElement.innerHTML = '$error_message';
-//                         errorMessageElement.style.display = 'block';
-//                     }
-//                 });
-//               </script>";
-//     }
-// }
-// function custom_login_processing($user_type_configs = []) {
-//     // Default configurations for user types
-//     $default_configs = [
-//         'institute_admin' => [
-//             'prefix' => 'admin',
-//             'role' => 'institute_admin',
-//             'redirect' => '/institute-dashboard/',
-//         ],
-//         'teacher' => [
-//             'prefix' => 'TEA-',
-//             'role' => 'teacher',
-//             'redirect' => '/teacher-dashboard/',
-//             'validate_edu_center' => true, // Teachers require educational_center_id validation
-//         ],
-//         'student' => [
-//             'prefix' => 'STU-',
-//             'role' => 'student',
-//             'redirect' => '/student-dashboard/',
-//             'validate_edu_center' => true, // Teachers require educational_center_id validation
-//         ],
-//     ];
-
-//     // Ensure $user_type_configs is an array
-//     if (!is_array($user_type_configs)) {
-//         $user_type_configs = [];
-//     }
-
-//     $configs = array_merge($default_configs, $user_type_configs);
-//     $error_message = '';
-
-//     if (isset($_POST['submit_login'])) {
-//         $user_id = sanitize_text_field($_POST['user_id']);
-//         $password = sanitize_text_field($_POST['password']);
-//         $educational_center_id = isset($_POST['educational_center_id']) ? sanitize_text_field($_POST['educational_center_id']) : '';
-
-//         // Determine user type based on prefix
-//         $matched_type = null;
-//         foreach ($configs as $type => $config) {
-//             if (strpos($user_id, $config['prefix']) === 0) {
-//                 $matched_type = $type;
-//                 break;
-//             }
-//         }
-
-//         if ($matched_type) {
-//             $config = $configs[$matched_type];
-
-//             // For teachers, educational_center_id is required
-//             if ($config['validate_edu_center'] && empty($educational_center_id)) {
-//                 $error_message = 'Educational Center ID is required for teachers.';
-//             } else {
-//                 $user = get_user_by('login', $user_id);
-
-//                 if ($user && wp_check_password($password, $user->user_pass, $user->ID)) {
-//                     if (in_array($config['role'], (array) $user->roles)) {
-//                         // Validate educational_center_id for teachers
-//                         if ($config['validate_edu_center']) {
-//                             $stored_edu_center_id = get_user_meta($user->ID, 'educational_center_id', true);
-//                             error_log("Teacher Login Attempt: User ID $user_id, Input Edu Center ID $educational_center_id, Stored Edu Center ID $stored_edu_center_id");
-
-//                             if (!$stored_edu_center_id) {
-//                                 $error_message = 'No Educational Center ID associated with this account.';
-//                             } elseif ($stored_edu_center_id !== $educational_center_id) {
-//                                 $error_message = 'Invalid Educational Center ID.';
-//                             } 
-//                             else {
-//                                 // Additional validation against teacher post
-//                                 $args = array(
-//                                     'post_type' => 'teacher',
-//                                     'post_status' => 'publish',
-//                                     'meta_query' => array(
-//                                         'relation' => 'AND',
-//                                         array(
-//                                             'key' => 'teacher_id',
-//                                             'value' => $user_id,
-//                                             'compare' => '=',
-//                                         ),
-//                                         array(
-//                                             'key' => 'educational_center_id',
-//                                             'value' => $stored_edu_center_id,
-//                                             'compare' => '=',
-//                                         ),
-//                                     ),
-//                                 );
-                                
-//                                 $teacher_query = new WP_Query($args);
-
-//                                 if (!$teacher_query->have_posts()) {
-//                                     $error_message = 'Teacher ID and Educational Center ID do not match any records.';
-//                                 }
-//                             }
-//                         }
-
-//                         if (empty($error_message)) {
-//                             wp_set_auth_cookie($user->ID);
-//                             wp_redirect(home_url($config['redirect']));
-//                             exit;
-//                         }
-//                     } else {
-//                         $error_message = 'User does not have the required role.';
-//                     }
-//                 } else {
-//                     $error_message = 'Invalid ID or Password.';
-//                 }
-//             }
-//         } else {
-//             $error_message = 'Incorrect ID format. Use a valid Admin or Teacher ID.';
-//         }
-//     }
-
-//     if (!empty($error_message)) {
-//         echo "<script type='text/javascript'>
-//                 document.addEventListener('DOMContentLoaded', function() {
-//                     var errorMessageElement = document.getElementById('login-error-message');
-//                     if (errorMessageElement) {
-//                         errorMessageElement.innerHTML = '$error_message';
-//                         errorMessageElement.style.display = 'block';
-//                     }
-//                 });
-//               </script>";
-//     }
-// }
 function custom_login_processing($user_type_configs = []) {
     // Default configurations for user types
     $default_configs = [
@@ -454,28 +280,28 @@ add_action('template_redirect', function() {
 });
 
 
-function restrict_dashboard_access() {
-    if (is_page('institute-dashboard') || is_page('edit-class-section')|| is_page('delete-class-section')|| is_page('attendance-management')|| is_page('attendance-entry-form')) {
+// function restrict_dashboard_access() {
+//     if (is_page('institute-dashboard') || is_page('edit-class-section')|| is_page('delete-class-section')|| is_page('attendance-management')|| is_page('attendance-entry-form')) {
         
-        // Check if the user is logged in
-        if (!is_user_logged_in()) {
-            // wp_redirect(home_url('/login'));  // Redirect to login page
-            // exit;
-            return false;
-        }
+//         // Check if the user is logged in
+//         if (!is_user_logged_in()) {
+//             // wp_redirect(home_url('/login'));  // Redirect to login page
+//             // exit;
+//             return false;
+//         }
 
-        // Get the current logged-in user
-        $user = wp_get_current_user();
+//         // Get the current logged-in user
+//         $user = wp_get_current_user();
 
-        // Check if the user has the 'institute_admin' or 'Administrator' role
-        if (!in_array('institute_admin', (array) $user->roles) && !in_array('administrator', (array) $user->roles)) {
-            wp_redirect(home_url('/'));  // Redirect to homepage or any other page
-            exit;
-        }
-    }
-}
+//         // Check if the user has the 'institute_admin' or 'Administrator' role
+//         if (!in_array('institute_admin', (array) $user->roles) && !in_array('administrator', (array) $user->roles)) {
+//             wp_redirect(home_url('/'));  // Redirect to homepage or any other page
+//             exit;
+//         }
+//     }
+// }
 
-add_action('template_redirect', 'restrict_dashboard_access');
+// add_action('template_redirect', 'restrict_dashboard_access');
 
 
 require_once plugin_dir_path(__FILE__) . 'dashboard.php';
@@ -683,47 +509,6 @@ function get_current_teacher_id() {
 
     return false; // Return false if no matching role
 }
-
-// Utility: Generate unique IDs (assumed unchanged from previous examples)
-// function generate_unique_id($wpdb, $table_name, $prefix, $education_center_id) {
-//     $max_attempts = 5;
-//     for ($attempt = 1; $attempt <= $max_attempts; $attempt++) {
-//         $time_part = substr(str_replace('.', '', microtime(true)), -10);
-//         $random_part = strtoupper(substr(bin2hex(random_bytes(1)), 0, 2));
-//         $id = $prefix . $time_part . $random_part;
-
-//         $exists = $wpdb->get_var($wpdb->prepare(
-//             "SELECT COUNT(*) FROM $table_name WHERE " . ($prefix === 'BOOK-' ? 'book_id' : 'item_id') . " = %s AND education_center_id = %s",
-//             $id, $education_center_id
-//         ));
-
-//         if ($exists == 0) {
-//             return $id;
-//         }
-//         usleep(10000);
-//     }
-//     return new WP_Error('id_generation_failed', 'Unable to generate a unique ID.');
-// }
-// Utility: Generate unique IDs (unchanged)
-// function generate_unique_id($wpdb, $table_name, $prefix, $education_center_id) {
-//     $max_attempts = 5;
-//     for ($attempt = 1; $attempt <= $max_attempts; $attempt++) {
-//         $time_part = substr(str_replace('.', '', microtime(true)), -10);
-//         $random_part = strtoupper(substr(bin2hex(random_bytes(1)), 0, 2));
-//         $id = $prefix . $time_part . $random_part;
-
-//         $exists = $wpdb->get_var($wpdb->prepare(
-//             "SELECT COUNT(*) FROM $table_name WHERE " . ($prefix === 'ITEM-' ? 'item_id' : 'book_id') . " = %s AND education_center_id = %s",
-//             $id, $education_center_id
-//         ));
-
-//         if ($exists == 0) {
-//             return $id;
-//         }
-//         usleep(10000);
-//     }
-//     return new WP_Error('id_generation_failed', 'Unable to generate a ID.');
-// }
 
 
 function generate_unique_id($wpdb, $type, $entity_name, $prefix, $field_name, $context = [], $max_attempts = 5) {
@@ -998,87 +783,11 @@ function handle_add_student_submission() {
             if ($attachment_id) {
                 update_field('field_67ab1bd7978ff', $attachment_id, $student_post_id); // ACF field key for teacher_profile_photo
             }
- // Register the teacher as a WordPress user
-//  if (!username_exists($student_id) && $teacher_email && $educational_center_id && $teacher_name) {
-//     $password = $teacher_phone_number ?: wp_generate_password(12, true);
-//     $name_parts = explode(' ', trim($teacher_name));
-//     $first_name = $name_parts[0];
-//     $last_name = isset($name_parts[1]) ? implode(' ', array_slice($name_parts, 1)) : '';
 
-//     $user_id = wp_create_user($student_id, $password, $teacher_email);
-
-//     if (!is_wp_error($user_id)) {
-//         wp_update_user(array(
-//             'ID' => $user_id,
-//             'first_name' => $first_name,
-//             'last_name' => $last_name,
-//             'display_name' => $teacher_name,
-//         ));
-
-//         $user = new WP_User($user_id);
-//         $user->set_role('teacher');
-
-//         // Store educational_center_id in user meta and log it
-//         $edu_center_stored = update_user_meta($user_id, 'educational_center_id', $educational_center_id);
-//         error_log("Teacher Registration: User ID $user_id, Teacher ID $teacher_id, Edu Center ID $educational_center_id, Stored: " . ($edu_center_stored ? 'Yes' : 'No'));
-
-//         update_user_meta($user_id, 'teacher_name', $teacher_name);
-//         update_post_meta($teacher_post_id, '_user_created', true);
-//            $home_url = home_url(); // Corrected function name
-
-//             // Optionally, send a welcome email with credentials
-//             $message = "Welcome, $teacher_name!\n\nYour username: $teacher_id\nYour password: $password\n\nLogin at: $home_url/login/";
-//              wp_mail($teacher_email, 'Your Teacher Account Credentials', $message);
-//             wp_redirect(home_url('/institute-dashboard/teachers'));
-//         } else {
-//             echo '<p class="error-message">Error creating user: ' . $user_id->get_error_message() . '</p>';
-//         }
-//     } elseif (username_exists($teacher_id)) {
-//         echo '<p class="error-message">A user with this teacher ID already exists.</p>';
-//     }
-// }
    // Call the reusable registration function
    $role='student';
    register_user_with_role($student_id, $student_email, $student_name, $phone_number, $role, $educational_center_id);
-// Register the teacher as a WordPress user
-// if (!username_exists($student_id) && $student_email && $educational_center_id && $student_name) {
-//     $password = $phone_number ?: wp_generate_password(12, true);
-//     $name_parts = explode(' ', trim($student_name));
-//     $first_name = $name_parts[0];
-//     $last_name = isset($name_parts[1]) ? implode(' ', array_slice($name_parts, 1)) : '';
 
-//     $user_id = wp_create_user($student_id, $password, $student_email);
-
-//     if (!is_wp_error($user_id)) {
-//         wp_update_user(array(
-//             'ID' => $user_id,
-//             'first_name' => $first_name,
-//             'last_name' => $last_name,
-//             'display_name' => $student_name,
-//         ));
-
-//         $user = new WP_User($user_id);
-//         $user->set_role('student');
-
-//         // Store educational_center_id in user meta and log it
-//         $edu_center_stored = update_user_meta($user_id, 'educational_center_id', $educational_center_id);
-//         error_log("student Registration: User ID $user_id, student ID $student_id, Edu Center ID $educational_center_id, Stored: " . ($edu_center_stored ? 'Yes' : 'No'));
-
-//         update_user_meta($user_id, 'student_name', $student_name);
-//         update_post_meta($student_post_id, '_user_created', true);
-//            $home_url = home_url(); // Corrected function name
-
-//             // Optionally, send a welcome email with credentials
-//             $message = "Welcome, $student_name!\n\nYour username: $student_id\nYour password: $password\n\nLogin at: $home_url/login/";
-//              wp_mail($student_email, 'Your Teacher Account Credentials', $message);
-//             // wp_redirect(home_url('/institute-dashboard/teachers'));
-//         } else {
-//             echo '<p class="error-message">Error creating user: ' . $user_id->get_error_message() . '</p>';
-//         }
-//     } elseif (username_exists($teacher_id)) {
-//         echo '<p class="error-message">A user with this studentstudent ID already exists.</p>';
-//     }
-// }
         }   
     }
 
@@ -1195,7 +904,7 @@ function register_user_with_role($user_id, $email, $name, $phone_number, $role, 
 
             // Redirect after successful registration
             wp_redirect($_SERVER['REQUEST_URI']);
-                        exit;
+                        return;
         } else {
             echo '<p class="error-message">Error creating user: ' . $created_user_id->get_error_message() . '</p>';
         }
@@ -1203,7 +912,6 @@ function register_user_with_role($user_id, $email, $name, $phone_number, $role, 
         echo '<p class="error-message">A user with this ID already exists.</p>';
     }
 }
-
 
 
 function handle_add_teacher_submission() {
@@ -1471,54 +1179,6 @@ function render_acf_select($name, $field_key, $label) {
         </select>
     <?php endif;
 }
-
-// Extracted Delete Function for Fee Templates
-// function my_education_erp_delete_fee_template() {
-//     global $wpdb;
-//     $education_center_id = get_educational_center_data();
-    
-//     if (empty($education_center_id)) {
-//         return '<p>No Educational Center found.</p>';
-//     }
-
-//     if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['template_id'])) {
-//         $template_id = intval($_GET['template_id']);
-//         $deleted = $wpdb->delete($wpdb->prefix . 'fee_templates', ['id' => $template_id]);
-        
-//         if ($deleted === false) {
-//             error_log('Delete error: ' . $wpdb->last_error);
-//             return '<p>Error deleting template. Please try again.</p>';
-//         }
-        
-//         wp_redirect(home_url('/institute-dashboard/fees/?section=delete-fee-template'));
-//         exit;
-//     }
-// }
-
-
-// include plugin_dir_path(__FILE__) . 'assets/edit-classes.php';
-// include plugin_dir_path(__FILE__) . 'assets/delete-class.php';
-// include plugin_dir_path(__FILE__) . 'assets/attendance/attendance-management.php';
-// include plugin_dir_path(__FILE__) . 'assets/attendance/insert-attendance.php';
-// include plugin_dir_path(__FILE__) . 'assets/attendance/edit-attendance.php';
-// include plugin_dir_path(__FILE__) . 'assets/attendance/bulk-import.php';
-// include plugin_dir_path(__FILE__) . 'assets/attendance/export-attendance.php';
-// include plugin_dir_path(__FILE__) . 'assets/add-students.php';
-// include plugin_dir_path(__FILE__) . 'assets/students.php';
-// include plugin_dir_path(__FILE__) . 'assets/edit-students.php';
-// include plugin_dir_path(__FILE__) . 'assets/classes.php';
-// include plugin_dir_path(__FILE__) . 'interface.php';
-// include plugin_dir_path(__FILE__) . 'subjects_interface.php';
-// include plugin_dir_path(__FILE__) . 'assets/subjects/subjects-management.php';
-// include plugin_dir_path(__FILE__) . 'assets/subjects/add-subjects.php';
-// include plugin_dir_path(__FILE__) . 'assets/subjects/edit-delete-subjects.php';
-// include plugin_dir_path(__FILE__) . 'assets/subjects/delete-subjects.php';
-// include plugin_dir_path(__FILE__) . 'assets/teachers/teachers.php';
-// include plugin_dir_path(__FILE__) . 'assets/teachers/add-teachers.php';
-// include plugin_dir_path(__FILE__) . 'assets/teachers/update-teachers.php';
-// include plugin_dir_path(__FILE__) . 'assets/teachers/delete-teachers.php';
-
-
 
 // Function to include all files from a given directory
 function include_files_from_directory($directory) {
@@ -1873,157 +1533,22 @@ function render_change_password($current_user, $post_id = null) {
     <?php
     return ob_get_clean();
 }
+?>
+<script>
+function toggleSection(sectionId) {
+    var content = document.getElementById(sectionId);
+    var icon = content.previousElementSibling.querySelector('.toggle-icon');
+    content.style.display = content.style.display === 'none' ? 'block' : 'none';
+    icon.textContent = content.style.display === 'none' ? '▼' : '▲';
+}
+function toggleForm() {
+    var form = document.getElementById('add-student-form');
+    if (form.style.display === 'none') {
+        form.style.display = 'block';
+    } else {
+        form.style.display = 'none';
+    }
+}
 
+</script>
 
-
-// function restrict_edit_class_section_access() {
-//     if (is_page('edit-class-section')) {
-        
-//         // Check if the user is logged in
-//         if (!is_user_logged_in()) {
-//             wp_redirect(home_url('/login'));  // Redirect to login page
-//             exit;
-//         }
-
-//         // Get the current logged-in user
-//         $user = wp_get_current_user();
-
-//         // Check if the user has the 'institute_admin' or 'Administrator' role
-//         if (!in_array('institute_admin', (array) $user->roles) && !in_array('administrator', (array) $user->roles)) {
-//             wp_redirect(home_url('/'));  // Redirect to homepage or any other page
-//             exit;
-//         }
-//     }
-// }
-
-// add_action('template_redirect', 'restrict_edit_class_section_access');
-// Hook to initialize the plugin
-// add_action('init', 'custom_institute_dashboard_init');
-
-// function custom_institute_dashboard_init() {
-//     // Register custom roles
-//     add_role('institute_admin', 'Institute Admin', array(
-//         'read' => true,               // Basic permission to read
-//         'edit_posts' => false,        // Disable editing posts
-//         'edit_institute_data' => true // Custom capability to edit institute data
-//     ));
-
-//     // Add custom capabilities for 'institute_admin'
-//     $role = get_role('institute_admin');
-//     if ($role) {
-//         $role->add_cap('edit_institute_data');
-//     }
-// }
-
-// Register custom post types for Institutes (Now using 'educational-center' instead of 'institute')
-// add_action('init', 'custom_educational_center_post_type');
-// function custom_educational_center_post_type() {
-//     register_post_type('educational-center', array(
-//         'labels' => array(
-//             'name' => __('Educational Centers'),
-//             'singular_name' => __('Educational Center'),
-//         ),
-//         'public' => true,
-//         'supports' => array('title', 'editor', 'thumbnail'),
-//         'show_in_rest' => true,  // Enable REST API for editing
-//     ));
-// }
-
-// // Login and redirect user to their dashboard
-// add_action('wp_login', 'custom_redirect_on_login', 10, 2);
-// function custom_redirect_on_login($user_login, $user) {
-//     if (in_array('institute_admin', (array) $user->roles)) {
-//         // Redirect to custom dashboard for 'institute_admin'
-//         wp_redirect(home_url('/institute-dashboard/'));
-//         exit;
-//     }
-// }
-
-// // Restrict access to the dashboard based on the user's associated educational center
-// function restrict_dashboard_access() {
-//     if (is_page('institute-dashboard') && is_user_logged_in()) {
-//         $current_user = wp_get_current_user();
-//         $educational_center_id = get_user_meta($current_user->ID, 'educational_center_id', true);  // Custom field that holds the educational center ID
-
-//         if (empty($educational_center_id)) {
-//             // If no educational center is associated with the user, redirect them to the homepage or a login page
-//             wp_redirect(home_url());
-//             exit;
-//         }
-
-//         // Now query the educational center's custom post type and verify if they have access to that specific post
-//         $educational_center_post = get_posts(array(
-//             'post_type' => 'educational-center',
-//             'meta_key' => 'educational_center_id',  // Custom ACF field to link users to educational centers
-//             'meta_value' => $educational_center_id,
-//             'posts_per_page' => 1
-//         ));
-
-//         if (empty($educational_center_post)) {
-//             // If no matching educational center post is found, deny access
-//             wp_redirect(home_url());
-//             exit;
-//         }
-//     }
-// }
-// add_action('template_redirect', 'restrict_dashboard_access');
-
-// // Add a custom admin menu page for each educational center
-// add_action('admin_menu', 'custom_educational_center_dashboard_menu');
-// function custom_educational_center_dashboard_menu() {
-//     add_menu_page(
-//         'Educational Center Dashboard',  // Page Title
-//         'Educational Center Dashboard',  // Menu Title
-//         'edit_institute_data',           // Capability
-//         'educational-center-dashboard',  // Menu Slug
-//         'custom_educational_center_dashboard_page',  // Function to display page
-//         'dashicons-building',            // Icon
-//         6                                // Position
-//     );
-// }
-
-// function custom_educational_center_dashboard_page() {
-//     if (!is_user_logged_in()) {
-//         echo "You must be logged in to access this page.";
-//         return;
-//     }
-    
-//     $current_user = wp_get_current_user();
-//     $educational_center_id = get_user_meta($current_user->ID, 'educational_center_id', true);
-
-//     // Display the dashboard form for managing the educational center's data
-//     echo '<div class="wrap"><h1>Welcome to Your Educational Center Dashboard</h1>';
-
-//     // Fetch the educational center post based on user-assigned educational_center_id
-//     $educational_center = get_posts(array(
-//         'post_type' => 'educational-center',
-//         'meta_key' => 'educational_center_id',
-//         'meta_value' => $educational_center_id,
-//         'posts_per_page' => 1
-//     ));
-
-//     if ($educational_center) {
-//         $educational_center_post = $educational_center[0];
-//         $center_name = get_field('center_name', $educational_center_post->ID);
-//         $center_location = get_field('center_location', $educational_center_post->ID);
-
-//         // Show the form with current values
-//         echo '<form method="post" action="">';
-//         echo '<label for="center_name">Educational Center Name:</label>';
-//         echo '<input type="text" name="center_name" value="' . esc_attr($center_name) . '" />';
-//         echo '<label for="center_location">Educational Center Location:</label>';
-//         echo '<input type="text" name="center_location" value="' . esc_attr($center_location) . '" />';
-//         echo '<input type="submit" name="submit_educational_center_data" value="Save Changes" />';
-//         echo '</form>';
-
-//         // Handle form submission
-//         if (isset($_POST['submit_educational_center_data'])) {
-//             update_field('center_name', sanitize_text_field($_POST['center_name']), $educational_center_post->ID);
-//             update_field('center_location', sanitize_text_field($_POST['center_location']), $educational_center_post->ID);
-//             echo '<p>Educational Center data updated successfully!</p>';
-//         }
-//     } else {
-//         echo "<p>Educational Center not found.</p>";
-//     }
-//     echo '</div>';
-// }

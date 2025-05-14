@@ -1,5 +1,5 @@
 <?php
-function add_students_institute_dashboard_shortcode() {
+function add_students_institute_dashboard_shortcode($educational_center_id) {
     global $wpdb;
 
     $table_name = $wpdb->prefix . 'class_sections';

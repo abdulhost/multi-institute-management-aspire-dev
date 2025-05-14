@@ -309,7 +309,6 @@ $charset_collate = $wpdb->get_charset_collate();
 
 
 $institute_admins = $wpdb->prefix . 'institute_admins';
-
 $sql = "CREATE TABLE IF NOT EXISTS $institute_admins (
     id BIGINT(20) NOT NULL AUTO_INCREMENT,
     institute_admin_id VARCHAR(50) NOT NULL, /* Username, e.g., adminC24162EFC0AE */
@@ -320,9 +319,8 @@ $sql = "CREATE TABLE IF NOT EXISTS $institute_admins (
     UNIQUE KEY (institute_admin_id),
     INDEX edu_center_idx (education_center_id)
 ) $charset_collate;";
+ dbDelta($sql);
 
-require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-dbDelta($sql);
 
 $table_name = $wpdb->prefix . 'student_attendance';
 $charset_collate = $wpdb->get_charset_collate();
@@ -353,9 +351,53 @@ $sql = "CREATE TABLE IF NOT EXISTS $table_name (
     PRIMARY KEY (subject_id)
 ) $charset_collate;"; // Removed the extra comma here
 
+//
+// Create educational_center table
+$educational_center_table = $wpdb->prefix . 'educational_center';
+$sql = "CREATE TABLE IF NOT EXISTS $educational_center_table (
+    educational_center_id VARCHAR(255) NOT NULL,
+    institute_logo TEXT DEFAULT NULL,
+    edu_center_name VARCHAR(255) NOT NULL,
+    mobile_number VARCHAR(50) DEFAULT NULL,
+    email_id VARCHAR(100) DEFAULT NULL,
+    address TEXT DEFAULT NULL,
+    PRIMARY KEY (educational_center_id),
+    INDEX (edu_center_name)
+) $charset_collate;";
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 dbDelta($sql);
 
+$students_table = $wpdb->prefix . 'aspire_students';
+// Create students table
+$sql = "CREATE TABLE IF NOT EXISTS $students_table (
+    student_id VARCHAR(255) NOT NULL,
+    student_name VARCHAR(255) NOT NULL,
+    educational_center_id VARCHAR(255) NOT NULL,
+    student_email VARCHAR(100) DEFAULT NULL,
+    admission_number VARCHAR(50) DEFAULT NULL,
+    phone_number VARCHAR(50) DEFAULT NULL,
+    gender VARCHAR(20) DEFAULT NULL,
+    date_of_birth DATE DEFAULT NULL,
+    religion VARCHAR(50) DEFAULT NULL,
+    student_profile_photo TEXT DEFAULT NULL,
+    blood_group VARCHAR(10) DEFAULT NULL,
+    height FLOAT DEFAULT NULL,
+    weight FLOAT DEFAULT NULL,
+    current_address TEXT DEFAULT NULL,
+    permanent_address TEXT DEFAULT NULL,
+    roll_number VARCHAR(50) DEFAULT NULL,
+    admission_date DATE DEFAULT NULL,
+    class MEDIUMINT(9) DEFAULT NULL,
+    section VARCHAR(50) DEFAULT NULL,
+    PRIMARY KEY (student_id),
+    UNIQUE KEY (admission_number),
+    INDEX (educational_center_id),
+    INDEX (student_email),
+    INDEX (class)
+) $charset_collate;";
+
+require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+dbDelta($sql);
 }
 
 function my_education_erp_seed_templates() {
@@ -397,8 +439,174 @@ function my_education_erp_seed_templates() {
         $wpdb->insert($exam_results_table, ['exam_id' => 1, 'subject_id' => 1, 'student_id' => 1, 'marks' => 85.50, 'education_center_id' => 1]);
         $wpdb->insert($exam_results_table, ['exam_id' => 1, 'subject_id' => 2, 'student_id' => 1, 'marks' => 78.00, 'education_center_id' => 1]);
     }
+    $educational_center_table = $wpdb->prefix . 'educational_center';
+
+    // Seed Educational Centers
+    if ($wpdb->get_var("SELECT COUNT(*) FROM $educational_center_table") == 0) {
+        $wpdb->insert($educational_center_table, [
+            'educational_center_id' => 'EC001',
+            'institute_logo' => '/wp-content/uploads/logos/sunrise.png',
+            'edu_center_name' => 'Sunrise Learning Academy',
+            'mobile_number' => '+1-555-123-4567',
+            'email_id' => 'contact@sunriseacademy.org',
+            'address' => '123 Main Street, Springfield, IL 62701, USA'
+        ]);
+        $wpdb->insert($educational_center_table, [
+            'educational_center_id' => 'EC002',
+            'institute_logo' => '/wp-content/uploads/logos/horizon.png',
+            'edu_center_name' => 'Horizon Education Center',
+            'mobile_number' => '+1-555-987-6543',
+            'email_id' => 'info@horizonedu.org',
+            'address' => '456 Oak Avenue, Boulder, CO 80301, USA'
+        ]);
+        $wpdb->insert($educational_center_table, [
+            'educational_center_id' => 'EC003',
+            'institute_logo' => null,
+            'edu_center_name' => 'Bright Future Institute',
+            'mobile_number' => '+1-555-456-7890',
+            'email_id' => 'admin@brightfuture.org',
+            'address' => '789 Pine Road, Austin, TX 73301, USA'
+        ]);
+    }
+    $institute_admins_table = $wpdb->prefix . 'institute_admins';
+
+    if ($wpdb->get_var("SELECT COUNT(*) FROM $institute_admins_table") == 0) {
+        $default_admins = [
+            [
+                'institute_admin_id' => 'adminC24162EFC0AE',
+                'education_center_id' => 'EC001',
+                'name' => 'John Doe',
+                'email' => 'john.doe@sunriseacademy.org',
+                'password' => 'admin123',
+                'role' => 'institute_admin'
+            ],
+            [
+                'institute_admin_id' => 'adminD39281AFB5CD',
+                'education_center_id' => 'EC002',
+                'name' => 'Jane Smith',
+                'email' => 'jane.smith@horizonedu.org',
+                'password' => 'securepass456',
+                'role' => 'institute_admin'
+            ],
+            [
+                'institute_admin_id' => 'adminE57192CDE6BF',
+                'education_center_id' => 'EC003',
+                'name' => 'Alice Brown',
+                'email' => 'alice.brown@brightfuture.org',
+                'password' => 'password789',
+                'role' => 'institute_admin'
+            ]
+        ];
+
+        foreach ($default_admins as $admin) {
+             $user_id = wp_create_user($admin['institute_admin_id'], $admin['password'], $admin['email']);
+
+             if (!is_wp_error($user_id)) {
+                 $user = new WP_User($user_id);
+                 $user->set_role($admin['role']);
+                 wp_update_user([
+                     'ID' => $user_id,
+                     'display_name' => $admin['name']
+                 ]);
+                 $wpdb->insert($institute_admins_table, [
+                     'institute_admin_id' => $admin['institute_admin_id'],
+                     'education_center_id' => $admin['education_center_id'],
+                     'name' => $admin['name'],
+                     'email' => $admin['email']
+                   
+                 ]);
+
+                 if ($wpdb->last_error) {
+                     error_log('Failed to insert institute admin ' . $admin['institute_admin_id'] . ': ' . $wpdb->last_error);
+                 }
+             } else {
+                 error_log('Failed to create user for ' . $admin['institute_admin_id'] . ': ' . $user_id->get_error_message());
+             }
+        }
+    }
+      // Seed Students if table is empty
+      $students_table = $wpdb->prefix . 'aspire_students';
+      if ($wpdb->get_var("SELECT COUNT(*) FROM $students_table") == 0) {
+        $default_students = [
+            [
+                'student_id' => 'STU-001',
+                'student_name' => 'Amit Sharma',
+                'educational_center_id' => 'EC001',
+                'student_email' => 'amit.sharma@example.com',
+                'admission_number' => 'ADM001',
+                'phone_number' => '+91-9876543210',
+                'gender' => 'Male',
+                'date_of_birth' => '2008-05-15',
+                'religion' => 'Hindu',
+                'student_profile_photo' => '/wp-content/uploads/students/amit.jpg',
+                'blood_group' => 'A+',
+                'height' => 165.5,
+                'weight' => 55.0,
+                'current_address' => '123 Elm Street, Springfield, IL 62701',
+                'permanent_address' => '456 Pine Road, Springfield, IL 62701',
+                'roll_number' => '101',
+                'admission_date' => '2023-04-01',
+                'class' => 1, // Class 1 (id from wp_class_sections)
+                'section' => 'a'
+            ],
+            [
+                'student_id' => 'STU-002',
+                'student_name' => 'Priya Patel',
+                'educational_center_id' => 'EC002',
+                'student_email' => 'priya.patel@example.com',
+                'admission_number' => 'ADM002',
+                'phone_number' => '+91-8765432109',
+                'gender' => 'Female',
+                'date_of_birth' => '2009-03-22',
+                'religion' => 'Hindu',
+                'student_profile_photo' => null,
+                'blood_group' => 'B+',
+                'height' => 158.0,
+                'weight' => 50.0,
+                'current_address' => '789 Oak Avenue, Boulder, CO 80301',
+                'permanent_address' => '789 Oak Avenue, Boulder, CO 80301',
+                'roll_number' => '102',
+                'admission_date' => '2023-04-02',
+                'class' => 2, // Class 2
+                'section' => 'x'
+            ],
+            [
+                'student_id' => 'STU-003',
+                'student_name' => 'Rahul Khan',
+                'educational_center_id' => 'EC003',
+                'student_email' => 'rahul.khan@example.com',
+                'admission_number' => 'ADM003',
+                'phone_number' => '+91-7654321098',
+                'gender' => 'Male',
+                'date_of_birth' => '2007-11-10',
+                'religion' => 'Muslim',
+                'student_profile_photo' => '/wp-content/uploads/students/rahul.jpg',
+                'blood_group' => 'O-',
+                'height' => 170.0,
+                'weight' => 60.0,
+                'current_address' => '321 Maple Drive, Austin, TX 73301',
+                'permanent_address' => '321 Maple Drive, Austin, TX 73301',
+                'roll_number' => '103',
+                'admission_date' => '2023-04-03',
+                'class' => 1, // Class 1
+                'section' => 'b'
+            ]
+        ];
+
+        foreach ($default_students as $student) {
+            
+            // Insert student record
+            $wpdb->insert($students_table, $student);
+              // Call the reusable registration function
+            $role='student';
+            register_user_with_role($student['student_id'], $student['student_email'], $student['student_name'], $student['phone_number'], $role, $student['educational_center_id']);
+
+            if ($wpdb->last_error) {
+                error_log('Failed to insert student ' . $student['student_id'] . ': ' . $wpdb->last_error);
+            }
+        }
+        }
 }
-// / Only run on activation, not on every include
-// Remove direct calls outside functions
 my_education_erp_create_db();
-my_education_erp_seed_templates();
+// my_education_erp_seed_templates();
+add_action('init', 'my_education_erp_seed_templates');

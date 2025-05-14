@@ -1,6 +1,6 @@
 <?php
 // student-list.php
-function edit_students_institute_dashboard_shortcode() {
+function edit_students_institute_dashboard_shortcode($educational_center_id) {
 
 // Fetch the current user and their admin_id
 $current_user = wp_get_current_user();

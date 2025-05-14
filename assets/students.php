@@ -1,35 +1,31 @@
 <?php
 // students.php
-function students_institute_dashboard_shortcode() {
-
-// Function to render the Students section
-// function render_students_section_content() {
-    // Fetch the current user and their admin_id
-    $current_user = wp_get_current_user();
-    $admin_id = $current_user->user_login;
+function students_institute_dashboard_shortcode($educational_center) {
+    error_log("Default students aspire dashboard " .print_r($educational_center, true));
+    // $current_user = wp_get_current_user();
+    // $admin_id = $current_user->user_login;
 
     // Query the Educational Center based on the admin_id
-    $educational_center = get_posts(array(
-        'post_type' => 'educational-center',
-        'meta_key' => 'admin_id',
-        'meta_value' => $admin_id,
-        'posts_per_page' => 1, // Limit to 1 post
-    ));
+    // $educational_center = get_posts(array(
+    //     'post_type' => 'educational-center',
+    //     'meta_key' => 'admin_id',
+    //     'meta_value' => $admin_id,
+    //     'posts_per_page' => 1, // Limit to 1 post
+    // ));
 
     // Check if there is an Educational Center for this admin
     if (empty($educational_center)) {
         wp_redirect(home_url('/login')); // Redirect to login page
         exit();
     }
+    $educational_center_id = $educational_center->educational_center_id;
 
-    $educational_center_id = get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
+    // $educational_center_id = get_post_meta($educational_center[0]->ID, 'educational_center_id', true);
     if (empty($educational_center_id)) {
         wp_redirect(home_url('/login')); // Redirect to login page
         exit();
     }
-    // Handle form submission to add student
-   // Include WordPress media handling functions
-require_once(ABSPATH . 'wp-admin/includes/image.php');
+    require_once(ABSPATH . 'wp-admin/includes/image.php');
 
 
 
@@ -51,18 +47,18 @@ require_once(ABSPATH . 'wp-admin/includes/image.php');
         <!-- <div class="institute-dashboard-wrapper"> -->
             <?php
 
-echo render_admin_header(wp_get_current_user());
-if (!is_center_subscribed($educational_center_id)) {
-    return render_subscription_expired_message($educational_center_id);
-}
-        $active_section = 'students';
-        include(plugin_dir_path(__FILE__) . 'sidebar.php');
+// echo render_admin_header(wp_get_current_user());
+// if (!is_center_subscribed($educational_center_id)) {
+//     return render_subscription_expired_message($educational_center_id);
+// }
+//         $active_section = 'students';
+//         include(plugin_dir_path(__FILE__) . 'sidebar.php');
             ?>
         <!-- </div> -->
         <div class="form-container attendance-entry-wrapper attendance-content-wrapper">
 
     <?php
-    include plugin_dir_path(__FILE__) . 'helper.php'; 
+    // include plugin_dir_path(__FILE__) . 'helper.php'; 
     include plugin_dir_path(__FILE__) . 'addstudents.php'; 
     ?>
 
@@ -75,14 +71,6 @@ if (!is_center_subscribed($educational_center_id)) {
 
 <!-- JavaScript to toggle the form visibility and handle AJAX search -->
 <script>
-function toggleForm() {
-    var form = document.getElementById('add-student-form');
-    if (form.style.display === 'none') {
-        form.style.display = 'block';
-    } else {
-        form.style.display = 'none';
-    }
-}
 
 document.addEventListener('DOMContentLoaded', function() {
     // Get the modal
@@ -149,5 +137,5 @@ $(document).ready(function(){
     // End output buffering and return the content
     return ob_get_clean();
 }
-add_shortcode('students_institute_dashboard', 'students_institute_dashboard_shortcode');
+// add_shortcode('students_institute_dashboard', 'students_institute_dashboard_shortcode');
 ?>
