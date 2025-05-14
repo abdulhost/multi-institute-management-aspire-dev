@@ -1,87 +1,65 @@
 <?php
-// Reusable function to get educational center by admin ID
-function get_educational_center_by_admin_id($admin_id) {
-    global $wpdb;
-    
-    $edu_center_table = $wpdb->prefix . 'educational_center';
-    $institute_admins_table = $wpdb->prefix . 'institute_admins';
-    
-    $query = $wpdb->prepare(
-        "SELECT ec.* 
-         FROM $edu_center_table ec
-         INNER JOIN $institute_admins_table ia 
-         ON ec.educational_center_id = ia.education_center_id
-         WHERE ia.institute_admin_id = %s",
-        $admin_id
-    );
-    
-    $educational_center = $wpdb->get_row($query, OBJECT);
-    
-    error_log("get_educational_center_by_admin_id Query: $query");
-    if ($educational_center) {
-        error_log("Educational Center Found: " . print_r($educational_center, true));
-    } else {
-        error_log("No Educational Center found for admin_id: $admin_id");
-    }
-    
-    return $educational_center;
-}
+// Shortcode to display educational center dashboard with conditional sidebar and reusable expired message
 
-function aspire_institute_dashboard_shortcode() {
-    global $wpdb;
-    
-    if (!function_exists('wp_get_current_user')) {
-        error_log("wp_get_current_user function not found");
-        return '<div class="alert alert-danger">System error: User functions unavailable.</div>';
+// Shortcode to display educational center dashboard with conditional sidebar and AJAX-driven expired message
+function institute_dashboard_shortcode() {
+    if (!is_user_logged_in()) {
+        return '<div class="login-prompt"><p>Please log in to access your dashboard.</p><a href="' . wp_login_url() . '" class="payment-button">Login</a></div>';
     }
+
+    ob_start();
 
     $current_user = wp_get_current_user();
     $admin_id = $current_user->user_login;
 
-    if (!$current_user->ID) {
-        error_log("No user logged in");
-        return '<div class="alert alert-danger">Please log in to access the dashboard.</div>';
+    $args = array(
+        'post_type' => 'educational-center',
+        'meta_query' => array(
+            array(
+                'key' => 'admin_id',
+                'value' => $admin_id,
+                'compare' => '='
+            )
+        )
+    );
+
+    $educational_center = new WP_Query($args);
+
+    if (!$educational_center->have_posts()) {
+        // return '<p>No Educational Center found for this Admin ID.</p>';
+        wp_redirect(home_url('/login')); // Redirect to login page
+        exit();
     }
 
-    $educational_center = get_educational_center_by_admin_id($admin_id);
+    $educational_center->the_post();
+    $post_id = get_the_ID();
+    $logo = get_field('institute_logo', $post_id);
+    $title = get_the_title($post_id);
+    $educational_center_id = get_post_meta($post_id, 'educational_center_id', true);
 
-    error_log("Educational Center after get_educational_center_by_admin_id: " . print_r($educational_center, true));
+    // Check subscription status
+    $is_subscribed = is_center_subscribed($educational_center_id);
 
-    if (!$educational_center || !is_object($educational_center) || !isset($educational_center->educational_center_id)) {
-        error_log("Invalid or no educational center data for admin_id: $admin_id");
-        return '<div class="alert alert-warning">Educational Center not found for this user. Please contact administration.</div>';
-    }
-
-    $educational_center_id = $educational_center->educational_center_id;
-    $section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'overview';
-    $action = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : '';
-
-    error_log("Before render_admin_header with Educational Center: " . print_r($educational_center, true));
-
-    ob_start();
     ?>
-    <div class="container-fluid" style="background: linear-gradient(135deg, #f0f8ff, #e6e6fa); min-height: 100vh; margin-top:60px">
-        <div class="row">
-            <?php
-            $active_section = $section;
-            $active_action = $action;
-            echo render_admin_header($current_user);
-            
-            // error_log("After render_admin_header with Educational Center: " . print_r($educational_center, true));
+    <div class="attendance-main-wrapper" style="display: <?php echo $is_subscribed ? 'flex' : 'block'; ?>;">
+        <?php
+        // Always show header
+        echo render_admin_header(wp_get_current_user());
 
-            if (!is_center_subscribed($educational_center_id)) {
+        // Show sidebar only if subscribed
+        if ($is_subscribed) {
+            include(plugin_dir_path(__FILE__) . 'assets/sidebar.php');
+        }
+        ?>
+        <div class="form-container attendance-entry-wrapper attendance-content-wrapper">
+            <?php
+            $active_section = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : 'dashboard';
+            $action = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : '';
+
+            if (!$is_subscribed && $active_section !== 'subscription') {
                 echo render_subscription_expired_message($educational_center_id);
             } else {
-                include plugin_dir_path(__FILE__) . 'assets/sidebar.php';
-            ?>
-            <div class="main-content">
-                <?php
-                switch ($section) {
-                    case 'overview':
-                        error_log("Calling render_institute_dashboard with Educational Center: " . print_r($educational_center, true));
-                        echo render_institute_dashboard($current_user, $educational_center);
-                        break;
-                    
+                switch ($active_section) {
                     case 'subscription':
                         if ($action === 'renew-subscription') {
                             echo render_subscription_renewal_form($educational_center_id);
@@ -91,151 +69,93 @@ function aspire_institute_dashboard_shortcode() {
                             echo render_institute_subscription_management($educational_center_id);
                         }
                         break;
-                    
                     default:
-                        error_log("Default case triggered, rendering dashboard with Educational Center: " . print_r($educational_center, true));
-                        echo render_institute_dashboard($current_user, $educational_center);
+                        ob_start();
+                        ?>
+                        <div class="institute-dashboard-container">
+                            <div class="institute-logo-container">
+                                <?php if ($logo): ?>
+                                    <div class="institute-logo" style="position: relative;">
+                                        <img id="institute-logo-image" src="<?php echo esc_url($logo['url']); ?>" alt="Institute Logo" style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover;">
+                                        <span class="edit-logo-icon" onclick="document.getElementById('logo-file-input').click();">📷</span>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="upload-logo-placeholder" onclick="document.getElementById('logo-file-input').click();">
+                                        <span class="upload-logo-icon">📷</span>
+                                        <span class="upload-logo-text">Upload Logo</span>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <h2 style="text-transform:capitalize"><?php echo esc_html($title); ?></h2>
+
+                            <form method="POST" enctype="multipart/form-data">
+                                <label for="institute_name">Institute Name</label>
+                                <input type="text" name="institute_name" value="<?php echo esc_html($title); ?>" required />
+                                <br>
+                                <label for="mobile_number">Mobile Number</label>
+                                <input type="text" name="mobile_number" value="<?php echo get_field('mobile_number', $post_id); ?>" required />
+                                <br>
+                                <label for="email_id">Email ID</label>
+                                <input type="email" name="email_id" value="<?php echo get_field('email_id', $post_id); ?>" required />
+                                <br>
+                                <input type="file" name="institute_logo" accept="image/*" id="logo-file-input" style="display: none;" onchange="previewLogo(event)" />
+                                <input type="submit" name="update_center" value="Update Center" />
+                            </form>
+
+                            <?php
+                            if (isset($_POST['update_center'])) {
+                                $new_institute_name = sanitize_text_field($_POST['institute_name']);
+                                $post_data = array(
+                                    'ID' => $post_id,
+                                    'post_title' => $new_institute_name,
+                                );
+                                wp_update_post($post_data);
+
+                                update_field('mobile_number', sanitize_text_field($_POST['mobile_number']), $post_id);
+                                update_field('email_id', sanitize_email($_POST['email_id']), $post_id);
+
+                                if (isset($_FILES['institute_logo']) && $_FILES['institute_logo']['error'] === UPLOAD_ERR_OK) {
+                                    if ($_FILES['institute_logo']['size'] > 1048576) {
+                                        echo '<p class="error-message">Logo size must be less than 1 MB.</p>';
+                                    } else {
+                                        $file = $_FILES['institute_logo'];
+                                        $upload_dir = wp_upload_dir();
+                                        $target_file = $upload_dir['path'] . '/' . basename($file['name']);
+
+                                        if (move_uploaded_file($file['tmp_name'], $target_file)) {
+                                            $file_type = wp_check_filetype($target_file);
+                                            $attachment = array(
+                                                'guid' => $upload_dir['url'] . '/' . basename($file['name']),
+                                                'post_mime_type' => $file_type['type'],
+                                                'post_title' => sanitize_file_name($file['name']),
+                                                'post_content' => '',
+                                                'post_status' => 'inherit'
+                                            );
+
+                                            $attach_id = wp_insert_attachment($attachment, $target_file, $post_id);
+                                            require_once(ABSPATH . 'wp-admin/includes/image.php');
+                                            $attach_data = wp_generate_attachment_metadata($attach_id, $target_file);
+                                            wp_update_attachment_metadata($attach_id, $attach_data);
+
+                                            update_field('institute_logo', $attach_id, $post_id);
+
+                                            echo "<script>document.getElementById('institute-logo-image').src = '" . wp_get_attachment_url($attach_id) . "';</script>";
+                                        }
+                                    }
+                                }
+                                header("Refresh:0");
+                                echo '<p class="success-message">Educational Center updated successfully.</p>';
+                            }
+                            ?>
+                        </div>
+                        <?php
+                        echo ob_get_clean();
                         break;
                 }
-                ?>
-            </div>
-            <?php } ?>
-        </div>
-    </div>
-    <?php
-    return ob_get_clean();
-}
-
-function render_institute_dashboard($current_user, $educational_center) {
-    global $wpdb;
-    $admin_id = $current_user->user_login;
-    $educational_center = get_educational_center_by_admin_id($admin_id);
-
-    // error_log('Educational Center Data for Render: ' . print_r($educational_center, true));
-
-    if (!is_object($educational_center) || !isset($educational_center->educational_center_id)) {
-        error_log('Invalid Educational Center Data passed to render_institute_dashboard. Expected stdClass, received: ' . gettype($educational_center));
-        return '<div class="alert alert-danger">Invalid Educational Center data. Please ensure your user is correctly associated with an educational center (ID: ' . esc_html($current_user->user_login) . ').</div>';
-    }
-
-    $table_name = $wpdb->prefix . 'educational_center';
-    $educational_center_id = $educational_center->educational_center_id;
-
-    // Handle form submission
-    if (isset($_POST['update_center'])) {
-        $new_institute_name = sanitize_text_field($_POST['institute_name'] ?? '');
-        $new_mobile_number = sanitize_text_field($_POST['mobile_number'] ?? '');
-        $new_email_id = sanitize_email($_POST['email_id'] ?? '');
-        $new_address = sanitize_text_field($_POST['address'] ?? '');
-        
-        $update_data = array(
-            'edu_center_name' => $new_institute_name,
-            'mobile_number' => $new_mobile_number,
-            'email_id' => $new_email_id,
-            'address' => $new_address
-        );
-
-        // error_log("Update Data: " . print_r($update_data, true));
-
-        if (isset($_FILES['institute_logo']) && $_FILES['institute_logo']['error'] === UPLOAD_ERR_OK) {
-            require_once(ABSPATH . 'wp-admin/includes/file.php');
-            require_once(ABSPATH . 'wp-admin/includes/image.php');
-            require_once(ABSPATH . 'wp-admin/includes/media.php');
-
-            $file = $_FILES['institute_logo'];
-            if ($file['size'] > 1048576) {
-                $error_message = '<p class="error-message">Logo size must be less than 1 MB.</p>';
-                error_log("Logo size exceeds 1 MB");
-            } else {
-                $upload = wp_handle_upload($file, array('test_form' => false));
-                if (isset($upload['error'])) {
-                    $error_message = '<p class="error-message">Failed to upload logo: ' . esc_html($upload['error']) . '</p>';
-                    error_log("Upload error: " . $upload['error']);
-                } else {
-                    // Register in Media Library
-                    $attachment = array(
-                        'guid' => $upload['url'],
-                        'post_mime_type' => $upload['type'],
-                        'post_title' => sanitize_file_name($file['name']),
-                        'post_content' => '',
-                        'post_status' => 'inherit'
-                    );
-                    $attachment_id = wp_insert_attachment($attachment, $upload['file']);
-                    if (!is_wp_error($attachment_id)) {
-                        wp_update_attachment_metadata($attachment_id, wp_generate_attachment_metadata($attachment_id, $upload['file']));
-                        // Save relative path
-                        $relative_path = str_replace(home_url(), '', $upload['url']);
-                        $update_data['institute_logo'] = $relative_path;
-                        error_log("Logo uploaded and registered: " . $relative_path);
-                    } else {
-                        $error_message = '<p class="error-message">Failed to register logo in Media Library.</p>';
-                        error_log("Attachment error: " . $attachment_id->get_error_message());
-                    }
-                }
             }
-        }
-
-        $result = $wpdb->update(
-            $table_name,
-            $update_data,
-            array('educational_center_id' => $educational_center_id),
-            array('%s', '%s', '%s', '%s', '%s'),
-            array('%s')
-        );
-
-        error_log("Update Result: " . ($result !== false ? "Rows affected: $result" : "Failed: " . $wpdb->last_error));
-
-        if ($result !== false && ($result > 0 || empty($_FILES['institute_logo']['size']))) {
-            echo '<script>window.location.href = "' . esc_url($_SERVER['REQUEST_URI']) . '";</script>';
-            exit;
-           
-        } else {
-            $error_message = '<p class="error-message">Failed to update Educational Center: ' . esc_html($wpdb->last_error) . '</p>';
-        }
-    }
-    ob_start();
-    ?>
-    <div class="institute-dashboard-container">
-        <?php
-        if (isset($error_message)) {
-            echo $error_message;
-        } elseif (isset($_GET['update_success'])) {
-            echo '<p class="success-message">Educational Center updated successfully.</p>';
-        }
-        ?>
-        <div class="institute-logo-container">
-            <?php if (!empty($educational_center->institute_logo)): ?>
-                <div class="institute-logo" style="position: relative;">
-                    <img id="institute-logo-image" src="<?php echo esc_url($educational_center->institute_logo); ?>" alt="Institute Logo" style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover;">
-                    <span class="edit-logo-icon" onclick="document.getElementById('logo-file-input').click();">📷</span>
-                </div>
-            <?php else: ?>
-                <div class="upload-logo-placeholder" onclick="document.getElementById('logo-file-input').click();">
-                    <span class="upload-logo-icon">📷</span>
-                    <span class="upload-logo-text">Upload Logo</span>
-                </div>
-            <?php endif; ?>
+            ?>
         </div>
-
-        <h2 style="text-transform:capitalize"><?php echo esc_html($educational_center->edu_center_name ?: 'Unnamed Center'); ?></h2>
-        <p><strong>Address:</strong> <?php echo esc_html($educational_center->address ?: 'No address provided'); ?></p>
-
-        <form method="POST" enctype="multipart/form-data">
-            <label for="institute_name">Institute Name</label>
-            <input type="text" name="institute_name" value="<?php echo esc_html($educational_center->edu_center_name ?: ''); ?>" required />
-            <br>
-            <label for="mobile_number">Mobile Number</label>
-            <input type="text" name="mobile_number" value="<?php echo esc_html($educational_center->mobile_number ?: ''); ?>" required />
-            <br>
-            <label for="email_id">Email ID</label>
-            <input type="email" name="email_id" value="<?php echo esc_html($educational_center->email_id ?: ''); ?>" required />
-            <br>
-            <label for="address">Address</label>
-            <input type="text" name="address" value="<?php echo esc_html($educational_center->address ?: ''); ?>" />
-            <br>
-            <input type="file" name="institute_logo" accept="image/*" id="logo-file-input" style="display: none;" onchange="previewLogo(event)" />
-            <input type="submit" name="update_center" value="Update Center" />
-        </form>
     </div>
 
     <script>
@@ -244,22 +164,18 @@ function render_institute_dashboard($current_user, $educational_center) {
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const img = document.getElementById('institute-logo-image');
-                if (img) {
-                    img.src = e.target.result;
-                }
+                document.getElementById('institute-logo-image').src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
     }
     </script>
     <?php
+    wp_enqueue_style('payment-methods-style', plugin_dir_url(__FILE__) . 'payment-methods.css');
     wp_enqueue_script('jquery');
     return ob_get_clean();
 }
-
-add_shortcode('aspire_institute_dashboard', 'aspire_institute_dashboard_shortcode');
-
+add_shortcode('institute_dashboard', 'institute_dashboard_shortcode');
 
 // Reusable Helper Function for Subscription Expired Message with AJAX
 function render_subscription_expired_message($center_id) {
@@ -374,25 +290,42 @@ function render_admin_header($admin_user) {
         $admin_user = wp_get_current_user();
     }
     $admin_id = $admin_user->user_login;
+    // $user = wp_get_current_user();
+    // $username = $user->user_login;
+    // Query the Educational Center based on the admin_id
+    $args = [
+        'post_type' => 'educational-center',
+        'meta_query' => [
+            ['key' => 'admin_id', 'value' => $admin_id, 'compare' => '=']
+        ],
+        'posts_per_page' => 1
+    ];
+    $educational_center = new WP_Query($args);
 
-    // Get the educational center using the reusable function
-    $educational_center = get_educational_center_by_admin_id($admin_id);
-
-    if (!$educational_center) {
+    if (!$educational_center->have_posts()) {
         return '<div class="alert alert-danger">No Educational Center found for this Admin ID.</div>';
+        die("No Educational Center found, redirecting...");
+        wp_redirect(home_url('/login')); // Redirect to login page
+        exit();
     }
 
+    $educational_center->the_post();
+    $post_id = get_the_ID();
+    // $institute_name = get_the_title($post_id);
+    // $logo_url = get_field('institute_logo', $post_id) ? esc_url(get_field('institute_logo', $post_id)['url']) : 'https://via.placeholder.com/150';
     $user_name = $admin_user->display_name;
     $user_email = $admin_user->user_email;
-    $avatar_url = $educational_center->institute_logo ? esc_url($educational_center->institute_logo) : 'https://via.placeholder.com/150';
+    $avatar_url = get_field('institute_logo', $post_id) ? esc_url(get_field('institute_logo', $post_id)['url']) : 'https://via.placeholder.com/150';
+
+    wp_reset_postdata();
 
     $dashboard_link = esc_url(home_url('/institute-dashboard'));
     $profile_link = esc_url(home_url('/institute-dashboard?section=profile'));
     $communication_link = esc_url(home_url('/institute-dashboard?section=communication'));
     $notifications_link = esc_url(home_url('/institute-dashboard?section=notifications'));
     $settings_link = esc_url(home_url('/institute-dashboard?section=settings'));
-    $logout_link = get_secure_logout_url_by_role();
-    $edu_center_id = $educational_center->educational_center_id;
+    $logout_link =  get_secure_logout_url_by_role();
+    $edu_center_id = $post_id;
     $seven_days_ago = date('Y-m-d H:i:s', strtotime('-7 days'));
 
     // Messages count and data
@@ -432,7 +365,7 @@ function render_admin_header($admin_user) {
         $edu_center_id, $seven_days_ago
     ));
 
-    $unread_notifications = $wpdb->get_results($wpdb->prepare(
+    $unread_announcements = $wpdb->get_results($wpdb->prepare(
         "SELECT sender_id, message, timestamp 
          FROM $announcements_table 
          WHERE education_center_id = %s 
@@ -449,9 +382,9 @@ function render_admin_header($admin_user) {
         <div class="header-container">
             <div class="header-left">
                 <a href="<?php echo $dashboard_link; ?>" class="header-logo">
-                    <img decoding="async" class="logo-image" src="<?php echo plugin_dir_url(__FILE__) . 'logo_instituto.jpg'; ?>">
-                    <span class="logo-text">Instituto</span>
-                </a>
+                <img decoding="async" class="logo-image" src="<?php echo plugin_dir_url(__FILE__) . 'logo instituto.jpg'; ?>">
+                <span class="logo-text">Instituto</span>
+             </a>
                 <div class="header-search">
                     <input type="text" placeholder="Search Admin Panel" class="search-input" id="header-search-input" aria-label="Search">
                     <div class="search-dropdown" id="search-results">
@@ -485,78 +418,79 @@ function render_admin_header($admin_user) {
                     </div>
 
                     <!-- Messages Dropdown -->
-                    <div class="header-messages">
-                        <a href="<?php echo $communication_link; ?>" class="action-btn" id="messages-toggle">
-                            <i class="fas fa-envelope fa-lg"></i>
-                            <span class="action-badge <?php echo $messages_count ? '' : 'd-none'; ?>" id="messages-count">
-                                <?php echo esc_html($messages_count ?: 0); ?>
-                            </span>
-                        </a>
-                        <div class="dropdown messages-dropdown" id="messages-dropdown">
-                            <div class="dropdown-header">
-                                <span>Messages (Last 7 Days)</span>
-                            </div>
-                            <ul class="dropdown-list">
-                                <?php if (!empty($unread_messages)): ?>
-                                    <?php foreach ($unread_messages as $msg): ?>
-                                        <?php
-                                        // Encode 'enigma_overlord' as 'Super Admin' for frontend display
-                                        $display_sender = ($msg->sender_id === 'enigma_overlord') ? 'Super Admin' : $msg->sender_id;
-                                        ?>
-                                        <li>
-                                            <span class="msg-content">
-                                                <span class="msg-sender"><?php echo esc_html($display_sender); ?></span>:
-                                                <span class="msg-preview"><?php echo esc_html(wp_trim_words($msg->message, 5, '...')); ?></span>
-                                            </span>
-                                            <span class="msg-time"><?php echo esc_html(date('M d, Y', strtotime($msg->timestamp))); ?></span>
-                                        </li>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <li><span class="msg-preview">No new messages</span></li>
-                                <?php endif; ?>
-                            </ul>
-                            <?php if (!empty($unread_messages)): ?>
-                                <a href="<?php echo $communication_link; ?>" class="dropdown-footer">View All Messages</a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+                    <!-- Messages Dropdown -->
+<div class="header-messages">
+    <a href="<?php echo $communication_link; ?>" class="action-btn" id="messages-toggle">
+        <i class="fas fa-envelope fa-lg"></i>
+        <span class="action-badge <?php echo $messages_count ? '' : 'd-none'; ?>" id="messages-count">
+            <?php echo esc_html($messages_count ?: 0); ?>
+        </span>
+    </a>
+    <div class="dropdown messages-dropdown" id="messages-dropdown">
+        <div class="dropdown-header">
+            <span>Messages (Last 7 Days)</span>
+        </div>
+        <ul class="dropdown-list">
+            <?php if (!empty($unread_messages)): ?>
+                <?php foreach ($unread_messages as $msg): ?>
+                    <?php
+                    // Encode 'enigma_overlord' as 'Super Admin' for frontend display
+                    $display_sender = ($msg->sender_id === 'enigma_overlord') ? 'Super Admin' : $msg->sender_id;
+                    ?>
+                    <li>
+                        <span class="msg-content">
+                            <span class="msg-sender"><?php echo esc_html($display_sender); ?></span>:
+                            <span class="msg-preview"><?php echo esc_html(wp_trim_words($msg->message, 5, '...')); ?></span>
+                        </span>
+                        <span class="msg-time"><?php echo esc_html(date('M d, Y', strtotime($msg->timestamp))); ?></span>
+                    </li>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <li><span class="msg-preview">No new messages</span></li>
+            <?php endif; ?>
+        </ul>
+        <?php if (!empty($unread_messages)): ?>
+            <a href="<?php echo $communication_link; ?>" class="dropdown-footer">View All Messages</a>
+        <?php endif; ?>
+    </div>
+</div>
 
-                    <!-- Notifications Dropdown -->
-                    <div class="header-notifications">
-                        <a href="<?php echo $notifications_link; ?>" class="action-btn" id="notifications-toggle">
-                            <i class="fas fa-bell fa-lg"></i>
-                            <span class="action-badge <?php echo $notifications_count ? '' : 'd-none'; ?>" id="notifications-count">
-                                <?php echo esc_html($notifications_count ?: 0); ?>
-                            </span>
-                        </a>
-                        <div class="dropdown notifications-dropdown" id="notifications-dropdown">
-                            <div class="dropdown-header">
-                                <span>Notifications (Last 7 Days)</span>
-                            </div>
-                            <ul class="dropdown-list">
-                                <?php if (!empty($unread_notifications)): ?>
-                                    <?php foreach ($unread_notifications as $ann): ?>
-                                        <?php
-                                        // Encode 'enigma_overlord' as 'Super Admin' for frontend display
-                                        $display_sender = ($ann->sender_id === 'enigma_overlord') ? 'Super Admin' : $ann->sender_id;
-                                        ?>
-                                        <li>
-                                            <span class="msg-content">
-                                                <span class="msg-sender"><?php echo esc_html($display_sender); ?></span>:
-                                                <span class="notif-text"><?php echo esc_html(wp_trim_words($ann->message, 5, '...')); ?></span>
-                                            </span>
-                                            <span class="notif-time"><?php echo esc_html(date('M d, Y', strtotime($ann->timestamp))); ?></span>
-                                        </li>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <li><span class="notif-text">No new notifications</span></li>
-                                <?php endif; ?>
-                            </ul>
-                            <?php if (!empty($unread_notifications)): ?>
-                                <a href="<?php echo $notifications_link; ?>" class="dropdown-footer">View All</a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+<!-- Notifications Dropdown -->
+<div class="header-notifications">
+    <a href="<?php echo $notifications_link; ?>" class="action-btn" id="notifications-toggle">
+        <i class="fas fa-bell fa-lg"></i>
+        <span class="action-badge <?php echo $notifications_count ? '' : 'd-none'; ?>" id="notifications-count">
+            <?php echo esc_html($notifications_count ?: 0); ?>
+        </span>
+    </a>
+    <div class="dropdown notifications-dropdown" id="notifications-dropdown">
+        <div class="dropdown-header">
+            <span>Notifications (Last 7 Days)</span>
+        </div>
+        <ul class="dropdown-list">
+            <?php if (!empty($unread_notifications)): ?>
+                <?php foreach ($unread_notifications as $ann): ?>
+                    <?php
+                    // Encode 'enigma_overlord' as 'Super Admin' for frontend display
+                    $display_sender = ($ann->sender_id === 'enigma_overlord') ? 'Super Admin' : $ann->sender_id;
+                    ?>
+                    <li>
+                        <span class="msg-content">
+                            <span class="msg-sender"><?php echo esc_html($display_sender); ?></span>:
+                            <span class="notif-text"><?php echo esc_html(wp_trim_words($ann->message, 5, '...')); ?></span>
+                        </span>
+                        <span class="notif-time"><?php echo esc_html(date('M d, Y', strtotime($ann->timestamp))); ?></span>
+                    </li>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <li><span class="notif-text">No new notifications</span></li>
+            <?php endif; ?>
+        </ul>
+        <?php if (!empty($unread_notifications)): ?>
+            <a href="<?php echo $notifications_link; ?>" class="dropdown-footer">View All</a>
+        <?php endif; ?>
+    </div>
+</div>
 
                     <!-- Settings -->
                     <div class="header-settings">
@@ -799,7 +733,6 @@ function render_admin_header($admin_user) {
     return ob_get_clean();
 }
 
-
 // AJAX Handlers for Admin
 add_action('wp_ajax_search_admin_sections', 'search_admin_sections_callback');
 function search_admin_sections_callback() {
@@ -827,6 +760,44 @@ function search_admin_sections_callback() {
     wp_die();
 }
 
+// add_action('wp_ajax_aspire_admin_mark_messages_read', 'aspire_admin_mark_messages_read');
+// function aspire_admin_mark_messages_read() {
+//     check_ajax_referer('aspire_admin_header_nonce', 'nonce');
+
+//     global $wpdb;
+//     $user = wp_get_current_user();
+//     $admin_id = $user->user_login;
+//     $edu_center_id = get_posts([
+//         'post_type' => 'educational-center',
+//         'meta_query' => [['key' => 'admin_id', 'value' => $admin_id, 'compare' => '=']],
+//         'posts_per_page' => 1
+//     ])[0]->ID;
+//     $seven_days_ago = date('Y-m-d H:i:s', strtotime('-7 days'));
+
+//     $messages_table = $wpdb->prefix . 'aspire_messages';
+//     $wpdb->query($wpdb->prepare(
+//         "UPDATE $messages_table 
+//          SET status = 'read' 
+//          WHERE education_center_id = %s 
+//          AND receiver_id = %s 
+//          AND status = 'sent' 
+//          AND timestamp > %s",
+//         $edu_center_id, $admin_id, $seven_days_ago
+//     ));
+
+//     $wpdb->query($wpdb->prepare(
+//         "UPDATE $messages_table 
+//          SET status = 'read' 
+//          WHERE education_center_id = %s 
+//          AND receiver_id IN ('all', 'admins') 
+//          AND status = 'sent' 
+//          AND sender_id != %s 
+//          AND timestamp > %s",
+//         $edu_center_id, $admin_id, $seven_days_ago
+//     ));
+
+//     wp_send_json_success();
+// }
 
 // Enqueue jQuery
 add_action('wp_enqueue_scripts', function() {
