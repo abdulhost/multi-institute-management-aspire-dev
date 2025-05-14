@@ -2,19 +2,6 @@
 <?php
     error_log("Default case triggered, editstuddents2 ");
 
-    // Fetch the current user and their admin_id
-    // $current_user = wp_get_current_user();
-    // $admin_id = $current_user->user_login;
-
-    // // Query the Educational Center based on the admin_id
-    // $educational_center = get_posts(array(
-    //     'post_type' => 'educational-center',
-    //     'meta_key' => 'admin_id',
-    //     'meta_value' => $admin_id,
-    //     'posts_per_page' => 1, // Limit to 1 post
-    // ));
-
-    // Check if there is an Educational Center for this admin
     if (empty($educational_center)) {
         // return '<p>No Educational Center found for this Admin ID.</p>';
         wp_redirect(home_url('/login')); // Redirect to login page
